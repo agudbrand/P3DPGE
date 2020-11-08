@@ -1,9 +1,57 @@
 #pragma once
-#include "Math.h"
 #include "olcPixelGameEngine.h"
+#include "Math.h"
+#include "Entities.h"
 
-struct Physics {
-public:
 
+namespace Physics {
+		//TODO: optimize by using arrays rather than vectors, 
+		static std::vector<PhysEntity*> hotEntities;
+		static std::vector<PhysEntity*> coldEntities;
+
+		static void Init() {
+			hotEntities = std::vector<PhysEntity*>();
+			coldEntities = std::vector<PhysEntity*>();
+		}
+
+		static void Update(float deltaTime) {
+			for (PhysEntity* ptr : hotEntities) {
+				if (ptr) {
+					ptr->Update(deltaTime);
+				} else {
+					break;
+				}
+			}
+			for (PhysEntity* ptr : coldEntities) {
+				if (ptr) {
+					ptr->Update(deltaTime);
+				} else {
+					break;
+				}
+			}
+		}
+
+		
+		static void Cleanup() {
+			for (PhysEntity*& ptr : hotEntities) {
+				delete ptr; ptr = nullptr;
+			}
+			hotEntities.clear();
+			for (PhysEntity*& ptr : coldEntities) {
+				delete ptr; ptr = nullptr;
+			}
+			coldEntities.clear();
+		}
+
+		//TODO: check if max amount of entities is in hot
+		static size_t AddEntity(PhysEntity* entity, bool bHot = false) {
+			if (bHot) {
+				hotEntities.push_back(entity);
+				return hotEntities.size();
+			} else {
+				coldEntities.push_back(entity);
+				return coldEntities.size();
+			}
+		}
 
 };

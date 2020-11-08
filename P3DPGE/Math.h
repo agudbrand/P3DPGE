@@ -51,15 +51,15 @@ class Vector3 {
 		bool operator	 == (const Vector3& rhs)    const { return (this->x == rhs.x && this->y == rhs.y && this->z == rhs.z); }
 		bool operator	 != (const Vector3& rhs)    const { return (this->x != rhs.x || this->y != rhs.y || this->z != rhs.z); }
 	
-		float		dot(const Vector3& rhs)   const { return this->x * rhs.x + this->y * rhs.y + this->z * rhs.z; }
-		Vector3		cross(const Vector3& rhs) const { return Vector3(this->y * rhs.z - rhs.z * this->z, this->x * rhs.z - rhs.x * this->z, this->x * rhs.y - rhs.x * this->y); }
-		float		mag() const { return std::sqrt(x * x + y * y + z * z); }
-		const std::string str() const { return std::string("(") + std::to_string(this->x) + "," + std::to_string(this->y) + ")"; }
-		Vector3 normalized() { return *this / this->mag(); }
-		Vector3 clampMag(float& rhs) { return this->normalized() * rhs; }
-		float distanceTo(Vector3& rhs) { return std::abs((*this - rhs).mag()); }
-		float projectOn(Vector3& rhs) { return this->dot(rhs.normalized()); }
-		Vector3 componentOn(Vector3& rhs) { return rhs.normalized() * this->dot(rhs.normalized()) ; }
+		float				dot(const Vector3& rhs)		const { return this->x * rhs.x + this->y * rhs.y + this->z * rhs.z; }
+		Vector3				cross(const Vector3& rhs)	const { return Vector3(this->y * rhs.z - rhs.z * this->z, this->x * rhs.z - rhs.x * this->z, this->x * rhs.y - rhs.x * this->y); }
+		float				mag()						const { return std::sqrt(x * x + y * y + z * z); }
+		const std::string	str()						const { return std::string("(") + std::to_string(this->x) + "," + std::to_string(this->y) + "," + std::to_string(this->z) + ")"; }
+		Vector3				normalized()				{ return *this / this->mag(); }
+		Vector3				clampMag(float& rhs)		{ return this->normalized() * rhs; }
+		float				distanceTo(Vector3& rhs)	{ return std::abs((*this - rhs).mag()); }
+		float				projectOn(Vector3& rhs)		{ return this->dot(rhs.normalized()); }
+		Vector3				componentOn(Vector3& rhs)	{ return rhs.normalized() * this->dot(rhs.normalized()) ; }
 		//TODO: perpendicular
 
 };

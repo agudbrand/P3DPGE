@@ -141,10 +141,12 @@
   <ItemGroup>
     <ClInclude Include="Entities.h" />
     <ClInclude Include="HandmadeMath.h" />
+    <ClInclude Include="Input.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="Moveables.h" />
     <ClInclude Include="olcPixelGameEngine.h" />
     <ClInclude Include="Physics.h" />
+    <ClInclude Include="Render.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Entities.cpp" />
