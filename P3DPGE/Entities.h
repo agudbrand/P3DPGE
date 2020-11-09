@@ -62,7 +62,7 @@ struct PhysEntity : public Entity{
 
 		void AddForce(PhysEntity* creator, Vector3 force, bool bIgnoreMass = false);
 		void GenerateRadialForce(Vector3 position, float radius, float strength, float falloff, bool bIgnoreMass);
-	
+		
 };
 
 struct Sphere : public PhysEntity {

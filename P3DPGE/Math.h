@@ -9,6 +9,7 @@
 #define M_E 2.71828f
 
 //vector constants
+#define V3NULL Vector3(std::numeric_limits<float>::min(), std::numeric_limits<float>::min(), std::numeric_limits<float>::min())
 #define V3ZERO	Vector3(0, 0, 0)
 #define V3ONE	Vector3(1, 1, 1)
 #define V3XU	Vector3(1, 0, 0)
@@ -55,7 +56,7 @@ class Vector3 {
 		Vector3				cross(const Vector3& rhs)	const { return Vector3(this->y * rhs.z - rhs.z * this->z, this->x * rhs.z - rhs.x * this->z, this->x * rhs.y - rhs.x * this->y); }
 		float				mag()						const { return std::sqrt(x * x + y * y + z * z); }
 		const std::string	str()						const { return std::string("(") + std::to_string(this->x) + "," + std::to_string(this->y) + "," + std::to_string(this->z) + ")"; }
-		Vector3				normalized()				{ return *this / this->mag(); }
+		Vector3				normalized()				{ return *this == V3ZERO ? V3ZERO : *this / this->mag(); }
 		Vector3				clampMag(float& rhs)		{ return this->normalized() * rhs; }
 		float				distanceTo(Vector3& rhs)	{ return std::abs((*this - rhs).mag()); }
 		float				projectOn(Vector3& rhs)		{ return this->dot(rhs.normalized()); }

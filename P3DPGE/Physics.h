@@ -9,6 +9,8 @@ namespace Physics {
 		static std::vector<PhysEntity*> hotEntities;
 		static std::vector<PhysEntity*> coldEntities;
 
+		static float airFriction = 5; //completely arbitrary number
+
 		static void Init() {
 			hotEntities = std::vector<PhysEntity*>();
 			coldEntities = std::vector<PhysEntity*>();
@@ -17,6 +19,7 @@ namespace Physics {
 		static void Update(float deltaTime) {
 			for (PhysEntity* ptr : hotEntities) {
 				if (ptr) {
+					ptr->AddForce(nullptr, -(ptr->velocity).normalized() * airFriction);
 					ptr->Update(deltaTime);
 				} else {
 					break;
@@ -24,6 +27,7 @@ namespace Physics {
 			}
 			for (PhysEntity* ptr : coldEntities) {
 				if (ptr) {
+					ptr->AddForce(nullptr, -(ptr->velocity).normalized() * airFriction);
 					ptr->Update(deltaTime);
 				} else {
 					break;

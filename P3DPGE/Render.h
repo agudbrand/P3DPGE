@@ -18,7 +18,6 @@ namespace Render {
 	}
 
 	static void Update(olc::PixelGameEngine* p) {
-		p->Clear(olc::BLACK);
 		//for (std::vector<Entity>* vecPtr : drawnEntities) {
 		//	for (auto &entity : *vecPtr) {
 		//		entity.Draw(p);

@@ -22,6 +22,8 @@ public:
 	}
 	
 	bool OnUserUpdate(float deltaTime) {
+		Clear(olc::BLACK);
+
 		//time
 		time += deltaTime;
 		
@@ -49,5 +51,5 @@ public:
 
 int main() {
 	P3DPGE game;
-	if (game.Construct(256, 240, 4, 4)) { game.Start(); }
+	if (game.Construct(800, 400, 2, 2)) { game.Start(); }
 }
