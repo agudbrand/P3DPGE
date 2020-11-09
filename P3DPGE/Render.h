@@ -4,36 +4,48 @@
 
 namespace Render {
 	//vector of pointers to vectors containing unique Enity pointers
-	static std::vector<std::vector<std::unique_ptr<Entity>>*> drawnEntities;
-
+	//static std::vector<std::vector<Entity>*> drawnEntities;
+	//
+	//static size_t AddEntityVector(std::vector<Entity>* entityVector) {
+	//	drawnEntities.push_back(entityVector);
+	//	return drawnEntities.size();
+	//}
+	//
 	static void Init() {
-		drawnEntities = std::vector<std::vector<std::unique_ptr<Entity>>*>();
+		//drawnEntities = std::vector<std::vector<Entity>*>();
+		//AddEntityVector(&Physics::hotEntities);
+		//AddEntityVector(&Physics::coldEntities);
 	}
 
 	static void Update(olc::PixelGameEngine* p) {
 		p->Clear(olc::BLACK);
-		for (std::vector<std::unique_ptr<Entity>>* vecPtr : drawnEntities) {
-			for (std::unique_ptr<Entity> const& entity : *vecPtr) {
-				if (entity) {
-					entity->Draw(p);
-				} else {
-					break;
-				}
+		//for (std::vector<Entity>* vecPtr : drawnEntities) {
+		//	for (auto &entity : *vecPtr) {
+		//		entity.Draw(p);
+		//	}
+		//}
+		for (Entity* ptr : Physics::hotEntities) {
+			if (ptr) {
+				ptr->Draw(p);
+			} else {
+				break;
+			}
+		}
+		for (Entity* ptr : Physics::coldEntities) {
+			if (ptr) {
+				ptr->Draw(p);
+			} else {
+				break;
 			}
 		}
 	}
 
 	static void Cleanup() {
-		for (auto vecPtr : drawnEntities) {
-			delete vecPtr;
-			vecPtr = nullptr;
-		}
-		drawnEntities.clear();
-	}
-
-	static size_t AddEntityUptrVector(std::vector<std::unique_ptr<Entity>>* entityPtrVector) {
-		drawnEntities.push_back(entityPtrVector);
-		return drawnEntities.size();
+		//for (auto vecPtr : drawnEntities) {
+		//	delete vecPtr;
+		//	vecPtr = nullptr;
+		//}
+		//drawnEntities.clear();
 	}
 
 };

@@ -4,8 +4,7 @@
 
 #define EntityArgs id, position, rotation, scale
 #define EntityParams Vector3 position = V3ZERO, Vector3 rotation = V3ZERO, Vector3 scale = V3ONE
-class Entity {
-	public:
+struct Entity {
 		//transform
 		Vector3 position;
 		Vector3 rotation;
@@ -41,8 +40,7 @@ class Entity {
 
 #define PhysEntityArgs velocity, acceleration, rotVelocity, rotAcceleration, mass, bStatic
 #define PhysEntityParams Vector3 velocity = V3ZERO, Vector3 acceleration = V3ZERO, Vector3 rotVelocity = V3ZERO, Vector3 rotAcceleration = V3ZERO, float mass = 1, bool bStatic = false
-class PhysEntity : public Entity{
-	public:
+struct PhysEntity : public Entity{
 		Vector3 velocity;
 		Vector3 acceleration;
 		Vector3 rotVelocity;
@@ -67,8 +65,7 @@ class PhysEntity : public Entity{
 	
 };
 
-class Sphere : public PhysEntity {
-	public:
+struct Sphere : public PhysEntity {
 		float radius;
 
 		Sphere() : PhysEntity(){}
@@ -80,8 +77,7 @@ class Sphere : public PhysEntity {
 		bool ContainsPoint(Vector3 point) override;
 };
 
-class Box : public PhysEntity {
-	public:
+struct Box : public PhysEntity {
 		Vector3 dimensions; //full dimensions
 
 		Box() : PhysEntity(){}

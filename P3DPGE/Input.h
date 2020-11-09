@@ -15,24 +15,12 @@ namespace Input {
 			deltaTimePtr = 0;
 		}
 
-		if (p->GetKey(olc::M).bPressed) {
-			std::cout << "Entities to draw: " << std::endl;
-			std::cout << "test" << Render::drawnEntities.size() << std::endl;
-			for (auto &entity : Render::drawnEntities) {
-				if (entity) {
-					printf("ID: %d, Pos: %s\n", entity->id, entity->position.str());
-				} else {
-					break;
-				}
-			}
-		}
-
 		//Q press = spawn sphere
 		if (p->GetKey(olc::Q).bPressed) {
 			Vector3 pos = Vector3(p->GetMouseX(), p->GetMouseY(), 0);
 			Sphere* sphere = new Sphere(10, -1, pos);
 			Physics::AddEntity(sphere, true);
-			Render::AddEntity(sphere);
+			//Render::AddEntity(sphere);
 			std::cout << "Creating Sphere at: " + pos.str() << std::endl;
 		}
 
@@ -41,7 +29,7 @@ namespace Input {
 			Vector3 pos = Vector3(p->GetMouseX(), p->GetMouseY(), 0);
 			Box* box = new Box(Vector3(10, 10, 0), -1, pos);
 			Physics::AddEntity(box, true);
-			Render::AddEntity(box);
+			//Render::AddEntity(box);
 			std::cout << "Creating Box at: " + pos.str() << std::endl;
 		}
 

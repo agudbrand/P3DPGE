@@ -44,7 +44,7 @@ bool Sphere::ContainsPoint(Vector3 point) {
 ////	Box		////
 
 void Box::Draw(olc::PixelGameEngine* p) {
-	p->FillRect(position.x - dimensions.x/2, position.y - dimensions.y/2, dimensions.x, dimensions.y);
+	p->FillRect(position.x - dimensions.x/2, position.y - dimensions.y/2, dimensions.x, dimensions.y, color);
 }
 
 bool Box::ContainsPoint(Vector3 point) {
