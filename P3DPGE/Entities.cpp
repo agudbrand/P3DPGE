@@ -10,6 +10,46 @@ void Entity::SetColor(olc::Pixel newColor) {
 	color = newColor;
 }
 
+void Entity::RotateX() {
+	for (auto& m : mesh.triangles) {
+		for (auto& n : m.points) {
+			n.rotateV3_X(rotation.x, position);
+		}
+	}
+}
+
+void Entity::RotateY() {
+	for (auto& m : mesh.triangles) {
+		for (auto& n : m.points) {
+			n.rotateV3_Y(rotation.y, position);
+		}
+	}
+}
+
+void Entity::RotateZ() {
+	for (auto& m : mesh.triangles) {
+		for (auto& n : m.points) {
+			n.rotateV3_Z(rotation.z, position);
+		}
+	}
+}
+
+void Entity::Translate(Vector3 translation) {
+	for (auto& m : mesh.triangles) {
+		for (auto& n : m.points) {
+			n.translateV3(translation);
+		}
+	}
+}
+
+void Entity::ProjectToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p) {
+	for (auto& m : mesh.triangles) {
+		for (auto& n : m.points) {
+			n.ProjToScreen(ProjMat, p, position);
+		}
+	}
+}
+
 //// Physics Entity ////
 
 void PhysEntity::Update(float deltaTime){
@@ -43,10 +83,6 @@ void Sphere::Draw(olc::PixelGameEngine* p) {
 	p->FillCircle(position.x, position.y, radius, color);
 }
 
-void Sphere::RotateX() {
-	//do when 3d spheres are implemented
-}
-
 bool Sphere::ContainsPoint(Vector3 point) {
 	return point.distanceTo(position) <= radius;
 }
@@ -55,13 +91,8 @@ bool Sphere::ContainsPoint(Vector3 point) {
 
 void Box::Draw(olc::PixelGameEngine* p) { mesh.Draw(p, color); }
 
-void Box::RotateX() {
-	for (auto& m : mesh.triangles) {
-		for (auto& n : m.points) {
-			n.rotateV3_X(rotation.x);
-		}
-	}
-}
+//TODO: only have these functions defined in parent class cause it doesn't need 3 different implementations
+
 
 //not sure if this still works or not, when I was trying to select boxes
 //it wouldn't do anything but i feel it should still work

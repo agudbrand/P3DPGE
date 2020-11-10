@@ -63,8 +63,17 @@ public:
 	virtual void Update(float deltaTime) = 0;
 	virtual bool ContainsPoint(Vector3 point) = 0;
 
-	//this is purely temporary for testing and will be changed later
-	virtual void RotateX() = 0;
+	//these functions are virtual but aren't implemented
+	//in any child yet as I see no use for differenciating
+	//between them yet
+	virtual void RotateX();
+	virtual void RotateY();
+	virtual void RotateZ();
+	//TODO: this function does not work well with rotating as if they are called
+	//on the same frame consistently it will begin oscillating around the axis
+	//that's being rotated over.
+	virtual void Translate(Vector3 translation);
+	virtual void ProjectToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p);
 
 	void SetTag(std::string newTag);
 	void SetColor(olc::Pixel newColor);
@@ -105,8 +114,6 @@ struct Sphere : public PhysEntity {
 	Sphere(float r, int id, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
 		this->radius = r;
 	}
-
-	void RotateX() override;
 	void Draw(olc::PixelGameEngine* p) override;
 	bool ContainsPoint(Vector3 point) override;
 };
@@ -149,11 +156,10 @@ struct Box : public PhysEntity {
 		mesh.triangles.push_back(Triangle(p3, p1, p2));
 		mesh.triangles.push_back(Triangle(p3, p2, p7));
 
-		std::cout << mesh.triangles.size() << std::endl;
+		//TODO: convert the vertices to be offsets of the center of the prism, IF that is really necessary
+		//or just add a center point and make sure its position is defined there
 	}
 	
-	void RotateX() override;
-
 	void Draw(olc::PixelGameEngine* p) override;
 	bool ContainsPoint(Vector3 point) override;
 };

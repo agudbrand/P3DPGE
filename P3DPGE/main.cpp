@@ -5,12 +5,15 @@
 #include "Render.h"
 using namespace olc;
 
-/* General TODOs and NOTES
+/* General TODOs and NOTEs board
 
 TODO: create system for handling multiple translations and rotations
 TODO: get translation and rotation to work with inputs
 TODO: define an object's local space so that we can rotate an object about its center
 TODO: find a reason to either keep or remove Render::Init()
+TODO: define a world origin in 3D space, how should we do this? For now its just 0, 0 in screen space.
+TODO: write a function that takes in an angle and interpolates to that angle over a set time
+TODO: write rotations to work with quaternions
 
 */
 

@@ -54,13 +54,13 @@ namespace Input {
 			leftClickPos = V3NULL;
 		}
 
-		//rotate over x
-		//TODO: make this work with selected entity 
+		//rotation over axes
+		//TODO: make these work with selected entity 
 		//I think the new set up for boxes
 		//doesn't work with the current Box::ContainsPoint()
-		if (p->GetKey(olc::K).bHeld) { 
+		if (p->GetKey(olc::K).bPressed) { 
 			for (auto& e : Render::entities) {
-				e->rotation.x = deltaTimePtr;
+				e->rotation.x = 0.15;
 				e->RotateX();
 			}
 		}
@@ -71,15 +71,55 @@ namespace Input {
 			}
 		}
 
-		if (p->GetKey(olc::I).bHeld) {
+		if (p->GetKey(olc::L).bPressed) {
 			for (auto& e : Render::entities) {
-				for (auto& m : e->mesh.triangles) {
-					for (auto& p : m.points) {
-						p.translateV3(Vector3(20, 1, 2));
-					}
-				}
+				e->rotation.z = 0.15;
+				e->RotateZ();
 			}
 		}
+
+		if (p->GetKey(olc::L).bReleased) {
+			for (auto& e : Render::entities) {
+				e->rotation.z = 0;
+			}
+		}
+
+		if (p->GetKey(olc::J).bPressed) {
+			for (auto& e : Render::entities) {
+				e->rotation.y = 0.15;
+				e->RotateY();
+			}
+		}
+
+		if (p->GetKey(olc::J).bReleased) {
+			for (auto& e : Render::entities) {
+				e->rotation.y = 0;
+			}
+		}
+
+		if (p->GetKey(olc::RIGHT).bHeld) {
+			for (auto& e : Render::entities) {
+				e->Translate(Vector3(70 * deltaTimePtr, 0, 0));
+			}
+		}
+		if (p->GetKey(olc::LEFT).bHeld) {
+			for (auto& e : Render::entities) {
+				e->Translate(Vector3(-70 * deltaTimePtr, 0, 0));
+			}
+		}
+		if (p->GetKey(olc::UP).bHeld) {
+			for (auto& e : Render::entities) {
+				e->Translate(Vector3(0, -70 * deltaTimePtr, 0));
+			}
+		}
+		if (p->GetKey(olc::DOWN).bHeld) {
+			for (auto& e : Render::entities) {
+				e->Translate(Vector3(0, 70 * deltaTimePtr, 0));
+			}
+		}
+
+
+		if (p->GetKey(olc::P).bPressed) { Render::projecting = !Render::projecting; }
 
 		//RMB press = select entity
 		if (p->GetMouse(1).bPressed) {
@@ -123,6 +163,9 @@ namespace Input {
 
 			p->DrawStringDecal(olc::vf2d(0, 0), text);
 		}
+
+		//point debugging
+		if()
 	}
 
 	//NOTE: selected entity should never point to a NEW object, since Input shouldnt own that object

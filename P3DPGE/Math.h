@@ -25,6 +25,13 @@
 
 using namespace boost::qvm;
 
+namespace Math {
+
+	static float to_radians(float angle) { return angle * (M_PI / 180); }
+	static float to_degrees(float angle) { return angle * (180 / M_PI); }
+
+}
+
 
 class Vector3 {
 	public:
@@ -75,41 +82,98 @@ class Vector3 {
 		//TODO: perpendicular
 
 		//conversions between qvm's matrices and our vectors
-		boost::qvm::mat<float,1,4> ConvertToM4x4() {
-			boost::qvm::mat<float, 1, 4> m;
+		mat<float,1,4> ConvertToM4x4() {
+			mat<float, 1, 4> m;
 			m.a[0][0] = x; m.a[0][1] = y; m.a[0][2] = z; m.a[0][3] = 1;
 			return m;
 		}
 
-		void M4x4ToVector3(boost::qvm::mat<float,1,4> m) {
+		void M1x4ToVector3(boost::qvm::mat<float,1,4> m) {
 			
 			x = m.a[0][0]; y = m.a[0][1]; z = m.a[0][2];
 			
 		}
-		
+
+		// Functions pertaining to matrix-vertex manipulation //
+
 		//translate vector with given translation
-		//TODO: this not working OR the thing calling it isn't working.
 		void translateV3(Vector3 translation) {
-			mat<float, 1, 4> v{ x, y, z };
-			mat<float, 4, 4> tv{
+			mat<float, 1, 4> v { x, y, z, 1 };
+			mat<float, 4, 4> tv {
 				1,			   0,			  0,			 0,
 				0,			   1,			  0,			 0,
 				0,			   0,			  1,			 0,
 				translation.x, translation.y, translation.z, 1
 			};
-			this->M4x4ToVector3(v * tv);
+			this->M1x4ToVector3(v * tv);
 		}
 
-		//TODO: implement local space so rotations don't look stupid
-		//rotate vector around X axis
-		void rotateV3_X(float theta) {
-			mat<float, 1, 4> v{ x,y,z };
-			mat<float, 4, 4>rv{
+		//covert point to WorldSpace
+		mat<float, 4, 4> LocalToWorld(Vector3 pos) {
+			mat<float, 4, 4> wtl{
+				1,	   0,	  0,	 0,
+				0,	   1,	  0,	 0,
+				0,	   0,	  1,	 0,
+				pos.x, pos.y, pos.z, 1
+			};
+			return wtl;
+		}
+
+		//convert point to LocalSpace
+		mat<float, 4, 4> WorldToLocal(Vector3 pos) {
+			mat<float, 4, 4> ltw{
+				1,	   0,	  0,	 0,
+				0,	   1,	  0,	 0,
+				0,	   0,	  1,	 0,
+				pos.x, pos.y, pos.z, 1
+			};
+			return inverse(ltw);
+		}
+
+		//basic euler rotations
+		void rotateV3_X(float theta, Vector3 pos) {
+			theta = Math::to_radians(theta);
+			mat<float, 1, 4> v { x, y, z, 1 };
+			mat<float, 1, 4> local_v = v * WorldToLocal(pos);
+			mat<float, 4, 4> rvx {
 				1,		0,			0,           0,
 				0,		cos(theta),	-sin(theta), 0,
 				0,		sin(theta),	cos(theta),  0,
 				0,		0,			0,			 1
 			};
-			this->M4x4ToVector3(v * rv);
+			this->M1x4ToVector3(local_v * rvx * LocalToWorld(pos));
+		}
+
+		void rotateV3_Y(float theta, Vector3 pos) {
+			theta = Math::to_radians(theta);
+			mat<float, 1, 4> v{ x, y, z, 1 };
+			mat<float, 1, 4> local_v = v * WorldToLocal(pos);
+			mat<float, 4, 4> rvx{
+				cos(theta),	0,	sin(theta),  0,
+				0,			1,	0,			 0,
+				-sin(theta),0,	cos(theta),  0,
+				0,			0,	0,			 1
+			};
+			this->M1x4ToVector3(local_v * rvx * LocalToWorld(pos));
+		}
+
+		void rotateV3_Z(float theta, Vector3 pos) {
+			theta = Math::to_radians(theta);
+			mat<float, 1, 4> v { x, y, z, 1 };
+			mat<float, 1, 4> local_v = v * WorldToLocal(pos);
+			mat<float, 4, 4> rvz { 
+				cos(theta), -sin(theta),	0, 0,
+				sin(theta), cos(theta),		0, 0,
+				0,			0,				1, 0,
+				0,			0,				0, 1
+			};
+			this->M1x4ToVector3(local_v * rvz * LocalToWorld(pos));
+		}
+
+		//TODO: figure out why this isn't projecting properly
+		//temporary fix: press P
+		void ProjToScreen(mat<float,4,4> ProjMat, olc::PixelGameEngine* p, Vector3 pos) {
+			mat<float, 1, 4> v{ x, y, z, 1 };
+			this->M1x4ToVector3(v * ProjMat);
 		}
 };
