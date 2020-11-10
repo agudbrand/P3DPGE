@@ -74,6 +74,7 @@ class Vector3 {
 
 		//TODO: perpendicular
 
+		//conversions between qvm's matrices and our vectors
 		boost::qvm::mat<float,1,4> ConvertToM4x4() {
 			boost::qvm::mat<float, 1, 4> m;
 			m.a[0][0] = x; m.a[0][1] = y; m.a[0][2] = z; m.a[0][3] = 1;
@@ -110,31 +111,4 @@ class Vector3 {
 			};
 			this->M4x4ToVector3(v * rv);
 		}
-
-};
-
-//TODO: maybe make this
-class Matrix4 {
-	public:
-
-		float m[4][4];
-
-		Matrix4() { 
-			m[4][4] = { 0 }; 
-		}
-
-		Matrix4 operator + (const Matrix4& rhs) const {
-			Matrix4 newMat;
-			for (int i = 0; i < 4; i++) {
-				for (int j = 0; j < 4; j++) {
-					newMat.m[i][j] = m[i][j] + rhs.m[i][j];
-				}
-			}
-			return newMat;
-		}
-
-		Matrix4 operator * (const Matrix4& rhs) const {
-
-		}
-
 };

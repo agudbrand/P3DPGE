@@ -42,8 +42,7 @@ public:
 
 	//mesh
 	olc::Pixel color = olc::WHITE;
-	//DO NOT make a pointer unless you're 
-	//prepared to solve the read access violation
+	//DO NOT make a pointer unless you're prepared to solve the read access violation
 	//that comes with it
 	Mesh mesh;
 	 
@@ -64,6 +63,7 @@ public:
 	virtual void Update(float deltaTime) = 0;
 	virtual bool ContainsPoint(Vector3 point) = 0;
 
+	//this is purely temporary for testing and will be changed later
 	virtual void RotateX() = 0;
 
 	void SetTag(std::string newTag);
@@ -119,7 +119,6 @@ struct Box : public PhysEntity {
 		this->dimensions = dimensions;
 
 		//vertices making up the prism
-
 		Vector3 p1 = position;
 		Vector3 p2 = position + dimensions.xComp();
 		Vector3 p3 = position + dimensions.yComp();
@@ -129,6 +128,7 @@ struct Box : public PhysEntity {
 		Vector3 p7 = position + dimensions.xComp() + dimensions.yComp();
 		Vector3 p8 = position + dimensions;
 
+		//TODO: make the points generate counter clockwise where they aren't already
 		//generate face triangles
 		//west
 		mesh.triangles.push_back(Triangle(p3, p4, p1));

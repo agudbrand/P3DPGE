@@ -6,6 +6,7 @@ namespace Render {
 
 	static std::vector<Entity*> entities;
 
+	//just shove all entities into here, then draw them
 	static void AddEntity(Entity* e) {
 		entities.push_back(e);
 	}
@@ -54,6 +55,8 @@ namespace Render {
 	//TODO: make ortho projection
 	static void WorldToScreenOrtho() {}
 
+	//draw all entities to screen
+	//TODO: cull entites not on screen
 	static void Update(olc::PixelGameEngine* p) {
 		for (auto& e : entities) { 
 			WorldToScreen(p, e);

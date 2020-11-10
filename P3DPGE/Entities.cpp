@@ -15,9 +15,9 @@ void Entity::SetColor(olc::Pixel newColor) {
 void PhysEntity::Update(float deltaTime){
 	if(!bStatic) {
 		velocity += acceleration * deltaTime;
-		//if (velocity.x < .0001f) { velocity.x = 0; }
-		//if (velocity.y < .0001f) { velocity.y = 0; }
-		//if (velocity.z < .0001f) { velocity.z = 0; }
+		if (velocity.x < 0.1f) { velocity.x = 0; }
+		if (velocity.y < 0.1f) { velocity.y = 0; }
+		if (velocity.z < 0.1f) { velocity.z = 0; }
 		position += velocity * deltaTime;
 
 		rotVelocity += rotAcceleration * deltaTime;
@@ -27,9 +27,9 @@ void PhysEntity::Update(float deltaTime){
 
 void PhysEntity::AddForce(PhysEntity* creator, Vector3 force, bool bIgnoreMass){
 	this->acceleration += bIgnoreMass ? force : force / mass;
-	if (acceleration.x < .0001f) { acceleration.x = 0; }
-	if (acceleration.y < .0001f) { acceleration.y = 0; }
-	if (acceleration.z < .0001f) { acceleration.z = 0; }
+	if (acceleration.x < 0.1f) { acceleration.x = 0; }
+	if (acceleration.y < 0.1f) { acceleration.y = 0; }
+	if (acceleration.z < 0.1f) { acceleration.z = 0; }
 	if (creator) { creator->acceleration -= bIgnoreMass ? force : force / creator->mass; }
 }
 
@@ -44,7 +44,7 @@ void Sphere::Draw(olc::PixelGameEngine* p) {
 }
 
 void Sphere::RotateX() {
-
+	//do when 3d spheres are implemented
 }
 
 bool Sphere::ContainsPoint(Vector3 point) {
@@ -53,10 +53,7 @@ bool Sphere::ContainsPoint(Vector3 point) {
 
 //// Box ////
 
-void Box::Draw(olc::PixelGameEngine* p) {
-	//p->FillRect(position.x - dimensions.x/2, position.y - dimensions.y/2, dimensions.x, dimensions.y, color);
-	mesh.Draw(p, color);
-}
+void Box::Draw(olc::PixelGameEngine* p) { mesh.Draw(p, color); }
 
 void Box::RotateX() {
 	for (auto& m : mesh.triangles) {
@@ -66,6 +63,8 @@ void Box::RotateX() {
 	}
 }
 
+//not sure if this still works or not, when I was trying to select boxes
+//it wouldn't do anything but i feel it should still work
 bool Box::ContainsPoint(Vector3 point) {
 	bool checkX = point.x >= position.x - dimensions.x / 2 && point.x <= position.x + dimensions.x / 2;
 	bool checkY = point.y >= position.y - dimensions.y / 2 && point.y <= position.y + dimensions.y / 2;

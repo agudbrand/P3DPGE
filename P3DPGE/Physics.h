@@ -34,7 +34,6 @@ namespace Physics {
 				}
 			}
 		}
-
 		
 		static void Cleanup() {
 			for (PhysEntity*& ptr : hotEntities) {
