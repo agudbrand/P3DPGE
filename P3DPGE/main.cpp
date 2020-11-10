@@ -3,7 +3,6 @@
 #include "olcPixelGameEngine.h"
 #include "Input.h"
 #include "Render.h"
-
 using namespace olc;
 
 class P3DPGE : public PixelGameEngine {
@@ -35,6 +34,7 @@ public:
 
 		//rendering
 		Render::Update(this);
+		
 
 		return true;
 	}

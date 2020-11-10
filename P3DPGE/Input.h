@@ -27,9 +27,11 @@ namespace Input {
 
 		//E press = spawn box
 		if (p->GetKey(olc::E).bPressed) {
-			Vector3 pos = Vector3(p->GetMouseX(), p->GetMouseY(), 0);
-			Box* box = new Box(Vector3(10, 10, 0), -1, pos);
+			Vector3 pos = GetMousePos(p);
+			pos.z += pos.x + 10; //for z testing
+			Box* box = new Box(Vector3(100, 130, 100), -1, pos);
 			Physics::AddEntity(box, true);
+			Render::entities.push_back(box);
 			//Render::AddEntity(box);
 			std::cout << "Creating Box at: " + pos.str() << std::endl;
 		}
@@ -45,7 +47,6 @@ namespace Input {
 			p->DrawLine(leftClickPos.x, leftClickPos.y, p->GetMouseX(), p->GetMouseY(), olc::WHITE);
 		}
 
-
 		//LMB release = add  drawn force to selected entity
 		if (p->GetMouse(0).bReleased) {
 			if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
@@ -53,6 +54,33 @@ namespace Input {
 			}
 
 			leftClickPos = V3NULL;
+		}
+
+		//rotate over x
+		//TODO: make this work with selected entity 
+		//I think the new set up for boxes
+		//doesn't work with the current Box::ContainsPoint()
+		if (p->GetKey(olc::K).bHeld) { 
+			for (auto& e : Render::entities) {
+				e->rotation.x = deltaTimePtr;
+				e->RotateX();
+			}
+		}
+
+		if (p->GetKey(olc::K).bReleased) {
+			for (auto& e : Render::entities) {
+				e->rotation.x = 0;
+			}
+		}
+
+		if (p->GetKey(olc::I).bHeld) {
+			for (auto& e : Render::entities) {
+				for (auto& m : e->mesh.triangles) {
+					for (auto& p : m.points) {
+						p.translateV3(Vector3(20, 1, 2));
+					}
+				}
+			}
 		}
 
 		//RMB press = select entity

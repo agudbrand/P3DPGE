@@ -43,6 +43,10 @@ void Sphere::Draw(olc::PixelGameEngine* p) {
 	p->FillCircle(position.x, position.y, radius, color);
 }
 
+void Sphere::RotateX() {
+
+}
+
 bool Sphere::ContainsPoint(Vector3 point) {
 	return point.distanceTo(position) <= radius;
 }
@@ -50,7 +54,16 @@ bool Sphere::ContainsPoint(Vector3 point) {
 //// Box ////
 
 void Box::Draw(olc::PixelGameEngine* p) {
-	p->FillRect(position.x - dimensions.x/2, position.y - dimensions.y/2, dimensions.x, dimensions.y, color);
+	//p->FillRect(position.x - dimensions.x/2, position.y - dimensions.y/2, dimensions.x, dimensions.y, color);
+	mesh.Draw(p, color);
+}
+
+void Box::RotateX() {
+	for (auto& m : mesh.triangles) {
+		for (auto& n : m.points) {
+			n.rotateV3_X(rotation.x);
+		}
+	}
 }
 
 bool Box::ContainsPoint(Vector3 point) {
