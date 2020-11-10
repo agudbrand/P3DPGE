@@ -5,6 +5,15 @@
 #include "Render.h"
 using namespace olc;
 
+/* General TODOs and NOTES
+
+TODO: create system for handling multiple translations and rotations
+TODO: get translation and rotation to work with inputs
+TODO: define an object's local space so that we can rotate an object about its center
+TODO: find a reason to either keep or remove Render::Init()
+
+*/
+
 class P3DPGE : public PixelGameEngine {
 private:
 	float time;

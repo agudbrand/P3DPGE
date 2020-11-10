@@ -88,6 +88,7 @@ class Vector3 {
 		}
 		
 		//translate vector with given translation
+		//TODO: this not working OR the thing calling it isn't working.
 		void translateV3(Vector3 translation) {
 			mat<float, 1, 4> v{ x, y, z };
 			mat<float, 4, 4> tv{

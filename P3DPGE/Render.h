@@ -59,9 +59,11 @@ namespace Render {
 	//TODO: cull entites not on screen
 	static void Update(olc::PixelGameEngine* p) {
 		for (auto& e : entities) { 
+			
 			WorldToScreen(p, e);
 			e->Draw(p); 
 		}
+		std::cout << "num of entities: " << entities.size() << std::endl;
 	}
 
 	

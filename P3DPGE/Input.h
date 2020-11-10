@@ -21,7 +21,7 @@ namespace Input {
 			Vector3 pos = Vector3(p->GetMouseX(), p->GetMouseY(), 0);
 			Sphere* sphere = new Sphere(10, -1, pos);
 			Physics::AddEntity(sphere, true);
-			//Render::AddEntity(sphere);
+			Render::AddEntity(sphere);
 			std::cout << "Creating Sphere at: " + pos.str() << std::endl;
 		}
 
@@ -31,8 +31,7 @@ namespace Input {
 			pos.z += pos.x + 10; //for z testing
 			Box* box = new Box(Vector3(100, 130, 100), -1, pos);
 			Physics::AddEntity(box, true);
-			Render::entities.push_back(box);
-			//Render::AddEntity(box);
+			Render::AddEntity(box);
 			std::cout << "Creating Box at: " + pos.str() << std::endl;
 		}
 
@@ -41,7 +40,6 @@ namespace Input {
 			leftClickPos = GetMousePos(p);
 		}
 
-		//TODO: the line wont draw
 		//LMB hold = draw line between click and mouse position
 		if (p->GetMouse(0).bHeld) {
 			p->DrawLine(leftClickPos.x, leftClickPos.y, p->GetMouseX(), p->GetMouseY(), olc::WHITE);
