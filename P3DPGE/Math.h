@@ -14,7 +14,7 @@
 
 //vector constants
 #define V3NULL	Vector3(std::numeric_limits<float>::min(), std::numeric_limits<float>::min(), std::numeric_limits<float>::min())
-#define V3ZERO	Vector3(0, 0, 0)
+#define V3ZERO	Vector3()
 #define V3ONE	Vector3(1, 1, 1)
 #define V3XU	Vector3(1, 0, 0)
 #define V3YU	Vector3(0, 1, 0)

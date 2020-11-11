@@ -19,25 +19,20 @@ namespace Physics {
 			coldEntities = std::vector<PhysEntity*>();
 		}
 
+		//TODO add friction
 		static void Update(float deltaTime) {
 			if (!paused || frame) {
 				for (PhysEntity* ptr : hotEntities) {
 					if (ptr) {
-						ptr->AddForce(nullptr, -(ptr->velocity).normalized() * airFriction);
+						//ptr->AddForce(nullptr, -(ptr->velocity).normalized() * airFriction);
 						ptr->Update(deltaTime);
-					}
-					else {
-						break;
-					}
+					} else { break; }
 				}
 				for (PhysEntity* ptr : coldEntities) {
 					if (ptr) {
-						ptr->AddForce(nullptr, -(ptr->velocity).normalized() * airFriction);
+						//ptr->AddForce(nullptr, -(ptr->velocity).normalized() * airFriction);
 						ptr->Update(deltaTime);
-					}
-					else {
-						break;
-					}
+					} else { break; }
 				}
 				if (frame) { frame = !frame; }
 			}

@@ -59,6 +59,7 @@ namespace Input {
 			p->DrawLine(leftClickPos.x, leftClickPos.y, p->GetMouseX(), p->GetMouseY(), olc::WHITE);
 		}
 
+		//TODO: fix this, it only adds force in the downright direction
 		//LMB release = add  drawn force to selected entity
 		if (p->GetMouse(0).bReleased) {
 			if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
@@ -68,10 +69,17 @@ namespace Input {
 			leftClickPos = V3NULL;
 		}
 
+		if (selectedEntity && p->GetKey(olc::P).bPressed) {
+			if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
+				entity->AddForce(nullptr, Vector3(-10, -10, 0), true);
+			}
+		}
+
 		//rotation over axes
 		//TODO: make these work with selected entity 
 		//I think the new set up for boxes
 		//doesn't work with the current Box::ContainsPoint()
+		//J held = rotate everything in the positive x
 		if (p->GetKey(olc::J).bHeld) { 
 			for (auto& e : Render::entities) {
 				e->rotation.x = 0.08;
@@ -79,6 +87,7 @@ namespace Input {
 			}
 		}
 
+		//K held = rotate everything in the positive y
 		if (p->GetKey(olc::K).bHeld) {
 			for (auto& e : Render::entities) {
 				e->rotation.y = 0.08;
@@ -86,6 +95,7 @@ namespace Input {
 			}
 		}
 
+		//L held = rotate everything in the positive z
 		if (p->GetKey(olc::L).bHeld) {
 			for (auto& e : Render::entities) {
 				e->rotation.z = 0.08;
@@ -93,6 +103,7 @@ namespace Input {
 			}
 		}
 
+		//M held = rotate everything in the negative x
 		if (p->GetKey(olc::M).bHeld) {
 			for (auto& e : Render::entities) {
 				e->rotation.x = -0.08;
@@ -100,6 +111,7 @@ namespace Input {
 			}
 		}
 
+		//COMMA held = rotate everything in the negative y
 		if (p->GetKey(olc::COMMA).bHeld) {
 			for (auto& e : Render::entities) {
 				e->rotation.y = -0.08;
@@ -107,6 +119,7 @@ namespace Input {
 			}
 		}
 
+		//PERIOD held = rotate everything in the negative z
 		if (p->GetKey(olc::PERIOD).bHeld) {
 			for (auto& e : Render::entities) {
 				e->rotation.z = -0.08;
@@ -114,33 +127,42 @@ namespace Input {
 			}
 		}
 
+		//RIGHT held = translate everything in the positive x
 		if (p->GetKey(olc::RIGHT).bHeld) {
 			for (auto& e : Render::entities) {
 				e->Translate(Vector3(70 * deltaTimePtr, 0, 0));
 			}
 		}
+
+		//LEFT held = translate everything in the negative x
 		if (p->GetKey(olc::LEFT).bHeld) {
 			for (auto& e : Render::entities) {
 				e->Translate(Vector3(-70 * deltaTimePtr, 0, 0));
 			}
 		}
+
+		//UP held = translate everything in the negative y
 		if (p->GetKey(olc::UP).bHeld) {
 			for (auto& e : Render::entities) {
 				e->Translate(Vector3(0, -70 * deltaTimePtr, 0));
 			}
 		}
+
+		//DOWNA held = translate everything in the positive y
 		if (p->GetKey(olc::DOWN).bHeld) {
 			for (auto& e : Render::entities) {
 				e->Translate(Vector3(0, 70 * deltaTimePtr, 0));
 			}
 		}
 
+		//SHIFT held = translate everything in the positive z
 		if (p->GetKey(olc::SHIFT).bHeld) {
 			for (auto& e : Render::entities) {
 				e->Translate(Vector3(0, 0, 70 * deltaTimePtr));
 			}
 		}
 
+		//CTRL held = translate everything in the negative z
 		if (p->GetKey(olc::CTRL).bHeld) {
 			for (auto& e : Render::entities) {
 				e->Translate(Vector3(0, 0, -70 * deltaTimePtr));
@@ -181,17 +203,17 @@ namespace Input {
 			}
 		}
 
-		//if (selectedEntity) {
-		//	std::string text = "ID: " + std::to_string(selectedEntity->id) + "\tTag: " + selectedEntity->tag + "\n";
-		//	text += "Position:" + selectedEntity->position.str() + "\nRotation:" + selectedEntity->rotation.str() + "\nScale:" + selectedEntity->scale.str() +  "\n";
-		//	if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
-		//		text += "Is Static: "; text += entity->bStatic ? "true" : "false"; text += "\nMass: " + std::to_string(entity->mass) + "\n";
-		//		text += "Velocity:" + entity->velocity.str() + "\nAcceleration:" + entity->acceleration.str() + "\n";
-		//		text += "rotVelocity:" + entity->rotVelocity.str() + "\nrotAcceleration:" + entity->rotAcceleration.str() + "\n";
-		//	}
-		//
-		//	p->DrawStringDecal(olc::vf2d(0, 0), text);
-		//}
+		if (selectedEntity) {
+			std::string text = "ID: " + std::to_string(selectedEntity->id) + "\tTag: " + selectedEntity->tag + "\n";
+			text += "Position:" + selectedEntity->position.str() + "\nRotation:" + selectedEntity->rotation.str() + "\nScale:" + selectedEntity->scale.str() +  "\n";
+			if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
+				text += "Is Static: "; text += entity->bStatic ? "true" : "false"; text += "\nMass: " + std::to_string(entity->mass) + "\n";
+				text += "Velocity:" + entity->velocity.str() + "\nAcceleration:" + entity->acceleration.str() + "\n";
+				text += "rotVelocity:" + entity->rotVelocity.str() + "\nrotAcceleration:" + entity->rotAcceleration.str() + "\n";
+			}
+		
+			p->DrawStringDecal(olc::vf2d(0, 0), text);
+		}
 
 		//point debugging
 		//if (selectedEntity) {

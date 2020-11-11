@@ -101,7 +101,7 @@ public:
 };
 
 #define PhysEntityArgs velocity, acceleration, rotVelocity, rotAcceleration, mass, bStatic
-#define PhysEntityParams Vector3 velocity = V3ZERO, Vector3 acceleration = V3ZERO, Vector3 rotVelocity = V3ZERO, Vector3 rotAcceleration = V3ZERO, float mass = 1, bool bStatic = false
+#define PhysEntityParams Vector3 velocity = V3ZERO, Vector3 acceleration = V3ZERO, Vector3 rotVelocity = V3ZERO, Vector3 rotAcceleration = V3ZERO, float mass = 1, float elasticity = 1, bool bStatic = false
 //the physics based implentation of Entity, anything that moves in time is this
 class PhysEntity : public Entity{
 public:
@@ -110,6 +110,7 @@ public:
 	Vector3 rotVelocity;
 	Vector3 rotAcceleration;
 	float mass;
+	float elasticity;
 	bool bStatic;
 
 	PhysEntity() : Entity() {}
@@ -119,14 +120,17 @@ public:
 		this->rotVelocity = rotVelocity;
 		this->rotAcceleration = rotAcceleration;
 		this->mass = mass;
+		this->elasticity = elasticity;
 		this->bStatic = bStatic;
 	};
 
 	void Update(float deltaTime) override;
 
 	void AddForce(PhysEntity* creator, Vector3 force, bool bIgnoreMass = false);
+	void AddImpulse(PhysEntity* creator, Vector3 impulse, bool bIgnoreMass = false);
 	void GenerateRadialForce(Vector3 position, float radius, float strength, float falloff, bool bIgnoreMass);
-		
+	virtual bool CheckCollision(Entity* entity) = 0;
+	virtual void ResolveCollision(Entity* entity) = 0;
 };
 
 struct Sphere : public PhysEntity {
@@ -136,8 +140,11 @@ struct Sphere : public PhysEntity {
 	Sphere(float r, int id, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
 		this->radius = r;
 	}
+
 	void Draw(olc::PixelGameEngine* p) override;
 	bool ContainsPoint(Vector3 point) override;
+	bool CheckCollision(Entity* entity) override;
+	void ResolveCollision(Entity* entity) override;
 };
 
 //formed by a single dimention vector
@@ -183,7 +190,11 @@ struct Box : public PhysEntity {
 	
 	void Draw(olc::PixelGameEngine* p) override;
 	bool ContainsPoint(Vector3 point) override;
+	bool CheckCollision(Entity* entity) override;
+	void ResolveCollision(Entity* entity) override;
 };
+
+//struct convexPoly
 
 //archaic camera class for now
 //in fact its nothing
