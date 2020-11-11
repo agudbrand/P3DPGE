@@ -16,6 +16,19 @@ namespace Input {
 			deltaTimePtr = 0;
 		}
 
+		//Space = full pause
+		if (p->GetKey(olc::SPACE).bPressed) { 
+			Render::paused = !Render::paused;  
+			Physics::paused = !Physics::paused;
+		}
+
+
+		//F = advance frame
+		if (p->GetKey(olc::F).bPressed) { 
+			Render::frame = !Render::frame; 
+			Physics::frame = !Physics::frame;
+		}
+
 		//Q press = spawn sphere
 		if (p->GetKey(olc::Q).bPressed) {
 			Vector3 pos = Vector3(p->GetMouseX(), p->GetMouseY(), 0);
@@ -28,8 +41,9 @@ namespace Input {
 		//E press = spawn box
 		if (p->GetKey(olc::E).bPressed) {
 			Vector3 pos = GetMousePos(p);
-			pos.z += pos.x + 10; //for z testing
-			Box* box = new Box(Vector3(100, 130, 100), -1, pos);
+			pos.z = 1;
+			Box* box = new Box(Vector3(1, 1, 1), -1, Vector3(0,0,3));
+			selectedEntity = box;
 			Physics::AddEntity(box, true);
 			Render::AddEntity(box);
 			std::cout << "Creating Box at: " + pos.str() << std::endl;
@@ -58,42 +72,45 @@ namespace Input {
 		//TODO: make these work with selected entity 
 		//I think the new set up for boxes
 		//doesn't work with the current Box::ContainsPoint()
-		if (p->GetKey(olc::K).bPressed) { 
+		if (p->GetKey(olc::J).bHeld) { 
 			for (auto& e : Render::entities) {
-				e->rotation.x = 0.15;
+				e->rotation.x = 0.08;
 				e->RotateX();
 			}
 		}
 
-		if (p->GetKey(olc::K).bReleased) {
+		if (p->GetKey(olc::K).bHeld) {
 			for (auto& e : Render::entities) {
-				e->rotation.x = 0;
-			}
-		}
-
-		if (p->GetKey(olc::L).bPressed) {
-			for (auto& e : Render::entities) {
-				e->rotation.z = 0.15;
-				e->RotateZ();
-			}
-		}
-
-		if (p->GetKey(olc::L).bReleased) {
-			for (auto& e : Render::entities) {
-				e->rotation.z = 0;
-			}
-		}
-
-		if (p->GetKey(olc::J).bPressed) {
-			for (auto& e : Render::entities) {
-				e->rotation.y = 0.15;
+				e->rotation.y = 0.08;
 				e->RotateY();
 			}
 		}
 
-		if (p->GetKey(olc::J).bReleased) {
+		if (p->GetKey(olc::L).bHeld) {
 			for (auto& e : Render::entities) {
-				e->rotation.y = 0;
+				e->rotation.z = 0.08;
+				e->RotateZ();
+			}
+		}
+
+		if (p->GetKey(olc::M).bHeld) {
+			for (auto& e : Render::entities) {
+				e->rotation.x = -0.08;
+				e->RotateX();
+			}
+		}
+
+		if (p->GetKey(olc::COMMA).bHeld) {
+			for (auto& e : Render::entities) {
+				e->rotation.y = -0.08;
+				e->RotateY();
+			}
+		}
+
+		if (p->GetKey(olc::PERIOD).bHeld) {
+			for (auto& e : Render::entities) {
+				e->rotation.z = -0.08;
+				e->RotateZ();
 			}
 		}
 
@@ -118,8 +135,20 @@ namespace Input {
 			}
 		}
 
+		if (p->GetKey(olc::SHIFT).bHeld) {
+			for (auto& e : Render::entities) {
+				e->Translate(Vector3(0, 0, 70 * deltaTimePtr));
+			}
+		}
 
-		if (p->GetKey(olc::P).bPressed) { Render::projecting = !Render::projecting; }
+		if (p->GetKey(olc::CTRL).bHeld) {
+			for (auto& e : Render::entities) {
+				e->Translate(Vector3(0, 0, -70 * deltaTimePtr));
+			}
+		}
+
+
+		//if (p->GetKey(olc::P).bHeld) { Mesh::projecting = !Render::projecting; }
 
 		//RMB press = select entity
 		if (p->GetMouse(1).bPressed) {
@@ -152,20 +181,31 @@ namespace Input {
 			}
 		}
 
-		if (selectedEntity) {
-			std::string text = "ID: " + std::to_string(selectedEntity->id) + "\tTag: " + selectedEntity->tag + "\n";
-			text += "Position:" + selectedEntity->position.str() + "\nRotation:" + selectedEntity->rotation.str() + "\nScale:" + selectedEntity->scale.str() +  "\n";
-			if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
-				text += "Is Static: "; text += entity->bStatic ? "true" : "false"; text += "\nMass: " + std::to_string(entity->mass) + "\n";
-				text += "Velocity:" + entity->velocity.str() + "\nAcceleration:" + entity->acceleration.str() + "\n";
-				text += "rotVelocity:" + entity->rotVelocity.str() + "\nrotAcceleration:" + entity->rotAcceleration.str() + "\n";
-			}
-
-			p->DrawStringDecal(olc::vf2d(0, 0), text);
-		}
+		//if (selectedEntity) {
+		//	std::string text = "ID: " + std::to_string(selectedEntity->id) + "\tTag: " + selectedEntity->tag + "\n";
+		//	text += "Position:" + selectedEntity->position.str() + "\nRotation:" + selectedEntity->rotation.str() + "\nScale:" + selectedEntity->scale.str() +  "\n";
+		//	if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
+		//		text += "Is Static: "; text += entity->bStatic ? "true" : "false"; text += "\nMass: " + std::to_string(entity->mass) + "\n";
+		//		text += "Velocity:" + entity->velocity.str() + "\nAcceleration:" + entity->acceleration.str() + "\n";
+		//		text += "rotVelocity:" + entity->rotVelocity.str() + "\nrotAcceleration:" + entity->rotAcceleration.str() + "\n";
+		//	}
+		//
+		//	p->DrawStringDecal(olc::vf2d(0, 0), text);
+		//}
 
 		//point debugging
-		if()
+		//if (selectedEntity) {
+		//	for (int i = 0; i < selectedEntity->mesh.triangles.size(); i++) {
+		//		auto pa = selectedEntity->mesh.triangles;
+		//		p->DrawString(olc::vd2d(1, i * 9),
+		//			"Triangle: " + std::to_string(i) + " " +
+		//			Math::append_decimal(std::to_string(pa[i].projectedPoints[0].x)) + "x " + Math::append_decimal(std::to_string(pa[i].projectedPoints[0].y)) + "y " + Math::append_decimal(std::to_string(pa[i].projectedPoints[0].z)) + "z " +
+		//			Math::append_decimal(std::to_string(pa[i].projectedPoints[1].x)) + "x " + Math::append_decimal(std::to_string(pa[i].projectedPoints[1].y)) + "y " + Math::append_decimal(std::to_string(pa[i].projectedPoints[1].z)) + "z " +
+		//			Math::append_decimal(std::to_string(pa[i].projectedPoints[2].x)) + "x " + Math::append_decimal(std::to_string(pa[i].projectedPoints[2].y)) + "y " + Math::append_decimal(std::to_string(pa[i].projectedPoints[2].z)) + "z "
+		//		);
+		//	}
+		//}
+
 	}
 
 	//NOTE: selected entity should never point to a NEW object, since Input shouldnt own that object

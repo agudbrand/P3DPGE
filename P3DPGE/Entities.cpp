@@ -43,8 +43,11 @@ void Entity::Translate(Vector3 translation) {
 }
 
 void Entity::ProjectToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p) {
+	for (auto& t : mesh.triangles) {
+		t.copy_points();
+	}
 	for (auto& m : mesh.triangles) {
-		for (auto& n : m.points) {
+		for (auto& n : m.projectedPoints) {
 			n.ProjToScreen(ProjMat, p, position);
 		}
 	}
@@ -89,10 +92,7 @@ bool Sphere::ContainsPoint(Vector3 point) {
 
 //// Box ////
 
-void Box::Draw(olc::PixelGameEngine* p) { mesh.Draw(p, color); }
-
-//TODO: only have these functions defined in parent class cause it doesn't need 3 different implementations
-
+void Box::Draw(olc::PixelGameEngine* p) { mesh.Draw(p, color, position); }
 
 //not sure if this still works or not, when I was trying to select boxes
 //it wouldn't do anything but i feel it should still work

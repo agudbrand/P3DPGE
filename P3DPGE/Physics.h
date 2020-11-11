@@ -11,27 +11,35 @@ namespace Physics {
 
 		static float airFriction = 5; //completely arbitrary number
 
+		static bool paused = false;
+		static bool frame = false;
+
 		static void Init() {
 			hotEntities = std::vector<PhysEntity*>();
 			coldEntities = std::vector<PhysEntity*>();
 		}
 
 		static void Update(float deltaTime) {
-			for (PhysEntity* ptr : hotEntities) {
-				if (ptr) {
-					ptr->AddForce(nullptr, -(ptr->velocity).normalized() * airFriction);
-					ptr->Update(deltaTime);
-				} else {
-					break;
+			if (!paused || frame) {
+				for (PhysEntity* ptr : hotEntities) {
+					if (ptr) {
+						ptr->AddForce(nullptr, -(ptr->velocity).normalized() * airFriction);
+						ptr->Update(deltaTime);
+					}
+					else {
+						break;
+					}
 				}
-			}
-			for (PhysEntity* ptr : coldEntities) {
-				if (ptr) {
-					ptr->AddForce(nullptr, -(ptr->velocity).normalized() * airFriction);
-					ptr->Update(deltaTime);
-				} else {
-					break;
+				for (PhysEntity* ptr : coldEntities) {
+					if (ptr) {
+						ptr->AddForce(nullptr, -(ptr->velocity).normalized() * airFriction);
+						ptr->Update(deltaTime);
+					}
+					else {
+						break;
+					}
 				}
+				if (frame) { frame = !frame; }
 			}
 		}
 		
