@@ -59,11 +59,6 @@ namespace Render {
 				if (frame) { frame = !frame; }
 			}
 			e->Draw(p);
-			Vector3 normal = e->mesh.triangles[0].get_normal();
-			normal.ProjToScreen(ProjectionMatrix(p), p, e->position);
-			Vector3 origin = V3ZERO;
-			origin.ProjToScreen(ProjectionMatrix(p), p, V3ZERO);
-			//p->DrawLine(olc::vd2d(origin.x, origin.y), olc::vd2d(normal.x, normal.y));
 		}
 	}
 

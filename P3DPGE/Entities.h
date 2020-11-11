@@ -148,6 +148,16 @@ struct Box : public PhysEntity {
 	Box(Vector3 dimensions, int id, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs){
 		this->dimensions = dimensions;
 
+		//vertices making up the box
+		Vector3 p1 = position;
+		Vector3 p2 = position + dimensions.xComp();
+		Vector3 p3 = position + dimensions.yComp();
+		Vector3 p4 = position + dimensions.zComp();
+		Vector3 p5 = position + dimensions.yComp() + dimensions.zComp();
+		Vector3 p6 = position + dimensions.xComp() + dimensions.zComp();
+		Vector3 p7 = position + dimensions.xComp() + dimensions.yComp();
+		Vector3 p8 = position + dimensions;
+
 		//west
 		mesh.triangles.push_back(Triangle(p3, p1, p4));
 		mesh.triangles.push_back(Triangle(p3, p4, p5));

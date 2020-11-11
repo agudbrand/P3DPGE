@@ -5,6 +5,10 @@
 #include "Render.h"
 using namespace olc;
 
+
+//// Requires boost library 1.74.0 ////
+
+
 /* General TODOs and NOTEs board
 
 TODO: find a reason to either keep or remove Render::Init()
