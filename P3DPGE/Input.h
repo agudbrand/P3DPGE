@@ -39,6 +39,16 @@ namespace Input {
 			std::cout << "Creating Sphere at: " + pos.str() << std::endl;
 		}
 
+		//T press = spawn complex test object
+		if (p->GetKey(olc::T).bPressed) {
+			Vector3 pos = Vector3(p->GetMouseX(), p->GetMouseY(), 0);
+			Complex* complex = new Complex("test_object.obj", 0, Vector3(0,0,0));
+			selectedEntity = complex;
+			Physics::AddEntity(complex);
+			Render::AddEntity(complex);
+			std::cout << "Creating " + complex->model_name + " at: " + pos.str() << std::endl;
+		}
+
 		//E press = spawn box
 		if (p->GetKey(olc::E).bPressed) {
 			Vector3 pos = GetMousePos(p);
@@ -57,7 +67,7 @@ namespace Input {
 		//J held = rotate everything in the positive x
 		if (p->GetKey(olc::J).bHeld) { 
 			for (auto& e : Render::entities) {
-				e->rotation.x = 0.08;
+				e->rotation.x = 0.6;
 				e->RotateX();
 			}
 		}
@@ -65,7 +75,7 @@ namespace Input {
 		//K held = rotate everything in the positive y
 		if (p->GetKey(olc::K).bHeld) {
 			for (auto& e : Render::entities) {
-				e->rotation.y = 0.08;
+				e->rotation.y = 0.6;
 				e->RotateY();
 			}
 		}
@@ -73,7 +83,7 @@ namespace Input {
 		//L held = rotate everything in the positive z
 		if (p->GetKey(olc::L).bHeld) {
 			for (auto& e : Render::entities) {
-				e->rotation.z = 0.08;
+				e->rotation.z = 0.6;
 				e->RotateZ();
 			}
 		}
@@ -81,7 +91,7 @@ namespace Input {
 		//M held = rotate everything in the negative x
 		if (p->GetKey(olc::M).bHeld) {
 			for (auto& e : Render::entities) {
-				e->rotation.x = -0.08;
+				e->rotation.x = -0.6;
 				e->RotateX();
 			}
 		}
@@ -89,7 +99,7 @@ namespace Input {
 		//COMMA held = rotate everything in the negative y
 		if (p->GetKey(olc::COMMA).bHeld) {
 			for (auto& e : Render::entities) {
-				e->rotation.y = -0.08;
+				e->rotation.y = -0.6;
 				e->RotateY();
 			}
 		}
@@ -97,7 +107,7 @@ namespace Input {
 		//PERIOD held = rotate everything in the negative z
 		if (p->GetKey(olc::PERIOD).bHeld) {
 			for (auto& e : Render::entities) {
-				e->rotation.z = -0.08;
+				e->rotation.z = -0.6;
 				e->RotateZ();
 			}
 		}
@@ -105,42 +115,42 @@ namespace Input {
 		//RIGHT held = translate everything in the positive x
 		if (p->GetKey(olc::RIGHT).bHeld) {
 			for (auto& e : Render::entities) {
-				e->Translate(Vector3(70 * deltaTimePtr, 0, 0));
+				e->Translate(Vector3(10 * deltaTimePtr, 0, 0));
 			}
 		}
 
 		//LEFT held = translate everything in the negative x
 		if (p->GetKey(olc::LEFT).bHeld) {
 			for (auto& e : Render::entities) {
-				e->Translate(Vector3(-70 * deltaTimePtr, 0, 0));
+				e->Translate(Vector3(-10 * deltaTimePtr, 0, 0));
 			}
 		}
 
 		//UP held = translate everything in the negative y
 		if (p->GetKey(olc::UP).bHeld) {
 			for (auto& e : Render::entities) {
-				e->Translate(Vector3(0, -70 * deltaTimePtr, 0));
+				e->Translate(Vector3(0, -10 * deltaTimePtr, 0));
 			}
 		}
 
 		//DOWNA held = translate everything in the positive y
 		if (p->GetKey(olc::DOWN).bHeld) {
 			for (auto& e : Render::entities) {
-				e->Translate(Vector3(0, 70 * deltaTimePtr, 0));
+				e->Translate(Vector3(0, 10 * deltaTimePtr, 0));
 			}
 		}
 
 		//SHIFT held = translate everything in the positive z
 		if (p->GetKey(olc::SHIFT).bHeld) {
 			for (auto& e : Render::entities) {
-				e->Translate(Vector3(0, 0, 70 * deltaTimePtr));
+				e->Translate(Vector3(0, 0, 10 * deltaTimePtr));
 			}
 		}
 
 		//CTRL held = translate everything in the negative z
 		if (p->GetKey(olc::CTRL).bHeld) {
 			for (auto& e : Render::entities) {
-				e->Translate(Vector3(0, 0, -70 * deltaTimePtr));
+				e->Translate(Vector3(0, 0, -10 * deltaTimePtr));
 			}
 		}
 
@@ -198,6 +208,8 @@ namespace Input {
 		if (selectedEntity) {
 			std::string text = "ID: " + std::to_string(selectedEntity->id) + "\tTag: " + selectedEntity->tag + "\n";
 			text += "Position:" + selectedEntity->position.str() + "\nRotation:" + selectedEntity->rotation.str() + "\nScale:" + selectedEntity->scale.str() +  "\n";
+			//why are you checking if a pointer to a PhysEntity is equal to an entity dynamically
+			//casted to PhysEntity? also should it be = and not ==?
 			if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
 				text += "Is Static: "; text += entity->bStatic ? "true" : "false"; text += "\nMass: " + std::to_string(entity->mass) + "\n";
 				text += "Velocity:" + entity->velocity.str() + "\nAcceleration:" + entity->acceleration.str() + "\n";

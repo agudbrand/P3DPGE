@@ -1,6 +1,9 @@
 #pragma once
 #include "olcPixelGameEngine.h"
 #include "Math.h"
+#include <fstream>
+#include <strstream>
+#include <algorithm>
 
 namespace qvm = boost::qvm;
 
@@ -21,6 +24,12 @@ struct Triangle {
 	}
 
 	Vector3 get_normal() {
+		Vector3 l1 = points[1] - points[0];
+		Vector3 l2 = points[2] - points[0];
+		return l2.cross(l1).normalized();
+	}
+
+	Vector3 get_proj_normal() {
 		Vector3 l1 = projectedPoints[1] - projectedPoints[0];
 		Vector3 l2 = projectedPoints[2] - projectedPoints[0];
 		return l2.cross(l1).normalized();
@@ -33,15 +42,52 @@ struct Mesh {
 
 	void Draw(olc::PixelGameEngine* p, olc::Pixel color, Vector3 pos) {
 
-		for (auto& t : triangles) {
-			//camera is currently permenantly at zero
-			Vector3 camera(0, 0, 0);
+		std::vector<Triangle> visibleTriangles;
 
-			if (t.get_normal().dot(t.points[0] - camera) > 0) {
+		//camera is currently permenantly at zero
+		Vector3 camera(0, 0, 0);
+		//temp lighting set up
+		Vector3 light_direction(0, 0, 1);
+		light_direction = light_direction.normalized();
+		//std::cout << t.get_normal().z << std::endl;
+
+		for (auto& t : triangles) {
+
+			if (t.get_proj_normal().dot(t.points[0] - camera) > 0) {
+				//store triangles we want to draw for sorting
+				visibleTriangles.push_back(t);
+			}
+		}
+
+		//sort triangles back to front
+		//javid uses a lambda function here so that's why its so odd
+		//it basically just tells sort if it needs to swap t1 and t2
+		//and this is determined by if t1's midpoint is greater than
+		//t2's midpoint.
+		//this method of culling hidden triangles is known as the Painter's Algorithm
+		//and all it does is sort them back to front and then draws them in that order
+		std::sort(visibleTriangles.begin(), visibleTriangles.end(), [](Triangle& t1, Triangle& t2) {
+			float mp1 = (t1.points[0].z + t1.points[1].z + t1.points[2].z) / 3;
+			float mp2 = (t2.points[0].z + t2.points[1].z + t2.points[2].z) / 3;
+			return mp1 > mp2;
+			});
+
+		for (Triangle t : visibleTriangles) {
+			float dp = light_direction.dot(t.get_normal());
+			p->FillTriangle(
+				t.projectedPoints[0].x, t.projectedPoints[0].y,
+				t.projectedPoints[1].x, t.projectedPoints[1].y,
+				t.projectedPoints[2].x, t.projectedPoints[2].y,
+				olc::Pixel(255 * abs(dp), 255 * abs(dp), 255 * abs(dp)));
+
+			//put this bool somewhere better later.
+			bool wireframe = true;
+			if (wireframe) {
 				p->DrawTriangle(
 					t.projectedPoints[0].x, t.projectedPoints[0].y,
 					t.projectedPoints[1].x, t.projectedPoints[1].y,
-					t.projectedPoints[2].x, t.projectedPoints[2].y, color);
+					t.projectedPoints[2].x, t.projectedPoints[2].y,
+					olc::BLACK);
 			}
 		}
 	}
@@ -87,9 +133,9 @@ public:
 	//these functions are virtual but aren't implemented
 	//in any child yet as I see no use for differenciating
 	//between them yet
-	virtual void RotateX();
-	virtual void RotateY();
-	virtual void RotateZ();
+	virtual void RotateX(Vector3 offset = V3ZERO);
+	virtual void RotateY(Vector3 offset = V3ZERO);
+	virtual void RotateZ(Vector3 offset = V3ZERO);
 	//TODO: this function does not work well with rotating as if they are called
 	//on the same frame consistently it will begin oscillating around the axis
 	//that's being rotated over. most likely have to define an order
@@ -157,14 +203,15 @@ struct Box : public PhysEntity {
 
 		//TODO talk about using half dimensions
 		//vertices making up the box
-		Vector3 p1 = position;
-		Vector3 p2 = position + dimensions.xComp();
-		Vector3 p3 = position + dimensions.yComp();
-		Vector3 p4 = position + dimensions.zComp();
-		Vector3 p5 = position + dimensions.yComp() + dimensions.zComp();
-		Vector3 p6 = position + dimensions.xComp() + dimensions.zComp();
-		Vector3 p7 = position + dimensions.xComp() + dimensions.yComp();
-		Vector3 p8 = position + dimensions;
+		Vector3 c = position; //center point
+		Vector3 p1 = c + dimensions.xInvert().yInvert().zInvert();
+		Vector3 p2 = c + dimensions.yInvert().zInvert();
+		Vector3 p3 = c + dimensions.xInvert().zInvert();
+		Vector3 p4 = c + dimensions.xInvert().yInvert();
+		Vector3 p5 = c + dimensions.xInvert();
+		Vector3 p6 = c + dimensions.yInvert();
+		Vector3 p7 = c + dimensions.zInvert();
+		Vector3 p8 = c + dimensions;
 
 		//west
 		mesh.triangles.push_back(Triangle(p3, p1, p4));
@@ -184,9 +231,6 @@ struct Box : public PhysEntity {
 		//north
 		mesh.triangles.push_back(Triangle(p7, p2, p1));
 		mesh.triangles.push_back(Triangle(p7, p1, p3));
-
-		//TODO: convert the vertices to be offsets of the center of the prism
-		//or just add a center point and make sure its position is defined there
 	}
 	
 	void Draw(olc::PixelGameEngine* p) override;
@@ -197,8 +241,79 @@ struct Box : public PhysEntity {
 
 //struct convexPoly
 
+//name subjuct to change
+//meant to represent a complex object eg. not a sphere or box, etc.
+//currently meshes will be imported from Blender, see NOTES
+//if we do choose to keep using Blender, it will probably be beneficial
+//to reorganize the model importing pipeline to be more general
+struct Complex : public PhysEntity {
+
+	std::string model_name;
+
+	Complex(std::string file_name, int id, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs){
+
+		if (!LoadFromObjectFile(file_name)) {
+			std::cout << "OBJ LOAD ERROR" << std::endl;
+		}
+
+		model_name = Math::append_decimal(file_name);
+
+	}
+
+	//this function is done exactly how Javid does it in
+	//his video and should probably be redone later
+	//for ex he uses a lot of weird ways to get strings
+	//from the obj file that may not be necessary
+	//TODO: generate complex object relative to input position
+	bool LoadFromObjectFile(std::string file_name) {
+
+		std::ifstream f(file_name);
+		if (!f.is_open()) { return false; }
+
+		std::vector<Vector3> vertices;
+
+		while (!f.eof()) {
+			char line[128];
+			f.getline(line, 128);
+
+			std::strstream s;
+
+			s << line;
+
+			char junk;
+
+			if (line[0] == 'v') {
+				Vector3 v;
+
+				s >> junk >> v.x >> v.y >> v.z;
+				vertices.push_back(v);
+			}
+
+			if (line[0] == 'f') {
+				int f[3];
+				s >> junk >> f[0] >> f[1] >> f[2];
+				mesh.triangles.push_back(Triangle(vertices[f[0] - 1], vertices[f[1] - 1], vertices[f[2] - 1]));
+			}
+
+		}
+
+		return true;
+	}
+
+	void Draw(olc::PixelGameEngine* p) override;
+	bool ContainsPoint(Vector3 point) override;
+	bool CheckCollision(Entity* entity) override;
+	void ResolveCollision(Entity* entity) override;
+
+};
+
 //archaic camera class for now
 //in fact its nothing
 struct Camera : public Entity {
 
+};
+
+//archaic light class
+struct Light : public Entity {
+	
 };

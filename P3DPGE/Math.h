@@ -76,7 +76,7 @@ class Vector3 {
 		bool operator	 != (const Vector3& rhs)		const { return (this->x != rhs.x || this->y != rhs.y || this->z != rhs.z); }
 	
 		float				dot(const Vector3& rhs)		const { return this->x * rhs.x + this->y * rhs.y + this->z * rhs.z; }
-		Vector3				cross(const Vector3& rhs)	const { return Vector3(this->y * rhs.z - rhs.z * this->z, this->x * rhs.z - rhs.x * this->z, this->x * rhs.y - rhs.x * this->y); }
+		Vector3				cross(const Vector3& rhs)	const { return Vector3(this->y * rhs.z - rhs.y * this->z, this->x * rhs.z - rhs.x * this->z, this->x * rhs.y - rhs.x * this->y); }
 		float				mag()						const { return std::sqrtf(x * x + y * y + z * z); }
 		const std::string	str()						const { return std::string("(") + std::to_string(this->x) + "," + std::to_string(this->y) + "," + std::to_string(this->z) + ")"; }
 		Vector3				normalized()				{ return *this == V3ZERO ? V3ZERO : *this / this->mag(); }
@@ -87,7 +87,12 @@ class Vector3 {
 		Vector3				xComp()						{ return Vector3(x, 0, 0); }
 		Vector3				yComp()						{ return Vector3(0, y, 0); }
 		Vector3				zComp()						{ return Vector3(0, 0, z); }
+		Vector3				xInvert()					{ return Vector3(-x, y, z); }
+		Vector3				yInvert()					{ return Vector3(x, -y, z); }
+		Vector3				zInvert()					{ return Vector3(x, y, -z); }
+		//could probably add more invert functions that do over 2 axes but that may be too much
 		//Vector3				invertedComponents()		{ return Vector3(1/x, 1/y, 1/z); }
+		//?^
 
 		//TODO: perpendicular
 
@@ -122,6 +127,18 @@ class Vector3 {
 			this->M1x4ToVector3(proj_mult(v, tv));
 		}
 
+		//scale object
+		void scaleV3(Vector3 scale) {
+			mat<float, 1, 4> v{ x, y, z, 1 };
+			mat<float, 4, 4> sv{
+				scale.x,0,		  0,	   0,
+				0,		 scale.y, 0,	   0,
+				0,		 0,		  scale.z, 0,
+				0,		 0,		  0,	   1
+			};
+			this->M1x4ToVector3(proj_mult(v, sv));
+		}
+
 		//covert point to WorldSpace
 		void LocalToWorld(Vector3 pos) {
 			mat<float, 1, 4> v{ x, y, z, 1 };
@@ -148,9 +165,9 @@ class Vector3 {
 		}
 
 		//basic euler rotations locally
-		void rotateV3_X(float theta, Vector3 pos) {
+		void rotateV3_X(float theta, Vector3 pos, Vector3 offset) {
 			theta = Math::to_radians(theta);
-			WorldToLocal(pos);
+			WorldToLocal(pos + offset);
 			mat<float, 1, 4> v{ x, y, z, 1 };
 			mat<float, 4, 4> rvx{
 				1,		0,			0,           0,
@@ -159,12 +176,12 @@ class Vector3 {
 				0,		0,			0,			 1
 			};
 			this->M1x4ToVector3(proj_mult(v, rvx));
-			LocalToWorld(pos);
+			LocalToWorld(pos + offset);
 		}
 
-		void rotateV3_Y(float theta, Vector3 pos) {
+		void rotateV3_Y(float theta, Vector3 pos, Vector3 offset) {
 			theta = Math::to_radians(theta);
-			WorldToLocal(pos);
+			WorldToLocal(pos + offset);
 			mat<float, 1, 4> v{ x, y, z, 1 };
 			mat<float, 4, 4> rvy{
 				cos(theta),	0,	sin(theta),  0,
@@ -173,12 +190,12 @@ class Vector3 {
 				0,			0,	0,			 1
 			};
 			this->M1x4ToVector3(proj_mult(v, rvy));
-			LocalToWorld(pos);
+			LocalToWorld(pos + offset);
 		}
 
-		void rotateV3_Z(float theta, Vector3 pos) {
+		void rotateV3_Z(float theta, Vector3 pos, Vector3 offset) {
 			theta = Math::to_radians(theta);
-			WorldToLocal(pos);
+			WorldToLocal(pos + offset);
 			mat<float, 1, 4> v{ x, y, z, 1 };
 			mat<float, 4, 4> rvz{
 				cos(theta), -sin(theta),	0, 0,
@@ -187,7 +204,7 @@ class Vector3 {
 				0,			0,				0, 1
 			};
 			this->M1x4ToVector3(proj_mult(v, rvz));
-			LocalToWorld(pos);
+			LocalToWorld(pos + offset);
 		}
 
 		//projects a meshs points to the screen

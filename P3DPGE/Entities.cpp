@@ -10,26 +10,26 @@ void Entity::SetColor(olc::Pixel newColor) {
 	color = newColor;
 }
 
-void Entity::RotateX() {
+void Entity::RotateX(Vector3 offset) {
 	for (auto& m : mesh.triangles) {
 		for (auto& n : m.points) {
-			n.rotateV3_X(rotation.x, position);
+			n.rotateV3_X(rotation.x, position, offset);
 		}
 	}
 }
 
-void Entity::RotateY() {
+void Entity::RotateY(Vector3 offset) {
 	for (auto& m : mesh.triangles) {
 		for (auto& n : m.points) {
-			n.rotateV3_Y(rotation.y, position);
+			n.rotateV3_Y(rotation.y, position, offset);
 		}
 	}
 }
 
-void Entity::RotateZ() {
+void Entity::RotateZ(Vector3 offset) {
 	for (auto& m : mesh.triangles) {
 		for (auto& n : m.points) {
-			n.rotateV3_Z(rotation.z, position);
+			n.rotateV3_Z(rotation.z, position, offset);
 		}
 	}
 }
@@ -40,6 +40,7 @@ void Entity::Translate(Vector3 translation) {
 			n.translateV3(translation);
 		}
 	}
+	position += translation;
 }
 
 void Entity::ProjectToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p) {
@@ -144,5 +145,22 @@ bool Box::CheckCollision(Entity* entity) {
 
 //TODO: expand this to a general entity check
 void Box::ResolveCollision(Entity* entity) {
+
+}
+
+//// Complex ////
+
+void Complex::Draw(olc::PixelGameEngine* p) { mesh.Draw(p, color, position); }
+
+bool Complex::ContainsPoint(Vector3 point) {
+	//this will probably be hard too implement good luck
+	return false;
+}
+
+bool Complex::CheckCollision(Entity* entity) {
+	return false;
+}
+
+void Complex::ResolveCollision(Entity* entity) {
 
 }
