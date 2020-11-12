@@ -69,6 +69,8 @@ void PhysEntity::Update(float deltaTime){
 	}
 }
 
+//adds a force to this entity, and this entity applies that force back on the sending object
+//simply, changes acceleration by force
 void PhysEntity::AddForce(PhysEntity* creator, Vector3 force, bool bIgnoreMass){
 	this->acceleration += bIgnoreMass ? force : force / mass;
 	//if (acceleration.x < .1f && acceleration.x > -.01f) { acceleration.x = 0; }
@@ -77,8 +79,11 @@ void PhysEntity::AddForce(PhysEntity* creator, Vector3 force, bool bIgnoreMass){
 	if (creator) { creator->acceleration -= bIgnoreMass ? force : force / creator->mass; }
 }
 
+//adds an impulse to this entity, and this entity applies that impulse back on the sending object
+//simply, changes velocity by impulse force
 void PhysEntity::AddImpulse(PhysEntity* creator, Vector3 impulse, bool bIgnoreMass) {
-	
+	this->velocity += bIgnoreMass ? impulse : impulse / mass;
+	if (creator) { creator->acceleration -= bIgnoreMass ? impulse : impulse / creator->mass; }
 }
 
 //TODO this
@@ -100,12 +105,14 @@ bool Sphere::ContainsPoint(Vector3 point) {
 //TODO if other object is sphere, can optimize the equation to not use sqrt
 bool Sphere::CheckCollision(Entity* entity) {
 	if (Sphere* sphere = dynamic_cast<Sphere*>(entity)) {
-		Vector3 betweenVector = position - sphere->position;
-		float overlap = betweenVector.mag() - radius - sphere->radius;
-		if (overlap >= 0) {
+		Vector3 vectorBetween = position - sphere->position;
+		float distanceBetween = vectorBetween.mag();
+		if (distanceBetween <= (radius + sphere->radius)) {
 			//TEMP manual static resolution in here
-			position -= betweenVector.normalized() * overlap;
-			sphere->position += betweenVector.normalized() * overlap;
+			float overlap = .5f * (distanceBetween - radius - sphere->radius);
+			vectorBetween = vectorBetween.normalized() * overlap;
+			position -= vectorBetween;
+			sphere->position += vectorBetween;
 			return true;
 		}
 	}

@@ -11,6 +11,7 @@ namespace Input {
 	}
 
 	static void Update(olc::PixelGameEngine* p, float& deltaTimePtr) {
+////    Keyboard Input    /////
 		//G press = pause
 		if (p->GetKey(olc::G).bHeld) {
 			deltaTimePtr = 0;
@@ -32,8 +33,8 @@ namespace Input {
 		//Q press = spawn sphere
 		if (p->GetKey(olc::Q).bPressed) {
 			Vector3 pos = Vector3(p->GetMouseX(), p->GetMouseY(), 0);
-			Sphere* sphere = new Sphere(10, -1, pos);
-			Physics::AddEntity(sphere, true);
+			Sphere* sphere = new Sphere(10, 0, pos);
+			Physics::AddEntity(sphere);
 			Render::AddEntity(sphere);
 			std::cout << "Creating Sphere at: " + pos.str() << std::endl;
 		}
@@ -44,35 +45,9 @@ namespace Input {
 			pos.z = 1;
 			Box* box = new Box(Vector3(1, 1, 1), -1, Vector3(0,0,3));
 			selectedEntity = box;
-			Physics::AddEntity(box, true);
+			Physics::AddEntity(box);
 			Render::AddEntity(box);
 			std::cout << "Creating Box at: " + pos.str() << std::endl;
-		}
-
-		//LMB press = set click position
-		if (p->GetMouse(0).bPressed) {
-			leftClickPos = GetMousePos(p);
-		}
-
-		//LMB hold = draw line between click and mouse position
-		if (p->GetMouse(0).bHeld) {
-			p->DrawLine(leftClickPos.x, leftClickPos.y, p->GetMouseX(), p->GetMouseY(), olc::WHITE);
-		}
-
-		//TODO: fix this, it only adds force in the downright direction
-		//LMB release = add  drawn force to selected entity
-		if (p->GetMouse(0).bReleased) {
-			if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
-				entity->AddForce(nullptr, GetMousePos(p)-leftClickPos, true);
-			}
-
-			leftClickPos = V3NULL;
-		}
-
-		if (selectedEntity && p->GetKey(olc::P).bPressed) {
-			if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
-				entity->AddForce(nullptr, Vector3(-10, -10, 0), true);
-			}
 		}
 
 		//rotation over axes
@@ -169,8 +144,28 @@ namespace Input {
 			}
 		}
 
-
 		//if (p->GetKey(olc::P).bHeld) { Mesh::projecting = !Render::projecting; }
+
+////    Mouse Input    /////
+
+		//LMB press = set click position
+		if (p->GetMouse(0).bPressed) {
+			leftClickPos = GetMousePos(p);
+		}
+
+		//LMB hold = draw line between click and mouse position
+		if (p->GetMouse(0).bHeld) {
+			p->DrawLine(leftClickPos.x, leftClickPos.y, p->GetMouseX(), p->GetMouseY(), olc::WHITE);
+		}
+
+		//LMB release = add  drawn force to selected entity
+		if (p->GetMouse(0).bReleased) {
+			if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
+				entity->AddForce(nullptr, GetMousePos(p) - leftClickPos, true);
+			}
+
+			leftClickPos = V3NULL;
+		}
 
 		//RMB press = select entity
 		if (p->GetMouse(1).bPressed) {
@@ -182,18 +177,10 @@ namespace Input {
 
 			//check if mouse click contains an entity
 			Vector3 mousePos = GetMousePos(p);
-			for (auto& entity : Physics::hotEntities) {
+			for (auto& entity : Physics::physEntities) {
 				if (entity->ContainsPoint(mousePos)) {
 					selectedEntity = entity;
 					break;
-				}
-			}
-			if (!selectedEntity) {
-				for (auto& entity : Physics::coldEntities) {
-					if (entity->ContainsPoint(mousePos)) {
-						selectedEntity = entity;
-						break;
-					}
 				}
 			}
 
@@ -201,6 +188,11 @@ namespace Input {
 			if (selectedEntity) {
 				selectedEntity->SetColor(olc::RED);
 			}
+		}
+
+		//RMB hold = set the position of selected entity to mouse
+		if (selectedEntity && p->GetMouse(1).bHeld) {
+			selectedEntity->position = Math::vi2dToVector3(p->GetMousePos(), selectedEntity->position.z);
 		}
 
 		if (selectedEntity) {

@@ -1,5 +1,6 @@
 #pragma once
 #include "HandmadeMath.h"
+#include "olcPixelGameEngine.h"
 #include <boost/qvm/mat.hpp>
 #include <boost/qvm/vec.hpp>
 #include <boost/qvm/map_vec_mat.hpp>
@@ -38,7 +39,6 @@ namespace Math {
 		s.pop_back();
 		return s;
 	}
-
 }
 
 
@@ -77,16 +77,17 @@ class Vector3 {
 	
 		float				dot(const Vector3& rhs)		const { return this->x * rhs.x + this->y * rhs.y + this->z * rhs.z; }
 		Vector3				cross(const Vector3& rhs)	const { return Vector3(this->y * rhs.z - rhs.z * this->z, this->x * rhs.z - rhs.x * this->z, this->x * rhs.y - rhs.x * this->y); }
-		float				mag()						const { return std::sqrt(x * x + y * y + z * z); }
+		float				mag()						const { return std::sqrtf(x * x + y * y + z * z); }
 		const std::string	str()						const { return std::string("(") + std::to_string(this->x) + "," + std::to_string(this->y) + "," + std::to_string(this->z) + ")"; }
 		Vector3				normalized()				{ return *this == V3ZERO ? V3ZERO : *this / this->mag(); }
 		Vector3				clampMag(float& rhs)		{ return this->normalized() * rhs; }
-		float				distanceTo(Vector3& rhs)	{ return std::abs((*this - rhs).mag()); }
+		float				distanceTo(Vector3& rhs)	{ return (*this - rhs).mag(); }
 		float				projectOn(Vector3& rhs)		{ return this->dot(rhs.normalized()); }
 		Vector3				componentOn(Vector3& rhs)	{ return rhs.normalized() * this->dot(rhs.normalized()) ; }
 		Vector3				xComp()						{ return Vector3(x, 0, 0); }
 		Vector3				yComp()						{ return Vector3(0, y, 0); }
 		Vector3				zComp()						{ return Vector3(0, 0, z); }
+		//Vector3				invertedComponents()		{ return Vector3(1/x, 1/y, 1/z); }
 
 		//TODO: perpendicular
 
@@ -198,4 +199,10 @@ class Vector3 {
 			x *= 0.5f * (float)p->ScreenWidth();
 			y *= 0.5f * (float)p->ScreenHeight();
 		}
+};
+
+namespace Math {
+	static Vector3 vi2dToVector3(olc::vi2d vector, float z = 0) {
+		return Vector3((float)vector.x, (float)vector.y, z);
+	}
 };

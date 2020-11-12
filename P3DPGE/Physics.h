@@ -6,57 +6,60 @@
 
 namespace Physics {
 		//TODO: optimize by using arrays rather than vectors, 
-		static std::vector<PhysEntity*> hotEntities;
-		static std::vector<PhysEntity*> coldEntities;
+		static std::vector<PhysEntity*> physEntities;
+		static std::vector<std::pair<PhysEntity*, PhysEntity*>> collidingEntities;
 
 		static float airFriction = 5; //completely arbitrary number
-
+		
+		static bool discreteCollision = true;
 		static bool paused = false;
 		static bool frame = false;
 
 		static void Init() {
-			hotEntities = std::vector<PhysEntity*>();
-			coldEntities = std::vector<PhysEntity*>();
+			physEntities = std::vector<PhysEntity*>();
 		}
 
 		//TODO add friction
 		static void Update(float deltaTime) {
+			collidingEntities = std::vector<std::pair<PhysEntity*, PhysEntity*>>();
 			if (!paused || frame) {
-				for (PhysEntity* ptr : hotEntities) {
+				for (PhysEntity* ptr : physEntities) {
 					if (ptr) {
 						//ptr->AddForce(nullptr, -(ptr->velocity).normalized() * airFriction);
-						ptr->Update(deltaTime);
+						if (discreteCollision) {
+							ptr->Update(deltaTime);
+							for (PhysEntity* target : physEntities) {
+								if (target && target->id != ptr->id) {
+									if (ptr->CheckCollision(target)) {
+										collidingEntities.push_back({ptr, target});
+									}
+								} else { break; }
+							}
+						}
 					} else { break; }
 				}
-				for (PhysEntity* ptr : coldEntities) {
-					if (ptr) {
-						//ptr->AddForce(nullptr, -(ptr->velocity).normalized() * airFriction);
-						ptr->Update(deltaTime);
-					} else { break; }
+				for (auto pair : collidingEntities) {
+					
 				}
 				if (frame) { frame = !frame; }
 			}
 		}
 		
 		static void Cleanup() {
-			for (PhysEntity*& ptr : hotEntities) {
+			for (PhysEntity*& ptr : physEntities) {
 				delete ptr; ptr = nullptr;
 			}
-			hotEntities.clear();
-			for (PhysEntity*& ptr : coldEntities) {
-				delete ptr; ptr = nullptr;
-			}
-			coldEntities.clear();
+			physEntities.clear();
 		}
 
-		//TODO: check if max amount of entities is in hot
-		static size_t AddEntity(PhysEntity* entity, bool bHot = false) {
-			if (bHot) {
-				hotEntities.push_back(entity);
-				return hotEntities.size();
+		static size_t AddEntity(PhysEntity* entity) {
+			if (physEntities.size() > 0) {
+				entity->id = physEntities.back()->id + 1;
+				physEntities.push_back(entity);
+				return physEntities.size();
 			} else {
-				coldEntities.push_back(entity);
-				return coldEntities.size();
+				physEntities.push_back(entity);
+				return physEntities.size();
 			}
 		}
 

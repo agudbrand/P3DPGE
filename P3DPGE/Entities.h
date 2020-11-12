@@ -155,6 +155,7 @@ struct Box : public PhysEntity {
 	Box(Vector3 dimensions, int id, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs){
 		this->dimensions = dimensions;
 
+		//TODO talk about using half dimensions
 		//vertices making up the box
 		Vector3 p1 = position;
 		Vector3 p2 = position + dimensions.xComp();

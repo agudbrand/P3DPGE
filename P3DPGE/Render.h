@@ -60,16 +60,16 @@ namespace Render {
 			}
 			e->Draw(p);
 		}
+		p->DrawStringDecal(olc::vf2d(0, p->ScreenHeight()-10), "Mouse Pos: " + p->GetMousePos().str());
+		for (auto pair : Physics::collidingEntities) {
+			p->DrawLine(pair.first->position.x, pair.first->position.y, pair.second->position.x, pair.second->position.y, olc::GREEN);
+		}
 	}
 
 	
 
 	static void Cleanup() {
-		//for (auto vecPtr : drawnEntities) {
-		//	delete vecPtr;
-		//	vecPtr = nullptr;
-		//}
-		//drawnEntities.clear();
+
 	}
 
 };
