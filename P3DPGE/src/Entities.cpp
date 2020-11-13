@@ -57,13 +57,12 @@ void Entity::ProjectToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p, 
 
 //// Physics Entity ////
 
-//TODO handle oscilating
+//TODO(sp,delle,11/13/20) handle oscilating
 void PhysEntity::Update(float deltaTime){
 	if(!bStatic) {
+		if (acceleration.mag() < .01f) { acceleration = V3ZERO; }
 		velocity += acceleration * deltaTime;
-		//if (velocity.x < .1f && velocity.x > -.01f) { velocity.x = 0; }
-		//if (velocity.y < .1f && velocity.y > -.01f) { velocity.y = 0; }
-		//if (velocity.z < .1f && velocity.z > -.01f) { velocity.z = 0; }
+		if (velocity.mag() < .0f) { velocity = V3ZERO; }
 		position += velocity * deltaTime;
 
 		rotVelocity += rotAcceleration * deltaTime;
@@ -75,9 +74,6 @@ void PhysEntity::Update(float deltaTime){
 //simply, changes acceleration by force
 void PhysEntity::AddForce(PhysEntity* creator, Vector3 force, bool bIgnoreMass){
 	this->acceleration += bIgnoreMass ? force : force / mass;
-	//if (acceleration.x < .1f && acceleration.x > -.01f) { acceleration.x = 0; }
-	//if (acceleration.y < .1f && acceleration.y > -.01f) { acceleration.y = 0; }
-	//if (acceleration.z < .1f && acceleration.z > -.01f) { acceleration.z = 0; }
 	if (creator) { creator->acceleration -= bIgnoreMass ? force : force / creator->mass; }
 }
 
@@ -88,7 +84,7 @@ void PhysEntity::AddImpulse(PhysEntity* creator, Vector3 impulse, bool bIgnoreMa
 	if (creator) { creator->acceleration -= bIgnoreMass ? impulse : impulse / creator->mass; }
 }
 
-//TODO this
+//TODO(up,delle,11/13/20) this
 void PhysEntity::GenerateRadialForce(Vector3 position, float radius, float strength, float falloff, bool bIgnoreMass){
 
 }
@@ -103,8 +99,8 @@ bool Sphere::ContainsPoint(Vector3 point) {
 	return point.distanceTo(position) <= radius;
 }
 
-//TODO: expand this to a general entity check, but right now it just checks circles
-//TODO if other object is sphere, can optimize the equation to not use sqrt
+//TODO(sp,delle,11/9/20) expand this to a general entity check, but right now it just checks circles
+//TODO(oup,delle,11/9/20) if other object is sphere, can optimize the equation to not use sqrt
 bool Sphere::CheckCollision(Entity* entity) {
 	if (Sphere* sphere = dynamic_cast<Sphere*>(entity)) {
 		Vector3 vectorBetween = position - sphere->position;
@@ -121,7 +117,7 @@ bool Sphere::CheckCollision(Entity* entity) {
 	return false;
 }
 
-//TODO: expand this to a general entity check, but right now it just checks circles
+//TODO(sp,delle,11/9/20) expand this to a general entity check, but right now it just checks circles
 void Sphere::ResolveCollision(Entity* entity) {
 
 }
@@ -139,12 +135,12 @@ bool Box::ContainsPoint(Vector3 point) {
 	return  checkX && checkY;//&& checkZ;
 }
 
-//TODO: expand this to a general entity check
+//TODO(sp,delle,11/9/20) expand this to a general entity check
 bool Box::CheckCollision(Entity* entity) {
 	return false;
 }
 
-//TODO: expand this to a general entity check
+//TODO(sp,delle,11/9/20) expand this to a general entity check
 void Box::ResolveCollision(Entity* entity) {
 
 }

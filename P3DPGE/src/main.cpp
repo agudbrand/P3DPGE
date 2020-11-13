@@ -27,6 +27,11 @@ TODO sushi: put mesh and triangle somewhere better than entities
 
 TODO sushi: find a reason to either keep or remove Render::Init() 
 
+TODO caj: add physics based collision resolution
+
+TODO caj: make inputs have a vector of the input so we dont have to have a large 
+		written list of them, method to add and remove inputs
+
 NOTE sushi: it may be benefitial to have an objects triangles always be defined in
 	  local space so we don't have to keep translating between world and local
 	  everytime we do something to it. but this may cause other issues

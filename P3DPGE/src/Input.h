@@ -204,6 +204,9 @@ namespace Input {
 			text += "Position:" + selectedEntity->position.str() + "\nRotation:" + selectedEntity->rotation.str() + "\nScale:" + selectedEntity->scale.str() +  "\n";
 			//why are you checking if a pointer to a PhysEntity is equal to an entity dynamically
 			//casted to PhysEntity? also should it be = and not ==?
+			// V answer to above V
+			//im casting entity* to physentity* and if it works, then i print physentity info
+			//it just verifies that its a physentity and creates a new physentity pointer to the physentity
 			if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
 				text += "Is Static: "; text += entity->bStatic ? "true" : "false"; text += "\nMass: " + std::to_string(entity->mass) + "\n";
 				text += "Velocity:" + entity->velocity.str() + "\nAcceleration:" + entity->acceleration.str() + "\n";
