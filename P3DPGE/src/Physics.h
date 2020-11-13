@@ -5,11 +5,11 @@
 
 
 namespace Physics {
-		//TODO: optimize by using arrays rather than vectors, 
+		//TODO(ou,delle,11/9/20) optimize by using arrays rather than vectors, 
 		static std::vector<PhysEntity*> physEntities;
 		static std::vector<std::pair<PhysEntity*, PhysEntity*>> collidingEntities;
 
-		static float airFriction = 5; //completely arbitrary number
+		static float airFriction = .5f; //completely arbitrary number
 		
 		static bool discreteCollision = true;
 		static bool paused = false;
@@ -19,15 +19,15 @@ namespace Physics {
 			physEntities = std::vector<PhysEntity*>();
 		}
 
-		//TODO add friction
+		//TODO(sp,delle,11/13/20) add friction
 		static void Update(float deltaTime) {
 			collidingEntities = std::vector<std::pair<PhysEntity*, PhysEntity*>>();
 			if (!paused || frame) {
 				for (PhysEntity* ptr : physEntities) {
 					if (ptr) {
-						//ptr->AddForce(nullptr, -(ptr->velocity).normalized() * airFriction);
 						if (discreteCollision) {
 							ptr->Update(deltaTime);
+							//ptr->AddForce(nullptr, -(ptr->velocity) * airFriction * deltaTime);
 							for (PhysEntity* target : physEntities) {
 								if (target && target->id != ptr->id) {
 									if (ptr->CheckCollision(target)) {

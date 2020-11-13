@@ -41,7 +41,6 @@ namespace Math {
 	}
 };
 
-
 class Vector3 {
 	public:
 		float x;
@@ -218,6 +217,35 @@ class Vector3 {
 			x *= 0.5f * (float)p->ScreenWidth();
 			y *= 0.5f * (float)p->ScreenHeight();
 		}
+};
+
+//collection of 3 points forming the basis of meshes
+struct Triangle {
+	Vector3 points[3];
+	Vector3 projectedPoints[3];
+
+	Triangle(Vector3 p1, Vector3 p2, Vector3 p3) {
+		points[0] = p1;
+		points[1] = p2;
+		points[2] = p3;
+		copy_points();
+	}
+
+	void copy_points() {
+		for (int p = 0; p < 3; p++) { projectedPoints[p] = points[p]; }
+	}
+
+	Vector3 get_normal() {
+		Vector3 l1 = points[1] - points[0];
+		Vector3 l2 = points[2] - points[0];
+		return l2.cross(l1).normalized();
+	}
+
+	Vector3 get_proj_normal() {
+		Vector3 l1 = projectedPoints[1] - projectedPoints[0];
+		Vector3 l2 = projectedPoints[2] - projectedPoints[0];
+		return l2.cross(l1).normalized();
+	}
 };
 
 namespace Math {
