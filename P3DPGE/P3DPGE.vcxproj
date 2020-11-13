@@ -18,6 +18,19 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Entities.h" />
+    <ClInclude Include="src\HandmadeMath.h" />
+    <ClInclude Include="src\Input.h" />
+    <ClInclude Include="src\Math.h" />
+    <ClInclude Include="src\olcPixelGameEngine.h" />
+    <ClInclude Include="src\Physics.h" />
+    <ClInclude Include="src\Render.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Entities.cpp" />
+    <ClCompile Include="src\main.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -146,20 +159,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="Entities.h" />
-    <ClInclude Include="HandmadeMath.h" />
-    <ClInclude Include="Input.h" />
-    <ClInclude Include="Math.h" />
-    <ClInclude Include="Moveables.h" />
-    <ClInclude Include="olcPixelGameEngine.h" />
-    <ClInclude Include="Physics.h" />
-    <ClInclude Include="Render.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Entities.cpp" />
-    <ClCompile Include="main.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
