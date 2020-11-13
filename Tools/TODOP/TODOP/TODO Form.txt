@@ -1,0 +1,22 @@
+TODO arguments and general form
+
+//TODO(arguments, TODO creator, title, asignee): The issue in question
+
+Where arguments and TODO creator are required and the rest are not. (title is recommended though)
+
+arguments could be
+
+	+ - this TODO is an issue that should be placed on GitHub
+	else it will not be placed on Github
+
+	s - severe issue eg. the code won't compile/displaying correctly/etc
+	
+	p - physics
+	r - render
+	e - entity
+	i - input
+	m - math
+	
+	
+
+
