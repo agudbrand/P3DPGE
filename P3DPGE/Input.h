@@ -6,6 +6,8 @@ namespace Input {
 	static Entity* selectedEntity;
 	static Vector3 leftClickPos = V3NULL;
 
+	
+
 	static Vector3 GetMousePos(olc::PixelGameEngine* p) {
 		return Vector3(p->GetMouseX(), p->GetMouseY(), 0);
 	}
@@ -112,51 +114,43 @@ namespace Input {
 			}
 		}
 
-		//RIGHT held = translate everything in the positive x
-		if (p->GetKey(olc::RIGHT).bHeld) {
-			for (auto& e : Render::entities) {
-				e->Translate(Vector3(10 * deltaTimePtr, 0, 0));
-			}
-		}
-
-		//LEFT held = translate everything in the negative x
-		if (p->GetKey(olc::LEFT).bHeld) {
-			for (auto& e : Render::entities) {
-				e->Translate(Vector3(-10 * deltaTimePtr, 0, 0));
-			}
-		}
-
-		//UP held = translate everything in the negative y
-		if (p->GetKey(olc::UP).bHeld) {
-			for (auto& e : Render::entities) {
-				e->Translate(Vector3(0, -10 * deltaTimePtr, 0));
-			}
-		}
-
-		//DOWNA held = translate everything in the positive y
-		if (p->GetKey(olc::DOWN).bHeld) {
-			for (auto& e : Render::entities) {
-				e->Translate(Vector3(0, 10 * deltaTimePtr, 0));
-			}
-		}
-
-		//SHIFT held = translate everything in the positive z
+		//SHIFT held = 
 		if (p->GetKey(olc::SHIFT).bHeld) {
 			for (auto& e : Render::entities) {
 				e->Translate(Vector3(0, 0, 10 * deltaTimePtr));
 			}
 		}
 
-		//CTRL held = translate everything in the negative z
+		//CTRL held = 
 		if (p->GetKey(olc::CTRL).bHeld) {
 			for (auto& e : Render::entities) {
 				e->Translate(Vector3(0, 0, -10 * deltaTimePtr));
 			}
 		}
 
-		//if (p->GetKey(olc::P).bHeld) { Mesh::projecting = !Render::projecting; }
+		//Camera movement
 
-////    Mouse Input    /////
+		//translation
+		if (p->GetKey(olc::W).bHeld) { Render::camera.position.y -= 8 * deltaTimePtr; }
+		if (p->GetKey(olc::S).bHeld) { Render::camera.position.y += 8 * deltaTimePtr; }
+		if (p->GetKey(olc::A).bHeld) { Render::camera.position.x -= 8 * deltaTimePtr; }
+		if (p->GetKey(olc::D).bHeld) { Render::camera.position.x += 8 * deltaTimePtr; }
+		if (p->GetKey(olc::UP).bHeld) { 
+			Vector3 forward = Render::camera.lookDir * 8 * deltaTimePtr;
+			Render::camera.position += forward;
+		}
+		if (p->GetKey(olc::DOWN).bHeld) { 
+			Vector3 forward = Render::camera.lookDir * 8 * deltaTimePtr;
+			Render::camera.position -= forward;
+		}
+
+		//rotation
+		if (p->GetKey(olc::RIGHT).bHeld) { Render::yaw -= 50 * deltaTimePtr; }
+		if (p->GetKey(olc::LEFT).bHeld) { Render::yaw += 50 * deltaTimePtr; }
+
+		
+
+		////    Mouse Input    /////
 
 		//LMB press = set click position
 		if (p->GetMouse(0).bPressed) {

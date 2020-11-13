@@ -6,6 +6,10 @@ namespace Render {
 
 	static std::vector<Entity*> entities;
 
+	static Camera camera;
+	static float yaw;
+	static float pitch;
+
 	bool projecting = true;
 
 	//booleans for pausing and advancing by frame
@@ -51,19 +55,27 @@ namespace Render {
 	static void WorldToScreenOrtho() {}
 
 	//draw all entities to screen
-	//TODO: cull entites not on screen
 	static void Update(olc::PixelGameEngine* p) {
+
+		mat<float, 4, 4> view = camera.MakeViewMatrix(yaw);
+
+		//draw all entities
 		for (auto& e : entities) { 
 			if (!paused || frame) {
-				if (projecting) { e->ProjectToScreen(ProjectionMatrix(p), p); }
+				if (projecting) { e->ProjectToScreen(ProjectionMatrix(p), p, view); }
 				if (frame) { frame = !frame; }
 			}
 			e->Draw(p);
+
 		}
+
+		//debug
 		p->DrawStringDecal(olc::vf2d(0, p->ScreenHeight()-10), "Mouse Pos: " + p->GetMousePos().str());
 		for (auto pair : Physics::collidingEntities) {
 			p->DrawLine(pair.first->position.x, pair.first->position.y, pair.second->position.x, pair.second->position.y, olc::GREEN);
 		}
+
+
 	}
 
 	

@@ -43,12 +43,13 @@ void Entity::Translate(Vector3 translation) {
 	position += translation;
 }
 
-void Entity::ProjectToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p) {
+void Entity::ProjectToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p, mat<float,4,4> view) {
 	for (auto& t : mesh.triangles) {
 		t.copy_points();
 	}
 	for (auto& m : mesh.triangles) {
 		for (auto& n : m.projectedPoints) {
+			n = n * view;
 			n.ProjToScreen(ProjMat, p, position);
 		}
 	}
@@ -162,5 +163,33 @@ bool Complex::CheckCollision(Entity* entity) {
 }
 
 void Complex::ResolveCollision(Entity* entity) {
+
+}
+
+//// Camera ////
+
+mat<float, 4, 4> Camera::MakeViewMatrix(float yaw) {
+
+	Vector3 target(0, 0, 1);
+	Vector3 up(0, 1, 0);
+
+	lookDir = target * Math::GetRotateV3_Y(yaw);
+	target = position + lookDir;
+
+	mat<float, 4, 4> view = inverse(Math::PointAt(position, target, up));
+
+	return view;
+}
+
+//i wish i could not write these
+void Camera::Draw(olc::PixelGameEngine* p) { 
+	//camera is not drawn
+}
+
+bool Camera::ContainsPoint(Vector3 point) {
+	return false;
+}
+
+void Camera::Update(float deltaTime) {
 
 }

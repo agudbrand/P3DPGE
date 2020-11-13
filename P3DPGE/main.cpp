@@ -13,36 +13,30 @@ using namespace olc;
    TODOs should be ordered about NOTEs and TODOs should be listed in order of
    severity.
 
-TODO: create a WorldMatrix that takes in several matrix operations and
+TODO sushi: create a WorldMatrix that takes in several matrix operations and
 	  gets there product in the order specified then apply that final matrix
 	  to the object. this would probably eliminate the need to constantly
 	  throw the object between local and world space everytime we do an 
-	  operation on it. //sushi
+	  operation on it
 
-TODO: put mesh and triangle somewhere better than entities
+TODO sushi: put mesh and triangle somewhere better than entities
 	  since these are the only two things that aren't entities
 	  and often I find myself wanting to call functions outside
 	  of entity, it would be best to put these somewhere else
-	  maybe in Render itself //sushi
+	  maybe in Render itself 
 
-TODO: find a reason to either keep or remove Render::Init() //sushi
+TODO sushi: find a reason to either keep or remove Render::Init() 
 
-TODO: attempt to implement the depth buffer explained in Javid's 
-	  3D engine part 2 video. this will probably be very complex 
-	  as we'll need a way to tell PGE whether or not it draws
-	  a single pixel based on the depth buffer. so maybe do this much later.
-	  either do this or just try to implement a better algorithm. //sushi
-
-NOTE: it may be benefitial to have an objects triangles always be defined in
+NOTE sushi: it may be benefitial to have an objects triangles always be defined in
 	  local space so we don't have to keep translating between world and local
-	  everytime we do something to it. but this may cause other issues. //sushi
+	  everytime we do something to it. but this may cause other issues
 
-NOTE: should we use Blender to import objects or make our own tool?
+NOTE sushi: should we use Blender to import objects or make our own tool?
 	  maybe use Blender then make a custom one later? dunno, it'd 
-	  be a fun project to build our own tool. //sushi
+	  be a fun project to build our own tool
 
-NOTE: currently, generating an object relative to mouse position
-	  does not work in 3D. //sushi
+NOTE sushi: currently, generating an object relative to mouse position
+	  does not work in 3D
 
 */
 

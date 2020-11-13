@@ -140,7 +140,7 @@ public:
 	//on the same frame consistently it will begin oscillating around the axis
 	//that's being rotated over. most likely have to define an order
 	virtual void Translate(Vector3 translation);
-	virtual void ProjectToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p);
+	virtual void ProjectToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p, mat<float, 4, 4> view);
 
 	void SetTag(std::string newTag);
 	void SetColor(olc::Pixel newColor);
@@ -310,6 +310,17 @@ struct Complex : public PhysEntity {
 //archaic camera class for now
 //in fact its nothing
 struct Camera : public Entity {
+
+	Vector3 lookDir;
+
+	Camera() {  }
+
+	mat<float, 4, 4> MakeViewMatrix(float yaw);
+
+	void Update(float deltaTime) override;
+	void Draw(olc::PixelGameEngine* p) override;
+	bool ContainsPoint(Vector3 point) override;
+
 
 };
 
