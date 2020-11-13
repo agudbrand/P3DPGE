@@ -2,10 +2,28 @@ import os
 import sys
 import fileinput
 from github import Github
+from flask import Flask, request, Response
+import json
+
+#events are received 5 minutes after they occur
 
 #important stuff here
-GITTOKEN = "a8193562d0023da3548295f4b3f2a7b5dde76d94"
+GITTOKEN = "320f32fa7ea8b537c83578d76d77d03bcb66671f"
 REPO = "SushiSalad/P3DPGE"
+
+app = Flask(__name__)
+
+
+
+@app.route('/webhook', methods=['POST'])
+def respond():
+	payload = request.get_json()
+	print(payload)
+	return Response(status=200)
+
+@app.route('/', methods=['GET'])
+def hello_world():
+	return "TODOP time"
 
 def find_files(dir_name, exts):
 	filepaths = []
@@ -16,7 +34,7 @@ def find_files(dir_name, exts):
 					filepaths.append(os.path.join(root, file))
 	return filepaths
 
-def find_files_git():
+def find_files_git(repo):
 	contents = repo.get_contents("")
 	files = []
 	while contents:
@@ -26,31 +44,51 @@ def find_files_git():
 		else:
 			files.append(file)
 	return files;
+
+def getTODOs(file):
+	TODOs = []
+	line_num = 0
+	for line in file:
+		if "TODO(" in line:
+			TODO = line[line.find("TODO("):]
+			arguments = TODO[TODO.find("(") + 1:TODO.find(")")].split(",")
+			body = TODO[TODO.find(":") + 1:]
+			TODOs.append((file.name, line_num, arguments, body))
+		line_num += 1
+	return TODOs
+	
 			
 
-def main(src_dir, local):
+def main(src_dir, git_check):
+
+
 
 	g = Github(GITTOKEN)
+	repo = g.get_repo(REPO)
 
+	Events = repo.get_events()
+	PushEvents = []
 
-	filePaths = find_files(src_dir, ['.cpp', '.h'])
-	filePathsGit = find_files_git()
-	
+	for event in Events:
+		if event.type == "PushEvent":
+			PushEvents.append(event)
+
+	print(PushEvents[0].payload)
+
 	TODOs = []
 	TODOList = open('TODOs.txt', "w")
 
 	#get TODOs and their data
-	for filePath in filePaths:
-		file = open(filePath, 'r+')
-		line_num = 0
-		for line in file:
-			if "TODO(" in line:
-				TODO = line[line.find("TODO("):]
-				arguments = TODO[TODO.find("(") + 1:TODO.find(")")].split(",")
-				body = TODO[TODO.find(":") + 1:]
-				TODOs.append((line_num, arguments, body))
-
-			line_num += 1
+	#if git_check:
+	#	filePathsGit = find_files_git(repo)
+	#	for filePath in filePathsGit:
+	#		file = open(filePath, "r+")
+	#		TODOs.extend(getTODOs(file))
+	#else:
+	#	filePaths = find_files(src_dir, ['.cpp', '.h'])
+	#	for filePath in filePaths:
+	#		file = open(filePath, 'r+')
+	#		TODOs.extend(getTODOs(file))
 
 	Tags = []
 
@@ -58,15 +96,10 @@ def main(src_dir, local):
 		
 		arg = arguments[0]
 
-		if '+' in arg and "-" in arg:
-			Tags.append("Invalid")
-		elif "+" in arg:
+		if "+" in arg:
 			Tags.append("GitIssue")
-		if "s" in arg and "u" in arg:
-			Tags.append("Invalid")
-		else:
-			if "s" in arg:
-				Tags.append("Severe")
+		if "s" in arg:
+			Tags.append("Severe")
 		if "p" in arg:
 			Tags.append("Physics")
 		if "r" in arg:
@@ -77,25 +110,16 @@ def main(src_dir, local):
 			Tags.append("Input")
 		if "m" in arg:
 			Tags.append("Math")
-
-	
-
-	repo = g.get_repo(REPO)
-
-	
-	
-
-	
-
-
-	
 	
 
 if __name__ == "__main__":
-	useage = "\nUseage:\n    python TODOP.py src_folder_path \n    Eg: python TODOP.py "
-	if len(sys.argv) < 2:
-		print(useage)
-		exit()
-	if len(sys.argv) > 2:
-		src_dir = sys.argv[1]
-	main(src_dir)
+	#useage = "\nUseage:\n    python TODOP.py src_folder_path \n    Eg: python TODOP.py "
+	#if len(sys.argv) < 2:
+	#	print(useage)
+	#	exit()
+	#if len(sys.argv) > 2:
+	#	src_dir = sys.argv[1]
+	#	git_check = sys.argv[2]
+	app.run(host="0.0.0.0", port = 80, threaded = True, debug = False)
+	
+	main(src_dir, git_check)
