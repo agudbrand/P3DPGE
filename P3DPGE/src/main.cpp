@@ -29,7 +29,7 @@ TODO sushi: find a reason to either keep or remove Render::Init()
 
 TODO caj: add physics based collision resolution
 
-TODO caj: make inputs have a vector of the input so we dont have to have a large 
+TODO caj: make inputs have a vector of inputs so we dont have to have a large 
 		written list of them, method to add and remove inputs
 
 NOTE sushi: it may be benefitial to have an objects triangles always be defined in
