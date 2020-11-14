@@ -3,7 +3,6 @@
 #include "Entities.h"
 
 namespace Render {
-
 	static std::vector<Entity*> entities;
 
 	static Camera camera;
@@ -24,7 +23,6 @@ namespace Render {
 	}
 
 	static void Init() {
-		
 	}
 
 	using namespace boost::qvm;
@@ -34,7 +32,6 @@ namespace Render {
 	//or when FOV is changed or something
 	//this matrix seems to only work well with 1:1 aspect ratios I think its cause FOV is set to 90
 	mat<float, 4, 4> ProjectionMatrix(olc::PixelGameEngine* p) {
-
 		float nearz = 0.1;
 		float farz = 1000.0;
 		float fov = 90;
@@ -51,37 +48,26 @@ namespace Render {
 		return proj;
 	}
 
-	//TODO: make ortho projection
-	static void WorldToScreenOrtho() {}
-
 	//draw all entities to screen
 	static void Update(olc::PixelGameEngine* p) {
-
 		mat<float, 4, 4> view = camera.MakeViewMatrix(yaw);
 
 		//draw all entities
-		for (auto& e : entities) { 
+		for (auto& e : entities) {
 			if (!paused || frame) {
 				if (projecting) { e->ProjectToScreen(ProjectionMatrix(p), p, view); }
 				if (frame) { frame = !frame; }
 			}
 			e->Draw(p);
-
 		}
 
 		//debug
-		p->DrawStringDecal(olc::vf2d(0, p->ScreenHeight()-10), "Mouse Pos: " + p->GetMousePos().str());
+		p->DrawStringDecal(olc::vf2d(0, p->ScreenHeight() - 10), "Mouse Pos: " + p->GetMousePos().str());
 		for (auto pair : Physics::collidingEntities) {
 			p->DrawLine(pair.first->position.x, pair.first->position.y, pair.second->position.x, pair.second->position.y, olc::GREEN);
 		}
-
-
 	}
-
-	
 
 	static void Cleanup() {
-
 	}
-
 };

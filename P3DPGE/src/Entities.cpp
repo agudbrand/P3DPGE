@@ -2,7 +2,7 @@
 
 //// Entity	////
 
-void Entity::SetTag(std::string newTag){
+void Entity::SetTag(std::string newTag) {
 	tag = newTag;
 }
 
@@ -43,7 +43,7 @@ void Entity::Translate(Vector3 translation) {
 	position += translation;
 }
 
-void Entity::ProjectToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p, mat<float,4,4> view) {
+void Entity::ProjectToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p, mat<float, 4, 4> view) {
 	for (auto& t : mesh.triangles) {
 		t.copy_points();
 	}
@@ -57,13 +57,13 @@ void Entity::ProjectToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p, 
 
 //// Physics Entity ////
 
-void PhysEntity::Update(float deltaTime){
-	if(!bStatic) {
-        if (acceleration.mag() < .01f) { acceleration = V3ZERO; }
+void PhysEntity::Update(float deltaTime) {
+	if (!bStatic) {
+		if (acceleration.mag() < .01f) { acceleration = V3ZERO; }
 		velocity += acceleration * deltaTime;
 		if (velocity.mag() < .1f) { velocity = V3ZERO; }
 		position += velocity * deltaTime;
-        
+
 		rotVelocity += rotAcceleration * deltaTime;
 		rotation += rotVelocity * deltaTime;
 	}
@@ -72,20 +72,20 @@ void PhysEntity::Update(float deltaTime){
 //adds a force to this entity, and this entity applies that force back on the sending object
 //simply, changes acceleration by force
 //NOTE for some reason, this breaks things like friction
-void PhysEntity::AddForce(PhysEntity* creator, Vector3 force, bool bIgnoreMass){
+void PhysEntity::AddForce(PhysEntity* creator, Vector3 force, bool bIgnoreMass) {
 	this->acceleration += bIgnoreMass ? force : force / mass;
 	if (creator) { creator->acceleration -= bIgnoreMass ? force : force / creator->mass; }
 }
 
 //if no creator, assume air friction and temporarily treat object as sphere with C=.5
 //if creator, assume sliding friction
-//TODO(up,delle,11/13/20) change air friction to calculate for shape of object 
-void PhysEntity::AddFrictionForce(PhysEntity* creator, float frictionCoef, bool bIngoreMass){
-    if(creator){
-        
-    }else{
-        acceleration = -velocity * frictionCoef;
-    }
+//TODO(up,delle,11/13/20) change air friction to calculate for shape of object
+void PhysEntity::AddFrictionForce(PhysEntity* creator, float frictionCoef, bool bIngoreMass) {
+	if (creator) {
+	}
+	else {
+		acceleration = -velocity * frictionCoef;
+	}
 }
 
 //adds an impulse to this entity, and this entity applies that impulse back on the sending object
@@ -96,8 +96,7 @@ void PhysEntity::AddImpulse(PhysEntity* creator, Vector3 impulse, bool bIgnoreMa
 }
 
 //TODO(up,delle,11/13/20) this
-void PhysEntity::GenerateRadialForce(Vector3 position, float radius, float strength, float falloff, bool bIgnoreMass){
-    
+void PhysEntity::GenerateRadialForce(Vector3 position, float radius, float strength, float falloff, bool bIgnoreMass) {
 }
 
 //// Sphere	////
@@ -131,7 +130,6 @@ bool Sphere::CheckCollision(Entity* entity) {
 
 //TODO(sp,delle,11/9/20) expand this to a general entity check, but right now it just checks circles
 void Sphere::ResolveCollision(Entity* entity) {
-    
 }
 
 //// Box ////
@@ -154,7 +152,6 @@ bool Box::CheckCollision(Entity* entity) {
 
 //TODO(sp,delle,11/9/20) expand this to a general entity check
 void Box::ResolveCollision(Entity* entity) {
-    
 }
 
 //// Complex ////
@@ -171,26 +168,24 @@ bool Complex::CheckCollision(Entity* entity) {
 }
 
 void Complex::ResolveCollision(Entity* entity) {
-    
 }
 
 //// Camera ////
 
 mat<float, 4, 4> Camera::MakeViewMatrix(float yaw) {
-    
 	Vector3 target(0, 0, 1);
 	Vector3 up(0, 1, 0);
-    
+
 	lookDir = target * Math::GetRotateV3_Y(yaw);
 	target = position + lookDir;
-    
+
 	mat<float, 4, 4> view = inverse(Math::PointAt(position, target, up));
-    
+
 	return view;
 }
 
 //i wish i could not write these
-void Camera::Draw(olc::PixelGameEngine* p) { 
+void Camera::Draw(olc::PixelGameEngine* p) {
 	//camera is not drawn
 }
 
@@ -199,5 +194,4 @@ bool Camera::ContainsPoint(Vector3 point) {
 }
 
 void Camera::Update(float deltaTime) {
-    
 }

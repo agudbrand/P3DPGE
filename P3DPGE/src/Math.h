@@ -121,8 +121,6 @@ class Vector3 {
 
 		//// Functions pertaining to matrix-vertex manipulation ////
 
-		//TODO: rewrite to use the new * operator for mats
-
 		//translate vector with given translation
 		void translateV3(Vector3 translation) {
 			mat<float, 4, 4> tv {
@@ -295,11 +293,11 @@ namespace Math {
 
 	//this function is really complex and i just pulled it from Javid's video
 	//hopefully later i'll try to understand it better
-	//TODO sushi: understand this please
+	//TODO(., sushi): understand this please
 	static int ClipTriangles(Vector3 plane_p, Vector3 plane_n, Triangle in_tri, Triangle out_tri1, Triangle out_tri2) {
 		plane_n.normalize();
 
-		//TODO sushi: make this into its own function
+		//TODO(., sushi): make this into its own function
 		//auto dist = [&](vec3d& p)
 		//{
 		//	vec3d n = Vector_Normalise(p);
@@ -307,7 +305,7 @@ namespace Math {
 		//};
 	}
 	
-	//TODO sushi: rename these functions to something not retarded
+	//TODO(., sushi): rename these functions to something not retarded
 	static mat<float, 4, 4> GetRotateV3_X(float theta) {
 		theta = Math::to_radians(theta);
 		mat<float, 4, 4> rvx{

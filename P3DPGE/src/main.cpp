@@ -13,23 +13,23 @@ using namespace olc;
    TODOs should be ordered about NOTEs and TODOs should be listed in order of
    severity.
 
-TODO sushi: create a WorldMatrix that takes in several matrix operations and
+TODO(g, sushi): create a WorldMatrix that takes in several matrix operations and
 	  gets there product in the order specified then apply that final matrix
 	  to the object. this would probably eliminate the need to constantly
 	  throw the object between local and world space everytime we do an 
 	  operation on it
 
-TODO sushi: put mesh and triangle somewhere better than entities
+TODO(g, sushi): put mesh and triangle somewhere better than entities
 	  since these are the only two things that aren't entities
 	  and often I find myself wanting to call functions outside
 	  of entity, it would be best to put these somewhere else
 	  maybe in Render itself 
 
-TODO sushi: find a reason to either keep or remove Render::Init() 
+TODO(g, sushi): find a reason to either keep or remove Render::Init() 
 
-TODO caj: add physics based collision resolution
+TODO(g, caj): add physics based collision resolution
 
-TODO caj: make inputs have a vector of inputs so we dont have to have a large 
+TODO(g, caj): make inputs have a vector of inputs so we dont have to have a large 
 		written list of them, method to add and remove inputs
 
 NOTE sushi: it may be benefitial to have an objects triangles always be defined in
