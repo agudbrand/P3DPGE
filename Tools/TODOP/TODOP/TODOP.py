@@ -2,6 +2,7 @@ import os
 import sys
 import fileinput
 from github import Github
+import github
 from flask import Flask, request, Response
 import json
 
@@ -10,6 +11,7 @@ import json
 #important stuff here
 GITTOKEN = "320f32fa7ea8b537c83578d76d77d03bcb66671f"
 REPO = "SushiSalad/P3DPGE"
+APP_ID = 88527
 
 app = Flask(__name__)
 
@@ -59,21 +61,26 @@ def getTODOs(file):
 	
 			
 
-def main(src_dir, git_check):
+def main():
 
+	#do this shit later I guess
+	#i = 0
+	#while os.path.exists("logs/payload%s.json" % i):
+	#	i += 1	
+	#with open("payload%s.json" % i, 'w') as logfile:
+	#	json.dump(payload, logfile)
 
+	#g = Github(GITTOKEN)
+	#repo = g.get_repo(REPO)
 
-	g = Github(GITTOKEN)
-	repo = g.get_repo(REPO)
+	#Events = repo.get_events()
+	#PushEvents = []
 
-	Events = repo.get_events()
-	PushEvents = []
+	#for event in Events:
+	#	if event.type == "PushEvent":
+	#		PushEvents.append(event)
 
-	for event in Events:
-		if event.type == "PushEvent":
-			PushEvents.append(event)
-
-	print(PushEvents[0].payload)
+	#print(PushEvents[0].payload)
 
 	TODOs = []
 	TODOList = open('TODOs.txt', "w")
@@ -85,31 +92,43 @@ def main(src_dir, git_check):
 	#		file = open(filePath, "r+")
 	#		TODOs.extend(getTODOs(file))
 	#else:
-	#	filePaths = find_files(src_dir, ['.cpp', '.h'])
-	#	for filePath in filePaths:
-	#		file = open(filePath, 'r+')
-	#		TODOs.extend(getTODOs(file))
+	filePaths = find_files(src_dir, ['.cpp', '.h'])
+	for filePath in filePaths:
+		file = open(filePath, 'r+')
+		TODOs.extend(getTODOs(file))
 
-	Tags = []
+	
 
 	for line_num, arguments, body in TODOs:
 		
-		arg = arguments[0]
+		Tags = []
 
-		if "+" in arg:
-			Tags.append("GitIssue")
-		if "s" in arg:
-			Tags.append("Severe")
-		if "p" in arg:
-			Tags.append("Physics")
-		if "r" in arg:
-			Tags.append("Render")
-		if "e" in arg:
-			Tags.append("Entity")
-		if "i" in arg:
-			Tags.append("Input")
-		if "m" in arg:
-			Tags.append("Math")
+		#set this up so that it goes through each argument and organizes the data to shove into a file later
+		argument = arguments[0]
+		for arg in argument:
+			if "+" in arg:
+				Tags.append("GitIssue")
+			if "s" in arg:
+				Tags.append("Severe")
+			if "p" in arg:
+				Tags.append("Physics")
+			if "r" in arg:
+				Tags.append("Render")
+			if "e" in arg:
+				Tags.append("Entity")
+			if "i" in arg:
+				Tags.append("Input")
+			if "m" in arg:
+				Tags.append("Math")
+		creator = arguments[1]
+		if len(arguments) == 2:
+			TODOList.write()
+		if len(arguments) > 3:
+			asignee = arguments[3]
+
+
+
+
 	
 
 if __name__ == "__main__":
@@ -120,6 +139,7 @@ if __name__ == "__main__":
 	#if len(sys.argv) > 2:
 	#	src_dir = sys.argv[1]
 	#	git_check = sys.argv[2]
+	main()
 	app.run(host="0.0.0.0", port = 80, threaded = True, debug = False)
 	
-	main(src_dir, git_check)
+	
