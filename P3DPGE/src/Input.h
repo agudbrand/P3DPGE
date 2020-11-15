@@ -2,12 +2,53 @@
 #include "Physics.h"
 #include "Render.h"
 
+typedef void (*Action)();
+
+struct InputAction {
+	olc::Key key;
+	int mouseButton;
+	int inputState; //0 = bPressed, 1 = bHeld, 2 = bReleased
+	bool bShiftHeld;
+	bool bCtrlHeld;
+	bool bAltHeld;
+	std::string name;
+	std::string description;
+	Action action;
+
+	InputAction(Action action, std::string name, olc::Key key = NONE, int mouseButton = -1, int inputState = 0, 
+				bool bShiftHeld = false, bool bCtrlHeld = false, bool bAltHeld = false, std::string description = "") {
+		this->key = key;
+		this->mouseButton = mouseButton;
+		this->inputState = inputState;
+		this->bShiftHeld = bShiftHeld;
+		this->bCtrlHeld = bCtrlHeld;
+		this->bAltHeld = bAltHeld;
+		this->name = name;
+		this->description = description;
+		this->action = action;
+	}
+
+	void Update(olc::PixelGameEngine* p) {
+		if (key != olc::NONE) {
+			
+		} else if (mouseButton != -1) {
+			
+		}
+	};
+};
+
 namespace Input {
+	static std::vector<InputAction> inputs;
+
 	static Entity* selectedEntity;
 	static Vector3 leftClickPos = V3NULL;
 
 	static Vector3 GetMousePos(olc::PixelGameEngine* p) {
 		return Vector3(p->GetMouseX(), p->GetMouseY(), 0);
+	}
+
+	static void Init() {
+		inputs = std::vector<InputAction>();
 	}
 
 	static void Update(olc::PixelGameEngine* p, float& deltaTimePtr) {
@@ -202,11 +243,7 @@ namespace Input {
 		if (selectedEntity) {
 			std::string text = "ID: " + std::to_string(selectedEntity->id) + "\tTag: " + selectedEntity->tag + "\n";
 			text += "Position:" + selectedEntity->position.str() + "\nRotation:" + selectedEntity->rotation.str() + "\nScale:" + selectedEntity->scale.str() + "\n";
-			//why are you checking if a pointer to a PhysEntity is equal to an entity dynamically
-			//casted to PhysEntity? also should it be = and not ==?
-			// V answer to above V
-			//im casting entity* to physentity* and if it works, then i print physentity info
-			//it just verifies that its a physentity and creates a new physentity pointer to the physentity
+			//NOTE this checks if possible and casts Entity* to PhysEntity*
 			if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
 				text += "Is Static: "; text += entity->bStatic ? "true" : "false"; text += "\nMass: " + std::to_string(entity->mass) + "\n";
 				text += "Velocity:" + entity->velocity.str() + "\nAcceleration:" + entity->acceleration.str() + "\n";

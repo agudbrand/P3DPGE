@@ -55,6 +55,7 @@ public:
 	bool OnUserCreate() override {
 
 		time = 0;
+		Input::Init();
 		Physics::Init();
 		Render::Init();
 		
