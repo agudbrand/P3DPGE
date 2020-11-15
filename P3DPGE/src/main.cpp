@@ -27,9 +27,9 @@ TODO(g, sushi) put mesh and triangle somewhere better than entities
 
 TODO(g, sushi) find a reason to either keep or remove Render::Init() 
 
-TODO(g, delle) add physics based collision resolution
+TODO(p, delle) add physics based collision resolution
 
-TODO(g, delle) make inputs have a vector of inputs so we dont have to have a large 
+TODO(i, delle) make inputs have a vector of inputs so we dont have to have a large 
 		written list of them, method to add and remove inputs
 
 NOTE sushi: it may be benefitial to have an objects triangles always be defined in
