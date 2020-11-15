@@ -44,15 +44,31 @@ void Entity::Translate(Vector3 translation) {
 }
 
 void Entity::ProjectToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p, mat<float, 4, 4> view) {
+	//copy triangles actual points to projected points for projecting
 	for (auto& t : mesh.triangles) {
 		t.copy_points();
 	}
+
+	//convert mesh to viewed mesh
 	for (auto& m : mesh.triangles) {
-		for (auto& n : m.projectedPoints) {
-			n = n * view;
-			n.ProjToScreen(ProjMat, p, position);
+		for (auto& n : m.projectedPoints) { n = n * view; }
+	}
+
+	for (auto& m : mesh.triangles) {
+		//get clipped triangles
+		int clippedTriangles = 0;
+		Triangle clipped[2];
+		clippedTriangles = Math::ClipTriangles(Vector3(0, 0, 0.1), Vector3(0, 0, 1), m, clipped[0], clipped[1]);
+		if (clippedTriangles == 0) { std::cout << "No clip" << std::endl; }
+		if (clippedTriangles == 1) { std::cout << " 2 clip" << std::endl; }
+		if (clippedTriangles == 2) { std::cout << " 3 clip" << std::endl; }
+		for (auto& t : clipped){
+			for (auto& n : t.projectedPoints) {
+				n.ProjToScreen(ProjMat, p, position);
+			}
 		}
 	}
+	
 }
 
 //// Physics Entity ////

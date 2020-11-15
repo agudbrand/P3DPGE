@@ -15,8 +15,8 @@ struct InputAction {
 	std::string description;
 	Action action;
 
-	InputAction(Action action, std::string name, olc::Key key = NONE, int mouseButton = -1, int inputState = 0, 
-				bool bShiftHeld = false, bool bCtrlHeld = false, bool bAltHeld = false, std::string description = "") {
+	InputAction(Action action, std::string name, olc::Key key = olc::Key::NONE, int mouseButton = -1, int inputState = 0,
+		bool bShiftHeld = false, bool bCtrlHeld = false, bool bAltHeld = false, std::string description = "") {
 		this->key = key;
 		this->mouseButton = mouseButton;
 		this->inputState = inputState;
@@ -30,9 +30,8 @@ struct InputAction {
 
 	void Update(olc::PixelGameEngine* p) {
 		if (key != olc::NONE) {
-			
-		} else if (mouseButton != -1) {
-			
+		}
+		else if (mouseButton != -1) {
 		}
 	};
 };
@@ -91,7 +90,7 @@ namespace Input {
 		//T press = spawn complex test object
 		if (p->GetKey(olc::T).bPressed) {
 			Vector3 pos = Vector3(p->GetMouseX(), p->GetMouseY(), 0);
-			Complex* complex = new Complex("test_object.obj", 0, Vector3(0, 0, 0));
+			Complex* complex = new Complex("objects/test_object.obj", 0, Vector3(0, 0, 3));
 			selectedEntity = complex;
 			Physics::AddEntity(complex);
 			Render::AddEntity(complex);
@@ -112,7 +111,7 @@ namespace Input {
 		//rotation over axes
 		if (p->GetKey(olc::J).bHeld) {
 			for (auto& e : Render::entities) {
-				e->rotation.x = 0.6;
+				e->rotation.x = 10 * deltaTimePtr;
 				e->RotateX();
 			}
 		}
@@ -120,7 +119,7 @@ namespace Input {
 		//K held = rotate everything in the positive y
 		if (p->GetKey(olc::K).bHeld) {
 			for (auto& e : Render::entities) {
-				e->rotation.y = 0.6;
+				e->rotation.y = 10 * deltaTimePtr;
 				e->RotateY();
 			}
 		}
@@ -128,7 +127,7 @@ namespace Input {
 		//L held = rotate everything in the positive z
 		if (p->GetKey(olc::L).bHeld) {
 			for (auto& e : Render::entities) {
-				e->rotation.z = 0.6;
+				e->rotation.z = 10 * deltaTimePtr;
 				e->RotateZ();
 			}
 		}
@@ -136,7 +135,7 @@ namespace Input {
 		//M held = rotate everything in the negative x
 		if (p->GetKey(olc::M).bHeld) {
 			for (auto& e : Render::entities) {
-				e->rotation.x = -0.6;
+				e->rotation.x = -10 * deltaTimePtr;
 				e->RotateX();
 			}
 		}
@@ -144,7 +143,7 @@ namespace Input {
 		//COMMA held = rotate everything in the negative y
 		if (p->GetKey(olc::COMMA).bHeld) {
 			for (auto& e : Render::entities) {
-				e->rotation.y = -0.6;
+				e->rotation.y = -10 * deltaTimePtr;
 				e->RotateY();
 			}
 		}
@@ -152,7 +151,7 @@ namespace Input {
 		//PERIOD held = rotate everything in the negative z
 		if (p->GetKey(olc::PERIOD).bHeld) {
 			for (auto& e : Render::entities) {
-				e->rotation.z = -0.6;
+				e->rotation.z = -10 * deltaTimePtr;
 				e->RotateZ();
 			}
 		}
