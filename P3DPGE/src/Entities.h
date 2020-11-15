@@ -227,7 +227,7 @@ struct Complex : public PhysEntity {
 	//his video and should probably be redone later
 	//for ex he uses a lot of weird ways to get strings
 	//from the obj file that may not be necessary
-	//TODO(e, sushi): generate complex object relative to input position
+	//TODO(e, sushi) generate complex object relative to input position
 	bool LoadFromObjectFile(std::string file_name) {
 		std::ifstream f(file_name);
 		if (!f.is_open()) { return false; }

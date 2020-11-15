@@ -1,0 +1,214 @@
+TODO List successfully generated with 17 TODOs found.
+
+~~~~~~~ TODO 0 ~~~~~~~
+in file Entities.cpp at line 81
+created by: delle
+----------------------
+Date: 11/13/20
+Tags: Unimportant, Physics
+----------------------
+change air friction to calculate for shape of object
+
+
+~~~~~~~ TODO 0 ~~~~~~~
+
+
+~~~~~~~ TODO 1 ~~~~~~~
+in file Entities.cpp at line 97
+created by: delle
+----------------------
+Date: 11/13/20
+Tags: Unimportant, Physics
+----------------------
+this
+
+
+~~~~~~~ TODO 1 ~~~~~~~
+
+
+~~~~~~~ TODO 2 ~~~~~~~
+in file Entities.cpp at line 112
+created by: delle
+----------------------
+Date: 11/9/20
+Tags: Severe, Physics
+----------------------
+expand this to a general entity check, but right now it just checks circles
+
+
+~~~~~~~ TODO 2 ~~~~~~~
+
+
+~~~~~~~ TODO 3 ~~~~~~~
+in file Entities.cpp at line 113
+created by: delle
+----------------------
+Date: 11/9/20
+Tags: Optimization, Unimportant, Physics
+----------------------
+if other object is sphere, can optimize the equation to not use sqrt
+
+
+~~~~~~~ TODO 3 ~~~~~~~
+
+
+~~~~~~~ TODO 4 ~~~~~~~
+in file Entities.cpp at line 130
+created by: delle
+----------------------
+Date: 11/9/20
+Tags: Severe, Physics
+----------------------
+expand this to a general entity check, but right now it just checks circles
+
+
+~~~~~~~ TODO 4 ~~~~~~~
+
+
+~~~~~~~ TODO 5 ~~~~~~~
+in file Entities.cpp at line 147
+created by: delle
+----------------------
+Date: 11/9/20
+Tags: Severe, Physics
+----------------------
+expand this to a general entity check
+
+
+~~~~~~~ TODO 5 ~~~~~~~
+
+
+~~~~~~~ TODO 6 ~~~~~~~
+in file Entities.cpp at line 152
+created by: delle
+----------------------
+Date: 11/9/20
+Tags: Severe, Physics
+----------------------
+expand this to a general entity check
+
+
+~~~~~~~ TODO 6 ~~~~~~~
+
+
+~~~~~~~ TODO 7 ~~~~~~~
+in file Entities.h at line 229
+created by:  sushi
+----------------------
+Tags: Entity
+----------------------
+generate complex object relative to input position
+
+
+~~~~~~~ TODO 7 ~~~~~~~
+
+
+~~~~~~~ TODO 8 ~~~~~~~
+in file main.cpp at line 15
+created by:  sushi
+----------------------
+Tags: General
+----------------------
+create a WorldMatrix that takes in several matrix operations and
+
+
+~~~~~~~ TODO 8 ~~~~~~~
+
+
+~~~~~~~ TODO 9 ~~~~~~~
+in file main.cpp at line 21
+created by:  sushi
+----------------------
+Tags: General
+----------------------
+put mesh and triangle somewhere better than entities
+
+
+~~~~~~~ TODO 9 ~~~~~~~
+
+
+~~~~~~~ TODO 10 ~~~~~~~
+in file main.cpp at line 27
+created by:  sushi
+----------------------
+Tags: General
+----------------------
+find a reason to either keep or remove Render::Init() 
+
+
+~~~~~~~ TODO 10 ~~~~~~~
+
+
+~~~~~~~ TODO 11 ~~~~~~~
+in file main.cpp at line 29
+created by:  delle
+----------------------
+Tags: General
+----------------------
+add physics based collision resolution
+
+
+~~~~~~~ TODO 11 ~~~~~~~
+
+
+~~~~~~~ TODO 12 ~~~~~~~
+in file main.cpp at line 31
+created by:  delle
+----------------------
+Tags: General
+----------------------
+make inputs have a vector of inputs so we dont have to have a large 
+
+
+~~~~~~~ TODO 12 ~~~~~~~
+
+
+~~~~~~~ TODO 13 ~~~~~~~
+in file Math.h at line 295
+created by:  sushi
+----------------------
+Tags: No Tags
+----------------------
+understand this please
+
+
+~~~~~~~ TODO 13 ~~~~~~~
+
+
+~~~~~~~ TODO 14 ~~~~~~~
+in file Math.h at line 299
+created by:  sushi
+----------------------
+Tags: No Tags
+----------------------
+make this into its own function
+
+
+~~~~~~~ TODO 14 ~~~~~~~
+
+
+~~~~~~~ TODO 15 ~~~~~~~
+in file Math.h at line 307
+created by:  sushi
+----------------------
+Tags: General
+----------------------
+rename these functions to something not retarded
+
+
+~~~~~~~ TODO 15 ~~~~~~~
+
+
+~~~~~~~ TODO 16 ~~~~~~~
+in file Physics.h at line 6
+created by: delle
+----------------------
+Date: 11/9/20
+Tags: Optimization, Unimportant
+----------------------
+optimize by using arrays rather than vectors,
+
+
+~~~~~~~ TODO 16 ~~~~~~~
+
+
