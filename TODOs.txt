@@ -5,7 +5,7 @@ Entities.cpp, Line: 97
 Creator: delle
 ----------------------
 Date: 11/13/20
-Tags: unimportant, physics
+Tags: TODOP, unimportant, TODOP, physics
 ----------------------
 change air friction to calculate for shape of object
 
@@ -14,7 +14,7 @@ Entities.cpp, Line: 113
 Creator: delle
 ----------------------
 Date: 11/13/20
-Tags: unimportant, physics
+Tags: TODOP, unimportant, TODOP, physics
 ----------------------
 this
 
@@ -23,7 +23,7 @@ Entities.cpp, Line: 128
 Creator: delle
 ----------------------
 Date: 11/9/20
-Tags: severe, physics
+Tags: TODOP, severe, TODOP, physics
 ----------------------
 expand this to a general entity check, but right now it just checks circles
 
@@ -32,7 +32,7 @@ Entities.cpp, Line: 129
 Creator: delle
 ----------------------
 Date: 11/9/20
-Tags: optimization, unimportant, physics
+Tags: TODOP, optimization, TODOP, unimportant, TODOP, physics
 ----------------------
 if other object is sphere, can optimize the equation to not use sqrt
 
@@ -41,7 +41,7 @@ Entities.cpp, Line: 146
 Creator: delle
 ----------------------
 Date: 11/9/20
-Tags: severe, physics
+Tags: TODOP, severe, TODOP, physics
 ----------------------
 expand this to a general entity check, but right now it just checks circles
 
@@ -50,7 +50,7 @@ Entities.cpp, Line: 163
 Creator: delle
 ----------------------
 Date: 11/9/20
-Tags: severe, physics
+Tags: TODOP, severe, TODOP, physics
 ----------------------
 expand this to a general entity check
 
@@ -59,7 +59,7 @@ Entities.cpp, Line: 168
 Creator: delle
 ----------------------
 Date: 11/9/20
-Tags: severe, physics
+Tags: TODOP, severe, TODOP, physics
 ----------------------
 expand this to a general entity check
 
@@ -67,7 +67,7 @@ expand this to a general entity check
 Entities.h, Line: 229
 Creator:  sushi
 ----------------------
-Tags: entity
+Tags: TODOP, entity
 ----------------------
 generate complex object relative to input position
 
@@ -75,7 +75,7 @@ generate complex object relative to input position
 main.cpp, Line: 14
 Creator:  sushi
 ----------------------
-Tags: general
+Tags: TODOP, general
 ----------------------
 create a WorldMatrix that takes in several matrix operations and
 
@@ -83,7 +83,7 @@ create a WorldMatrix that takes in several matrix operations and
 main.cpp, Line: 20
 Creator:  sushi
 ----------------------
-Tags: general
+Tags: TODOP, general
 ----------------------
 put mesh and triangle somewhere better than entities
 
@@ -91,7 +91,7 @@ put mesh and triangle somewhere better than entities
 main.cpp, Line: 26
 Creator:  sushi
 ----------------------
-Tags: general
+Tags: TODOP, general
 ----------------------
 find a reason to either keep or remove Render::Init() 
 
@@ -99,7 +99,7 @@ find a reason to either keep or remove Render::Init()
 main.cpp, Line: 28
 Creator:  delle
 ----------------------
-Tags: physics
+Tags: TODOP, physics
 ----------------------
 add physics based collision resolution
 
@@ -107,7 +107,7 @@ add physics based collision resolution
 main.cpp, Line: 30
 Creator:  delle
 ----------------------
-Tags: input
+Tags: TODOP, input
 ----------------------
 make inputs have a vector of inputs so we dont have to have a large 
 
@@ -117,7 +117,7 @@ Math.h, Line: 298
 Creator:  sushi
 ----------------------
 Date:  11/15/2020
-Tags: GitIssue, render
+Tags: TODOP, GitIssue, TODOP, render
 ----------------------
 mesh Javid\'s clipping algorithm with what we already have set up, also rewatch his video to fix the camera not moving the clipping plane.
 
@@ -134,7 +134,7 @@ Physics.h, Line: 6
 Creator: delle
 ----------------------
 Date: 11/9/20
-Tags: optimization, unimportant
+Tags: TODOP, optimization, TODOP, unimportant
 ----------------------
 optimize by using arrays rather than vectors,
 
