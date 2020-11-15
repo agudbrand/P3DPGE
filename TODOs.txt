@@ -1,65 +1,65 @@
 TODO List successfully generated with 17 TODOs found.
 
 ~~~~~~~ TODO 0 ~~~~~~~
-Entities.cpp, Line: 81
-Creator: delle
-----------------------
-Date: 11/13/20
-Tags: Unimportant, Physics
-----------------------
-change air friction to calculate for shape of object
-
-~~~~~~~ TODO 1 ~~~~~~~
 Entities.cpp, Line: 97
 Creator: delle
 ----------------------
 Date: 11/13/20
-Tags: Unimportant, Physics
+Tags: unimportant, physics
+----------------------
+change air friction to calculate for shape of object
+
+~~~~~~~ TODO 1 ~~~~~~~
+Entities.cpp, Line: 113
+Creator: delle
+----------------------
+Date: 11/13/20
+Tags: unimportant, physics
 ----------------------
 this
 
 ~~~~~~~ TODO 2 ~~~~~~~
-Entities.cpp, Line: 112
+Entities.cpp, Line: 128
 Creator: delle
 ----------------------
 Date: 11/9/20
-Tags: Severe, Physics
+Tags: severe, physics
 ----------------------
 expand this to a general entity check, but right now it just checks circles
 
 ~~~~~~~ TODO 3 ~~~~~~~
-Entities.cpp, Line: 113
+Entities.cpp, Line: 129
 Creator: delle
 ----------------------
 Date: 11/9/20
-Tags: Optimization, Unimportant, Physics
+Tags: optimization, unimportant, physics
 ----------------------
 if other object is sphere, can optimize the equation to not use sqrt
 
 ~~~~~~~ TODO 4 ~~~~~~~
-Entities.cpp, Line: 130
+Entities.cpp, Line: 146
 Creator: delle
 ----------------------
 Date: 11/9/20
-Tags: Severe, Physics
+Tags: severe, physics
 ----------------------
 expand this to a general entity check, but right now it just checks circles
 
 ~~~~~~~ TODO 5 ~~~~~~~
-Entities.cpp, Line: 147
+Entities.cpp, Line: 163
 Creator: delle
 ----------------------
 Date: 11/9/20
-Tags: Severe, Physics
+Tags: severe, physics
 ----------------------
 expand this to a general entity check
 
 ~~~~~~~ TODO 6 ~~~~~~~
-Entities.cpp, Line: 152
+Entities.cpp, Line: 168
 Creator: delle
 ----------------------
 Date: 11/9/20
-Tags: Severe, Physics
+Tags: severe, physics
 ----------------------
 expand this to a general entity check
 
@@ -67,68 +67,73 @@ expand this to a general entity check
 Entities.h, Line: 229
 Creator:  sushi
 ----------------------
-Tags: Entity
+Tags: entity
 ----------------------
 generate complex object relative to input position
 
 ~~~~~~~ TODO 8 ~~~~~~~
-main.cpp, Line: 15
+Title:  Test Issue for TODOP
+main.cpp, Line: 10
 Creator:  sushi
 ----------------------
-Tags: General
+Date:  11/15/2020
+Tags: GitIssue, physics, render, entity, input, math, optimization, clean up
+----------------------
+please please please please work :) 
+
+~~~~~~~ TODO 9 ~~~~~~~
+main.cpp, Line: 16
+Creator:  sushi
+----------------------
+Tags: general
 ----------------------
 create a WorldMatrix that takes in several matrix operations and
 
-~~~~~~~ TODO 9 ~~~~~~~
-main.cpp, Line: 21
+~~~~~~~ TODO 10 ~~~~~~~
+main.cpp, Line: 22
 Creator:  sushi
 ----------------------
-Tags: General
+Tags: general
 ----------------------
 put mesh and triangle somewhere better than entities
 
-~~~~~~~ TODO 10 ~~~~~~~
-main.cpp, Line: 27
+~~~~~~~ TODO 11 ~~~~~~~
+main.cpp, Line: 28
 Creator:  sushi
 ----------------------
-Tags: General
+Tags: general
 ----------------------
 find a reason to either keep or remove Render::Init() 
 
-~~~~~~~ TODO 11 ~~~~~~~
-main.cpp, Line: 29
+~~~~~~~ TODO 12 ~~~~~~~
+main.cpp, Line: 30
 Creator:  delle
 ----------------------
-Tags: Physics
+Tags: physics
 ----------------------
 add physics based collision resolution
 
-~~~~~~~ TODO 12 ~~~~~~~
-main.cpp, Line: 31
+~~~~~~~ TODO 13 ~~~~~~~
+main.cpp, Line: 32
 Creator:  delle
 ----------------------
-Tags: Input
+Tags: input
 ----------------------
 make inputs have a vector of inputs so we dont have to have a large 
 
-~~~~~~~ TODO 13 ~~~~~~~
-Math.h, Line: 295
-Creator:  sushi
-----------------------
-Tags: No Tags
-----------------------
-understand this please
-
 ~~~~~~~ TODO 14 ~~~~~~~
-Math.h, Line: 299
+Title:  Implement Clipping Algorithm
+Math.h, Line: 298
 Creator:  sushi
+Assigned to: sushi
 ----------------------
-Tags: No Tags
+Date:  11/15/2020
+Tags: GitIssue, render
 ----------------------
-make this into its own function
+mesh Javid\'s clipping algorithm with what we already have set up, also rewatch his video to fix the camera not moving the clipping plane.
 
 ~~~~~~~ TODO 15 ~~~~~~~
-Math.h, Line: 307
+Math.h, Line: 358
 Creator:  sushi
 ----------------------
 Tags: No Tags
@@ -140,7 +145,7 @@ Physics.h, Line: 6
 Creator: delle
 ----------------------
 Date: 11/9/20
-Tags: Optimization, Unimportant
+Tags: optimization, unimportant
 ----------------------
 optimize by using arrays rather than vectors,
 
