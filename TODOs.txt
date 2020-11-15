@@ -77,7 +77,7 @@ main.cpp, Line: 10
 Creator:  sushi
 ----------------------
 Date:  11/15/2020
-Tags: GitIssue, physics, render, entity, input, math, optimization, clean up
+Tags: GitIssue, severe, severe
 ----------------------
 please please please please work :) 
 
@@ -125,7 +125,6 @@ make inputs have a vector of inputs so we dont have to have a large
 Title:  Implement Clipping Algorithm
 Math.h, Line: 298
 Creator:  sushi
-Assigned to: sushi
 ----------------------
 Date:  11/15/2020
 Tags: GitIssue, render
