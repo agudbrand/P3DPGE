@@ -8,12 +8,6 @@ using namespace olc;
 
 //// Requires boost library 1.74.0 ////
 
-
-//TODO(+iope, sushi, 11/23/2020) hahahaha testing!!!!!!!!!
-//TODO(+iope, sushi, 11/23/2020) hahahaha testing!!!!!!!!!
-//TODO(+eru, delle, 10101/89/2222) yep yep yep yep yep yep yep y pey pey pey pey 
-//TODO(+iiiii, sushi, FUCK YOU, THIS BETTER WORK) this better had worked
-
 /* General TODOs and NOTEs board
    TODOs should be ordered about NOTEs and TODOs should be listed in order of
    severity.
