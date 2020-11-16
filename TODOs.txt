@@ -1,4 +1,4 @@
-TODO List successfully generated with 16 TODOs found.
+TODO List successfully generated with 15 TODOs found.
 
 ~~~~~~~ TODO 0 ~~~~~~~
 Entities.cpp, Line: 97
@@ -112,16 +112,6 @@ Tags: TODOP, input
 make inputs have a vector of inputs so we dont have to have a large 
 
 ~~~~~~~ TODO 13 ~~~~~~~
-Title:  Implement Clipping Algorithm
-Math.h, Line: 298
-Creator:  sushi
-----------------------
-Date:  11/15/2020
-Tags: TODOP, GitIssue, TODOP, render
-----------------------
-mesh Javid\'s clipping algorithm with what we already have set up, also rewatch his video to fix the camera not moving the clipping plane.
-
-~~~~~~~ TODO 14 ~~~~~~~
 Math.h, Line: 358
 Creator:  sushi
 ----------------------
@@ -129,7 +119,7 @@ Tags: No Tags
 ----------------------
 rename these functions to something not retarded
 
-~~~~~~~ TODO 15 ~~~~~~~
+~~~~~~~ TODO 14 ~~~~~~~
 Physics.h, Line: 6
 Creator: delle
 ----------------------
