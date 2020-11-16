@@ -1,4 +1,4 @@
-TODO List successfully generated with 16 TODOs found.
+TODO List successfully generated with 17 TODOs found.
 
 ~~~~~~~ TODO 0 ~~~~~~~
 Entities.cpp, Line: 97
@@ -72,46 +72,56 @@ Tags: TODOP, entity
 generate complex object relative to input position
 
 ~~~~~~~ TODO 8 ~~~~~~~
-main.cpp, Line: 15
+Title:  TODOP works?!
+main.cpp, Line: 10
+Creator:  sushi
+----------------------
+Date:  11/19/2020
+Tags: TODOP, GitIssue, severe
+----------------------
+yes
+
+~~~~~~~ TODO 9 ~~~~~~~
+main.cpp, Line: 16
 Creator:  sushi
 ----------------------
 Tags: TODOP, general
 ----------------------
 create a WorldMatrix that takes in several matrix operations and
 
-~~~~~~~ TODO 9 ~~~~~~~
-main.cpp, Line: 21
+~~~~~~~ TODO 10 ~~~~~~~
+main.cpp, Line: 22
 Creator:  sushi
 ----------------------
 Tags: TODOP, general
 ----------------------
 put mesh and triangle somewhere better than entities
 
-~~~~~~~ TODO 10 ~~~~~~~
-main.cpp, Line: 27
+~~~~~~~ TODO 11 ~~~~~~~
+main.cpp, Line: 28
 Creator:  sushi
 ----------------------
 Tags: TODOP, general
 ----------------------
 find a reason to either keep or remove Render::Init() 
 
-~~~~~~~ TODO 11 ~~~~~~~
-main.cpp, Line: 29
+~~~~~~~ TODO 12 ~~~~~~~
+main.cpp, Line: 30
 Creator:  delle
 ----------------------
 Tags: TODOP, physics
 ----------------------
 add physics based collision resolution
 
-~~~~~~~ TODO 12 ~~~~~~~
-main.cpp, Line: 31
+~~~~~~~ TODO 13 ~~~~~~~
+main.cpp, Line: 32
 Creator:  delle
 ----------------------
 Tags: TODOP, input
 ----------------------
 make inputs have a vector of inputs so we dont have to have a large 
 
-~~~~~~~ TODO 13 ~~~~~~~
+~~~~~~~ TODO 14 ~~~~~~~
 Title:  Implement Clipping Algorithm
 Math.h, Line: 298
 Creator:  sushi
@@ -121,7 +131,7 @@ Tags: TODOP, GitIssue, render, severe
 ----------------------
 mesh Javid\'s clipping algorithm with what we already have set up, also rewatch his video to fix the camera not moving the clipping plane.
 
-~~~~~~~ TODO 14 ~~~~~~~
+~~~~~~~ TODO 15 ~~~~~~~
 Math.h, Line: 358
 Creator:  sushi
 ----------------------
@@ -129,7 +139,7 @@ Tags: TODOP
 ----------------------
 rename these functions to something not retarded
 
-~~~~~~~ TODO 15 ~~~~~~~
+~~~~~~~ TODO 16 ~~~~~~~
 Physics.h, Line: 6
 Creator: delle
 ----------------------
