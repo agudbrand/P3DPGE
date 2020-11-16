@@ -296,7 +296,7 @@ namespace Math {
 
 	//this function is really complex and i just pulled it from Javid's video
 	//hopefully later i'll try to understand it better
-	//TODO(+r, sushi, 11/15/2020, Implement Clipping Algorithm) mesh Javid's clipping algorithm with what we already have set up, also rewatch his video to fix the camera not moving the clipping plane.
+	//TODO(+rs, sushi, 11/15/2020, Implement Clipping Algorithm) mesh Javid's clipping algorithm with what we already have set up, also rewatch his video to fix the camera not moving the clipping plane.
 	static int ClipTriangles(Vector3 plane_p, Vector3 plane_n, Triangle in_tri, Triangle out_tri1, Triangle out_tri2) {
 		plane_n.normalize();
 
