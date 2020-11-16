@@ -1,11 +1,11 @@
-TODO List successfully generated with 17 TODOs found.
+TODO List successfully generated with 16 TODOs found.
 
 ~~~~~~~ TODO 0 ~~~~~~~
 Entities.cpp, Line: 97
 Creator: delle
 ----------------------
 Date: 11/13/20
-Tags: unimportant, physics
+Tags: TODOP, unimportant, TODOP, physics
 ----------------------
 change air friction to calculate for shape of object
 
@@ -14,7 +14,7 @@ Entities.cpp, Line: 113
 Creator: delle
 ----------------------
 Date: 11/13/20
-Tags: unimportant, physics
+Tags: TODOP, unimportant, TODOP, physics
 ----------------------
 this
 
@@ -23,7 +23,7 @@ Entities.cpp, Line: 128
 Creator: delle
 ----------------------
 Date: 11/9/20
-Tags: severe, physics
+Tags: TODOP, severe, TODOP, physics
 ----------------------
 expand this to a general entity check, but right now it just checks circles
 
@@ -32,7 +32,7 @@ Entities.cpp, Line: 129
 Creator: delle
 ----------------------
 Date: 11/9/20
-Tags: optimization, unimportant, physics
+Tags: TODOP, optimization, TODOP, unimportant, TODOP, physics
 ----------------------
 if other object is sphere, can optimize the equation to not use sqrt
 
@@ -41,7 +41,7 @@ Entities.cpp, Line: 146
 Creator: delle
 ----------------------
 Date: 11/9/20
-Tags: severe, physics
+Tags: TODOP, severe, TODOP, physics
 ----------------------
 expand this to a general entity check, but right now it just checks circles
 
@@ -50,7 +50,7 @@ Entities.cpp, Line: 163
 Creator: delle
 ----------------------
 Date: 11/9/20
-Tags: severe, physics
+Tags: TODOP, severe, TODOP, physics
 ----------------------
 expand this to a general entity check
 
@@ -59,7 +59,7 @@ Entities.cpp, Line: 168
 Creator: delle
 ----------------------
 Date: 11/9/20
-Tags: severe, physics
+Tags: TODOP, severe, TODOP, physics
 ----------------------
 expand this to a general entity check
 
@@ -67,71 +67,61 @@ expand this to a general entity check
 Entities.h, Line: 229
 Creator:  sushi
 ----------------------
-Tags: entity
+Tags: TODOP, entity
 ----------------------
 generate complex object relative to input position
 
 ~~~~~~~ TODO 8 ~~~~~~~
-Title:  Test Issue for TODOP
-main.cpp, Line: 10
+main.cpp, Line: 14
 Creator:  sushi
 ----------------------
-Date:  11/15/2020
-Tags: GitIssue, severe, severe
-----------------------
-please please please please work :) 
-
-~~~~~~~ TODO 9 ~~~~~~~
-main.cpp, Line: 16
-Creator:  sushi
-----------------------
-Tags: general
+Tags: TODOP, general
 ----------------------
 create a WorldMatrix that takes in several matrix operations and
 
-~~~~~~~ TODO 10 ~~~~~~~
-main.cpp, Line: 22
+~~~~~~~ TODO 9 ~~~~~~~
+main.cpp, Line: 20
 Creator:  sushi
 ----------------------
-Tags: general
+Tags: TODOP, general
 ----------------------
 put mesh and triangle somewhere better than entities
 
-~~~~~~~ TODO 11 ~~~~~~~
-main.cpp, Line: 28
+~~~~~~~ TODO 10 ~~~~~~~
+main.cpp, Line: 26
 Creator:  sushi
 ----------------------
-Tags: general
+Tags: TODOP, general
 ----------------------
 find a reason to either keep or remove Render::Init() 
+
+~~~~~~~ TODO 11 ~~~~~~~
+main.cpp, Line: 28
+Creator:  delle
+----------------------
+Tags: TODOP, physics
+----------------------
+add physics based collision resolution
 
 ~~~~~~~ TODO 12 ~~~~~~~
 main.cpp, Line: 30
 Creator:  delle
 ----------------------
-Tags: physics
-----------------------
-add physics based collision resolution
-
-~~~~~~~ TODO 13 ~~~~~~~
-main.cpp, Line: 32
-Creator:  delle
-----------------------
-Tags: input
+Tags: TODOP, input
 ----------------------
 make inputs have a vector of inputs so we dont have to have a large 
 
-~~~~~~~ TODO 14 ~~~~~~~
+~~~~~~~ TODO 13 ~~~~~~~
 Title:  Implement Clipping Algorithm
 Math.h, Line: 298
 Creator:  sushi
 ----------------------
 Date:  11/15/2020
-Tags: GitIssue, render
+Tags: TODOP, GitIssue, TODOP, render
 ----------------------
 mesh Javid\'s clipping algorithm with what we already have set up, also rewatch his video to fix the camera not moving the clipping plane.
 
-~~~~~~~ TODO 15 ~~~~~~~
+~~~~~~~ TODO 14 ~~~~~~~
 Math.h, Line: 358
 Creator:  sushi
 ----------------------
@@ -139,12 +129,12 @@ Tags: No Tags
 ----------------------
 rename these functions to something not retarded
 
-~~~~~~~ TODO 16 ~~~~~~~
+~~~~~~~ TODO 15 ~~~~~~~
 Physics.h, Line: 6
 Creator: delle
 ----------------------
 Date: 11/9/20
-Tags: optimization, unimportant
+Tags: TODOP, optimization, TODOP, unimportant
 ----------------------
 optimize by using arrays rather than vectors,
 
