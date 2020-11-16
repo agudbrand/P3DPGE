@@ -91,5 +91,5 @@ public:
 
 int main() {
 	P3DPGE game;
-	if (game.Construct(600, 600, 2, 2)) { game.Start(); }
+	if (game.Construct(256, 240, 4, 4)) { game.Start(); }
 }

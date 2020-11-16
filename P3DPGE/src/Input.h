@@ -1,6 +1,8 @@
 #pragma once
 #include "Physics.h"
 #include "Render.h"
+#include "Entities.h"
+//^this is temp for testing so it doesnt need to be there
 
 typedef void (*Action)();
 
@@ -90,7 +92,7 @@ namespace Input {
 		//T press = spawn complex test object
 		if (p->GetKey(olc::T).bPressed) {
 			Vector3 pos = Vector3(p->GetMouseX(), p->GetMouseY(), 0);
-			Complex* complex = new Complex("objects/test_object.obj", 0, Vector3(0, 0, 3));
+			Complex* complex = new Complex("objects/whale_ship.obj", 0, Vector3(0, 0, 0));
 			selectedEntity = complex;
 			Physics::AddEntity(complex);
 			Render::AddEntity(complex);
@@ -111,7 +113,7 @@ namespace Input {
 		//rotation over axes
 		if (p->GetKey(olc::J).bHeld) {
 			for (auto& e : Render::entities) {
-				e->rotation.x = 10 * deltaTimePtr;
+				e->rotation.x = 40 * deltaTimePtr;
 				e->RotateX();
 			}
 		}
@@ -119,7 +121,7 @@ namespace Input {
 		//K held = rotate everything in the positive y
 		if (p->GetKey(olc::K).bHeld) {
 			for (auto& e : Render::entities) {
-				e->rotation.y = 10 * deltaTimePtr;
+				e->rotation.y = 40 * deltaTimePtr;
 				e->RotateY();
 			}
 		}
@@ -127,7 +129,7 @@ namespace Input {
 		//L held = rotate everything in the positive z
 		if (p->GetKey(olc::L).bHeld) {
 			for (auto& e : Render::entities) {
-				e->rotation.z = 10 * deltaTimePtr;
+				e->rotation.z = 40 * deltaTimePtr;
 				e->RotateZ();
 			}
 		}
@@ -135,7 +137,7 @@ namespace Input {
 		//M held = rotate everything in the negative x
 		if (p->GetKey(olc::M).bHeld) {
 			for (auto& e : Render::entities) {
-				e->rotation.x = -10 * deltaTimePtr;
+				e->rotation.x = -40 * deltaTimePtr;
 				e->RotateX();
 			}
 		}
@@ -143,7 +145,7 @@ namespace Input {
 		//COMMA held = rotate everything in the negative y
 		if (p->GetKey(olc::COMMA).bHeld) {
 			for (auto& e : Render::entities) {
-				e->rotation.y = -10 * deltaTimePtr;
+				e->rotation.y = -40 * deltaTimePtr;
 				e->RotateY();
 			}
 		}
@@ -151,7 +153,7 @@ namespace Input {
 		//PERIOD held = rotate everything in the negative z
 		if (p->GetKey(olc::PERIOD).bHeld) {
 			for (auto& e : Render::entities) {
-				e->rotation.z = -10 * deltaTimePtr;
+				e->rotation.z = -40 * deltaTimePtr;
 				e->RotateZ();
 			}
 		}
@@ -238,7 +240,7 @@ namespace Input {
 		if (selectedEntity && p->GetMouse(1).bHeld) {
 			selectedEntity->position = Math::vi2dToVector3(p->GetMousePos(), selectedEntity->position.z);
 		}
-
+		/* disabling temporarily sorry if i forget to turn it back on
 		if (selectedEntity) {
 			std::string text = "ID: " + std::to_string(selectedEntity->id) + "\tTag: " + selectedEntity->tag + "\n";
 			text += "Position:" + selectedEntity->position.str() + "\nRotation:" + selectedEntity->rotation.str() + "\nScale:" + selectedEntity->scale.str() + "\n";
@@ -250,7 +252,7 @@ namespace Input {
 			}
 
 			p->DrawStringDecal(olc::vf2d(0, 0), text);
-		}
+		}*/
 
 		//point debugging
 		//if (selectedEntity) {
@@ -264,6 +266,9 @@ namespace Input {
 		//		);
 		//	}
 		//}
+
+		if (p->GetKey(olc::C).bPressed) { Render::wireframe = !Render::wireframe; }
+
 	}
 
 	//NOTE: selected entity should never point to a NEW object, since Input shouldnt own that object

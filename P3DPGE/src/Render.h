@@ -10,6 +10,7 @@ namespace Render {
 	static float pitch;
 
 	bool projecting = true;
+	bool wireframe = false;
 
 	//booleans for pausing and advancing by frame
 	//pausing is sort of archaic right now but should be fleshed out later
@@ -58,11 +59,11 @@ namespace Render {
 				if (projecting) { e->ProjectToScreen(ProjectionMatrix(p), p, view); }
 				if (frame) { frame = !frame; }
 			}
-			e->Draw(p);
+			e->Draw(p, wireframe);
 		}
 
 		//debug
-		p->DrawStringDecal(olc::vf2d(0, p->ScreenHeight() - 10), "Mouse Pos: " + p->GetMousePos().str());
+		//p->DrawStringDecal(olc::vf2d(0, p->ScreenHeight() - 10), "Mouse Pos: " + p->GetMousePos().str());
 		for (auto pair : Physics::collidingEntities) {
 			p->DrawLine(pair.first->position.x, pair.first->position.y, pair.second->position.x, pair.second->position.y, olc::GREEN);
 		}

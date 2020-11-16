@@ -11,7 +11,7 @@ namespace qvm = boost::qvm;
 struct Mesh {
 	std::vector<Triangle> triangles;
 
-	void Draw(olc::PixelGameEngine* p, olc::Pixel color, Vector3 pos) {
+	void Draw(olc::PixelGameEngine* p, olc::Pixel color, Vector3 pos, bool wireframe = false) {
 		std::vector<Triangle> visibleTriangles;
 
 		//camera is currently permenantly at zero
@@ -47,10 +47,9 @@ struct Mesh {
 				t.projectedPoints[0].x, t.projectedPoints[0].y,
 				t.projectedPoints[1].x, t.projectedPoints[1].y,
 				t.projectedPoints[2].x, t.projectedPoints[2].y,
-				olc::Pixel(255 * abs(dp), 255 * abs(dp), 255 * abs(dp)));
+				olc::Pixel(25 * abs(dp), 150 * abs(dp), 255 * abs(dp)));
 
 			//put this bool somewhere better later.
-			bool wireframe = true;
 			if (wireframe) {
 				p->DrawTriangle(
 					t.projectedPoints[0].x, t.projectedPoints[0].y,
@@ -95,7 +94,7 @@ public:
 	// them abstract because I do need a default behaviour to occur if
 	// they are not overwritten
 	//TODO: this ^
-	virtual void Draw(olc::PixelGameEngine* p) = 0;
+	virtual void Draw(olc::PixelGameEngine* p, bool wireframe) = 0;
 	virtual void Update(float deltaTime) = 0;
 	virtual bool ContainsPoint(Vector3 point) = 0;
 
@@ -154,7 +153,7 @@ struct Sphere : public PhysEntity {
 		this->radius = r;
 	}
 
-	void Draw(olc::PixelGameEngine* p) override;
+	void Draw(olc::PixelGameEngine* p, bool wireframe) override;
 	bool ContainsPoint(Vector3 point) override;
 	bool CheckCollision(Entity* entity) override;
 	void ResolveCollision(Entity* entity) override;
@@ -199,7 +198,7 @@ struct Box : public PhysEntity {
 		mesh.triangles.push_back(Triangle(p7, p1, p3));
 	}
 
-	void Draw(olc::PixelGameEngine* p) override;
+	void Draw(olc::PixelGameEngine* p, bool wireframe) override;
 	bool ContainsPoint(Vector3 point) override;
 	bool CheckCollision(Entity* entity) override;
 	void ResolveCollision(Entity* entity) override;
@@ -227,7 +226,7 @@ struct Complex : public PhysEntity {
 	//his video and should probably be redone later
 	//for ex he uses a lot of weird ways to get strings
 	//from the obj file that may not be necessary
-	//TODO(e, sushi) generate complex object relative to input position
+	//TODO(+e, sushi) generate complex object relative to input position
 	bool LoadFromObjectFile(std::string file_name) {
 		std::ifstream f(file_name);
 		if (!f.is_open()) { return false; }
@@ -261,7 +260,7 @@ struct Complex : public PhysEntity {
 		return true;
 	}
 
-	void Draw(olc::PixelGameEngine* p) override;
+	void Draw(olc::PixelGameEngine* p, bool wireframe) override;
 	bool ContainsPoint(Vector3 point) override;
 	bool CheckCollision(Entity* entity) override;
 	void ResolveCollision(Entity* entity) override;
@@ -277,7 +276,7 @@ struct Camera : public Entity {
 	mat<float, 4, 4> MakeViewMatrix(float yaw);
 
 	void Update(float deltaTime) override;
-	void Draw(olc::PixelGameEngine* p) override;
+	void Draw(olc::PixelGameEngine* p, bool wireframe) override;
 	bool ContainsPoint(Vector3 point) override;
 };
 

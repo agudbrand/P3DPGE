@@ -59,14 +59,15 @@ void Entity::ProjectToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p, 
 		int clippedTriangles = 0;
 		Triangle clipped[2];
 		clippedTriangles = Math::ClipTriangles(Vector3(0, 0, 0.1), Vector3(0, 0, 1), m, clipped[0], clipped[1]);
-		if (clippedTriangles == 0) { std::cout << "No clip" << std::endl; }
-		if (clippedTriangles == 1) { std::cout << " 2 clip" << std::endl; }
-		if (clippedTriangles == 2) { std::cout << " 3 clip" << std::endl; }
 		for (auto& t : clipped){
 			for (auto& n : t.projectedPoints) {
 				n.ProjToScreen(ProjMat, p, position);
 			}
 		}
+		for (auto& n : m.projectedPoints) {
+			n.ProjToScreen(ProjMat, p, position);
+		}
+		
 	}
 	
 }
@@ -117,7 +118,7 @@ void PhysEntity::GenerateRadialForce(Vector3 position, float radius, float stren
 
 //// Sphere	////
 
-void Sphere::Draw(olc::PixelGameEngine* p) {
+void Sphere::Draw(olc::PixelGameEngine* p, bool wireframe) {
 	p->FillCircle(position.x, position.y, radius, color);
 }
 
@@ -150,7 +151,7 @@ void Sphere::ResolveCollision(Entity* entity) {
 
 //// Box ////
 
-void Box::Draw(olc::PixelGameEngine* p) { mesh.Draw(p, color, position); }
+void Box::Draw(olc::PixelGameEngine* p, bool wireframe) { mesh.Draw(p, color, position, wireframe); }
 
 //not sure if this still works or not, when I was trying to select boxes
 //it wouldn't do anything but i feel it should still work
@@ -172,7 +173,7 @@ void Box::ResolveCollision(Entity* entity) {
 
 //// Complex ////
 
-void Complex::Draw(olc::PixelGameEngine* p) { mesh.Draw(p, color, position); }
+void Complex::Draw(olc::PixelGameEngine* p, bool wireframe) { mesh.Draw(p, color, position, wireframe); }
 
 bool Complex::ContainsPoint(Vector3 point) {
 	//this will probably be hard too implement good luck
@@ -201,7 +202,7 @@ mat<float, 4, 4> Camera::MakeViewMatrix(float yaw) {
 }
 
 //i wish i could not write these
-void Camera::Draw(olc::PixelGameEngine* p) {
+void Camera::Draw(olc::PixelGameEngine* p, bool wireframe) {
 	//camera is not drawn
 }
 
