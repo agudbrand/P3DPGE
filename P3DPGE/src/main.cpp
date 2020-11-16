@@ -8,6 +8,7 @@ using namespace olc;
 
 //// Requires boost library 1.74.0 ////
 
+//TODO(+s, sushi, 11/19/2020, TODOP works?!) yes
 
 /* General TODOs and NOTEs board
    TODOs should be ordered about NOTEs and TODOs should be listed in order of
