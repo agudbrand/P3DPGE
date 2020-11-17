@@ -75,13 +75,17 @@ namespace Input {
 		if (p->GetKey(olc::Q).bPressed) {
 			Vector3 pos = Vector3(p->GetMouseX(), p->GetMouseY(), 0);
 			Sphere* sphere;
+			CircleMesh* circle;
+			circle = new CircleMesh();
 			if (p->GetKey(olc::SHIFT).bHeld) {
 				sphere = new Sphere(100, 0, pos);
 				sphere->mass = sphere->radius;
+				sphere->mesh = circle;
 			}
 			else {
 				sphere = new Sphere(10, 0, pos);
 				sphere->mass = sphere->radius;
+				sphere->mesh = circle;
 			}
 			Physics::AddEntity(sphere);
 			Render::AddEntity(sphere);
@@ -206,7 +210,7 @@ namespace Input {
 		//LMB release = add  drawn force to selected entity
 		if (p->GetMouse(0).bReleased) {
 			if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
-				entity->AddImpulse(nullptr, GetMousePos(p) - leftClickPos, true);
+				entity->AddForce(nullptr, (GetMousePos(p) - leftClickPos)*10, true);
 			}
 
 			leftClickPos = V3NULL;
@@ -239,19 +243,19 @@ namespace Input {
 		if (selectedEntity && p->GetMouse(1).bHeld) {
 			selectedEntity->position = Math::vi2dToVector3(p->GetMousePos(), selectedEntity->position.z);
 		}
-		/* disabling temporarily sorry if i forget to turn it back on
+
 		if (selectedEntity) {
 			std::string text = "ID: " + std::to_string(selectedEntity->id) + "\tTag: " + selectedEntity->tag + "\n";
 			text += "Position:" + selectedEntity->position.str() + "\nRotation:" + selectedEntity->rotation.str() + "\nScale:" + selectedEntity->scale.str() + "\n";
 			//NOTE this checks if possible and casts Entity* to PhysEntity*
 			if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
 				text += "Is Static: "; text += entity->bStatic ? "true" : "false"; text += "\nMass: " + std::to_string(entity->mass) + "\n";
-				text += "Velocity:" + entity->velocity.str() + "\nAcceleration:" + entity->acceleration.str() + "\n";
+				text += "Velocity:" + entity->velocity.str() + " " + std::to_string(entity->velocity.mag()) + "\nAcceleration:" + entity->acceleration.str() + "\n";
 				text += "rotVelocity:" + entity->rotVelocity.str() + "\nrotAcceleration:" + entity->rotAcceleration.str() + "\n";
 			}
 
 			p->DrawStringDecal(olc::vf2d(0, 0), text);
-		}*/
+		}
 
 		//point debugging
 		//if (selectedEntity) {

@@ -58,10 +58,10 @@ namespace Render {
 		//draw all entities
 		for (auto& e : entities) {
 			if (!paused || frame) {
-				if (projecting) { e->mesh.ProjectToScreen(p, e->position, ProjectionMatrix(p), view); }
+				if (projecting) { e->mesh->ProjectToScreen(p, e->position, ProjectionMatrix(p), view); }
 				if (frame) { frame = !frame; }
 			}
-			e->mesh.Draw(p, e->position, wireframe);
+			e->mesh->Draw(p, e->position, wireframe);
 		}
 
 		//debug

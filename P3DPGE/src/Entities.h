@@ -28,7 +28,7 @@ public:
 	//mesh
 	olc::Pixel color = olc::WHITE;
 	//DO NOT make a pointer unless you're prepared to solve the read access violation that comes with it
-	Mesh mesh;
+	Mesh* mesh;
 
 	Entity() {}
 	Entity(int id, EntityParams) {
@@ -85,7 +85,7 @@ public:
 	void Update(float deltaTime) override;
 
 	void AddForce(PhysEntity* creator, Vector3 force, bool bIgnoreMass = false);
-	void AddFrictionForce(PhysEntity* creator, float frictionCoef, bool bIngoreMass = false);
+	void AddFrictionForce(PhysEntity* creator, float frictionCoef, float deltaTime, bool bIngoreMass = false);
 	void AddImpulse(PhysEntity* creator, Vector3 impulse, bool bIgnoreMass = false);
 	void GenerateRadialForce(Vector3 position, float radius, float strength, float falloff, bool bIgnoreMass);
 	virtual bool CheckCollision(Entity* entity) = 0;
@@ -124,23 +124,23 @@ struct Box : public PhysEntity {
 		Vector3 p8 = position + dimensions;
 
 		//west
-		mesh.triangles.push_back(Triangle(p3, p1, p4));
-		mesh.triangles.push_back(Triangle(p3, p4, p5));
+		mesh->triangles.push_back(Triangle(p3, p1, p4));
+		mesh->triangles.push_back(Triangle(p3, p4, p5));
 		//top
-		mesh.triangles.push_back(Triangle(p4, p1, p2));
-		mesh.triangles.push_back(Triangle(p4, p2, p6));
+		mesh->triangles.push_back(Triangle(p4, p1, p2));
+		mesh->triangles.push_back(Triangle(p4, p2, p6));
 		//east
-		mesh.triangles.push_back(Triangle(p8, p6, p2));
-		mesh.triangles.push_back(Triangle(p8, p2, p7));
+		mesh->triangles.push_back(Triangle(p8, p6, p2));
+		mesh->triangles.push_back(Triangle(p8, p2, p7));
 		//bottom
-		mesh.triangles.push_back(Triangle(p3, p5, p8));
-		mesh.triangles.push_back(Triangle(p3, p8, p7));
+		mesh->triangles.push_back(Triangle(p3, p5, p8));
+		mesh->triangles.push_back(Triangle(p3, p8, p7));
 		//south
-		mesh.triangles.push_back(Triangle(p5, p4, p6));
-		mesh.triangles.push_back(Triangle(p5, p6, p8));
+		mesh->triangles.push_back(Triangle(p5, p4, p6));
+		mesh->triangles.push_back(Triangle(p5, p6, p8));
 		//north
-		mesh.triangles.push_back(Triangle(p7, p2, p1));
-		mesh.triangles.push_back(Triangle(p7, p1, p3));
+		mesh->triangles.push_back(Triangle(p7, p2, p1));
+		mesh->triangles.push_back(Triangle(p7, p1, p3));
 	}
 
 	bool ContainsPoint(Vector3 point) override;
@@ -196,7 +196,7 @@ struct Complex : public PhysEntity {
 			if (line[0] == 'f') {
 				int f[3];
 				s >> junk >> f[0] >> f[1] >> f[2];
-				mesh.triangles.push_back(Triangle(vertices[f[0] - 1], vertices[f[1] - 1], vertices[f[2] - 1]));
+				mesh->triangles.push_back(Triangle(vertices[f[0] - 1], vertices[f[1] - 1], vertices[f[2] - 1]));
 			}
 		}
 

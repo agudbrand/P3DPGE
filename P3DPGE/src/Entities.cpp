@@ -11,7 +11,7 @@ void Entity::SetColor(olc::Pixel newColor) {
 }
 
 void Entity::RotateX(Vector3 offset) {
-	for (auto& m : mesh.triangles) {
+	for (auto& m : mesh->triangles) {
 		for (auto& n : m.points) {
 			n.rotateV3_X(rotation.x, position, offset);
 		}
@@ -19,7 +19,7 @@ void Entity::RotateX(Vector3 offset) {
 }
 
 void Entity::RotateY(Vector3 offset) {
-	for (auto& m : mesh.triangles) {
+	for (auto& m : mesh->triangles) {
 		for (auto& n : m.points) {
 			n.rotateV3_Y(rotation.y, position, offset);
 		}
@@ -27,7 +27,7 @@ void Entity::RotateY(Vector3 offset) {
 }
 
 void Entity::RotateZ(Vector3 offset) {
-	for (auto& m : mesh.triangles) {
+	for (auto& m : mesh->triangles) {
 		for (auto& n : m.points) {
 			n.rotateV3_Z(rotation.z, position, offset);
 		}
@@ -35,7 +35,7 @@ void Entity::RotateZ(Vector3 offset) {
 }
 
 void Entity::Translate(Vector3 translation) {
-	for (auto& m : mesh.triangles) {
+	for (auto& m : mesh->triangles) {
 		for (auto& n : m.points) {
 			n.translateV3(translation);
 		}
@@ -47,9 +47,9 @@ void Entity::Translate(Vector3 translation) {
 
 void PhysEntity::Update(float deltaTime) {
 	if (!bStatic) {
-		if (acceleration.mag() < .01f) { acceleration = V3ZERO; }
+		//if (acceleration.mag() < .01f) { acceleration = V3ZERO; }
 		velocity += acceleration * deltaTime;
-		if (velocity.mag() < .1f) { velocity = V3ZERO; }
+		//if (velocity.mag() < .01f) { velocity = V3ZERO; acceleration = V3ZERO; }
 		position += velocity * deltaTime;
 
 		rotVelocity += rotAcceleration * deltaTime;
@@ -68,11 +68,12 @@ void PhysEntity::AddForce(PhysEntity* creator, Vector3 force, bool bIgnoreMass) 
 //if no creator, assume air friction and temporarily treat object as sphere with C=.5
 //if creator, assume sliding friction
 //TODO(up,delle,11/13/20) change air friction to calculate for shape of object
-void PhysEntity::AddFrictionForce(PhysEntity* creator, float frictionCoef, bool bIngoreMass) {
+void PhysEntity::AddFrictionForce(PhysEntity* creator, float frictionCoef, float deltaTime, bool bIngoreMass) {
 	if (creator) {
 
-	}else {
-		acceleration = -velocity * frictionCoef;
+	}
+	else {
+		acceleration -= velocity.normalized() * 0.1;
 	}
 }
 

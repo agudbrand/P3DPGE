@@ -33,10 +33,15 @@ struct Triangle {
 };
 
 //a collection of triangles that make up the geomery of objects in space
-struct Mesh {
+class Mesh {
+public:
 	std::vector<Triangle> triangles;
 
-	void Draw(olc::PixelGameEngine* p, Vector3 pos, bool wireframe = false, olc::Pixel color = olc::WHITE) {
+	Mesh() {
+		triangles = std::vector<Triangle>();
+	}
+
+	virtual void Draw(olc::PixelGameEngine* p, Vector3 pos, bool wireframe = false, olc::Pixel color = olc::WHITE) {
 		std::vector<Triangle> visibleTriangles;
 
 		//camera is currently permenantly at zero
@@ -110,7 +115,7 @@ struct Mesh {
 	//this function is really complex and i just pulled it from Javid's video
 	//hopefully later i'll try to understand it better
 	//TODO(+rs, sushi, 11/15/2020, Implement Clipping Algorithm) mesh Javid's clipping algorithm with what we already have set up, also rewatch his video to fix the camera not moving the clipping plane.
-	static int ClipTriangles(Vector3 plane_p, Vector3 plane_n, Triangle& in_tri, Triangle& out_tri1, Triangle& out_tri2) {
+	int ClipTriangles(Vector3 plane_p, Vector3 plane_n, Triangle& in_tri, Triangle& out_tri1, Triangle& out_tri2) {
 		plane_n.normalize();
 
 		//temp storage to classify points on either side of plane
@@ -165,6 +170,13 @@ struct Mesh {
 			out_tri2.projectedPoints[2] = Math::VectorPlaneIntersect(plane_p, plane_n, *inside_points[1], *outside_points[0]);
 			return 2;
 		}
+	}
+};
+
+struct CircleMesh : public Mesh {
+
+	void Draw(olc::PixelGameEngine* p, Vector3 pos, bool wireframe = false, olc::Pixel color = olc::WHITE) override {
+		p->FillCircle(pos.Vector3Tovd2d(), 10, color);
 	}
 };
 

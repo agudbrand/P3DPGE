@@ -66,11 +66,13 @@ public:
 		//time
 		time += deltaTime;
 
-		//input
-		Input::Update(this, deltaTime);
+		
 
 		//physics
 		Physics::Update(deltaTime);
+
+		//input
+		Input::Update(this, deltaTime);
 
 		//rendering
 		Render::Update(this);
