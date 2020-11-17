@@ -27,6 +27,7 @@
     <ClInclude Include="src\olcPixelGameEngine.h" />
     <ClInclude Include="src\Physics.h" />
     <ClInclude Include="src\Render.h" />
+    <ClInclude Include="src\Time.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Entities.cpp" />

@@ -143,6 +143,25 @@ namespace Input {
 			std::cout << "Creating Large Sphere at: " + pos.str() << std::endl;
 		}, "spawn_sphere_large", olc::Q, -1, 0, 1, 0,
 		"Spawns a large sphere of radius/mass 100 at the mouse."));
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			Complex* complex = new Complex("objects/whale_ship.obj", 0, V3ZERO);
+			selectedEntity = complex;
+			Physics::AddEntity(complex);
+			Render::AddEntity(complex);
+			std::cout << "Creating " + complex->model_name + " at: " + V3ZERO.str() << std::endl;
+		}, "spawn_complex", olc::T, -1, 0, 0, 0,
+		"Spawns a complex object at (0,0,0)"));
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			Vector3 pos = Vector3(0, 0, 3);
+			Box* box = new Box(Vector3(1, 1, 1), 0, pos);
+			selectedEntity = box;
+			Physics::AddEntity(box);
+			Render::AddEntity(box);
+			std::cout << "Creating Box at: " + pos.str() << std::endl;
+		}, "spawn_complex", olc::E, -1, 0, 0, 0,
+		"Spawns a box at (0,0,3)"));
 	}
     
 	static void Update(olc::PixelGameEngine* p, float& deltaTimePtr) {
@@ -155,28 +174,7 @@ namespace Input {
 		if (p->GetKey(olc::G).bHeld) {
 			deltaTimePtr = 0;
 		}
-        
-		//T press = spawn complex test object
-		if (p->GetKey(olc::T).bPressed) {
-			Vector3 pos = Vector3(p->GetMouseX(), p->GetMouseY(), 0);
-			Complex* complex = new Complex("objects/whale_ship.obj", 0, Vector3(0, 0, 0));
-			selectedEntity = complex;
-			Physics::AddEntity(complex);
-			Render::AddEntity(complex);
-			std::cout << "Creating " + complex->model_name + " at: " + pos.str() << std::endl;
-		}
-        
-		//E press = spawn box
-		if (p->GetKey(olc::E).bPressed) {
-			Vector3 pos = GetMousePos(p);
-			pos.z = 1;
-			Box* box = new Box(Vector3(1, 1, 1), -1, Vector3(0, 0, 3));
-			selectedEntity = box;
-			Physics::AddEntity(box);
-			Render::AddEntity(box);
-			std::cout << "Creating Box at: " + pos.str() << std::endl;
-		}
-        
+
 		//rotation over axes
 		if (p->GetKey(olc::J).bHeld) {
 			for (auto& e : Render::entities) {
