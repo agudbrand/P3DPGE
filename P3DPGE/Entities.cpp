@@ -101,6 +101,11 @@ bool Sphere::CheckCollision(Entity* entity) {
 		Vector3 vectorBetween = position - sphere->position;
 		float distanceBetween = vectorBetween.mag();
 		if (distanceBetween <= (radius + sphere->radius)) {
+			//TEMP manual static resolution in here
+			float overlap = .5f * (distanceBetween - radius - sphere->radius);
+			vectorBetween = vectorBetween.normalized() * overlap;
+			position -= vectorBetween;
+			sphere->position += vectorBetween;
 			return true;
 		}
 	}
@@ -108,24 +113,9 @@ bool Sphere::CheckCollision(Entity* entity) {
 }
 
 //TODO(sp,delle,11/9/20) expand this to a general entity check, but right now it just checks circles
-void Sphere::ResolveCollision(PhysEntity* other) {
-	if (Sphere* sphere = dynamic_cast<Sphere*>(other)) {
-		//static resolution
-		Vector3 vectorBetween = position - sphere->position;
-		float distanceBetween = vectorBetween.mag();
-		float overlap = .5f * (distanceBetween - radius - sphere->radius);
-		vectorBetween = vectorBetween.normalized() * overlap;
-		position -= vectorBetween;
-		sphere->position += vectorBetween;
+void Sphere::ResolveCollision(Entity* entity) {
+	DrawLine(pair.first->position.x, pair.first->position.y, pair.second->position.x, pair.second->position.y, olc::GREEN);
 
-		//dynamic resolution
-		//From wikipedia without rotation
-		//https://en.wikipedia.org/wiki/Elastic_collision#Two-dimensional_collision_with_two_moving_objects
-		Vector3 normal = (other->position - position) / distanceBetween;
-		float p = 2.f * (normal.dot(velocity - other->velocity)) / (mass + other->mass);
-		velocity -= normal * p * other->mass;
-		other->velocity += normal * p * mass;
-	}
 }
 
 //// Box ////
@@ -145,7 +135,7 @@ bool Box::CheckCollision(Entity* entity) {
 }
 
 //TODO(sp,delle,11/9/20) expand this to a general entity check
-void Box::ResolveCollision(PhysEntity* entity) {
+void Box::ResolveCollision(Entity* entity) {
 }
 
 //// Complex ////
@@ -159,7 +149,7 @@ bool Complex::CheckCollision(Entity* entity) {
 	return false;
 }
 
-void Complex::ResolveCollision(PhysEntity* entity) {
+void Complex::ResolveCollision(Entity* entity) {
 }
 
 //// Camera ////

@@ -2,7 +2,6 @@
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
 #include "Input.h"
-#include "Render.h"
 using namespace olc;
 
 
@@ -91,5 +90,5 @@ public:
 
 int main() {
 	P3DPGE game;
-	if (game.Construct(256, 240, 4, 4)) { game.Start(); }
+	if (game.Construct(500, 500, 2, 2)) { game.Start(); }
 }

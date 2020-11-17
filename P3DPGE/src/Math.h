@@ -1,5 +1,5 @@
 #pragma once
-#include "HandmadeMath.h"
+//#include "HandmadeMath.h"
 #include "olcPixelGameEngine.h"
 #include <boost/qvm/mat.hpp>
 #include <boost/qvm/vec.hpp>
@@ -8,9 +8,10 @@
 #include <math.h>
 #include <iostream>
 #include <string>
+#include <algorithm>
 
 //math constants
-#define M_PI HMM_PI32
+#define M_PI 3.14159265359f
 #define M_E 2.71828f
 
 //vector constants
@@ -27,19 +28,9 @@
 using namespace boost::qvm;
 
 namespace Math {
-
 	static float to_radians(float angle) { return angle * (M_PI / 180); }
 	static float to_degrees(float angle) { return angle * (180 / M_PI); }
-
-	//for debugging with floats or doubles
-	static std::string append_decimal(std::string s) {
-		while (s.back() != '.') {
-			s.pop_back();
-		}
-		s.pop_back();
-		return s;
-	}
-};
+}
 
 class Vector3 {
 	public:
@@ -91,11 +82,9 @@ class Vector3 {
 		Vector3				xInvert()						  { return Vector3(-x,  y,  z); }
 		Vector3				yInvert()						  { return Vector3( x, -y,  z); }
 		Vector3				zInvert()						  { return Vector3( x,  y, -z); }
-		//could probably add more invert functions that do over 2 axes but that may be too much
-		//more complex operator so its seperated
+		olc::vd2d			Vector3Tovd2d()					  { return olc::vd2d(x, y); }
 		
 		//Vector3				invertedComponents()		{ return Vector3(1/x, 1/y, 1/z); }
-		//?^
 
 		//conversions between qvm's matrices and our vectors and a special mult function
 		mat<float,1,4> ConvertToM4x4() {
@@ -217,60 +206,42 @@ class Vector3 {
 		}
 };
 
-//collection of 3 points forming the basis of meshes
-struct Triangle {
-	Vector3 points[3];
-	Vector3 projectedPoints[3];
 
-	Triangle() {}
-	Triangle(Vector3 p1, Vector3 p2, Vector3 p3) {
-		points[0] = p1;
-		points[1] = p2;
-		points[2] = p3;
-		copy_points();
-	}
-
-	void copy_points() {
-		for (int p = 0; p < 3; p++) { projectedPoints[p] = points[p]; }
-	}
-
-	Vector3 get_normal() {
-		Vector3 l1 = points[1] - points[0];
-		Vector3 l2 = points[2] - points[0];
-		return l2.cross(l1).normalized();
-	}
-
-	Vector3 get_proj_normal() {
-		Vector3 l1 = projectedPoints[1] - projectedPoints[0];
-		Vector3 l2 = projectedPoints[2] - projectedPoints[0];
-		return l2.cross(l1).normalized();
-	}
-};
 
 namespace Math {
+	
+
+	//for debugging with floats or doubles
+	static std::string append_decimal(std::string s) {
+		while (s.back() != '.') {
+			s.pop_back();
+		}
+		s.pop_back();
+		return s;
+	}
+
 	static Vector3 vi2dToVector3(olc::vi2d vector, float z = 0) {
 		return Vector3((float)vector.x, (float)vector.y, z);
 	}
 
-	//this is a function from Javid's videos,
-	//i do NOT know how this works but I plan to figure it out eventually
-	//for now, using it is going to be a bit odd.
-	//in essence, all it does is point a vector towards another vector and
-	//therefor is necessary for the camera.
-	static mat<float, 4, 4> PointAt(Vector3 pos, Vector3 target, Vector3 up) {
+	//this function returns a matrix that tells a vector how to look at a specific point in space.
+	static mat<float, 4, 4> PointAt(Vector3& pos, Vector3& target, Vector3& up) {
+		up.normalize();
+
 		//get new forward direction
 		Vector3 newFor = target - pos;
-		newFor = newFor.normalized();
+		newFor.normalize();
 
-		//get new up direction
-		Vector3 a = newFor * up.dot(newFor);
-		Vector3 newUp = up - a;
-		newUp = newUp.normalized();
+		//get right direction
+		Vector3 newRight = up.cross(newFor);
+		newRight.normalize();
 
-		//new right direction
-		Vector3 newRight = newUp.cross(newFor);
+		//get up direction
+		Vector3 newUp = newRight.cross(newFor);
+		newUp.normalize();
 
-		mat<float, 4, 4> m{
+		//make point at matrix
+		mat<float, 4, 4> m {
 			newRight.x, newRight.y, newRight.z, 0,
 			newUp.x,	newUp.y,	newUp.z,	0,
 			newFor.x,	newFor.y,	newFor.z,	0,
@@ -292,68 +263,6 @@ namespace Math {
 		Vector3 line_start_to_end = line_end - line_start;
 		Vector3 line_to_intersect = line_start_to_end * t;
 		return line_start + line_to_intersect;
-	}
-
-	//this function is really complex and i just pulled it from Javid's video
-	//hopefully later i'll try to understand it better
-	//TODO(+rs, sushi, 11/15/2020, Implement Clipping Algorithm) mesh Javid's clipping algorithm with what we already have set up, also rewatch his video to fix the camera not moving the clipping plane.
-	static int ClipTriangles(Vector3 plane_p, Vector3 plane_n, Triangle in_tri, Triangle out_tri1, Triangle out_tri2) {
-		plane_n.normalize();
-
-		//temp storage to classify points on either side of plane
-		Vector3* inside_points[3];  int nInsidePointCount = 0;
-		Vector3* outside_points[3]; int nOutsidePointCount = 0;
-
-		auto dist = [&](Vector3& p)
-		{
-			Vector3 n = p.normalized();
-			return (plane_n.x * p.x + plane_n.y * p.y + plane_n.z * p.z - plane_n.dot(plane_p));
-		};
-		
-		//signed distance of each point in triangle to plane
-		float d0 = -dist(in_tri.projectedPoints[0]);
-		float d1 = -dist(in_tri.projectedPoints[1]);
-		float d2 = -dist(in_tri.projectedPoints[2]);
-
-		if (d0 >= 0) { inside_points[nInsidePointCount++] = &in_tri.projectedPoints[0]; }
-		else { outside_points[nOutsidePointCount++] = &in_tri.projectedPoints[0]; }
-		if (d1 >= 0) { inside_points[nInsidePointCount++] = &in_tri.projectedPoints[1]; }
-		else { outside_points[nOutsidePointCount++] = &in_tri.projectedPoints[1]; }
-		if (d2 >= 0) { inside_points[nInsidePointCount++] = &in_tri.projectedPoints[2]; }
-		else { outside_points[nOutsidePointCount++] = &in_tri.projectedPoints[2]; }
-
-		//classify points and break input triangle into smaller trangles if
-		//required. there are four possible outcomes
-
-		//all points lie outside the plane
-		if (nInsidePointCount == 0) { return 0; }
-		//all points lie inside the plane so do nothing and allow triangle to pass
-		if (nInsidePointCount == 3) { out_tri1 = in_tri; return 1; }
-		if (nInsidePointCount == 1 && nOutsidePointCount == 2) {
-			//the inside point is valid so we keep it
-			out_tri1.projectedPoints[0] = *inside_points[0];
-
-			//but the two new points are not where the original triangle intersects with the plane
-			out_tri1.projectedPoints[1] = VectorPlaneIntersect(plane_p, plane_n, *inside_points[0], *outside_points[0]);
-			out_tri1.projectedPoints[2] = VectorPlaneIntersect(plane_p, plane_n, *inside_points[0], *outside_points[1]);
-
-			return 1; //return new triangle
-		}
-		if (nInsidePointCount == 2 && nOutsidePointCount == 1) {
-			//triangle will be clipped and becomes a quad which is 
-			//cut into two more triagles.
-
-			out_tri1.projectedPoints[0] = *inside_points[0];
-			out_tri1.projectedPoints[1] = *inside_points[1];
-			out_tri1.projectedPoints[2] = VectorPlaneIntersect(plane_p, plane_n, *inside_points[0], *outside_points[0]);
-
-			out_tri2.projectedPoints[0] = *inside_points[1];
-			out_tri2.projectedPoints[1] = out_tri1.projectedPoints[2];
-			out_tri2.projectedPoints[2] = VectorPlaneIntersect(plane_p, plane_n, *inside_points[1], *outside_points[0]);
-			return 2;
-
-		}
-
 	}
 	
 	//TODO(, sushi) rename these functions to something not retarded

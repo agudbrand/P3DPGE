@@ -1,6 +1,8 @@
 #pragma once
-#include "olcPixelGameEngine.h"
 #include "Entities.h"
+#include "olcPixelGameEngine.h"
+
+//TODO(r, sushi, 11/16/2020) set up a function that loops through a vector of matrix operations to reduce the amount of times we need to convert from local to world space and so the order stays consistent
 
 namespace Render {
 	static std::vector<Entity*> entities;
@@ -19,12 +21,9 @@ namespace Render {
 	static bool frame = false;
 
 	//just shove all entities into here, then draw them
-	static void AddEntity(Entity* e) {
-		entities.push_back(e);
-	}
+	static void AddEntity(Entity* e) { entities.push_back(e); }
 
-	static void Init() {
-	}
+	static void Init() {}
 
 	using namespace boost::qvm;
 	//projection matrix
@@ -49,24 +48,25 @@ namespace Render {
 		return proj;
 	}
 
+	
+
 	//draw all entities to screen
 	static void Update(olc::PixelGameEngine* p) {
+
 		mat<float, 4, 4> view = camera.MakeViewMatrix(yaw);
 
 		//draw all entities
 		for (auto& e : entities) {
 			if (!paused || frame) {
-				if (projecting) { e->ProjectToScreen(ProjectionMatrix(p), p, view); }
+				if (projecting) { e->mesh.ProjectToScreen(p, e->position, ProjectionMatrix(p), view); }
 				if (frame) { frame = !frame; }
 			}
-			e->Draw(p, wireframe);
+			e->mesh.Draw(p, e->position, wireframe);
 		}
 
 		//debug
 		//p->DrawStringDecal(olc::vf2d(0, p->ScreenHeight() - 10), "Mouse Pos: " + p->GetMousePos().str());
-		for (auto pair : Physics::collidingEntities) {
-			p->DrawLine(pair.first->position.x, pair.first->position.y, pair.second->position.x, pair.second->position.y, olc::GREEN);
-		}
+		p->DrawStringDecal(olc::vf2d(0, p->ScreenHeight() - 10), "Mouse Pos: " + camera.position.str());
 	}
 
 	static void Cleanup() {

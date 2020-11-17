@@ -1,65 +1,13 @@
 #pragma once
-#include "olcPixelGameEngine.h"
-#include "Math.h"
 #include <fstream>
 #include <strstream>
-#include <algorithm>
+#include "Mesh.h"
+#include "olcPixelGameEngine.h"
+
 
 namespace qvm = boost::qvm;
 
-//a collection of triangles that make up the geomery of objects in space
-struct Mesh {
-	std::vector<Triangle> triangles;
 
-	void Draw(olc::PixelGameEngine* p, olc::Pixel color, Vector3 pos, bool wireframe = false) {
-		std::vector<Triangle> visibleTriangles;
-
-		//camera is currently permenantly at zero
-		Vector3 camera(0, 0, 0);
-		//temp lighting set up
-		Vector3 light_direction(0, 0, 1);
-		light_direction = light_direction.normalized();
-		//std::cout << t.get_normal().z << std::endl;
-
-		for (auto& t : triangles) {
-			if (t.get_proj_normal().dot(t.points[0] - camera) > 0) {
-				//store triangles we want to draw for sorting
-				visibleTriangles.push_back(t);
-			}
-		}
-
-		//sort triangles back to front
-		//javid uses a lambda function here so that's why its so odd
-		//it basically just tells sort if it needs to swap t1 and t2
-		//and this is determined by if t1's midpoint is greater than
-		//t2's midpoint.
-		//this method of culling hidden triangles is known as the Painter's Algorithm
-		//and all it does is sort them back to front and then draws them in that order
-		std::sort(visibleTriangles.begin(), visibleTriangles.end(), [](Triangle& t1, Triangle& t2) {
-			float mp1 = (t1.points[0].z + t1.points[1].z + t1.points[2].z) / 3;
-			float mp2 = (t2.points[0].z + t2.points[1].z + t2.points[2].z) / 3;
-			return mp1 > mp2;
-			});
-
-		for (Triangle t : visibleTriangles) {
-			float dp = light_direction.dot(t.get_normal());
-			p->FillTriangle(
-				t.projectedPoints[0].x, t.projectedPoints[0].y,
-				t.projectedPoints[1].x, t.projectedPoints[1].y,
-				t.projectedPoints[2].x, t.projectedPoints[2].y,
-				olc::Pixel(25 * abs(dp), 150 * abs(dp), 255 * abs(dp)));
-
-			//put this bool somewhere better later.
-			if (wireframe) {
-				p->DrawTriangle(
-					t.projectedPoints[0].x, t.projectedPoints[0].y,
-					t.projectedPoints[1].x, t.projectedPoints[1].y,
-					t.projectedPoints[2].x, t.projectedPoints[2].y,
-					olc::BLACK);
-			}
-		}
-	}
-};
 
 #define EntityArgs id, position, rotation, scale
 #define EntityParams Vector3 position = V3ZERO, Vector3 rotation = V3ZERO, Vector3 scale = V3ONE
@@ -67,6 +15,7 @@ struct Mesh {
 //as position, rotation, scale, tags, etc.
 class Entity {
 public:
+
 	//transform
 	Vector3 position;
 	Vector3 rotation;
@@ -94,7 +43,6 @@ public:
 	// them abstract because I do need a default behaviour to occur if
 	// they are not overwritten
 	//TODO: this ^
-	virtual void Draw(olc::PixelGameEngine* p, bool wireframe) = 0;
 	virtual void Update(float deltaTime) = 0;
 	virtual bool ContainsPoint(Vector3 point) = 0;
 
@@ -105,7 +53,6 @@ public:
 	virtual void RotateY(Vector3 offset = V3ZERO);
 	virtual void RotateZ(Vector3 offset = V3ZERO);
 	virtual void Translate(Vector3 translation);
-	virtual void ProjectToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p, mat<float, 4, 4> view);
 
 	void SetTag(std::string newTag);
 	void SetColor(olc::Pixel newColor);
@@ -142,7 +89,7 @@ public:
 	void AddImpulse(PhysEntity* creator, Vector3 impulse, bool bIgnoreMass = false);
 	void GenerateRadialForce(Vector3 position, float radius, float strength, float falloff, bool bIgnoreMass);
 	virtual bool CheckCollision(Entity* entity) = 0;
-	virtual void ResolveCollision(Entity* entity) = 0;
+	virtual void ResolveCollision(PhysEntity* entity) = 0;
 };
 
 struct Sphere : public PhysEntity {
@@ -153,10 +100,9 @@ struct Sphere : public PhysEntity {
 		this->radius = r;
 	}
 
-	void Draw(olc::PixelGameEngine* p, bool wireframe) override;
 	bool ContainsPoint(Vector3 point) override;
 	bool CheckCollision(Entity* entity) override;
-	void ResolveCollision(Entity* entity) override;
+	void ResolveCollision(PhysEntity* entity) override;
 };
 
 //formed by a single dimension vector
@@ -168,15 +114,14 @@ struct Box : public PhysEntity {
 		this->dimensions = dimensions;
 
 		//vertices making up the box
-		Vector3 c = position; //center point
-		Vector3 p1 = c + dimensions.xInvert().yInvert().zInvert();
-		Vector3 p2 = c + dimensions.yInvert().zInvert();
-		Vector3 p3 = c + dimensions.xInvert().zInvert();
-		Vector3 p4 = c + dimensions.xInvert().yInvert();
-		Vector3 p5 = c + dimensions.xInvert();
-		Vector3 p6 = c + dimensions.yInvert();
-		Vector3 p7 = c + dimensions.zInvert();
-		Vector3 p8 = c + dimensions;
+		Vector3 p1 = position + dimensions.xInvert().yInvert().zInvert();
+		Vector3 p2 = position + dimensions.yInvert().zInvert();
+		Vector3 p3 = position + dimensions.xInvert().zInvert();
+		Vector3 p4 = position + dimensions.xInvert().yInvert();
+		Vector3 p5 = position + dimensions.xInvert();
+		Vector3 p6 = position + dimensions.yInvert();
+		Vector3 p7 = position + dimensions.zInvert();
+		Vector3 p8 = position + dimensions;
 
 		//west
 		mesh.triangles.push_back(Triangle(p3, p1, p4));
@@ -198,10 +143,9 @@ struct Box : public PhysEntity {
 		mesh.triangles.push_back(Triangle(p7, p1, p3));
 	}
 
-	void Draw(olc::PixelGameEngine* p, bool wireframe) override;
 	bool ContainsPoint(Vector3 point) override;
 	bool CheckCollision(Entity* entity) override;
-	void ResolveCollision(Entity* entity) override;
+	void ResolveCollision(PhysEntity* entity) override;
 };
 
 //struct convexPoly
@@ -218,7 +162,6 @@ struct Complex : public PhysEntity {
 		if (!LoadFromObjectFile(file_name)) {
 			std::cout << "OBJ LOAD ERROR" << std::endl;
 		}
-
 		model_name = Math::append_decimal(file_name);
 	}
 
@@ -260,10 +203,9 @@ struct Complex : public PhysEntity {
 		return true;
 	}
 
-	void Draw(olc::PixelGameEngine* p, bool wireframe) override;
 	bool ContainsPoint(Vector3 point) override;
 	bool CheckCollision(Entity* entity) override;
-	void ResolveCollision(Entity* entity) override;
+	void ResolveCollision(PhysEntity* entity) override;
 };
 
 //archaic camera class for now
@@ -276,7 +218,6 @@ struct Camera : public Entity {
 	mat<float, 4, 4> MakeViewMatrix(float yaw);
 
 	void Update(float deltaTime) override;
-	void Draw(olc::PixelGameEngine* p, bool wireframe) override;
 	bool ContainsPoint(Vector3 point) override;
 };
 

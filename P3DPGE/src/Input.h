@@ -1,8 +1,7 @@
 #pragma once
-#include "Physics.h"
 #include "Render.h"
-#include "Entities.h"
-//^this is temp for testing so it doesnt need to be there
+#include "Physics.h"
+#include "olcPixelGameEngine.h"
 
 typedef void (*Action)();
 
@@ -175,10 +174,10 @@ namespace Input {
 		//Camera movement
 
 		//translation
-		if (p->GetKey(olc::W).bHeld) { Render::camera.position.y -= 8 * deltaTimePtr; }
-		if (p->GetKey(olc::S).bHeld) { Render::camera.position.y += 8 * deltaTimePtr; }
-		if (p->GetKey(olc::A).bHeld) { Render::camera.position.x -= 8 * deltaTimePtr; }
-		if (p->GetKey(olc::D).bHeld) { Render::camera.position.x += 8 * deltaTimePtr; }
+		if (p->GetKey(olc::W).bHeld)  { Render::camera.position.y -= 8 * deltaTimePtr; }
+		if (p->GetKey(olc::S).bHeld)  { Render::camera.position.y += 8 * deltaTimePtr; }
+		if (p->GetKey(olc::A).bHeld)  { Render::camera.position.x -= 8 * deltaTimePtr; }
+		if (p->GetKey(olc::D).bHeld)  { Render::camera.position.x += 8 * deltaTimePtr; }
 		if (p->GetKey(olc::UP).bHeld) {
 			Vector3 forward = Render::camera.lookDir * 8 * deltaTimePtr;
 			Render::camera.position += forward;
