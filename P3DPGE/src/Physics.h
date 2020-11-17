@@ -22,7 +22,9 @@ namespace Physics {
 			for (PhysEntity* ptr : physEntities) {
 				if (ptr) {
 					if (discreteCollision) {
-						ptr->acceleration = V3ZERO;
+						
+
+
 						ptr->AddFrictionForce(nullptr, airFriction, deltaTime);
 
 						ptr->Update(deltaTime);

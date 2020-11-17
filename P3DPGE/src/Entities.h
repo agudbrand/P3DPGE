@@ -37,7 +37,9 @@ public:
 		this->rotation = rotation;
 		this->scale = scale;
 	}
-	virtual ~Entity() {}
+	virtual ~Entity() {
+		delete mesh;
+	}
 
 	// User must override these functions as required. I have not made
 	// them abstract because I do need a default behaviour to occur if
@@ -112,35 +114,7 @@ struct Box : public PhysEntity {
 	Box() : PhysEntity() {}
 	Box(Vector3 dimensions, int id, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
 		this->dimensions = dimensions;
-
-		//vertices making up the box
-		Vector3 p1 = position + dimensions.xInvert().yInvert().zInvert();
-		Vector3 p2 = position + dimensions.yInvert().zInvert();
-		Vector3 p3 = position + dimensions.xInvert().zInvert();
-		Vector3 p4 = position + dimensions.xInvert().yInvert();
-		Vector3 p5 = position + dimensions.xInvert();
-		Vector3 p6 = position + dimensions.yInvert();
-		Vector3 p7 = position + dimensions.zInvert();
-		Vector3 p8 = position + dimensions;
-
-		//west
-		mesh->triangles.push_back(Triangle(p3, p1, p4));
-		mesh->triangles.push_back(Triangle(p3, p4, p5));
-		//top
-		mesh->triangles.push_back(Triangle(p4, p1, p2));
-		mesh->triangles.push_back(Triangle(p4, p2, p6));
-		//east
-		mesh->triangles.push_back(Triangle(p8, p6, p2));
-		mesh->triangles.push_back(Triangle(p8, p2, p7));
-		//bottom
-		mesh->triangles.push_back(Triangle(p3, p5, p8));
-		mesh->triangles.push_back(Triangle(p3, p8, p7));
-		//south
-		mesh->triangles.push_back(Triangle(p5, p4, p6));
-		mesh->triangles.push_back(Triangle(p5, p6, p8));
-		//north
-		mesh->triangles.push_back(Triangle(p7, p2, p1));
-		mesh->triangles.push_back(Triangle(p7, p1, p3));
+		mesh = new BoxMesh(dimensions, position);
 	}
 
 	bool ContainsPoint(Vector3 point) override;

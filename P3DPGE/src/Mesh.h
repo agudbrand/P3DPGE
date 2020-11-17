@@ -180,3 +180,38 @@ struct CircleMesh : public Mesh {
 	}
 };
 
+struct BoxMesh : public Mesh {
+
+	BoxMesh(Vector3 dimensions, Vector3 position){
+
+		//vertices making up the box
+		Vector3 p1 = position + dimensions.xInvert().yInvert().zInvert();
+		Vector3 p2 = position + dimensions.yInvert().zInvert();
+		Vector3 p3 = position + dimensions.xInvert().zInvert();
+		Vector3 p4 = position + dimensions.xInvert().yInvert();
+		Vector3 p5 = position + dimensions.xInvert();
+		Vector3 p6 = position + dimensions.yInvert();
+		Vector3 p7 = position + dimensions.zInvert();
+		Vector3 p8 = position + dimensions;
+
+		//west
+		triangles.push_back(Triangle(p3, p1, p4));
+		triangles.push_back(Triangle(p3, p4, p5));
+		//top
+		triangles.push_back(Triangle(p4, p1, p2));
+		triangles.push_back(Triangle(p4, p2, p6));
+		//east
+		triangles.push_back(Triangle(p8, p6, p2));
+		triangles.push_back(Triangle(p8, p2, p7));
+		//bottom
+		triangles.push_back(Triangle(p3, p5, p8));
+		triangles.push_back(Triangle(p3, p8, p7));
+		//south
+		triangles.push_back(Triangle(p5, p4, p6));
+		triangles.push_back(Triangle(p5, p6, p8));
+		//north
+		triangles.push_back(Triangle(p7, p2, p1));
+		triangles.push_back(Triangle(p7, p1, p3));
+	}
+};
+
