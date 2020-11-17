@@ -181,7 +181,6 @@ struct CircleMesh : public Mesh {
 };
 
 struct BoxMesh : public Mesh {
-
 	BoxMesh(Vector3 dimensions, Vector3 position){
 
 		//vertices making up the box

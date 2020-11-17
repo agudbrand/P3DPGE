@@ -66,13 +66,11 @@ public:
 		//time
 		time += deltaTime;
 
-		
+		//input
+		Input::Update(this, deltaTime);
 
 		//physics
 		Physics::Update(deltaTime);
-
-		//input
-		Input::Update(this, deltaTime);
 
 		//rendering
 		Render::Update(this);
@@ -92,5 +90,5 @@ public:
 
 int main() {
 	P3DPGE game;
-	if (game.Construct(500, 500, 2, 2)) { game.Start(); }
+	if (game.Construct(500, 500, 2, 2, false, true)) { game.Start(); }
 }

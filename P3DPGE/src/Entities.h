@@ -27,7 +27,6 @@ public:
 
 	//mesh
 	olc::Pixel color = olc::WHITE;
-	//DO NOT make a pointer unless you're prepared to solve the read access violation that comes with it
 	Mesh* mesh;
 
 	Entity() {}
@@ -72,6 +71,8 @@ public:
 	float mass;
 	float elasticity;
 	bool bStatic;
+
+	std::vector<Vector3> forces;
 
 	PhysEntity() : Entity() {}
 	PhysEntity(int id, EntityParams, PhysEntityParams) : Entity(EntityArgs) {

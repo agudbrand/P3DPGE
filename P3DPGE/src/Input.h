@@ -210,7 +210,7 @@ namespace Input {
 		//LMB release = add  drawn force to selected entity
 		if (p->GetMouse(0).bReleased) {
 			if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
-				entity->AddForce(nullptr, (GetMousePos(p) - leftClickPos)*10, true);
+				entity->AddForce(nullptr, (GetMousePos(p) - leftClickPos)*100, true);
 			}
 
 			leftClickPos = V3NULL;

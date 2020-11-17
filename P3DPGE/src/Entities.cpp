@@ -47,10 +47,17 @@ void Entity::Translate(Vector3 translation) {
 
 void PhysEntity::Update(float deltaTime) {
 	if (!bStatic) {
+		//Vector3 velLast = velocity;
 		//if (acceleration.mag() < .01f) { acceleration = V3ZERO; }
+		acceleration = V3ZERO;
+		for (auto& f : forces) {
+			acceleration += f / mass;
+		}
+		forces.clear();
 		velocity += acceleration * deltaTime;
-		//if (velocity.mag() < .01f) { velocity = V3ZERO; acceleration = V3ZERO; }
-		position += velocity * deltaTime;
+		//if (velLast.normalized() == -velocity.normalized()) { velocity = V3ZERO; acceleration = V3ZERO; }
+		if (velocity.mag() < .01f) { velocity = V3ZERO; acceleration = V3ZERO; }
+		position += velocity * deltaTime * 10;
 
 		rotVelocity += rotAcceleration * deltaTime;
 		rotation += rotVelocity * deltaTime;
@@ -61,8 +68,9 @@ void PhysEntity::Update(float deltaTime) {
 //simply, changes acceleration by force
 //NOTE for some reason, this breaks things like friction
 void PhysEntity::AddForce(PhysEntity* creator, Vector3 force, bool bIgnoreMass) {
-	this->acceleration += bIgnoreMass ? force : force / mass;
-	if (creator) { creator->acceleration -= bIgnoreMass ? force : force / creator->mass; }
+	//this->acceleration += bIgnoreMass ? force : force / mass;
+	//if (creator) { creator->acceleration -= bIgnoreMass ? force : force / creator->mass; }
+	forces.push_back(force);
 }
 
 //if no creator, assume air friction and temporarily treat object as sphere with C=.5
@@ -73,7 +81,7 @@ void PhysEntity::AddFrictionForce(PhysEntity* creator, float frictionCoef, float
 
 	}
 	else {
-		acceleration -= velocity.normalized() * 0.1;
+		forces.push_back(-velocity.normalized() * frictionCoef * mass * GRAVITY);
 	}
 }
 
