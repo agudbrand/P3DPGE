@@ -3,42 +3,81 @@
 #include "Physics.h"
 #include "olcPixelGameEngine.h"
 
+//TODO(io,delle,11/17/20) look into heap vs stack memory allocation for the func pointer
 typedef void (*Action)();
 
+//NOTE update InputAction to support ALT when olcPGE does
 struct InputAction {
 	olc::Key key;
 	int mouseButton;
 	int inputState; //0 = bPressed, 1 = bHeld, 2 = bReleased
 	bool bShiftHeld;
 	bool bCtrlHeld;
-	bool bAltHeld;
+	//bool bAltHeld;
 	std::string name;
 	std::string description;
 	Action action;
 
 	InputAction(Action action, std::string name, olc::Key key = olc::Key::NONE, int mouseButton = -1, int inputState = 0,
-		bool bShiftHeld = false, bool bCtrlHeld = false, bool bAltHeld = false, std::string description = "") {
+		bool bShiftHeld = false, bool bCtrlHeld = false, /*bool bAltHeld = false,*/ std::string description = "") {
 		this->key = key;
 		this->mouseButton = mouseButton;
 		this->inputState = inputState;
 		this->bShiftHeld = bShiftHeld;
 		this->bCtrlHeld = bCtrlHeld;
-		this->bAltHeld = bAltHeld;
+		//this->bAltHeld = bAltHeld;
 		this->name = name;
 		this->description = description;
 		this->action = action;
 	}
 
+	void CheckKeyboard(olc::PixelGameEngine* p) {
+		if (inputState == 1 && p->GetKey(key).bHeld) {
+			action();
+		} else if (inputState == 2 && p->GetKey(key).bReleased) {
+			action();
+		} else if (p->GetKey(key).bPressed) {
+			action();
+		}
+	}
+
+	void CheckMouse(olc::PixelGameEngine* p) {
+		if (inputState == 1 && p->GetMouse(mouseButton).bHeld) {
+			action();
+		} else if (inputState == 2 && p->GetMouse(mouseButton).bReleased) {
+			action();
+		} else if (p->GetMouse(mouseButton).bPressed) {
+			action();
+		}
+	}
+
 	void Update(olc::PixelGameEngine* p) {
 		if (key != olc::NONE) {
-		}
-		else if (mouseButton != -1) {
+			if (bShiftHeld && p->GetKey(olc::SHIFT).bHeld) {
+				CheckKeyboard(p);
+			} else if (bCtrlHeld && p->GetKey(olc::CTRL).bHeld) {
+				CheckKeyboard(p);
+			//} else if (bAltHeld && p->GetKey(olc::LALT)) {
+			//	CheckInputState();
+			} else {
+				CheckKeyboard(p);
+			}
+		} else if (mouseButton != -1) {
+			if (bShiftHeld && p->GetKey(olc::SHIFT).bHeld) {
+				CheckMouse(p);
+			} else if (bCtrlHeld && p->GetKey(olc::CTRL).bHeld) {
+				CheckMouse(p);
+				//} else if (bAltHeld && p->GetKey(olc::LALT)) {
+				//	CheckMouse();
+			} else {
+				CheckMouse(p);
+			}
 		}
 	};
 };
 
 namespace Input {
-	static std::vector<InputAction> inputs;
+	static std::vector<InputAction> inputActions;
 
 	static Entity* selectedEntity;
 	static Vector3 leftClickPos = V3NULL;
@@ -48,10 +87,25 @@ namespace Input {
 	}
 
 	static void Init() {
-		inputs = std::vector<InputAction>();
+		inputActions = std::vector<InputAction>();
+		
+		inputActions.push_back(InputAction([]() {
+			//Time::deltaTime = 0;
+		}, "pause_game_held", olc::P, -1, 1));
+
+
+		inputActions.push_back(InputAction([]() {
+			Render::paused = !Render::paused;
+			Physics::paused = !Physics::paused;
+		}, "pause_game", olc::SPACE, -1, 0, 0, 0,
+		"Pauses the game on press."));
 	}
 
 	static void Update(olc::PixelGameEngine* p, float& deltaTimePtr) {
+		for (InputAction action : inputActions) {
+			action.Update(p);
+		}
+
 		////    Keyboard Input    /////
 		//G press = pause
 		if (p->GetKey(olc::G).bHeld) {
@@ -59,10 +113,10 @@ namespace Input {
 		}
 
 		//Space = full pause
-		if (p->GetKey(olc::SPACE).bPressed) {
+		/*if (p->GetKey(olc::SPACE).bPressed) {
 			Render::paused = !Render::paused;
 			Physics::paused = !Physics::paused;
-		}
+		}*/
 
 		//F = advance frame
 		if (p->GetKey(olc::F).bPressed) {
