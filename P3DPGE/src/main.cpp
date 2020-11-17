@@ -11,6 +11,9 @@ using namespace olc;
    TODOs should be ordered about NOTEs and TODOs should be listed in order of
    severity.
 
+Tags: + GitIssue, s Severe, u Unimportant, p Physics, r Render, e Entity, i Input,
+	m Math, o Optimization, g General, c Clean Up Code
+
 TODO(g, sushi) create a WorldMatrix that takes in several matrix operations and
 	  gets there product in the order specified then apply that final matrix
 	  to the object. this would probably eliminate the need to constantly

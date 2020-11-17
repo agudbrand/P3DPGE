@@ -174,9 +174,14 @@ public:
 };
 
 struct CircleMesh : public Mesh {
+	float radius;
+
+	CircleMesh(float radius) {
+		this->radius = radius;
+	}
 
 	void Draw(olc::PixelGameEngine* p, Vector3 pos, bool wireframe = false, olc::Pixel color = olc::WHITE) override {
-		p->FillCircle(pos.Vector3Tovd2d(), 10, color);
+		p->FillCircle(pos.Vector3Tovd2d(), radius, color);
 	}
 };
 
