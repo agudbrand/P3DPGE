@@ -1,4 +1,4 @@
-TODO List successfully generated with 22 TODOs found.
+TODO List successfully generated with 23 TODOs found.
 
 ~~~~~~~ TODO 0 ~~~~~~~
 Entities.cpp, Line: 77
@@ -90,7 +90,15 @@ Tags: TODOP, input, optimization
 look into heap vs stack memory allocation for the func pointer
 
 ~~~~~~~ TODO 10 ~~~~~~~
-Input.h, Line: 281
+Input.h, Line: 107
+Creator:  sushi
+----------------------
+Tags: TODOP, input
+----------------------
+set up pausing to also pause moving/rotating objects manually
+
+~~~~~~~ TODO 11 ~~~~~~~
+Input.h, Line: 282
 Creator: delle
 ----------------------
 Date: 11/17/20
@@ -98,7 +106,7 @@ Tags: TODOP, severe, input
 ----------------------
 change this so it checks objects in screen space
 
-~~~~~~~ TODO 11 ~~~~~~~
+~~~~~~~ TODO 12 ~~~~~~~
 main.cpp, Line: 16
 Creator:  sushi
 ----------------------
@@ -106,7 +114,7 @@ Tags: TODOP, general
 ----------------------
 create a WorldMatrix that takes in several matrix operations and
 
-~~~~~~~ TODO 12 ~~~~~~~
+~~~~~~~ TODO 13 ~~~~~~~
 main.cpp, Line: 22
 Creator:  sushi
 ----------------------
@@ -114,7 +122,7 @@ Tags: TODOP, general
 ----------------------
 find a reason to either keep or remove Render::Init() 
 
-~~~~~~~ TODO 13 ~~~~~~~
+~~~~~~~ TODO 14 ~~~~~~~
 main.cpp, Line: 24
 Creator: delle
 ----------------------
@@ -122,7 +130,7 @@ Tags: TODOP, physics
 ----------------------
 add physics based collision resolution for all entities
 
-~~~~~~~ TODO 14 ~~~~~~~
+~~~~~~~ TODO 15 ~~~~~~~
 main.cpp, Line: 26
 Creator: delle
 ----------------------
@@ -130,7 +138,7 @@ Tags: TODOP, input
 ----------------------
 convert inputs to new format, method to add and remove inputs
 
-~~~~~~~ TODO 15 ~~~~~~~
+~~~~~~~ TODO 16 ~~~~~~~
 main.cpp, Line: 28
 Creator: delle
 ----------------------
@@ -138,17 +146,17 @@ Tags: TODOP, general
 ----------------------
 create a debug header for easy printing and such
 
-~~~~~~~ TODO 16 ~~~~~~~
-Math.h, Line: 268
+~~~~~~~ TODO 17 ~~~~~~~
+Math.h, Line: 266
 Creator:  sushi
 ----------------------
 Tags: TODOP
 ----------------------
 rename these functions to something not retarded
 
-~~~~~~~ TODO 17 ~~~~~~~
+~~~~~~~ TODO 18 ~~~~~~~
 Title:  Implement Clipping Algorithm
-Mesh.h, Line: 116
+Mesh.h, Line: 140
 Creator:  sushi
 ----------------------
 Date:  11/15/2020
@@ -156,7 +164,7 @@ Tags: TODOP, GitIssue, render, severe
 ----------------------
 mesh Javid\'s clipping algorithm with what we already have set up, also rewatch his video to fix the camera not moving the clipping plane.
 
-~~~~~~~ TODO 18 ~~~~~~~
+~~~~~~~ TODO 19 ~~~~~~~
 Physics.h, Line: 5
 Creator: delle
 ----------------------
@@ -165,7 +173,7 @@ Tags: TODOP, optimization, unimportant
 ----------------------
 optimize by using arrays rather than vectors,
 
-~~~~~~~ TODO 19 ~~~~~~~
+~~~~~~~ TODO 20 ~~~~~~~
 Physics.h, Line: 48
 Creator: delle
 ----------------------
@@ -174,7 +182,7 @@ Tags: TODOP, unimportant, physics, optimization
 ----------------------
 this could maybe be optimized by having an id counter instead of checking back element
 
-~~~~~~~ TODO 20 ~~~~~~~
+~~~~~~~ TODO 21 ~~~~~~~
 Render.h, Line: 4
 Creator:  sushi
 ----------------------
@@ -183,7 +191,7 @@ Tags: TODOP, render
 ----------------------
 set up a function that loops through a vector of matrix operations to reduce the amount of times we need to convert from local to world space and so the order stays consistent
 
-~~~~~~~ TODO 21 ~~~~~~~
+~~~~~~~ TODO 22 ~~~~~~~
 Time.h, Line: 3
 Creator: delle
 ----------------------
