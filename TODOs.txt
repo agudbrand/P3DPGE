@@ -1,7 +1,7 @@
-TODO List successfully generated with 23 TODOs found.
+TODO List successfully generated with 27 TODOs found.
 
 ~~~~~~~ TODO 0 ~~~~~~~
-Entities.cpp, Line: 77
+Entities.cpp, Line: 81
 Creator: delle
 ----------------------
 Date: 11/13/20
@@ -10,7 +10,7 @@ Tags: TODOP, unimportant, physics
 change air friction to calculate for shape of object
 
 ~~~~~~~ TODO 1 ~~~~~~~
-Entities.cpp, Line: 94
+Entities.cpp, Line: 98
 Creator: delle
 ----------------------
 Date: 11/13/20
@@ -19,7 +19,7 @@ Tags: TODOP, unimportant, physics
 this
 
 ~~~~~~~ TODO 2 ~~~~~~~
-Entities.cpp, Line: 105
+Entities.cpp, Line: 109
 Creator: delle
 ----------------------
 Date: 11/9/20
@@ -28,7 +28,7 @@ Tags: TODOP, severe, physics
 expand this to a general entity check, but right now it just checks circles
 
 ~~~~~~~ TODO 3 ~~~~~~~
-Entities.cpp, Line: 106
+Entities.cpp, Line: 110
 Creator: delle
 ----------------------
 Date: 11/9/20
@@ -37,7 +37,7 @@ Tags: TODOP, optimization, unimportant, physics
 if other object is sphere, can optimize the equation to not use sqrt
 
 ~~~~~~~ TODO 4 ~~~~~~~
-Entities.cpp, Line: 118
+Entities.cpp, Line: 122
 Creator: delle
 ----------------------
 Date: 11/9/20
@@ -46,7 +46,7 @@ Tags: TODOP, severe, physics
 expand this to a general entity check, but right now it just checks circles
 
 ~~~~~~~ TODO 5 ~~~~~~~
-Entities.cpp, Line: 119
+Entities.cpp, Line: 123
 Creator: delle
 ----------------------
 Date: 11/17/20
@@ -55,7 +55,7 @@ Tags: TODOP, optimization, unimportant, physics
 can optimize this by recieving info from CheckCollision
 
 ~~~~~~~ TODO 6 ~~~~~~~
-Entities.cpp, Line: 151
+Entities.cpp, Line: 155
 Creator: delle
 ----------------------
 Date: 11/9/20
@@ -64,7 +64,7 @@ Tags: TODOP, severe, physics
 expand this to a general entity check
 
 ~~~~~~~ TODO 7 ~~~~~~~
-Entities.cpp, Line: 156
+Entities.cpp, Line: 160
 Creator: delle
 ----------------------
 Date: 11/9/20
@@ -73,6 +73,23 @@ Tags: TODOP, severe, physics
 expand this to a general entity check
 
 ~~~~~~~ TODO 8 ~~~~~~~
+Entities.cpp, Line: 184
+Creator:  sushi
+----------------------
+Date:  11/18/2020
+Tags: TODOP, render, entity
+----------------------
+for some reason this seems to havbe the same projecting problem as meshes did but idk y yet so fix it 
+
+~~~~~~~ TODO 9 ~~~~~~~
+Entities.cpp, Line: 188
+Creator:  sushi
+----------------------
+Tags: TODOP, math
+----------------------
+abstract the following functions in Math.h in order to make this not look retarded
+
+~~~~~~~ TODO 10 ~~~~~~~
 Entities.h, Line: 144
 Creator:  sushi
 ----------------------
@@ -80,7 +97,7 @@ Tags: TODOP, GitIssue, entity
 ----------------------
 generate complex object relative to input position
 
-~~~~~~~ TODO 9 ~~~~~~~
+~~~~~~~ TODO 11 ~~~~~~~
 Input.h, Line: 5
 Creator: delle
 ----------------------
@@ -89,7 +106,7 @@ Tags: TODOP, input, optimization
 ----------------------
 look into heap vs stack memory allocation for the func pointer
 
-~~~~~~~ TODO 10 ~~~~~~~
+~~~~~~~ TODO 12 ~~~~~~~
 Input.h, Line: 107
 Creator:  sushi
 ----------------------
@@ -97,7 +114,7 @@ Tags: TODOP, input
 ----------------------
 set up pausing to also pause moving/rotating objects manually
 
-~~~~~~~ TODO 11 ~~~~~~~
+~~~~~~~ TODO 13 ~~~~~~~
 Input.h, Line: 282
 Creator: delle
 ----------------------
@@ -106,7 +123,7 @@ Tags: TODOP, severe, input
 ----------------------
 change this so it checks objects in screen space
 
-~~~~~~~ TODO 12 ~~~~~~~
+~~~~~~~ TODO 14 ~~~~~~~
 main.cpp, Line: 16
 Creator:  sushi
 ----------------------
@@ -114,7 +131,7 @@ Tags: TODOP, general
 ----------------------
 create a WorldMatrix that takes in several matrix operations and
 
-~~~~~~~ TODO 13 ~~~~~~~
+~~~~~~~ TODO 15 ~~~~~~~
 main.cpp, Line: 22
 Creator:  sushi
 ----------------------
@@ -122,7 +139,7 @@ Tags: TODOP, general
 ----------------------
 find a reason to either keep or remove Render::Init() 
 
-~~~~~~~ TODO 14 ~~~~~~~
+~~~~~~~ TODO 16 ~~~~~~~
 main.cpp, Line: 24
 Creator: delle
 ----------------------
@@ -130,7 +147,7 @@ Tags: TODOP, physics
 ----------------------
 add physics based collision resolution for all entities
 
-~~~~~~~ TODO 15 ~~~~~~~
+~~~~~~~ TODO 17 ~~~~~~~
 main.cpp, Line: 26
 Creator: delle
 ----------------------
@@ -138,7 +155,7 @@ Tags: TODOP, input
 ----------------------
 convert inputs to new format, method to add and remove inputs
 
-~~~~~~~ TODO 16 ~~~~~~~
+~~~~~~~ TODO 18 ~~~~~~~
 main.cpp, Line: 28
 Creator: delle
 ----------------------
@@ -146,7 +163,7 @@ Tags: TODOP, general
 ----------------------
 create a debug header for easy printing and such
 
-~~~~~~~ TODO 17 ~~~~~~~
+~~~~~~~ TODO 19 ~~~~~~~
 Math.h, Line: 266
 Creator:  sushi
 ----------------------
@@ -154,9 +171,9 @@ Tags: TODOP
 ----------------------
 rename these functions to something not retarded
 
-~~~~~~~ TODO 18 ~~~~~~~
+~~~~~~~ TODO 20 ~~~~~~~
 Title:  Implement Clipping Algorithm
-Mesh.h, Line: 140
+Mesh.h, Line: 155
 Creator:  sushi
 ----------------------
 Date:  11/15/2020
@@ -164,7 +181,15 @@ Tags: TODOP, GitIssue, render, severe
 ----------------------
 mesh Javid\'s clipping algorithm with what we already have set up, also rewatch his video to fix the camera not moving the clipping plane.
 
-~~~~~~~ TODO 19 ~~~~~~~
+~~~~~~~ TODO 21 ~~~~~~~
+Mesh.h, Line: 215
+Creator:  sushi
+----------------------
+Tags: TODOP, clean up
+----------------------
+adapt this to be drawn in an entity class
+
+~~~~~~~ TODO 22 ~~~~~~~
 Physics.h, Line: 5
 Creator: delle
 ----------------------
@@ -173,7 +198,7 @@ Tags: TODOP, optimization, unimportant
 ----------------------
 optimize by using arrays rather than vectors,
 
-~~~~~~~ TODO 20 ~~~~~~~
+~~~~~~~ TODO 23 ~~~~~~~
 Physics.h, Line: 48
 Creator: delle
 ----------------------
@@ -182,7 +207,7 @@ Tags: TODOP, unimportant, physics, optimization
 ----------------------
 this could maybe be optimized by having an id counter instead of checking back element
 
-~~~~~~~ TODO 21 ~~~~~~~
+~~~~~~~ TODO 24 ~~~~~~~
 Render.h, Line: 4
 Creator:  sushi
 ----------------------
@@ -191,7 +216,16 @@ Tags: TODOP, render
 ----------------------
 set up a function that loops through a vector of matrix operations to reduce the amount of times we need to convert from local to world space and so the order stays consistent
 
-~~~~~~~ TODO 22 ~~~~~~~
+~~~~~~~ TODO 25 ~~~~~~~
+Render.h, Line: 74
+Creator:  sushi
+----------------------
+Date:  11/18/2020
+Tags: TODOP, render
+----------------------
+writing this is probably important
+
+~~~~~~~ TODO 26 ~~~~~~~
 Time.h, Line: 3
 Creator: delle
 ----------------------
