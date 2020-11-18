@@ -39,9 +39,23 @@ public:
 
 	std::vector<Triangle> drawnTriangles_Debug;
 
+	Vector3 camPos;
+	mat<float, 4, 4> ProjMat;
+	mat<float, 4, 4> view;
+
 	Mesh() { triangles = std::vector<Triangle>(); }
 
-	virtual void Draw(olc::PixelGameEngine* p, Vector3 pos, Vector3 camPos, mat<float,4,4> ProjMat, mat<float,4,4> view, bool wireframe = false, olc::Pixel color = olc::WHITE) {
+	void Update(Vector3 camPos, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
+		this->camPos = camPos;
+		this->ProjMat = ProjMat;
+		this->view = view;
+	}
+
+	Vector3 getCamPos()				{ return camPos; }
+	mat<float, 4, 4> getProjMat()	{ return ProjMat; }
+	mat<float, 4, 4> getView()		{ return view; }
+
+	virtual void Draw(olc::PixelGameEngine* p, Vector3 pos, bool wireframe = false, olc::Pixel color = olc::WHITE) {
 		std::vector<Triangle> visibleTriangles;
 		std::vector<Triangle> drawnTriangles;
 		drawnTriangles_Debug.clear();
@@ -53,9 +67,8 @@ public:
 		//store triangles we want to draw for sorting and copy world points to projected points
 		for (auto& t : triangles) {
 			t.copy_points();
-
-			if (t.get_proj_normal().dot(t.points[0] - camPos) > 0) {
-				visibleTriangles.push_back(t);
+			if (t.get_proj_normal().dot(t.points[0] - camPos) > 0) { 
+				visibleTriangles.push_back(t); 
 			}
 		}
 
@@ -136,6 +149,8 @@ public:
 		}
 	}//Draw
 
+	//virtual void Draw(olc::PixelGameEngine* p, )
+
 	//this function is really complex and i just pulled it from Javid's video
 	//hopefully later i'll try to understand it better
 	//TODO(+rs, sushi, 11/15/2020, Implement Clipping Algorithm) mesh Javid's clipping algorithm with what we already have set up, also rewatch his video to fix the camera not moving the clipping plane.
@@ -195,9 +210,10 @@ public:
 			out_tri2.projectedPoints[2] = Math::VectorPlaneIntersect(plane_p, plane_n, *inside_points[1], *outside_points[0]);
 			return 2;
 		}
-	}
+	}//ClipTriangles
 };
 
+//TODO(c, sushi) adapt this to be drawn in an entity class
 struct CircleMesh : public Mesh {
 	float radius;
 
@@ -205,10 +221,12 @@ struct CircleMesh : public Mesh {
 		this->radius = radius;
 	}
 
-	void Draw(olc::PixelGameEngine* p, Vector3 pos, Vector3 camPos, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view, bool wireframe = false, olc::Pixel color = olc::WHITE) override {
+	void Draw(olc::PixelGameEngine* p, Vector3 pos, bool wireframe = false, olc::Pixel color = olc::WHITE) override {
 		p->FillCircle(pos.Vector3Tovd2d(), radius, color);
 	}
 };
+
+
 
 struct BoxMesh : public Mesh {
 	BoxMesh(Vector3 dimensions, Vector3 position){

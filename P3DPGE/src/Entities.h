@@ -4,8 +4,6 @@
 #include "Mesh.h"
 #include "olcPixelGameEngine.h"
 
-//namespace qvm = boost::qvm;
-
 #define EntityArgs id, position, rotation, scale
 #define EntityParams Vector3 position = V3ZERO, Vector3 rotation = V3ZERO, Vector3 scale = V3ONE
 //the basis of all objects drawn on screen or otherwise, includes basic information such
@@ -43,6 +41,8 @@ public:
 	//TODO: this ^
 	virtual void Update(float deltaTime) = 0;
 	virtual bool ContainsPoint(Vector3 point) = 0;
+
+	virtual void Draw(olc::PixelGameEngine* p, bool wireframe = false);
 
 	//these functions are virtual but aren't implemented
 	//in any child yet as I see no use for differenciating
@@ -182,10 +182,50 @@ struct Complex : public PhysEntity {
 	void ResolveCollision(PhysEntity* entity) override;
 };
 
+//should there be 2 vf2d's instead of a Vector3 pos and Vector3 endPos?
+struct Line2 : public Entity {
+	Vector3 endPosition;
+
+	Line2(Vector3 endPosition, int id, EntityParams) : Entity(EntityArgs){
+
+		//just so no RAV
+		mesh = new Mesh();
+
+		endPosition.z = 0; this->endPosition = endPosition;
+		this->id = id;
+
+	}
+
+	void Update(float deltaTime) override;
+	bool ContainsPoint(Vector3 point) override;
+
+	void Draw(olc::PixelGameEngine* p, bool wireframe = false) override;
+
+};
+
+struct Line3 : public Entity {
+	Vector3 endPosition;
+
+	Line3(Vector3 endPosition, int id, EntityParams) : Entity(EntityArgs) {
+
+		mesh = new Mesh();
+		this->endPosition = endPosition;
+		this->id = id;
+
+	}
+
+	void Draw(olc::PixelGameEngine* p, bool wireframe = false) override;
+
+	void Update(float deltaTime) override;
+	bool ContainsPoint(Vector3 point) override;
+};
+
 struct Camera : public Entity {
 	Vector3 lookDir;
 
-	Camera() {  }
+	Camera() {  
+		position = V3ZERO;
+	}
 
 	mat<float, 4, 4> MakeViewMatrix(float yaw);
 

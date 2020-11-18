@@ -10,6 +10,10 @@ void Entity::SetColor(olc::Pixel newColor) {
 	color = newColor;
 }
 
+void Entity::Draw(olc::PixelGameEngine* p, bool wireframe) {
+	mesh->Draw(p, position, wireframe);
+}
+
 void Entity::RotateX(Vector3 offset) {
 	for (auto& m : mesh->triangles) {
 		for (auto& n : m.points) {
@@ -171,6 +175,29 @@ bool Complex::CheckCollision(Entity* entity) {
 
 void Complex::ResolveCollision(PhysEntity* entity) {
 }
+
+//// Line2 and Line3 ////
+
+void Line2::Draw(olc::PixelGameEngine* p, bool wireframe) { p->DrawLine(position.Vector3Tovd2d(), endPosition.Vector3Tovd2d(), color); }
+bool Line2::ContainsPoint(Vector3 point) { return false; }
+void Line2::Update(float deltaTime) {}
+
+//TODO(re, sushi, 11/18/2020) for some reason this seems to havbe the same projecting problem as meshes did but idk y yet so fix it 
+void Line3::Draw(olc::PixelGameEngine* p, bool wireframe) {
+
+	//these operations are very gross and could probably be abstracted in Math
+	//TODO(m, sushi) abstract the following functions in Math.h in order to make this not look retarded
+	Vector3 posView = position.GetM1x4ToVector3(position.proj_mult(position.ConvertToM4x4(), mesh->view));
+	Vector3 posProj = posView.GetM1x4ToVector3(posView.proj_mult(posView.ConvertToM4x4(), mesh->ProjMat));
+
+	Vector3 endView = endPosition.GetM1x4ToVector3(endPosition.proj_mult(endPosition.ConvertToM4x4(), mesh->view));
+	Vector3 endProj = endView.GetM1x4ToVector3(endView.proj_mult(endView.ConvertToM4x4(), mesh->ProjMat));
+
+	p->DrawLine(posProj.Vector3Tovd2d(), endProj.Vector3Tovd2d(), color);
+}
+
+bool Line3::ContainsPoint(Vector3 point) { return false; }
+void Line3::Update(float deltaTime) {}
 
 //// Camera ////
 

@@ -23,7 +23,13 @@ namespace Render {
 	//just shove all entities into here, then draw them
 	static void AddEntity(Entity* e) { entities.push_back(e); }
 
-	static void Init() {}
+	static void Init() {
+		//test lines, remove them if i forget pls
+		Line2* l1 = new Line2(Vector3(100, 100, 0), 1);
+		Line3* l2 = new Line3(Vector3(10, 10, 4), 1, Vector3(-10, -10, 1));
+		entities.push_back(l1);
+		entities.push_back(l2);
+	}
 
 	using namespace boost::qvm;
 	//projection matrix
@@ -55,12 +61,8 @@ namespace Render {
 
 		//draw all entities
 		for (auto& e : entities) {
-			/* do I need to even have pausing in render?
-			if (!paused || frame) {
-				e->mesh->ProjectToScreen(p, e->position, ProjectionMatrix(p), view);
-				if (frame) { frame = !frame; }
-			}*/
-			e->mesh->Draw(p, e->position, camera.position, ProjectionMatrix(p), view, wireframe);
+			e->mesh->Update(camera.position, ProjectionMatrix(p), view);
+			e->Draw(p, wireframe);
 		}
 
 		//debug
@@ -69,5 +71,7 @@ namespace Render {
 	}
 
 	static void Cleanup() {
+
+		//TODO(r, sushi, 11/18/2020) writing this is probably important
 	}
 };
