@@ -333,7 +333,7 @@ namespace Input {
 				);
 			}
             
-			p->DrawStringDecal(olc::vf2d(0, 0), text);
+			//p->DrawStringDecal(olc::vf2d(0, 0), text);
 		}
         
 		//point debugging

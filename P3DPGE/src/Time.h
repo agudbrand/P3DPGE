@@ -35,7 +35,7 @@ namespace Time {
 		//if (deltaTime > fixedDeltaTime) throw deltaTimeException;
 
 		//physics
-		Physics::Update(Time::fixedDeltaTime);
+		//Physics::Update(Time::fixedDeltaTime);
 
 		//std::cout << "Fixed Update :)" << std::endl;
 	}

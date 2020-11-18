@@ -4,7 +4,7 @@
 #include "Mesh.h"
 #include "olcPixelGameEngine.h"
 
-namespace qvm = boost::qvm;
+//namespace qvm = boost::qvm;
 
 #define EntityArgs id, position, rotation, scale
 #define EntityParams Vector3 position = V3ZERO, Vector3 rotation = V3ZERO, Vector3 scale = V3ONE

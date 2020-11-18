@@ -205,10 +205,8 @@ struct CircleMesh : public Mesh {
 		this->radius = radius;
 	}
 
-	void Draw(olc::PixelGameEngine* p, Vector3 pos, bool wireframe = false, olc::Pixel color = olc::WHITE) override {
-		p->FillCircle(pos.Vector3Tovd2d(), radius, color);
 	void Draw(olc::PixelGameEngine* p, Vector3 pos, Vector3 camPos, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view, bool wireframe = false, olc::Pixel color = olc::WHITE) override {
-		p->FillCircle(pos.Vector3Tovd2d(), 10, color);
+		p->FillCircle(pos.Vector3Tovd2d(), radius, color);
 	}
 };
 
