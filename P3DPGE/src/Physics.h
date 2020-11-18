@@ -5,7 +5,6 @@
 namespace Physics {
 	//TODO(ou,delle,11/9/20) optimize by using arrays rather than vectors,
 	static std::vector<PhysEntity*> physEntities;
-	static std::vector<std::pair<PhysEntity*, PhysEntity*>> collidingEntities;
 
 	static float airFriction = .8f; //completely arbitrary number
 
@@ -47,6 +46,7 @@ namespace Physics {
 		physEntities.clear();
 	}
 
+	//TODO(upo,delle,11/17/20) this could maybe be optimized by having an id counter instead of checking back element
 	static size_t AddEntity(PhysEntity* entity) {
 		if (physEntities.size() > 0) {
 			entity->id = physEntities.back()->id + 1;

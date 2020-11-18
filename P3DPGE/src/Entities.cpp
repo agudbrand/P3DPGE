@@ -117,6 +117,7 @@ bool Sphere::CheckCollision(Entity* entity) {
 }
 
 //TODO(sp,delle,11/9/20) expand this to a general entity check, but right now it just checks circles
+//TODO(oup,delle,11/17/20) can optimize this by recieving info from CheckCollision
 void Sphere::ResolveCollision(PhysEntity* other) {
 	if (Sphere* sphere = dynamic_cast<Sphere*>(other)) {
 		//static resolution

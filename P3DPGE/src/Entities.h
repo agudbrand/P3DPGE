@@ -4,10 +4,7 @@
 #include "Mesh.h"
 #include "olcPixelGameEngine.h"
 
-
 namespace qvm = boost::qvm;
-
-
 
 #define EntityArgs id, position, rotation, scale
 #define EntityParams Vector3 position = V3ZERO, Vector3 rotation = V3ZERO, Vector3 scale = V3ONE
@@ -134,6 +131,7 @@ struct Complex : public PhysEntity {
 	std::string model_name;
 
 	Complex(std::string file_name, int id, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
+		mesh = new Mesh();
 		if (!LoadFromObjectFile(file_name)) {
 			std::cout << "OBJ LOAD ERROR" << std::endl;
 		}
@@ -171,6 +169,7 @@ struct Complex : public PhysEntity {
 			if (line[0] == 'f') {
 				int f[3];
 				s >> junk >> f[0] >> f[1] >> f[2];
+
 				mesh->triangles.push_back(Triangle(vertices[f[0] - 1], vertices[f[1] - 1], vertices[f[2] - 1]));
 			}
 		}
