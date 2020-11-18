@@ -7,11 +7,11 @@
 namespace Render {
 	static std::vector<Entity*> entities;
 
+	static mat<float, 4, 4> view;
 	static Camera camera;
 	static float yaw;
 	static float pitch;
 
-	bool projecting = true;
 	bool wireframe = false;
 
 	//booleans for pausing and advancing by frame
@@ -48,25 +48,24 @@ namespace Render {
 		return proj;
 	}
 
-	
-
 	//draw all entities to screen
 	static void Update(olc::PixelGameEngine* p) {
 
-		mat<float, 4, 4> view = camera.MakeViewMatrix(yaw);
+		view = camera.MakeViewMatrix(yaw);
 
 		//draw all entities
 		for (auto& e : entities) {
+			/* do I need to even have pausing in render?
 			if (!paused || frame) {
-				if (projecting) { e->mesh->ProjectToScreen(p, e->position, ProjectionMatrix(p), view); }
+				e->mesh->ProjectToScreen(p, e->position, ProjectionMatrix(p), view);
 				if (frame) { frame = !frame; }
-			}
-			e->mesh->Draw(p, e->position, wireframe);
+			}*/
+			e->mesh->Draw(p, e->position, camera.position, ProjectionMatrix(p), view, wireframe);
 		}
 
 		//debug
 		//p->DrawStringDecal(olc::vf2d(0, p->ScreenHeight() - 10), "Mouse Pos: " + p->GetMousePos().str());
-		p->DrawStringDecal(olc::vf2d(0, p->ScreenHeight() - 10), "Mouse Pos: " + camera.position.str());
+		p->DrawStringDecal(olc::vf2d(0, p->ScreenHeight() - 10), "Camera Pos: " + camera.position.str());
 	}
 
 	static void Cleanup() {

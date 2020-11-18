@@ -183,8 +183,6 @@ struct Complex : public PhysEntity {
 	void ResolveCollision(PhysEntity* entity) override;
 };
 
-//archaic camera class for now
-//in fact its nothing
 struct Camera : public Entity {
 	Vector3 lookDir;
 

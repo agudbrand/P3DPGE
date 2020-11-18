@@ -59,7 +59,7 @@ class Vector3 {
 		Vector3 operator /  (const Vector3& rhs)		const { return Vector3(this->x / rhs.x, this->y / rhs.y, this->z / rhs.z); }
 		Vector3 operator += (const Vector3& rhs)			  { this->x += rhs.x; this->y += rhs.y; this->z += rhs.z; return *this; }
 		Vector3 operator -= (const Vector3& rhs)			  { this->x -= rhs.x; this->y -= rhs.y; this->z -= rhs.z; return *this; }
-		Vector3 operator *= (const float& rhs)				  { this->x *= rhs; this->y *= rhs; this->z *= rhs; return *this; }
+		Vector3 operator *= (const mat<float, 4, 4> rhs)	  { mat<float, 1, 4> v{ x,y,z,1 }; return GetM1x4ToVector3(v * rhs); }
 		Vector3 operator /= (const float& rhs)				  { this->x /= rhs; this->y /= rhs; this->z /= rhs; return *this; }
 		Vector3 operator +  ()							const { return { +x, +y, +z }; }
 		Vector3 operator -  ()							const { return { -x, -y, -z }; }
@@ -194,8 +194,6 @@ class Vector3 {
 			this->M1x4ToVector3(proj_mult(ConvertToM4x4(), rvz));
 			LocalToWorld(pos + offset);
 		}
-
-		
 
 		//projects a mesh's points to the screen
 		void ProjToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p, Vector3 pos) {

@@ -93,7 +93,7 @@ namespace Input {
 			//Time::deltaTime = 0;
 		}, "pause_game_held", olc::P, -1, 1));
 
-
+		//TODO(i, sushi) set up pausing to also pause moving/rotating objects manually
 		inputActions.push_back(InputAction([]() {
 			Render::paused = !Render::paused;
 			Physics::paused = !Physics::paused;
@@ -298,31 +298,31 @@ namespace Input {
 			selectedEntity->position = Math::vi2dToVector3(p->GetMousePos(), selectedEntity->position.z);
 		}
 
-		if (selectedEntity) {
-			std::string text = "ID: " + std::to_string(selectedEntity->id) + "\tTag: " + selectedEntity->tag + "\n";
-			text += "Position:" + selectedEntity->position.str() + "\nRotation:" + selectedEntity->rotation.str() + "\nScale:" + selectedEntity->scale.str() + "\n";
-			//NOTE this checks if possible and casts Entity* to PhysEntity*
-			if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
-				text += "Is Static: "; text += entity->bStatic ? "true" : "false"; text += "\nMass: " + std::to_string(entity->mass) + "\n";
-				text += "Velocity:" + entity->velocity.str() + " " + std::to_string(entity->velocity.mag()) + "\nAcceleration:" + entity->acceleration.str() + "\n";
-				text += "rotVelocity:" + entity->rotVelocity.str() + "\nrotAcceleration:" + entity->rotAcceleration.str() + "\n";
-			}
-
-			p->DrawStringDecal(olc::vf2d(0, 0), text);
-		}
+		//if (selectedEntity) {
+		//	std::string text = "ID: " + std::to_string(selectedEntity->id) + "\tTag: " + selectedEntity->tag + "\n";
+		//	text += "Position:" + selectedEntity->position.str() + "\nRotation:" + selectedEntity->rotation.str() + "\nScale:" + selectedEntity->scale.str() + "\n";
+		//	//NOTE this checks if possible and casts Entity* to PhysEntity*
+		//	if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
+		//		text += "Is Static: "; text += entity->bStatic ? "true" : "false"; text += "\nMass: " + std::to_string(entity->mass) + "\n";
+		//		text += "Velocity:" + entity->velocity.str() + " " + std::to_string(entity->velocity.mag()) + "\nAcceleration:" + entity->acceleration.str() + "\n";
+		//		text += "rotVelocity:" + entity->rotVelocity.str() + "\nrotAcceleration:" + entity->rotAcceleration.str() + "\n";
+		//	}
+		//
+		//	p->DrawStringDecal(olc::vf2d(0, 0), text);
+		//}
 
 		//point debugging
-		//if (selectedEntity) {
-		//	for (int i = 0; i < selectedEntity->mesh.triangles.size(); i++) {
-		//		auto pa = selectedEntity->mesh.triangles;
-		//		p->DrawString(olc::vd2d(1, i * 9),
-		//			"Triangle: " + std::to_string(i) + " " +
-		//			Math::append_decimal(std::to_string(pa[i].projectedPoints[0].x)) + "x " + Math::append_decimal(std::to_string(pa[i].projectedPoints[0].y)) + "y " + Math::append_decimal(std::to_string(pa[i].projectedPoints[0].z)) + "z " +
-		//			Math::append_decimal(std::to_string(pa[i].projectedPoints[1].x)) + "x " + Math::append_decimal(std::to_string(pa[i].projectedPoints[1].y)) + "y " + Math::append_decimal(std::to_string(pa[i].projectedPoints[1].z)) + "z " +
-		//			Math::append_decimal(std::to_string(pa[i].projectedPoints[2].x)) + "x " + Math::append_decimal(std::to_string(pa[i].projectedPoints[2].y)) + "y " + Math::append_decimal(std::to_string(pa[i].projectedPoints[2].z)) + "z "
-		//		);
-		//	}
-		//}
+		if (selectedEntity) {
+			for (int i = 0; i < selectedEntity->mesh->drawnTriangles_Debug.size(); i++) {
+				auto pa = selectedEntity->mesh->drawnTriangles_Debug;
+				p->DrawString(olc::vd2d(1, i * 9),
+					"Triangle: " + std::to_string(i) + " " +
+					Math::append_decimal(std::to_string(pa[i].projectedPoints[0].x)) + "x " + Math::append_decimal(std::to_string(pa[i].projectedPoints[0].y)) + "y " + Math::append_decimal(std::to_string(pa[i].projectedPoints[0].z)) + "z " +
+					Math::append_decimal(std::to_string(pa[i].projectedPoints[1].x)) + "x " + Math::append_decimal(std::to_string(pa[i].projectedPoints[1].y)) + "y " + Math::append_decimal(std::to_string(pa[i].projectedPoints[1].z)) + "z " +
+					Math::append_decimal(std::to_string(pa[i].projectedPoints[2].x)) + "x " + Math::append_decimal(std::to_string(pa[i].projectedPoints[2].y)) + "y " + Math::append_decimal(std::to_string(pa[i].projectedPoints[2].z)) + "z "
+				);
+			}
+		}
 
 		if (p->GetKey(olc::C).bPressed) { Render::wireframe = !Render::wireframe; }
 

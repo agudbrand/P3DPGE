@@ -37,85 +37,109 @@ class Mesh {
 public:
 	std::vector<Triangle> triangles;
 
-	Mesh() {
-		triangles = std::vector<Triangle>();
-	}
+	std::vector<Triangle> drawnTriangles_Debug;
 
-	virtual void Draw(olc::PixelGameEngine* p, Vector3 pos, bool wireframe = false, olc::Pixel color = olc::WHITE) {
+	Mesh() { triangles = std::vector<Triangle>(); }
+
+	virtual void Draw(olc::PixelGameEngine* p, Vector3 pos, Vector3 camPos, mat<float,4,4> ProjMat, mat<float,4,4> view, bool wireframe = false, olc::Pixel color = olc::WHITE) {
 		std::vector<Triangle> visibleTriangles;
-
-		//camera is currently permenantly at zero
-		Vector3 camera(0, 0, 0);
+		std::vector<Triangle> drawnTriangles;
+		drawnTriangles_Debug.clear();
 		//temp lighting set up
 		Vector3 light_direction(0, 0, 1);
 		light_direction = light_direction.normalized();
 		//std::cout << t.get_normal().z << std::endl;
 
+		//store triangles we want to draw for sorting and copy world points to projected points
 		for (auto& t : triangles) {
-			if (t.get_proj_normal().dot(t.points[0] - camera) > 0) {
-				//store triangles we want to draw for sorting
+			t.copy_points();
+
+			if (t.get_proj_normal().dot(t.points[0] - camPos) > 0) {
 				visibleTriangles.push_back(t);
 			}
 		}
 
-		std::sort(visibleTriangles.begin(), visibleTriangles.end(), [](Triangle& t1, Triangle& t2) {
+		//project triangles to screen and add them to the 
+		//draw vector
+		for (Triangle t : visibleTriangles) {
+			for (Vector3& n : t.projectedPoints) {
+				n.M1x4ToVector3(n.proj_mult(n.ConvertToM4x4(), view));
+			}
+
+			int clippedTriangles = 0;
+			Triangle clipped[2];
+			clippedTriangles = ClipTriangles(Vector3(0, 0, 0.1), Vector3(0, 0, 1), t, clipped[0], clipped[1]);
+			
+			std::cout << clippedTriangles << std::endl;
+
+			for (int i = 0; i < clippedTriangles; i++) {
+				for (Vector3& n : clipped[i].projectedPoints) {
+					n.ProjToScreen(ProjMat, p, pos);
+				}
+				drawnTriangles.push_back(clipped[i]);
+				drawnTriangles_Debug.push_back(clipped[i]);
+			}
+		}
+
+		std::sort(drawnTriangles.begin(), drawnTriangles.end(), [](Triangle& t1, Triangle& t2) {
 			float mp1 = (t1.points[0].z + t1.points[1].z + t1.points[2].z) / 3;
 			float mp2 = (t2.points[0].z + t2.points[1].z + t2.points[2].z) / 3;
 			return mp1 > mp2;
 			});
 
-		for (Triangle t : visibleTriangles) {
+		for (Triangle t : drawnTriangles) {
+
+			Triangle clipped[2];
+			std::list<Triangle> listTriangles;
+
+			listTriangles.push_back(t);
+			int newTriangles = 1;
+
+			for (int a = 0; a < 4; a++) {
+				int trisToAdd = 0;
+				while (newTriangles > 0) {
+					Triangle test = listTriangles.front();
+					listTriangles.pop_front();
+					newTriangles--;
+
+					switch (a) {
+					case 0:	trisToAdd = ClipTriangles(Vector3(0, 0, 0), Vector3(0, 1, 0), test, clipped[0], clipped[1]); break;
+					case 1:	trisToAdd = ClipTriangles(Vector3(0, (float)p->ScreenHeight() - 1, 0), Vector3(0, -1, 0), test, clipped[0], clipped[1]); break;
+					case 2:	trisToAdd = ClipTriangles(Vector3(0, 0, 0), Vector3(1, 0, 0), test, clipped[0], clipped[1]); break;
+					case 3: trisToAdd = ClipTriangles(Vector3((float)p->ScreenHeight() - 1, 0, 0), Vector3(-1, 0, 0), test, clipped[0], clipped[1]); break;
+					}
+
+					for (int w = 0; w < trisToAdd; w++) { listTriangles.push_back(clipped[w]); }
+				}
+				newTriangles = listTriangles.size();
+			}
+
 			float dp = light_direction.dot(t.get_normal());
-			p->FillTriangle(
-				t.projectedPoints[0].x, t.projectedPoints[0].y,
-				t.projectedPoints[1].x, t.projectedPoints[1].y,
-				t.projectedPoints[2].x, t.projectedPoints[2].y,
-				olc::Pixel(25 * abs(dp), 150 * abs(dp), 255 * abs(dp)));
+			for (Triangle& t : listTriangles) {
+				p->FillTriangle(
+					t.projectedPoints[0].x, t.projectedPoints[0].y,
+					t.projectedPoints[1].x, t.projectedPoints[1].y,
+					t.projectedPoints[2].x, t.projectedPoints[2].y,
+					olc::Pixel(25 * abs(dp), 150 * abs(dp), 255 * abs(dp)));
+			}
 			
 		}
+
 		if (wireframe) {
-			for (auto& t : triangles) {
+			for (auto& t : drawnTriangles) {
 				p->DrawTriangle(
 					t.projectedPoints[0].x, t.projectedPoints[0].y,
 					t.projectedPoints[1].x, t.projectedPoints[1].y,
 					t.projectedPoints[2].x, t.projectedPoints[2].y,
-					olc::BLACK);
+					olc::WHITE);
 			}
 		}
-	}
-
-	void ProjectToScreen(olc::PixelGameEngine* p, Vector3 position, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
-		
-		
-
-		//convert mesh to viewed mesh
-		for (auto& m : triangles) {
-			for (auto& n : m.projectedPoints) { n = n * view; }
-		}
-		for (auto& m : triangles) {
-			//get clipped triangles
-			int clippedTriangles = 0;
-			Triangle clipped[2];
-			clippedTriangles = ClipTriangles(Vector3(0, 0, 0.1), Vector3(0, 0, 1), m, clipped[0], clipped[1]);
-			for (auto& t : clipped) {
-				for (auto& n : t.points) {
-					n.ProjToScreen(ProjMat, p, position);
-				}
-			}
-			//copy triangles actual points to projected points for projecting
-			for (auto& t : triangles) {
-				t.copy_points();
-			}
-			for (auto& n : m.projectedPoints) {
-				n.ProjToScreen(ProjMat, p, position);
-			}
-		}
-	}
+	}//Draw
 
 	//this function is really complex and i just pulled it from Javid's video
 	//hopefully later i'll try to understand it better
 	//TODO(+rs, sushi, 11/15/2020, Implement Clipping Algorithm) mesh Javid's clipping algorithm with what we already have set up, also rewatch his video to fix the camera not moving the clipping plane.
-	int ClipTriangles(Vector3 plane_p, Vector3 plane_n, Triangle& in_tri, Triangle& out_tri1, Triangle& out_tri2) {
+	int ClipTriangles(Vector3 plane_p, Vector3 plane_n, Triangle in_tri, Triangle& out_tri1, Triangle& out_tri2) {
 		plane_n.normalize();
 
 		//temp storage to classify points on either side of plane
@@ -129,9 +153,10 @@ public:
 		};
 
 		//signed distance of each point in triangle to plane
-		float d0 = -dist(in_tri.projectedPoints[0]);
-		float d1 = -dist(in_tri.projectedPoints[1]);
-		float d2 = -dist(in_tri.projectedPoints[2]);
+		float d0 = dist(in_tri.projectedPoints[0]);
+		float d1 = dist(in_tri.projectedPoints[1]);
+		float d2 = dist(in_tri.projectedPoints[2]);
+		
 
 		if (d0 >= 0) { inside_points[nInsidePointCount++] = &in_tri.projectedPoints[0]; }
 		else { outside_points[nOutsidePointCount++] = &in_tri.projectedPoints[0]; }
@@ -175,7 +200,7 @@ public:
 
 struct CircleMesh : public Mesh {
 
-	void Draw(olc::PixelGameEngine* p, Vector3 pos, bool wireframe = false, olc::Pixel color = olc::WHITE) override {
+	void Draw(olc::PixelGameEngine* p, Vector3 pos, Vector3 camPos, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view, bool wireframe = false, olc::Pixel color = olc::WHITE) override {
 		p->FillCircle(pos.Vector3Tovd2d(), 10, color);
 	}
 };
