@@ -15,7 +15,7 @@ namespace Time {
 
 	static float fixedTimeStep;
 	static float fixedDeltaTime;
-	
+
 	namespace { //private variables
 		static float fixedCounter;
 	}
@@ -26,7 +26,7 @@ namespace Time {
 		updateCount = 0;
 
 		fixedTimeStep = 50.f;
-		fixedDeltaTime = 1.f/fixedTimeStep;
+		fixedDeltaTime = 1.f / fixedTimeStep;
 		fixedCounter = 0;
 	}
 
@@ -53,5 +53,4 @@ namespace Time {
 	}
 
 	static void Cleanup() {}
-	
 };

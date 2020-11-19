@@ -4,7 +4,6 @@
 #include "Input.h"
 using namespace olc;
 
-
 //// Requires boost library 1.74.0 ////
 
 /* General TODOs and NOTEs board
@@ -12,15 +11,15 @@ using namespace olc;
    severity.
 
 Tags: + GitIssue, s Severe, u Unimportant, p Physics, r Render, e Entity, i Input,
-	m Math, o Optimization, g General, c Clean Up Code
+	  m Math, o Optimization, g General, c Clean Up Code
 
 TODO(g, sushi) create a WorldMatrix that takes in several matrix operations and
 	  gets there product in the order specified then apply that final matrix
 	  to the object. this would probably eliminate the need to constantly
-	  throw the object between local and world space everytime we do an 
+	  throw the object between local and world space everytime we do an
 	  operation on it
 
-TODO(g, sushi) find a reason to either keep or remove Render::Init() 
+TODO(g, sushi) find a reason to either keep or remove Render::Init()
 
 TODO(p,delle) add physics based collision resolution for all entities
 
@@ -33,7 +32,7 @@ NOTE sushi: it may be benefitial to have an objects triangles always be defined 
 	  everytime we do something to it. but this may cause other issues
 
 NOTE sushi: should we use Blender to import objects or make our own tool?
-	  maybe use Blender then make a custom one later? dunno, it'd 
+	  maybe use Blender then make a custom one later? dunno, it'd
 	  be a fun project to build our own tool
 
 NOTE sushi: currently, generating an object relative to mouse position
@@ -46,15 +45,14 @@ public:
 	P3DPGE() { sAppName = "P3DPGE"; }
 
 	bool OnUserCreate() override {
-
 		Time::Init();
 		Input::Init();
 		Physics::Init();
 		Render::Init();
-		
+
 		return true;
 	}
-	
+
 	bool OnUserUpdate(float deltaTime) {
 		Clear(olc::BLACK);
 
@@ -78,7 +76,6 @@ public:
 
 		return true;
 	}
-	
 };
 
 int main() {

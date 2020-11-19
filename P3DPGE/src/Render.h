@@ -57,7 +57,6 @@ namespace Render {
 
 	//draw all entities to screen
 	static void Update(olc::PixelGameEngine* p) {
-
 		view = camera.MakeViewMatrix(yaw);
 
 		//draw all entities
@@ -67,15 +66,12 @@ namespace Render {
 			if (select) { e->ContainsPoint(Math::vi2dToVector3(p->GetMousePos())); }
 		}
 
-		
-
 		//debug
 		//p->DrawStringDecal(olc::vf2d(0, p->ScreenHeight() - 10), "Mouse Pos: " + p->GetMousePos().str());
 		p->DrawStringDecal(olc::vf2d(0, p->ScreenHeight() - 10), "Camera Pos: " + camera.position.str());
 	}
 
 	static void Cleanup() {
-
 		//TODO(r, sushi, 11/18/2020) writing this is probably important
 	}
 };

@@ -4,8 +4,7 @@
 
 //this will currently only be set up to facilitate 2D
 //also this could probably be stored in math
-//this is primarily for calculations and doesn't actually do anything 
-
+//this is primarily for calculations and doesn't actually do anything
 
 //collection of 3 points forming the basis of meshes
 struct Triangle {
@@ -45,9 +44,6 @@ struct Triangle {
 	}
 
 	bool contains_point(Vector3 point) {
-		
-
-
 		return false;
 	}
 };
@@ -71,9 +67,9 @@ public:
 		this->view = view;
 	}
 
-	Vector3 getCamPos()				{ return camPos; }
-	mat<float, 4, 4> getProjMat()	{ return ProjMat; }
-	mat<float, 4, 4> getView()		{ return view; }
+	Vector3 getCamPos() { return camPos; }
+	mat<float, 4, 4> getProjMat() { return ProjMat; }
+	mat<float, 4, 4> getView() { return view; }
 
 	virtual void Draw(olc::PixelGameEngine* p, Vector3 pos, bool wireframe = false, olc::Pixel color = olc::WHITE) {
 		std::vector<Triangle> visibleTriangles;
@@ -87,14 +83,14 @@ public:
 		//store triangles we want to draw for sorting and copy world points to projected points
 		for (auto& t : triangles) {
 			t.copy_points();
-			if (t.get_proj_normal().dot(t.points[0] - camPos) > 0) { 
+			if (t.get_proj_normal().dot(t.points[0] - camPos) > 0) {
 				float dp = light_direction.dot(t.get_normal());
 				t.set_color(olc::Pixel(25 * abs(dp), 150 * abs(dp), 255 * abs(dp)));
 				visibleTriangles.push_back(t);
 			}
 		}
 
-		//project triangles to screen and add them to the 
+		//project triangles to screen and add them to the
 		//draw vector
 		for (Triangle t : visibleTriangles) {
 			for (Vector3& n : t.projectedPoints) {
@@ -121,7 +117,6 @@ public:
 			});
 
 		for (Triangle t : drawnTriangles) {
-
 			Triangle clipped[2];
 			std::list<Triangle> listTriangles;
 
@@ -147,16 +142,13 @@ public:
 				newTriangles = listTriangles.size();
 			}
 
-			
 			for (Triangle& t : listTriangles) {
-				
 				p->FillTriangle(
 					t.projectedPoints[0].x, t.projectedPoints[0].y,
 					t.projectedPoints[1].x, t.projectedPoints[1].y,
 					t.projectedPoints[2].x, t.projectedPoints[2].y,
 					t.color);
 			}
-			
 		}
 
 		if (wireframe) {
@@ -192,7 +184,6 @@ public:
 		float d0 = dist(in_tri.projectedPoints[0]);
 		float d1 = dist(in_tri.projectedPoints[1]);
 		float d2 = dist(in_tri.projectedPoints[2]);
-		
 
 		if (d0 >= 0) { inside_points[nInsidePointCount++] = &in_tri.projectedPoints[0]; }
 		else { outside_points[nOutsidePointCount++] = &in_tri.projectedPoints[0]; }
@@ -247,11 +238,8 @@ struct CircleMesh : public Mesh {
 	}
 };
 
-
-
 struct BoxMesh : public Mesh {
-	BoxMesh(Vector3 dimensions, Vector3 position){
-
+	BoxMesh(Vector3 dimensions, Vector3 position) {
 		//vertices making up the box
 		Vector3 p1 = position + dimensions.xInvert().yInvert().zInvert();
 		Vector3 p2 = position + dimensions.yInvert().zInvert();
@@ -282,4 +270,3 @@ struct BoxMesh : public Mesh {
 		triangles.push_back(Triangle(p7, p1, p3));
 	}
 };
-

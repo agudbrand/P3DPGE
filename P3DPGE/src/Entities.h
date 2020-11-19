@@ -189,8 +189,7 @@ struct Line2 : public Entity {
 
 	Edge edge;
 
-	Line2(Vector3 endPosition, int id, EntityParams) : Entity(EntityArgs){
-
+	Line2(Vector3 endPosition, int id, EntityParams) : Entity(EntityArgs) {
 		//just so no RAV
 		mesh = new Mesh();
 
@@ -198,7 +197,6 @@ struct Line2 : public Entity {
 		this->id = id;
 
 		edge = Edge(position, endPosition);
-
 	}
 
 	void Update(float deltaTime) override;
@@ -206,7 +204,6 @@ struct Line2 : public Entity {
 	void Draw(olc::PixelGameEngine* p, bool wireframe = false) override;
 
 	void SetColor(olc::Pixel newColor) override;
-
 };
 
 //edge is not yet implemented here yet
@@ -216,11 +213,9 @@ struct Line3 : public Entity {
 	olc::Pixel color = olc::WHITE;
 
 	Line3(Vector3 endPosition, int id, EntityParams) : Entity(EntityArgs) {
-
 		mesh = new Mesh();
 		this->endPosition = endPosition;
 		this->id = id;
-
 	}
 
 	void Update(float deltaTime) override;
@@ -233,7 +228,7 @@ struct Line3 : public Entity {
 struct Camera : public Entity {
 	Vector3 lookDir;
 
-	Camera() {  
+	Camera() {
 		position = V3ZERO;
 	}
 
@@ -245,5 +240,4 @@ struct Camera : public Entity {
 
 //archaic light class
 struct Light : public Entity {
-	
 };

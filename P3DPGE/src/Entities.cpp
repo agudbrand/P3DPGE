@@ -81,7 +81,6 @@ void PhysEntity::AddForce(PhysEntity* creator, Vector3 force, bool bIgnoreMass) 
 //TODO(up,delle,11/13/20) change air friction to calculate for shape of object
 void PhysEntity::AddFrictionForce(PhysEntity* creator, float frictionCoef, float deltaTime, bool bIngoreMass) {
 	if (creator) {
-
 	}
 	else {
 		forces.push_back(-velocity.normalized() * frictionCoef * mass * GRAVITY);
@@ -180,17 +179,16 @@ void Complex::ResolveCollision(PhysEntity* entity) {
 
 //// Line2 and Line3 ////
 
-void Line2::Draw(olc::PixelGameEngine* p, bool wireframe) { 
-	p->DrawLine(position.Vector3Tovd2d(), endPosition.Vector3Tovd2d(), color); 
+void Line2::Draw(olc::PixelGameEngine* p, bool wireframe) {
+	p->DrawLine(position.Vector3Tovd2d(), endPosition.Vector3Tovd2d(), color);
 }
 
 void Line2::SetColor(olc::Pixel newColor) { color = newColor; }
 bool Line2::ContainsPoint(Vector3 point) { return false; }
 void Line2::Update(float deltaTime) {}
 
-//TODO(re, sushi, 11/18/2020) for some reason this seems to havbe the same projecting problem as meshes did but idk y yet so fix it 
+//TODO(re, sushi, 11/18/2020) for some reason this seems to have the same projecting problem as meshes did but idk y yet so fix it
 void Line3::Draw(olc::PixelGameEngine* p, bool wireframe) {
-
 	//these operations are very gross and could probably be abstracted in Math
 	//TODO(m, sushi) abstract the following functions in Math.h in order to make this not look retarded
 	Vector3 posView = position.GetM1x4ToVector3(position.proj_mult(position.ConvertToM4x4(), mesh->view));
