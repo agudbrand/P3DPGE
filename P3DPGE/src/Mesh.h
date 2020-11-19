@@ -2,10 +2,18 @@
 #include "Math.h"
 #include "olcPixelGameEngine.h"
 
+//this will currently only be set up to facilitate 2D
+//also this could probably be stored in math
+//this is primarily for calculations and doesn't actually do anything 
+
+
 //collection of 3 points forming the basis of meshes
 struct Triangle {
 	Vector3 points[3];
 	Vector3 projectedPoints[3];
+
+	bool selected = false;
+	olc::Pixel color = olc::WHITE;
 
 	Triangle() {}
 	Triangle(Vector3 p1, Vector3 p2, Vector3 p3) {
@@ -19,6 +27,11 @@ struct Triangle {
 		for (int p = 0; p < 3; p++) { projectedPoints[p] = points[p]; }
 	}
 
+	void set_color(olc::Pixel newColor) {
+		if (selected) { color = olc::RED; }
+		else { color = newColor; }
+	}
+
 	Vector3 get_normal() {
 		Vector3 l1 = points[1] - points[0];
 		Vector3 l2 = points[2] - points[0];
@@ -29,6 +42,13 @@ struct Triangle {
 		Vector3 l1 = projectedPoints[1] - projectedPoints[0];
 		Vector3 l2 = projectedPoints[2] - projectedPoints[0];
 		return l2.cross(l1).normalized();
+	}
+
+	bool contains_point(Vector3 point) {
+		
+
+
+		return false;
 	}
 };
 
@@ -68,7 +88,9 @@ public:
 		for (auto& t : triangles) {
 			t.copy_points();
 			if (t.get_proj_normal().dot(t.points[0] - camPos) > 0) { 
-				visibleTriangles.push_back(t); 
+				float dp = light_direction.dot(t.get_normal());
+				t.set_color(olc::Pixel(25 * abs(dp), 150 * abs(dp), 255 * abs(dp)));
+				visibleTriangles.push_back(t);
 			}
 		}
 
@@ -82,8 +104,6 @@ public:
 			int clippedTriangles = 0;
 			Triangle clipped[2];
 			clippedTriangles = ClipTriangles(Vector3(0, 0, 0.1), Vector3(0, 0, 1), t, clipped[0], clipped[1]);
-			
-			std::cout << clippedTriangles << std::endl;
 
 			for (int i = 0; i < clippedTriangles; i++) {
 				for (Vector3& n : clipped[i].projectedPoints) {
@@ -127,13 +147,14 @@ public:
 				newTriangles = listTriangles.size();
 			}
 
-			float dp = light_direction.dot(t.get_normal());
+			
 			for (Triangle& t : listTriangles) {
+				
 				p->FillTriangle(
 					t.projectedPoints[0].x, t.projectedPoints[0].y,
 					t.projectedPoints[1].x, t.projectedPoints[1].y,
 					t.projectedPoints[2].x, t.projectedPoints[2].y,
-					olc::Pixel(25 * abs(dp), 150 * abs(dp), 255 * abs(dp)));
+					t.color);
 			}
 			
 		}

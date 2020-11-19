@@ -205,8 +205,6 @@ class Vector3 {
 		}
 };
 
-
-
 namespace Math {
 	
 
@@ -297,4 +295,91 @@ namespace Math {
 		};
 		return rvz;
 	}
+
+	//return where two lines intersect on the x axis with slope and the y-intercept
+	static Vector3 LineIntersect(float slope1, float ycross1, float slope2, float ycross2) {
+		mat<float, 2, 2> lhs{ slope1, ycross1, slope2, ycross2 };
+		mat<float, 2, 1> rhs{ 1, 1 };
+		mat<float, 2, 1> det = inverse(lhs)* rhs;
+		float x = 1 / (det.a[0][1]) * det.a[0][0];
+		float y = slope1 * x + ycross1;
+		return Vector3(x, y, 0);
+	}
 };
+
+//attached to entities to allow different forms of checking sides
+//of more complex objects
+//TODO(m, sushi) implement Edge in 3D
+struct Edge {
+	Vector3 p[2];
+	//if lead is true then p[1] is the right most point.
+	//ditto for high but on y
+	bool lead;
+	bool high;
+
+	Edge() { }
+	Edge(Vector3 point1, Vector3 point2) {
+		p[0] = point1;
+		p[1] = point2;
+		if (point1.x > point2.x) { lead = false; }
+		else { lead = true; }
+		if (point1.y > point2.y) { high = false; }
+		else { high = true; }
+	}
+
+	//TODO(?, sushi) find a good place to update edge, probably in Triangle?
+	void update(Vector3 point1, Vector3 point2) {
+		p[0] = point1;
+		p[1] = point2;
+		if (point1.x > point2.x) { lead = false; }
+		else { lead = true; }
+		if (point1.y > point2.y) { high = false; }
+		else { high = true; }
+	}
+
+	float slope() {
+		if (p[1].x == p[0].x || p[1].y == p[0].y) { return 0; }
+		else { return (p[1].y - p[0].y) / (p[1].x - p[0].x); }
+	}
+
+	//y intercept and range/domain checks
+	float ycross() { return p[!lead].y - slope() * p[!lead].x; }
+	bool within_range(Vector3 point) { return (point.y < p[high].y&& point.y > p[!high].y); }
+	bool within_range(float y_point) { return (y_point < p[high].y&& y_point > p[!high].y); }
+	bool within_domain(Vector3 point) { return (point.x < p[lead].x&& point.x > p[!lead].x); }
+	bool within_domain(float x_point) { return (x_point < p[lead].x&& x_point > p[!lead].x); }
+
+	//is a point on, above, or below edge
+	//might want to the left or right checks but idk yet
+	bool on_edge(Vector3 point) {
+		if ((point.y == slope() * point.x + ycross()) && within_domain(point)) { return true; }
+		else { return false; }
+	}
+
+	bool above_edge(Vector3 point) {
+		if (point.y > slope() * point.x + ycross() && within_domain(point)) { return true; }
+		else { return false; }
+	}
+
+	bool below_edge(Vector3 point) {
+		if (point.y < slope() * point.x + ycross() && within_domain(point)) { return true; }
+		else { return false; }
+	}
+
+	//checks if two edges intersect by finding their line representation's
+	//intersection and then seeing if that point lies on either of them
+	bool edge_intersect(Edge e) {
+		if (slope() == e.slope() && (!on_edge(e.p[0]) || !on_edge(e.p[1]))) { return false; }
+		Vector3 cross = Math::LineIntersect(slope(), ycross(), e.slope(), e.ycross());
+		if (within_domain(cross) && within_range(cross) &&
+			e.within_domain(cross) && e.within_range(cross)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+};
+
+

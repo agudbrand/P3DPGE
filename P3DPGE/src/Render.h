@@ -13,6 +13,7 @@ namespace Render {
 	static float pitch;
 
 	bool wireframe = false;
+	bool select = false;
 
 	//booleans for pausing and advancing by frame
 	//pausing is sort of archaic right now but should be fleshed out later
@@ -63,7 +64,10 @@ namespace Render {
 		for (auto& e : entities) {
 			e->mesh->Update(camera.position, ProjectionMatrix(p), view);
 			e->Draw(p, wireframe);
+			if (select) { e->ContainsPoint(Math::vi2dToVector3(p->GetMousePos())); }
 		}
+
+		
 
 		//debug
 		//p->DrawStringDecal(olc::vf2d(0, p->ScreenHeight() - 10), "Mouse Pos: " + p->GetMousePos().str());

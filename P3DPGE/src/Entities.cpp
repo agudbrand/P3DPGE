@@ -7,7 +7,7 @@ void Entity::SetTag(std::string newTag) {
 }
 
 void Entity::SetColor(olc::Pixel newColor) {
-	color = newColor;
+	for (Triangle& t : mesh->triangles) { t.color = newColor; }
 }
 
 void Entity::Draw(olc::PixelGameEngine* p, bool wireframe) {
@@ -70,7 +70,6 @@ void PhysEntity::Update(float deltaTime) {
 
 //adds a force to this entity, and this entity applies that force back on the sending object
 //simply, changes acceleration by force
-//NOTE for some reason, this breaks things like friction
 void PhysEntity::AddForce(PhysEntity* creator, Vector3 force, bool bIgnoreMass) {
 	//this->acceleration += bIgnoreMass ? force : force / mass;
 	//if (creator) { creator->acceleration -= bIgnoreMass ? force : force / creator->mass; }
@@ -165,7 +164,10 @@ void Box::ResolveCollision(PhysEntity* entity) {
 //// Complex ////
 
 bool Complex::ContainsPoint(Vector3 point) {
-	//this will probably be hard too implement good luck
+	for (Triangle& t : mesh->triangles) {
+		if (t.selected) { t.selected = false; }
+		if (t.contains_point(point)) { return true; }
+	}
 	return false;
 }
 
@@ -178,7 +180,11 @@ void Complex::ResolveCollision(PhysEntity* entity) {
 
 //// Line2 and Line3 ////
 
-void Line2::Draw(olc::PixelGameEngine* p, bool wireframe) { p->DrawLine(position.Vector3Tovd2d(), endPosition.Vector3Tovd2d(), color); }
+void Line2::Draw(olc::PixelGameEngine* p, bool wireframe) { 
+	p->DrawLine(position.Vector3Tovd2d(), endPosition.Vector3Tovd2d(), color); 
+}
+
+void Line2::SetColor(olc::Pixel newColor) { color = newColor; }
 bool Line2::ContainsPoint(Vector3 point) { return false; }
 void Line2::Update(float deltaTime) {}
 
@@ -196,6 +202,7 @@ void Line3::Draw(olc::PixelGameEngine* p, bool wireframe) {
 	p->DrawLine(posProj.Vector3Tovd2d(), endProj.Vector3Tovd2d(), color);
 }
 
+void Line3::SetColor(olc::Pixel newColor) { color = newColor; }
 bool Line3::ContainsPoint(Vector3 point) { return false; }
 void Line3::Update(float deltaTime) {}
 

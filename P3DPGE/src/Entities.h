@@ -21,7 +21,6 @@ public:
 	std::string tag;
 
 	//mesh
-	olc::Pixel color = olc::WHITE;
 	Mesh* mesh;
 
 	Entity() {}
@@ -53,7 +52,7 @@ public:
 	virtual void Translate(Vector3 translation);
 
 	void SetTag(std::string newTag);
-	void SetColor(olc::Pixel newColor);
+	virtual void SetColor(olc::Pixel newColor);
 };
 
 #define PhysEntityArgs velocity, acceleration, rotVelocity, rotAcceleration, mass, bStatic
@@ -186,6 +185,10 @@ struct Complex : public PhysEntity {
 struct Line2 : public Entity {
 	Vector3 endPosition;
 
+	olc::Pixel color = olc::WHITE;
+
+	Edge edge;
+
 	Line2(Vector3 endPosition, int id, EntityParams) : Entity(EntityArgs){
 
 		//just so no RAV
@@ -194,17 +197,23 @@ struct Line2 : public Entity {
 		endPosition.z = 0; this->endPosition = endPosition;
 		this->id = id;
 
+		edge = Edge(position, endPosition);
+
 	}
 
 	void Update(float deltaTime) override;
 	bool ContainsPoint(Vector3 point) override;
-
 	void Draw(olc::PixelGameEngine* p, bool wireframe = false) override;
+
+	void SetColor(olc::Pixel newColor) override;
 
 };
 
+//edge is not yet implemented here yet
 struct Line3 : public Entity {
 	Vector3 endPosition;
+
+	olc::Pixel color = olc::WHITE;
 
 	Line3(Vector3 endPosition, int id, EntityParams) : Entity(EntityArgs) {
 
@@ -214,10 +223,11 @@ struct Line3 : public Entity {
 
 	}
 
-	void Draw(olc::PixelGameEngine* p, bool wireframe = false) override;
-
 	void Update(float deltaTime) override;
 	bool ContainsPoint(Vector3 point) override;
+	void Draw(olc::PixelGameEngine* p, bool wireframe = false) override;
+
+	void SetColor(olc::Pixel newColor) override;
 };
 
 struct Camera : public Entity {
@@ -235,4 +245,5 @@ struct Camera : public Entity {
 
 //archaic light class
 struct Light : public Entity {
+	
 };
