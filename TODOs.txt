@@ -1,7 +1,7 @@
-TODO List successfully generated with 27 TODOs found.
+TODO List successfully generated with 29 TODOs found.
 
 ~~~~~~~ TODO 0 ~~~~~~~
-Entities.cpp, Line: 81
+Entities.cpp, Line: 80
 Creator: delle
 ----------------------
 Date: 11/13/20
@@ -10,7 +10,7 @@ Tags: TODOP, unimportant, physics
 change air friction to calculate for shape of object
 
 ~~~~~~~ TODO 1 ~~~~~~~
-Entities.cpp, Line: 98
+Entities.cpp, Line: 97
 Creator: delle
 ----------------------
 Date: 11/13/20
@@ -19,7 +19,7 @@ Tags: TODOP, unimportant, physics
 this
 
 ~~~~~~~ TODO 2 ~~~~~~~
-Entities.cpp, Line: 109
+Entities.cpp, Line: 108
 Creator: delle
 ----------------------
 Date: 11/9/20
@@ -28,7 +28,7 @@ Tags: TODOP, severe, physics
 expand this to a general entity check, but right now it just checks circles
 
 ~~~~~~~ TODO 3 ~~~~~~~
-Entities.cpp, Line: 110
+Entities.cpp, Line: 109
 Creator: delle
 ----------------------
 Date: 11/9/20
@@ -37,7 +37,7 @@ Tags: TODOP, optimization, unimportant, physics
 if other object is sphere, can optimize the equation to not use sqrt
 
 ~~~~~~~ TODO 4 ~~~~~~~
-Entities.cpp, Line: 122
+Entities.cpp, Line: 121
 Creator: delle
 ----------------------
 Date: 11/9/20
@@ -46,7 +46,7 @@ Tags: TODOP, severe, physics
 expand this to a general entity check, but right now it just checks circles
 
 ~~~~~~~ TODO 5 ~~~~~~~
-Entities.cpp, Line: 123
+Entities.cpp, Line: 122
 Creator: delle
 ----------------------
 Date: 11/17/20
@@ -55,7 +55,7 @@ Tags: TODOP, optimization, unimportant, physics
 can optimize this by recieving info from CheckCollision
 
 ~~~~~~~ TODO 6 ~~~~~~~
-Entities.cpp, Line: 155
+Entities.cpp, Line: 154
 Creator: delle
 ----------------------
 Date: 11/9/20
@@ -64,7 +64,7 @@ Tags: TODOP, severe, physics
 expand this to a general entity check
 
 ~~~~~~~ TODO 7 ~~~~~~~
-Entities.cpp, Line: 160
+Entities.cpp, Line: 159
 Creator: delle
 ----------------------
 Date: 11/9/20
@@ -73,7 +73,7 @@ Tags: TODOP, severe, physics
 expand this to a general entity check
 
 ~~~~~~~ TODO 8 ~~~~~~~
-Entities.cpp, Line: 184
+Entities.cpp, Line: 190
 Creator:  sushi
 ----------------------
 Date:  11/18/2020
@@ -82,7 +82,7 @@ Tags: TODOP, render, entity
 for some reason this seems to havbe the same projecting problem as meshes did but idk y yet so fix it 
 
 ~~~~~~~ TODO 9 ~~~~~~~
-Entities.cpp, Line: 188
+Entities.cpp, Line: 194
 Creator:  sushi
 ----------------------
 Tags: TODOP, math
@@ -90,7 +90,7 @@ Tags: TODOP, math
 abstract the following functions in Math.h in order to make this not look retarded
 
 ~~~~~~~ TODO 10 ~~~~~~~
-Entities.h, Line: 144
+Entities.h, Line: 143
 Creator:  sushi
 ----------------------
 Tags: TODOP, GitIssue, entity
@@ -107,7 +107,7 @@ Tags: TODOP, input, optimization
 look into heap vs stack memory allocation for the func pointer
 
 ~~~~~~~ TODO 12 ~~~~~~~
-Input.h, Line: 107
+Input.h, Line: 108
 Creator:  sushi
 ----------------------
 Tags: TODOP, input
@@ -115,7 +115,7 @@ Tags: TODOP, input
 set up pausing to also pause moving/rotating objects manually
 
 ~~~~~~~ TODO 13 ~~~~~~~
-Input.h, Line: 282
+Input.h, Line: 306
 Creator: delle
 ----------------------
 Date: 11/17/20
@@ -164,7 +164,7 @@ Tags: TODOP, general
 create a debug header for easy printing and such
 
 ~~~~~~~ TODO 19 ~~~~~~~
-Math.h, Line: 266
+Math.h, Line: 264
 Creator:  sushi
 ----------------------
 Tags: TODOP
@@ -172,8 +172,24 @@ Tags: TODOP
 rename these functions to something not retarded
 
 ~~~~~~~ TODO 20 ~~~~~~~
+Math.h, Line: 311
+Creator:  sushi
+----------------------
+Tags: TODOP, math
+----------------------
+implement Edge in 3D
+
+~~~~~~~ TODO 21 ~~~~~~~
+Math.h, Line: 329
+Creator:  sushi
+----------------------
+Tags: TODOP
+----------------------
+find a good place to update edge, probably in Triangle?
+
+~~~~~~~ TODO 22 ~~~~~~~
 Title:  Implement Clipping Algorithm
-Mesh.h, Line: 155
+Mesh.h, Line: 176
 Creator:  sushi
 ----------------------
 Date:  11/15/2020
@@ -181,15 +197,15 @@ Tags: TODOP, GitIssue, render, severe
 ----------------------
 mesh Javid\'s clipping algorithm with what we already have set up, also rewatch his video to fix the camera not moving the clipping plane.
 
-~~~~~~~ TODO 21 ~~~~~~~
-Mesh.h, Line: 215
+~~~~~~~ TODO 23 ~~~~~~~
+Mesh.h, Line: 236
 Creator:  sushi
 ----------------------
 Tags: TODOP, clean up
 ----------------------
 adapt this to be drawn in an entity class
 
-~~~~~~~ TODO 22 ~~~~~~~
+~~~~~~~ TODO 24 ~~~~~~~
 Physics.h, Line: 5
 Creator: delle
 ----------------------
@@ -198,7 +214,7 @@ Tags: TODOP, optimization, unimportant
 ----------------------
 optimize by using arrays rather than vectors,
 
-~~~~~~~ TODO 23 ~~~~~~~
+~~~~~~~ TODO 25 ~~~~~~~
 Physics.h, Line: 48
 Creator: delle
 ----------------------
@@ -207,7 +223,7 @@ Tags: TODOP, unimportant, physics, optimization
 ----------------------
 this could maybe be optimized by having an id counter instead of checking back element
 
-~~~~~~~ TODO 24 ~~~~~~~
+~~~~~~~ TODO 26 ~~~~~~~
 Render.h, Line: 4
 Creator:  sushi
 ----------------------
@@ -216,8 +232,8 @@ Tags: TODOP, render
 ----------------------
 set up a function that loops through a vector of matrix operations to reduce the amount of times we need to convert from local to world space and so the order stays consistent
 
-~~~~~~~ TODO 25 ~~~~~~~
-Render.h, Line: 74
+~~~~~~~ TODO 27 ~~~~~~~
+Render.h, Line: 78
 Creator:  sushi
 ----------------------
 Date:  11/18/2020
@@ -225,7 +241,7 @@ Tags: TODOP, render
 ----------------------
 writing this is probably important
 
-~~~~~~~ TODO 26 ~~~~~~~
+~~~~~~~ TODO 28 ~~~~~~~
 Time.h, Line: 3
 Creator: delle
 ----------------------
