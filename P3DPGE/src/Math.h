@@ -1,5 +1,4 @@
 #pragma once
-//#include "HandmadeMath.h"
 #include <math.h>
 #include <algorithm>
 #include "Time.h"
