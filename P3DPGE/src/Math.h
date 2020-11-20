@@ -7,8 +7,6 @@
 #include <boost/qvm/map_vec_mat.hpp>
 #include <boost/qvm/mat_operations.hpp>
 #include <math.h>
-#include <iostream>
-#include <string>
 #include <algorithm>
 
 //math constants
@@ -375,3 +373,4 @@ struct Edge {
 		}
 	}
 };
+

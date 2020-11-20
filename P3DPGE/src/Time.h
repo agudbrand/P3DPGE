@@ -1,4 +1,5 @@
 #pragma once
+#include "Debug.h"
 //#include <exception>
 
 //TODO(u,delle,11/17/20) look into this exception and whether it is necessary
