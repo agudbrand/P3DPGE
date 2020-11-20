@@ -2,8 +2,6 @@
 #include "Entities.h"
 #include "olcPixelGameEngine.h"
 
-//TODO(r, sushi, 11/16/2020) set up a function that loops through a vector of matrix operations to reduce the amount of times we need to convert from local to world space and so the order stays consistent
-
 namespace Render {
 	static std::vector<Entity*> entities;
 
@@ -26,10 +24,14 @@ namespace Render {
 
 	static void Init() {
 		//test lines, remove them if i forget pls
-		Line2* l1 = new Line2(Vector3(100, 100, 0), 1);
-		Line3* l2 = new Line3(Vector3(10, 10, 4), 1, Vector3(-10, -10, 1));
-		entities.push_back(l1);
-		entities.push_back(l2);
+		//Line2* l1 = new Line2(Vector3(100, 100, 0), 1);
+		//Line3* l2 = new Line3(Vector3(10, 10, 4), 1, Vector3(-10, -10, 1));
+		//entities.push_back(l1);
+		//entities.push_back(l2);
+
+		//test triangle
+		DebugTriangle* test = new DebugTriangle(1);
+		entities.push_back(test);
 	}
 
 	using namespace boost::qvm;

@@ -9,7 +9,10 @@
 //collection of 3 points forming the basis of meshes
 struct Triangle {
 	Vector3 points[3];
-	Vector3 projectedPoints[3];
+	Vector3 proj_points[3];
+	Vector3 proj_persistent[3];
+
+	Edge edges[3];
 
 	bool selected = false;
 	olc::Pixel color = olc::WHITE;
@@ -20,10 +23,24 @@ struct Triangle {
 		points[1] = p2;
 		points[2] = p3;
 		copy_points();
+
+		edges[0] = Edge(p1, p2);
+		edges[1] = Edge(p2, p3);
+		edges[2] = Edge(p3, p1);
+	}
+
+	void copy_persistent() {
+		for (int p = 0; p < 3; p++) { proj_persistent[p] = proj_points[p]; }
 	}
 
 	void copy_points() {
-		for (int p = 0; p < 3; p++) { projectedPoints[p] = points[p]; }
+		for (int p = 0; p < 3; p++) { proj_points[p] = points[p]; }
+	}
+
+	void update_edges() {
+		edges[0].update(proj_persistent[0], proj_persistent[1]);
+		edges[1].update(proj_persistent[1], proj_persistent[2]);
+		edges[2].update(proj_persistent[2], proj_persistent[1]);
 	}
 
 	void set_color(olc::Pixel newColor) {
@@ -38,13 +55,44 @@ struct Triangle {
 	}
 
 	Vector3 get_proj_normal() {
-		Vector3 l1 = projectedPoints[1] - projectedPoints[0];
-		Vector3 l2 = projectedPoints[2] - projectedPoints[0];
+		Vector3 l1 = proj_points[1] - proj_points[0];
+		Vector3 l2 = proj_points[2] - proj_points[0];
 		return l2.cross(l1).normalized();
 	}
 
+	//checks if a triangle contains a point in screen space
 	bool contains_point(Vector3 point) {
-		return false;
+
+		update_edges();
+
+		//if normal points up then bool is true
+		bool norms[3] = {
+			(edges[0].edge_normal().y < 0) ? true : false,
+			(edges[1].edge_normal().y < 0) ? true : false,
+			(edges[2].edge_normal().y < 0) ? true : false
+		};
+
+		bool truths[3];
+		for (int b = 0; b < 3; b++) {
+			std::cout << "Norm " << norms[b] << std::endl;
+			if (norms[b]) {
+				truths[b] = edges[b].above_edge(point);
+			}
+			else {
+				truths[b] = edges[b].below_edge(point);
+			}
+		}
+
+		std::cout << truths[0] << " " << truths[1] << " " << truths[2] << std::endl;
+
+		bool the_final_truth = true;
+		for (bool b : truths) {
+			if (!b) { the_final_truth = false; }
+		}
+		
+		if (the_final_truth) { return true; }
+		else { return false; }
+		
 	}
 };
 
@@ -61,15 +109,23 @@ public:
 
 	Mesh() { triangles = std::vector<Triangle>(); }
 
+	//for manually making Triangles
+	Mesh(std::vector<Vector3> points) {
+		if (points.size() % 3 != 0) { throw "Invalid number of points"; }
+		else {
+			for (int v = 0; v < points.size(); v += 3){
+				triangles.push_back(Triangle(points[v], points[v + 1], points[v + 2]));
+
+			}
+		}
+		
+	}
+
 	void Update(Vector3 camPos, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
 		this->camPos = camPos;
 		this->ProjMat = ProjMat;
 		this->view = view;
 	}
-
-	Vector3 getCamPos() { return camPos; }
-	mat<float, 4, 4> getProjMat() { return ProjMat; }
-	mat<float, 4, 4> getView() { return view; }
 
 	virtual void Draw(olc::PixelGameEngine* p, Vector3 pos, bool wireframe = false, olc::Pixel color = olc::WHITE) {
 		std::vector<Triangle> visibleTriangles;
@@ -78,14 +134,12 @@ public:
 		//temp lighting set up
 		Vector3 light_direction(0, 0, 1);
 		light_direction = light_direction.normalized();
-		//std::cout << t.get_normal().z << std::endl;
 
 		//store triangles we want to draw for sorting and copy world points to projected points
 		for (auto& t : triangles) {
 			t.copy_points();
 			if (t.get_proj_normal().dot(t.points[0] - camPos) > 0) {
 				float dp = light_direction.dot(t.get_normal());
-				t.set_color(olc::Pixel(25 * abs(dp), 150 * abs(dp), 255 * abs(dp)));
 				visibleTriangles.push_back(t);
 			}
 		}
@@ -93,16 +147,16 @@ public:
 		//project triangles to screen and add them to the
 		//draw vector
 		for (Triangle t : visibleTriangles) {
-			for (Vector3& n : t.projectedPoints) {
+			for (Vector3& n : t.proj_points) {
 				n.M1x4ToVector3(n.proj_mult(n.ConvertToM4x4(), view));
 			}
 
 			int clippedTriangles = 0;
 			Triangle clipped[2];
-			clippedTriangles = ClipTriangles(Vector3(0, 0, 0.1), Vector3(0, 0, 1), t, clipped[0], clipped[1]);
+			clippedTriangles = ClipTriangles(Vector3(0, 0, 0.01), Vector3(0, 0, 1), t, clipped[0], clipped[1]);
 
 			for (int i = 0; i < clippedTriangles; i++) {
-				for (Vector3& n : clipped[i].projectedPoints) {
+				for (Vector3& n : clipped[i].proj_points) {
 					n.ProjToScreen(ProjMat, p, pos);
 				}
 				drawnTriangles.push_back(clipped[i]);
@@ -144,20 +198,24 @@ public:
 
 			for (Triangle& t : listTriangles) {
 				p->FillTriangle(
-					t.projectedPoints[0].x, t.projectedPoints[0].y,
-					t.projectedPoints[1].x, t.projectedPoints[1].y,
-					t.projectedPoints[2].x, t.projectedPoints[2].y,
+					t.proj_points[0].x, t.proj_points[0].y,
+					t.proj_points[1].x, t.proj_points[1].y,
+					t.proj_points[2].x, t.proj_points[2].y,
 					t.color);
+				t.copy_persistent();
+				//std::cout << t.edges[0].edge_normal().str()  << std::endl;
+
 			}
 		}
 
 		if (wireframe) {
 			for (auto& t : drawnTriangles) {
 				p->DrawTriangle(
-					t.projectedPoints[0].x, t.projectedPoints[0].y,
-					t.projectedPoints[1].x, t.projectedPoints[1].y,
-					t.projectedPoints[2].x, t.projectedPoints[2].y,
+					t.proj_points[0].x, t.proj_points[0].y,
+					t.proj_points[1].x, t.proj_points[1].y,
+					t.proj_points[2].x, t.proj_points[2].y,
 					olc::WHITE);
+				
 			}
 		}
 	}//Draw
@@ -181,16 +239,16 @@ public:
 		};
 
 		//signed distance of each point in triangle to plane
-		float d0 = dist(in_tri.projectedPoints[0]);
-		float d1 = dist(in_tri.projectedPoints[1]);
-		float d2 = dist(in_tri.projectedPoints[2]);
+		float d0 = dist(in_tri.proj_points[0]);
+		float d1 = dist(in_tri.proj_points[1]);
+		float d2 = dist(in_tri.proj_points[2]);
 
-		if (d0 >= 0) { inside_points[nInsidePointCount++] = &in_tri.projectedPoints[0]; }
-		else { outside_points[nOutsidePointCount++] = &in_tri.projectedPoints[0]; }
-		if (d1 >= 0) { inside_points[nInsidePointCount++] = &in_tri.projectedPoints[1]; }
-		else { outside_points[nOutsidePointCount++] = &in_tri.projectedPoints[1]; }
-		if (d2 >= 0) { inside_points[nInsidePointCount++] = &in_tri.projectedPoints[2]; }
-		else { outside_points[nOutsidePointCount++] = &in_tri.projectedPoints[2]; }
+		if (d0 >= 0) { inside_points[nInsidePointCount++] = &in_tri.proj_points[0]; }
+		else { outside_points[nOutsidePointCount++] = &in_tri.proj_points[0]; }
+		if (d1 >= 0) { inside_points[nInsidePointCount++] = &in_tri.proj_points[1]; }
+		else { outside_points[nOutsidePointCount++] = &in_tri.proj_points[1]; }
+		if (d2 >= 0) { inside_points[nInsidePointCount++] = &in_tri.proj_points[2]; }
+		else { outside_points[nOutsidePointCount++] = &in_tri.proj_points[2]; }
 
 		//classify points and break input triangle into smaller trangles if
 		//required. there are four possible outcomes
@@ -201,11 +259,11 @@ public:
 		if (nInsidePointCount == 3) { out_tri1 = in_tri; return 1; }
 		if (nInsidePointCount == 1 && nOutsidePointCount == 2) {
 			//the inside point is valid so we keep it
-			out_tri1.projectedPoints[0] = *inside_points[0];
+			out_tri1.proj_points[0] = *inside_points[0];
 
 			//but the two new points are not where the original triangle intersects with the plane
-			out_tri1.projectedPoints[1] = Math::VectorPlaneIntersect(plane_p, plane_n, *inside_points[0], *outside_points[0]);
-			out_tri1.projectedPoints[2] = Math::VectorPlaneIntersect(plane_p, plane_n, *inside_points[0], *outside_points[1]);
+			out_tri1.proj_points[1] = Math::VectorPlaneIntersect(plane_p, plane_n, *inside_points[0], *outside_points[0]);
+			out_tri1.proj_points[2] = Math::VectorPlaneIntersect(plane_p, plane_n, *inside_points[0], *outside_points[1]);
 
 			return 1; //return new triangle
 		}
@@ -213,13 +271,13 @@ public:
 			//triangle will be clipped and becomes a quad which is
 			//cut into two more triagles.
 
-			out_tri1.projectedPoints[0] = *inside_points[0];
-			out_tri1.projectedPoints[1] = *inside_points[1];
-			out_tri1.projectedPoints[2] = Math::VectorPlaneIntersect(plane_p, plane_n, *inside_points[0], *outside_points[0]);
+			out_tri1.proj_points[0] = *inside_points[0];
+			out_tri1.proj_points[1] = *inside_points[1];
+			out_tri1.proj_points[2] = Math::VectorPlaneIntersect(plane_p, plane_n, *inside_points[0], *outside_points[0]);
 
-			out_tri2.projectedPoints[0] = *inside_points[1];
-			out_tri2.projectedPoints[1] = out_tri1.projectedPoints[2];
-			out_tri2.projectedPoints[2] = Math::VectorPlaneIntersect(plane_p, plane_n, *inside_points[1], *outside_points[0]);
+			out_tri2.proj_points[0] = *inside_points[1];
+			out_tri2.proj_points[1] = out_tri1.proj_points[2];
+			out_tri2.proj_points[2] = Math::VectorPlaneIntersect(plane_p, plane_n, *inside_points[1], *outside_points[0]);
 			return 2;
 		}
 	}//ClipTriangles
@@ -268,5 +326,9 @@ struct BoxMesh : public Mesh {
 		//north
 		triangles.push_back(Triangle(p7, p2, p1));
 		triangles.push_back(Triangle(p7, p1, p3));
+
+		for (Triangle& t : triangles) {
+			t.set_color(olc::Pixel(rand() % 255 + 1, rand() % 255 + 1, rand() % 255 + 1));
+		}
 	}
 };
