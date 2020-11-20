@@ -1,4 +1,4 @@
-TODO List successfully generated with 29 TODOs found.
+TODO List successfully generated with 27 TODOs found.
 
 ~~~~~~~ TODO 0 ~~~~~~~
 Entities.cpp, Line: 80
@@ -90,7 +90,7 @@ Tags: TODOP, math
 abstract the following functions in Math.h in order to make this not look retarded
 
 ~~~~~~~ TODO 10 ~~~~~~~
-Entities.h, Line: 143
+Entities.h, Line: 144
 Creator:  sushi
 ----------------------
 Tags: TODOP, GitIssue, entity
@@ -115,7 +115,7 @@ Tags: TODOP, input
 set up pausing to also pause moving/rotating objects manually
 
 ~~~~~~~ TODO 13 ~~~~~~~
-Input.h, Line: 314
+Input.h, Line: 316
 Creator: delle
 ----------------------
 Date: 11/17/20
@@ -133,37 +133,29 @@ create a WorldMatrix that takes in several matrix operations and
 
 ~~~~~~~ TODO 15 ~~~~~~~
 main.cpp, Line: 21
-Creator:  sushi
-----------------------
-Tags: TODOP, general
-----------------------
-find a reason to either keep or remove Render::Init()
-
-~~~~~~~ TODO 16 ~~~~~~~
-main.cpp, Line: 23
 Creator: delle
 ----------------------
 Tags: TODOP, physics
 ----------------------
 add physics based collision resolution for all entities
 
-~~~~~~~ TODO 17 ~~~~~~~
-main.cpp, Line: 25
+~~~~~~~ TODO 16 ~~~~~~~
+main.cpp, Line: 23
 Creator: delle
 ----------------------
 Tags: TODOP, input
 ----------------------
 convert inputs to new format, method to add and remove inputs
 
-~~~~~~~ TODO 18 ~~~~~~~
-main.cpp, Line: 27
+~~~~~~~ TODO 17 ~~~~~~~
+main.cpp, Line: 25
 Creator: delle
 ----------------------
 Tags: TODOP, general
 ----------------------
 create a debug header for easy printing and such
 
-~~~~~~~ TODO 19 ~~~~~~~
+~~~~~~~ TODO 18 ~~~~~~~
 Math.h, Line: 259
 Creator:  sushi
 ----------------------
@@ -171,25 +163,25 @@ Tags: TODOP
 ----------------------
 rename these functions to something not retarded
 
-~~~~~~~ TODO 20 ~~~~~~~
-Math.h, Line: 306
+~~~~~~~ TODO 19 ~~~~~~~
+Math.h, Line: 310
 Creator:  sushi
 ----------------------
 Tags: TODOP, math
 ----------------------
 implement Edge in 3D
 
-~~~~~~~ TODO 21 ~~~~~~~
-Math.h, Line: 324
+~~~~~~~ TODO 20 ~~~~~~~
+Math.h, Line: 328
 Creator:  sushi
 ----------------------
 Tags: TODOP
 ----------------------
 find a good place to update edge, probably in Triangle?
 
-~~~~~~~ TODO 22 ~~~~~~~
+~~~~~~~ TODO 21 ~~~~~~~
 Title:  Implement Clipping Algorithm
-Mesh.h, Line: 168
+Mesh.h, Line: 226
 Creator:  sushi
 ----------------------
 Date:  11/15/2020
@@ -197,15 +189,15 @@ Tags: TODOP, GitIssue, render, severe
 ----------------------
 mesh Javid\'s clipping algorithm with what we already have set up, also rewatch his video to fix the camera not moving the clipping plane.
 
-~~~~~~~ TODO 23 ~~~~~~~
-Mesh.h, Line: 227
+~~~~~~~ TODO 22 ~~~~~~~
+Mesh.h, Line: 285
 Creator:  sushi
 ----------------------
 Tags: TODOP, clean up
 ----------------------
 adapt this to be drawn in an entity class
 
-~~~~~~~ TODO 24 ~~~~~~~
+~~~~~~~ TODO 23 ~~~~~~~
 Physics.h, Line: 5
 Creator: delle
 ----------------------
@@ -214,7 +206,7 @@ Tags: TODOP, optimization, unimportant
 ----------------------
 optimize by using arrays rather than vectors,
 
-~~~~~~~ TODO 25 ~~~~~~~
+~~~~~~~ TODO 24 ~~~~~~~
 Physics.h, Line: 48
 Creator: delle
 ----------------------
@@ -223,17 +215,8 @@ Tags: TODOP, unimportant, physics, optimization
 ----------------------
 this could maybe be optimized by having an id counter instead of checking back element
 
-~~~~~~~ TODO 26 ~~~~~~~
-Render.h, Line: 4
-Creator:  sushi
-----------------------
-Date:  11/16/2020
-Tags: TODOP, render
-----------------------
-set up a function that loops through a vector of matrix operations to reduce the amount of times we need to convert from local to world space and so the order stays consistent
-
-~~~~~~~ TODO 27 ~~~~~~~
-Render.h, Line: 74
+~~~~~~~ TODO 25 ~~~~~~~
+Render.h, Line: 76
 Creator:  sushi
 ----------------------
 Date:  11/18/2020
@@ -241,7 +224,7 @@ Tags: TODOP, render
 ----------------------
 writing this is probably important
 
-~~~~~~~ TODO 28 ~~~~~~~
+~~~~~~~ TODO 26 ~~~~~~~
 Time.h, Line: 3
 Creator: delle
 ----------------------
