@@ -19,8 +19,6 @@ TODO(g, sushi) create a WorldMatrix that takes in several matrix operations and
 	  throw the object between local and world space everytime we do an
 	  operation on it
 
-TODO(g, sushi) find a reason to either keep or remove Render::Init()
-
 TODO(p,delle) add physics based collision resolution for all entities
 
 TODO(i,delle) convert inputs to new format, method to add and remove inputs
@@ -49,6 +47,8 @@ public:
 		Input::Init();
 		Physics::Init();
 		Render::Init();
+
+		
 
 		return true;
 	}
@@ -83,5 +83,5 @@ public:
 
 int main() {
 	P3DPGE game;
-	if (game.Construct(500, 500, 2, 2, false, false)) { game.Start(); }
+	if (game.Construct(800, 800, 1, 1, false, false)) { game.Start(); }
 }

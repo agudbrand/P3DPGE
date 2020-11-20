@@ -176,6 +176,7 @@ namespace Input {
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 
 			Vector3 pos = GetMousePos(p);
+			std::cout << pos.str() << std::endl;
 			if (selectedTriangle) { selectedTriangle->selected = false; }
 			selectedTriangle = nullptr;
 			for (Entity* e : Render::entities) {
@@ -186,6 +187,7 @@ namespace Input {
 			if (selectedTriangle) { selectedTriangle->selected = true; }
 		}, "select_triangle", olc::NONE, 0, 0, 0, 0,
 		"Selects a triangle at the mouse position"));
+
 		//inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 		//	Vector3 pos = GetMousePos(p);
 		//	if (selectedEntity) {
@@ -340,6 +342,8 @@ namespace Input {
 			selectedEntity->position = Math::vi2dToVector3(p->GetMousePos(), selectedEntity->position.z);
 		}
 
+		if (p->GetKey(olc::F).bPressed) { selectedEntity = Render::entities[0]; }
+
 		//if (selectedEntity) {
 		//	std::string text = "ID: " + std::to_string(selectedEntity->id) + "\tTag: " + selectedEntity->tag + "\n";
 		//	text += "Position:" + selectedEntity->position.str() + "\nRotation:" + selectedEntity->rotation.str() + "\nScale:" + selectedEntity->scale.str() + "\n";
@@ -355,14 +359,15 @@ namespace Input {
 
 		//point debugging
 		if (selectedEntity) {
-			for (int i = 0; i < selectedEntity->mesh->drawnTriangles_Debug.size(); i++) {
-				auto pa = selectedEntity->mesh->drawnTriangles_Debug;
+			int i = 0;
+			for (auto& pa : selectedEntity->mesh->drawnTriangles_Debug) {
 				p->DrawString(olc::vd2d(1, i * 9),
-					"Triangle: " + std::to_string(i) + " " +
-					Math::append_decimal(std::to_string(pa[i].projectedPoints[0].x)) + "x " + Math::append_decimal(std::to_string(pa[i].projectedPoints[0].y)) + "y " + Math::append_decimal(std::to_string(pa[i].projectedPoints[0].z)) + "z " +
-					Math::append_decimal(std::to_string(pa[i].projectedPoints[1].x)) + "x " + Math::append_decimal(std::to_string(pa[i].projectedPoints[1].y)) + "y " + Math::append_decimal(std::to_string(pa[i].projectedPoints[1].z)) + "z " +
-					Math::append_decimal(std::to_string(pa[i].projectedPoints[2].x)) + "x " + Math::append_decimal(std::to_string(pa[i].projectedPoints[2].y)) + "y " + Math::append_decimal(std::to_string(pa[i].projectedPoints[2].z)) + "z "
-				);
+					"Triangle " + std::to_string(i) + ": " +
+					Math::append_decimal(std::to_string(pa.proj_points[0].x)) + "x " + Math::append_decimal(std::to_string(pa.proj_points[0].y)) + "y " + Math::append_decimal(std::to_string(pa.proj_points[0].z)) + "z " +
+					Math::append_decimal(std::to_string(pa.proj_points[1].x)) + "x " + Math::append_decimal(std::to_string(pa.proj_points[1].y)) + "y " + Math::append_decimal(std::to_string(pa.proj_points[1].z)) + "z " +
+					Math::append_decimal(std::to_string(pa.proj_points[2].x)) + "x " + Math::append_decimal(std::to_string(pa.proj_points[2].y)) + "y " + Math::append_decimal(std::to_string(pa.proj_points[2].z)) + "z " +
+					pa.edges[0].edge_normal().str() + " " + pa.edges[1].edge_normal().str() + " " + pa.edges[2].edge_normal().str());
+					i++;
 			}
 
 			//p->DrawStringDecal(olc::vf2d(0, 0), text);
@@ -374,9 +379,9 @@ namespace Input {
 		//		auto pa = selectedEntity->mesh.triangles;
 		//		p->DrawString(olc::vd2d(1, i * 9),
 		//			"Triangle: " + std::to_string(i) + " " +
-		//			Math::append_decimal(std::to_string(pa[i].projectedPoints[0].x)) + "x " + Math::append_decimal(std::to_string(pa[i].projectedPoints[0].y)) + "y " + Math::append_decimal(std::to_string(pa[i].projectedPoints[0].z)) + "z " +
-		//			Math::append_decimal(std::to_string(pa[i].projectedPoints[1].x)) + "x " + Math::append_decimal(std::to_string(pa[i].projectedPoints[1].y)) + "y " + Math::append_decimal(std::to_string(pa[i].projectedPoints[1].z)) + "z " +
-		//			Math::append_decimal(std::to_string(pa[i].projectedPoints[2].x)) + "x " + Math::append_decimal(std::to_string(pa[i].projectedPoints[2].y)) + "y " + Math::append_decimal(std::to_string(pa[i].projectedPoints[2].z)) + "z "
+		//			Math::append_decimal(std::to_string(pa[i].proj_points[0].x)) + "x " + Math::append_decimal(std::to_string(pa[i].proj_points[0].y)) + "y " + Math::append_decimal(std::to_string(pa[i].proj_points[0].z)) + "z " +
+		//			Math::append_decimal(std::to_string(pa[i].proj_points[1].x)) + "x " + Math::append_decimal(std::to_string(pa[i].proj_points[1].y)) + "y " + Math::append_decimal(std::to_string(pa[i].proj_points[1].z)) + "z " +
+		//			Math::append_decimal(std::to_string(pa[i].proj_points[2].x)) + "x " + Math::append_decimal(std::to_string(pa[i].proj_points[2].y)) + "y " + Math::append_decimal(std::to_string(pa[i].proj_points[2].z)) + "z "
 		//		);
 		//	}
 		//}

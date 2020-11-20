@@ -204,6 +204,15 @@ void Line3::SetColor(olc::Pixel newColor) { color = newColor; }
 bool Line3::ContainsPoint(Vector3 point) { return false; }
 void Line3::Update(float deltaTime) {}
 
+//// Debug Triangle ////
+
+bool DebugTriangle::ContainsPoint(Vector3 point) {
+	return false;
+}
+
+void DebugTriangle::Update(float deltaTime) {
+}
+
 //// Camera ////
 
 mat<float, 4, 4> Camera::MakeViewMatrix(float yaw) {

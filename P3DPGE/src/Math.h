@@ -1,13 +1,13 @@
 #pragma once
 //#include "HandmadeMath.h"
-#include "olcPixelGameEngine.h"
-#include "Time.h"
-#include <boost/qvm/mat.hpp>
-#include <boost/qvm/vec.hpp>
-#include <boost/qvm/map_vec_mat.hpp>
-#include <boost/qvm/mat_operations.hpp>
 #include <math.h>
 #include <algorithm>
+#include "Time.h"
+#include "boost/qvm/mat.hpp"
+#include "boost/qvm/vec.hpp"
+#include "boost/qvm/map_vec_mat.hpp"
+#include "boost/qvm/mat_operations.hpp"
+#include "olcPixelGameEngine.h"
 
 //math constants
 #define M_PI 3.14159265359f
@@ -300,8 +300,12 @@ namespace Math {
 	}
 };
 
-//attached to entities to allow different forms of checking sides
-//of more complex objects
+//attached to entities to allow different forms of checking sides of more complex objects
+//NOTE: there's probably a better way to update the edges for triangles
+//		currently Triangle has a function that calls Edge's update function
+//		and the edge update function might not even be necessary but idk yet
+//		Triangle can also just not store edges and only have them when it needs them,
+//		but I don't know how much we're gonna be using them yet
 //TODO(m, sushi) implement Edge in 3D
 struct Edge {
 	Vector3 p[2];
@@ -337,25 +341,43 @@ struct Edge {
 
 	//y intercept and range/domain checks
 	float ycross() { return p[!lead].y - slope() * p[!lead].x; }
-	bool within_range(Vector3 point) { return (point.y < p[high].y&& point.y > p[!high].y); }
-	bool within_range(float y_point) { return (y_point < p[high].y&& y_point > p[!high].y); }
+	bool within_range(Vector3 point)  { return (point.y < p[high].y&& point.y > p[!high].y); }
+	bool within_range(float y_point)  { return (y_point < p[high].y&& y_point > p[!high].y); }
 	bool within_domain(Vector3 point) { return (point.x < p[lead].x&& point.x > p[!lead].x); }
 	bool within_domain(float x_point) { return (x_point < p[lead].x&& x_point > p[!lead].x); }
+	
+	//returns edge's normal
+	//this only works for 2D and returns a normal rotated -90
+	Vector3 edge_normal() {
+		Vector3 v = p[1] - p[0];
+		return Vector3(v.y, -v.x, 0).normalized();
+	}
 
 	//is a point on, above, or below edge
-	//might want to the left or right checks but idk yet
 	bool on_edge(Vector3 point) {
 		if ((point.y == slope() * point.x + ycross()) && within_domain(point)) { return true; }
 		else { return false; }
 	}
 
+	//these signs may look wrong but its to accomidate for the top left coord (maybe)
 	bool above_edge(Vector3 point) {
-		if (point.y > slope() * point.x + ycross() && within_domain(point)) { return true; }
+		int bp = 0;
+		if (point.y < slope() * point.x + ycross() && within_domain(point)) { return true; }
 		else { return false; }
 	}
 
 	bool below_edge(Vector3 point) {
-		if (point.y < slope() * point.x + ycross() && within_domain(point)) { return true; }
+		if (point.y > slope() * point.x + ycross() && within_domain(point)) { return true; }
+		else { return false; }
+	}
+
+	bool right_of_edge(Vector3 point) {
+		if ((point.x > (point.y - ycross()) / slope()) && within_range(point)) { return true; }
+		else { return false; }
+	}
+
+	bool left_of_edge(Vector3 point) {
+		if ((point.x < (point.y - ycross()) / slope()) && within_range(point)) { return true; }
 		else { return false; }
 	}
 
