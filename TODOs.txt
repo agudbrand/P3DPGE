@@ -156,7 +156,7 @@ Tags: TODOP, general
 create a debug header for easy printing and such
 
 ~~~~~~~ TODO 18 ~~~~~~~
-Math.h, Line: 259
+Math.h, Line: 256
 Creator:  sushi
 ----------------------
 Tags: TODOP
@@ -164,7 +164,7 @@ Tags: TODOP
 rename these functions to something not retarded
 
 ~~~~~~~ TODO 19 ~~~~~~~
-Math.h, Line: 310
+Math.h, Line: 307
 Creator:  sushi
 ----------------------
 Tags: TODOP, math
@@ -172,7 +172,7 @@ Tags: TODOP, math
 implement Edge in 3D
 
 ~~~~~~~ TODO 20 ~~~~~~~
-Math.h, Line: 328
+Math.h, Line: 325
 Creator:  sushi
 ----------------------
 Tags: TODOP
@@ -225,7 +225,7 @@ Tags: TODOP, render
 writing this is probably important
 
 ~~~~~~~ TODO 26 ~~~~~~~
-Time.h, Line: 3
+Time.h, Line: 4
 Creator: delle
 ----------------------
 Date: 11/17/20

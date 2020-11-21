@@ -63,6 +63,9 @@ public:
 		//rendering
 		Render::Update(this);
 
+		//Debug::Print("string: %s, decimal: %d, integer: %i", V3ZERO.str(), 1, 2);
+		//Debug::Print("float: %f, .2 float: %.2f, double: %f", 5.1234f, 5.1234f, 2.0);
+
 		return true;
 	}
 

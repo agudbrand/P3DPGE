@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Debug.h" />
     <ClInclude Include="src\Entities.h" />
     <ClInclude Include="src\HandmadeMath.h" />
     <ClInclude Include="src\Input.h" />

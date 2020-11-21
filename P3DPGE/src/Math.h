@@ -1,8 +1,5 @@
 #pragma once
-//#include "HandmadeMath.h"
 #include <math.h>
-#include <string>
-#include <iostream>
 #include <algorithm>
 #include "Time.h"
 #include "boost/qvm/mat.hpp"
@@ -400,3 +397,4 @@ struct Edge {
 		}
 	}
 };
+
