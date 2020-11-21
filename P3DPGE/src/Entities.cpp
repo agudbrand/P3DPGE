@@ -192,12 +192,12 @@ void Line3::Draw(olc::PixelGameEngine* p, bool wireframe) {
 	//these operations are very gross and could probably be abstracted in Math
 	//TODO(m, sushi) abstract the following functions in Math.h in order to make this not look retarded
 	Vector3 posView = position.GetM1x4ToVector3(position.proj_mult(position.ConvertToM4x4(), mesh->view));
-	Vector3 posProj = posView.GetM1x4ToVector3(posView.proj_mult(posView.ConvertToM4x4(), mesh->ProjMat));
-
 	Vector3 endView = endPosition.GetM1x4ToVector3(endPosition.proj_mult(endPosition.ConvertToM4x4(), mesh->view));
-	Vector3 endProj = endView.GetM1x4ToVector3(endView.proj_mult(endView.ConvertToM4x4(), mesh->ProjMat));
 
-	p->DrawLine(posProj.Vector3Tovd2d(), endProj.Vector3Tovd2d(), color);
+	posView.ProjToScreen(mesh->ProjMat, p);
+	endView.ProjToScreen(mesh->ProjMat, p);
+
+	p->DrawLine(posView.Vector3Tovd2d(), endView.Vector3Tovd2d(), color);
 }
 
 void Line3::SetColor(olc::Pixel newColor) { color = newColor; }

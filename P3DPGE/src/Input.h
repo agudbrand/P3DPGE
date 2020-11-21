@@ -179,9 +179,12 @@ namespace Input {
 			std::cout << pos.str() << std::endl;
 			if (selectedTriangle) { selectedTriangle->selected = false; }
 			selectedTriangle = nullptr;
-			for (Entity* e : Render::entities) {
-				for (Triangle t : e->mesh->triangles) {
-					if (t.contains_point(pos)) { selectedTriangle = &t; break; }
+			for (auto& e : Render::entities) {
+				for (Triangle& t : e->mesh->drawnTriangles) {
+					if (t.contains_point(pos)) { 
+						selectedTriangle = &t; 
+						break; 
+					}
 				}
 			}
 			if (selectedTriangle) { selectedTriangle->selected = true; }
@@ -360,7 +363,7 @@ namespace Input {
 		//point debugging
 		if (selectedEntity) {
 			int i = 0;
-			for (auto& pa : selectedEntity->mesh->drawnTriangles_Debug) {
+			for (auto& pa : selectedEntity->mesh->drawnTriangles) {
 				p->DrawString(olc::vd2d(1, i * 9),
 					"Triangle " + std::to_string(i) + ": " +
 					Math::append_decimal(std::to_string(pa.proj_points[0].x)) + "x " + Math::append_decimal(std::to_string(pa.proj_points[0].y)) + "y " + Math::append_decimal(std::to_string(pa.proj_points[0].z)) + "z " +

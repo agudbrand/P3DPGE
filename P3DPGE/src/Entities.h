@@ -232,7 +232,7 @@ struct DebugTriangle : public Entity {
 	DebugTriangle(int id, EntityParams) : Entity(EntityArgs) {
 
 		std::vector<Vector3> v = {
-			Vector3(0, 0, 0), Vector3(0, 2, 1), Vector3(1, 1, 1)
+			Vector3(0, 0, 2), Vector3(0, 2, 1), Vector3(1, 1, 1)
 		};
 
 		mesh = new Mesh(v);

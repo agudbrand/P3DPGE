@@ -51,39 +51,39 @@ public:
 		this->z = z;
 	}
 
-	Vector3 operator +  (const Vector3& rhs)		const { return Vector3(this->x + rhs.x, this->y + rhs.y, this->z + rhs.z); }
-	Vector3 operator -  (const Vector3& rhs)		const { return Vector3(this->x - rhs.x, this->y - rhs.y, this->z - rhs.z); }
-	Vector3 operator *  (const float& rhs)			const { return Vector3(this->x * rhs, this->y * rhs, this->z * rhs); }
-	Vector3 operator *  (const Vector3& rhs)		const { return Vector3(this->x * rhs.x, this->y * rhs.y, this->z * rhs.z); }
-	Vector3 operator *  (const mat<float, 4, 4> rhs) { mat<float, 1, 4> v{ x,y,z,1 }; return GetM1x4ToVector3(v * rhs); }
-	Vector3 operator /  (const float& rhs)			const { return Vector3(this->x / rhs, this->y / rhs, this->z / rhs); }
-	Vector3 operator /  (const Vector3& rhs)		const { return Vector3(this->x / rhs.x, this->y / rhs.y, this->z / rhs.z); }
-	Vector3 operator += (const Vector3& rhs) { this->x += rhs.x; this->y += rhs.y; this->z += rhs.z; return *this; }
-	Vector3 operator -= (const Vector3& rhs) { this->x -= rhs.x; this->y -= rhs.y; this->z -= rhs.z; return *this; }
-	Vector3 operator *= (const mat<float, 4, 4> rhs) { mat<float, 1, 4> v{ x,y,z,1 }; return GetM1x4ToVector3(v * rhs); }
-	Vector3 operator /= (const float& rhs) { this->x /= rhs; this->y /= rhs; this->z /= rhs; return *this; }
-	Vector3 operator +  ()							const { return { +x, +y, +z }; }
-	Vector3 operator -  ()							const { return { -x, -y, -z }; }
-	bool operator	 == (const Vector3& rhs)		const { return (this->x == rhs.x && this->y == rhs.y && this->z == rhs.z); }
-	bool operator	 != (const Vector3& rhs)		const { return (this->x != rhs.x || this->y != rhs.y || this->z != rhs.z); }
-
-	float				dot(const Vector3& rhs)		const { return this->x * rhs.x + this->y * rhs.y + this->z * rhs.z; }
-	Vector3				cross(const Vector3& rhs)	const { return Vector3(this->y * rhs.z - rhs.y * this->z, this->x * rhs.z - rhs.x * this->z, this->x * rhs.y - rhs.x * this->y); }
-	float				mag()						const { return std::sqrtf(x * x + y * y + z * z); }
-	const std::string	str()						const { return std::string("(") + std::to_string(this->x) + "," + std::to_string(this->y) + "," + std::to_string(this->z) + ")"; }
-	Vector3				normalized() { return *this == V3ZERO ? V3ZERO : *this / this->mag(); }
-	void				normalize() { *this == V3ZERO ? *this = V3ZERO : *this = *this / this->mag(); }
-	Vector3				clampMag(float& rhs) { return this->normalized() * rhs; }
-	float				distanceTo(Vector3& rhs) { return (*this - rhs).mag(); }
-	float				projectOn(Vector3& rhs) { return this->dot(rhs.normalized()); }
-	Vector3				componentOn(Vector3& rhs) { return rhs.normalized() * this->dot(rhs.normalized()); }
-	Vector3				xComp() { return Vector3(x, 0, 0); }
-	Vector3				yComp() { return Vector3(0, y, 0); }
-	Vector3				zComp() { return Vector3(0, 0, z); }
-	Vector3				xInvert() { return Vector3(-x, y, z); }
-	Vector3				yInvert() { return Vector3(x, -y, z); }
-	Vector3				zInvert() { return Vector3(x, y, -z); }
-	olc::vd2d			Vector3Tovd2d() { return olc::vd2d(x, y); }
+	Vector3 operator +  (const Vector3& rhs)		const	{ return Vector3(this->x + rhs.x, this->y + rhs.y, this->z + rhs.z); }
+	Vector3 operator -  (const Vector3& rhs)		const	{ return Vector3(this->x - rhs.x, this->y - rhs.y, this->z - rhs.z); }
+	Vector3 operator *  (const float& rhs)			const	{ return Vector3(this->x * rhs, this->y * rhs, this->z * rhs); }
+	Vector3 operator *  (const Vector3& rhs)		const	{ return Vector3(this->x * rhs.x, this->y * rhs.y, this->z * rhs.z); }
+	Vector3 operator *  (const mat<float, 4, 4> rhs)		{ mat<float, 1, 4> v{ x,y,z,1 }; return GetM1x4ToVector3(v * rhs); }
+	Vector3 operator /  (const float& rhs)			const	{ return Vector3(this->x / rhs, this->y / rhs, this->z / rhs); }
+	Vector3 operator /  (const Vector3& rhs)		const	{ return Vector3(this->x / rhs.x, this->y / rhs.y, this->z / rhs.z); }
+	Vector3 operator += (const Vector3& rhs)				{ this->x += rhs.x; this->y += rhs.y; this->z += rhs.z; return *this; }
+	Vector3 operator -= (const Vector3& rhs)				{ this->x -= rhs.x; this->y -= rhs.y; this->z -= rhs.z; return *this; }
+	Vector3 operator *= (const mat<float, 4, 4> rhs)		{ mat<float, 1, 4> v{ x,y,z,1 }; return GetM1x4ToVector3(v * rhs); }
+	Vector3 operator /= (const float& rhs)					{ this->x /= rhs; this->y /= rhs; this->z /= rhs; return *this; }
+	Vector3 operator +  ()							const	{ return { +x, +y, +z }; }
+	Vector3 operator -  ()							const	{ return { -x, -y, -z }; }
+	bool operator	 == (const Vector3& rhs)		const	{ return (this->x == rhs.x && this->y == rhs.y && this->z == rhs.z); }
+	bool operator	 != (const Vector3& rhs)		const	{ return (this->x != rhs.x || this->y != rhs.y || this->z != rhs.z); }
+															
+	float				dot(const Vector3& rhs)		const	{ return this->x * rhs.x + this->y * rhs.y + this->z * rhs.z; }
+	Vector3				cross(const Vector3& rhs)	const	{ return Vector3(this->y * rhs.z - rhs.y * this->z, this->x * rhs.z - rhs.x * this->z, this->x * rhs.y - rhs.x * this->y); }
+	float				mag()						const	{ return std::sqrtf(x * x + y * y + z * z); }
+	const std::string	str()						const	{ return std::string("(") + std::to_string(this->x) + "," + std::to_string(this->y) + "," + std::to_string(this->z) + ")"; }
+	Vector3				normalized()						{ return *this == V3ZERO ? V3ZERO : *this / this->mag(); }
+	void				normalize()							{ *this == V3ZERO ? *this = V3ZERO : *this = *this / this->mag(); }
+	Vector3				clampMag(float& rhs)				{ return this->normalized() * rhs; }
+	float				distanceTo(Vector3& rhs)			{ return (*this - rhs).mag(); }
+	float				projectOn(Vector3& rhs)				{ return this->dot(rhs.normalized()); }
+	Vector3				componentOn(Vector3& rhs)			{ return rhs.normalized() * this->dot(rhs.normalized()); }
+	Vector3				xComp()								{ return Vector3(x, 0, 0); }
+	Vector3				yComp()								{ return Vector3(0, y, 0); }
+	Vector3				zComp()								{ return Vector3(0, 0, z); }
+	Vector3				xInvert()							{ return Vector3(-x, y, z); }
+	Vector3				yInvert()							{ return Vector3(x, -y, z); }
+	Vector3				zInvert()							{ return Vector3(x, y, -z); }
+	olc::vd2d			Vector3Tovd2d()						{ return olc::vd2d(x, y); }
 
 	//conversions between qvm's matrices and our vectors and a special mult function
 	mat<float, 1, 4> ConvertToM4x4() {
@@ -97,7 +97,6 @@ public:
 	}
 
 	Vector3 GetM1x4ToVector3(mat<float, 1, 4> m) {
-		x = m.a[0][0]; y = m.a[0][1]; z = m.a[0][2];
 		return Vector3(m.a[0][0], m.a[0][1], m.a[0][2]);
 	}
 
@@ -194,7 +193,7 @@ public:
 	}
 
 	//projects a mesh's points to the screen
-	void ProjToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p, Vector3 pos) {
+	void ProjToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p) {
 		this->M1x4ToVector3(proj_mult(ConvertToM4x4(), ProjMat));
 		x += 1.0f; y += 1.0f;
 		x *= 0.5f * (float)p->ScreenWidth();
@@ -355,6 +354,10 @@ struct Edge {
 		return Vector3(v.y, -v.x, 0).normalized();
 	}
 
+	Vector3 edge_midpoint() {
+		return Vector3((p[0].x + p[1].x) / 2, (p[0].y + p[1].y) / 2, 0);
+	}
+
 	//is a point on, above, or below edge
 	bool on_edge(Vector3 point) {
 		if ((point.y == slope() * point.x + ycross()) && within_domain(point)) { return true; }
@@ -364,22 +367,22 @@ struct Edge {
 	//these signs may look wrong but its to accomidate for the top left coord (maybe)
 	bool above_edge(Vector3 point) {
 		int bp = 0;
-		if (point.y < slope() * point.x + ycross() && within_domain(point)) { return true; }
+		if (point.y < slope() * point.x + ycross()) { return true; }
 		else { return false; }
 	}
 
 	bool below_edge(Vector3 point) {
-		if (point.y > slope() * point.x + ycross() && within_domain(point)) { return true; }
+		if (point.y > slope() * point.x + ycross()) { return true; }
 		else { return false; }
 	}
 
 	bool right_of_edge(Vector3 point) {
-		if ((point.x > (point.y - ycross()) / slope()) && within_range(point)) { return true; }
+		if ((point.x > (point.y - ycross()) / slope())) { return true; }
 		else { return false; }
 	}
 
 	bool left_of_edge(Vector3 point) {
-		if ((point.x < (point.y - ycross()) / slope()) && within_range(point)) { return true; }
+		if ((point.x < (point.y - ycross()) / slope())) { return true; }
 		else { return false; }
 	}
 
