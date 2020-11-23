@@ -62,7 +62,7 @@ void PhysEntity::Update(float deltaTime) {
 		//if (velLast.normalized() == -velocity.normalized()) { velocity = V3ZERO; acceleration = V3ZERO; }
 		if (velocity.mag() < .01f) { velocity = V3ZERO; acceleration = V3ZERO; }
 		position += velocity * deltaTime * 10;
-
+		
 		rotVelocity += rotAcceleration * deltaTime;
 		rotation += rotVelocity * deltaTime;
 	}
@@ -94,7 +94,7 @@ void PhysEntity::AddImpulse(PhysEntity* creator, Vector3 impulse, bool bIgnoreMa
 	if (creator) { creator->acceleration -= bIgnoreMass ? impulse : impulse / creator->mass; }
 }
 
-//TODO(up,delle,11/13/20) this
+//TODO(up,delle,11/13/20) create the GenerateRadialForce function
 void PhysEntity::GenerateRadialForce(Vector3 position, float radius, float strength, float falloff, bool bIgnoreMass) {
 }
 
@@ -102,6 +102,14 @@ void PhysEntity::GenerateRadialForce(Vector3 position, float radius, float stren
 
 bool Sphere::ContainsPoint(Vector3 point) {
 	return point.distanceTo(position) <= radius;
+}
+
+
+bool Sphere::ContainsScreenPoint(Vector3 point) {
+	point.z = 0;
+	Vector3 pos = position;
+	pos.z = 0;
+	return point.distanceTo(pos) <= radius;
 }
 
 //NOTE can instead return a Collision object with all info needed
@@ -129,7 +137,7 @@ void Sphere::ResolveCollision(PhysEntity* other) {
 		vectorBetween = vectorBetween.normalized() * overlap;
 		position -= vectorBetween;
 		sphere->position += vectorBetween;
-
+		
 		//dynamic resolution
 		//From wikipedia without rotation
 		//https://en.wikipedia.org/wiki/Elastic_collision#Two-dimensional_collision_with_two_moving_objects
@@ -145,6 +153,13 @@ void Sphere::ResolveCollision(PhysEntity* other) {
 //not sure if this still works or not, when I was trying to select boxes
 //it wouldn't do anything but i feel it should still work
 bool Box::ContainsPoint(Vector3 point) {
+	bool checkX = point.x >= position.x - dimensions.x / 2 && point.x <= position.x + dimensions.x / 2;
+	bool checkY = point.y >= position.y - dimensions.y / 2 && point.y <= position.y + dimensions.y / 2;
+	bool checkZ = point.z >= position.z - dimensions.z / 2 && point.z <= position.z + dimensions.z / 2;
+	return  checkX && checkY && checkZ;
+}
+
+bool Box::ContainsScreenPoint(Vector3 point) {
 	bool checkX = point.x >= position.x - dimensions.x / 2 && point.x <= position.x + dimensions.x / 2;
 	bool checkY = point.y >= position.y - dimensions.y / 2 && point.y <= position.y + dimensions.y / 2;
 	//bool checkZ = point.z >= position.z - dimensions.z / 2 && point.z <= position.z + dimensions.z / 2;
@@ -170,6 +185,10 @@ bool Complex::ContainsPoint(Vector3 point) {
 	return false;
 }
 
+bool Complex::ContainsScreenPoint(Vector3 point){
+	return false;
+}
+
 bool Complex::CheckCollision(Entity* entity) {
 	return false;
 }
@@ -185,6 +204,7 @@ void Line2::Draw(olc::PixelGameEngine* p, bool wireframe) {
 
 void Line2::SetColor(olc::Pixel newColor) { color = newColor; }
 bool Line2::ContainsPoint(Vector3 point) { return false; }
+bool Line2::ContainsScreenPoint(Vector3 point) { return false; }
 void Line2::Update(float deltaTime) {}
 
 //TODO(re, sushi, 11/18/2020) for some reason this seems to have the same projecting problem as meshes did but idk y yet so fix it
@@ -202,6 +222,7 @@ void Line3::Draw(olc::PixelGameEngine* p, bool wireframe) {
 
 void Line3::SetColor(olc::Pixel newColor) { color = newColor; }
 bool Line3::ContainsPoint(Vector3 point) { return false; }
+bool Line3::ContainsScreenPoint(Vector3 point) { return false; }
 void Line3::Update(float deltaTime) {}
 
 //// Debug Triangle ////
@@ -209,6 +230,7 @@ void Line3::Update(float deltaTime) {}
 bool DebugTriangle::ContainsPoint(Vector3 point) {
 	return false;
 }
+bool DebugTriangle::ContainsScreenPoint(Vector3 point) { return false; }
 
 void DebugTriangle::Update(float deltaTime) {
 }
@@ -218,18 +240,19 @@ void DebugTriangle::Update(float deltaTime) {
 mat<float, 4, 4> Camera::MakeViewMatrix(float yaw) {
 	Vector3 target(0, 0, 1);
 	Vector3 up(0, 1, 0);
-
+	
 	lookDir = target * Math::GetRotateV3_Y(yaw);
 	target = position + lookDir;
-
+	
 	mat<float, 4, 4> view = inverse(Math::PointAt(position, target, up));
-
+	
 	return view;
 }
 
 bool Camera::ContainsPoint(Vector3 point) {
 	return false;
 }
+bool Camera::ContainsScreenPoint(Vector3 point) { return false; }
 
 void Camera::Update(float deltaTime) {
 }
