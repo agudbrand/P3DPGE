@@ -83,7 +83,7 @@ public:
 	olc::vd2d			Vector3Tovd2d()						{ return olc::vd2d(x, y); }
 
 	//conversions between qvm's matrices and our vectors and a special mult function
-	mat<float, 1, 4> ConvertToM4x4() {
+	mat<float, 1, 4> ConvertToM1x4() {
 		mat<float, 1, 4> m;
 		m.a[0][0] = x; m.a[0][1] = y; m.a[0][2] = z; m.a[0][3] = 1;
 		return m;
@@ -113,7 +113,7 @@ public:
 			0,			   0,			  1,			 0,
 			translation.x, translation.y, translation.z, 1
 		};
-		this->M1x4ToVector3(proj_mult(ConvertToM4x4(), tv));
+		this->M1x4ToVector3(proj_mult(ConvertToM1x4(), tv));
 	}
 
 	//scale object
@@ -124,7 +124,7 @@ public:
 			0,		 0,		  scale.z, 0,
 			0,		 0,		  0,	   1
 		};
-		this->M1x4ToVector3(proj_mult(ConvertToM4x4(), sv));
+		this->M1x4ToVector3(proj_mult(ConvertToM1x4(), sv));
 	}
 
 	//covert point to WorldSpace
@@ -135,7 +135,7 @@ public:
 			0,	   0,	  1,	 0,
 			pos.x, pos.y, pos.z, 1
 		};
-		this->M1x4ToVector3(proj_mult(ConvertToM4x4(), wtl));
+		this->M1x4ToVector3(proj_mult(ConvertToM1x4(), wtl));
 	}
 
 	//convert point to LocalSpace
@@ -146,7 +146,7 @@ public:
 			0,	   0,	  1,	 0,
 			pos.x, pos.y, pos.z, 1
 		};
-		this->M1x4ToVector3(proj_mult(ConvertToM4x4(), inverse(ltw)));
+		this->M1x4ToVector3(proj_mult(ConvertToM1x4(), inverse(ltw)));
 	}
 
 	//basic euler rotations locally
@@ -159,7 +159,7 @@ public:
 			0,		sin(theta),	cos(theta),  0,
 			0,		0,			0,			 1
 		};
-		this->M1x4ToVector3(proj_mult(ConvertToM4x4(), rvx));
+		this->M1x4ToVector3(proj_mult(ConvertToM1x4(), rvx));
 		LocalToWorld(pos + offset);
 	}
 
@@ -172,7 +172,7 @@ public:
 			-sin(theta),0,	cos(theta),  0,
 			0,			0,	0,			 1
 		};
-		this->M1x4ToVector3(proj_mult(ConvertToM4x4(), rvy));
+		this->M1x4ToVector3(proj_mult(ConvertToM1x4(), rvy));
 		LocalToWorld(pos + offset);
 	}
 
@@ -185,13 +185,13 @@ public:
 			0,			0,				1, 0,
 			0,			0,				0, 1
 		};
-		this->M1x4ToVector3(proj_mult(ConvertToM4x4(), rvz));
+		this->M1x4ToVector3(proj_mult(ConvertToM1x4(), rvz));
 		LocalToWorld(pos + offset);
 	}
 
 	//projects a mesh's points to the screen
 	void ProjToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p) {
-		this->M1x4ToVector3(proj_mult(ConvertToM4x4(), ProjMat));
+		this->M1x4ToVector3(proj_mult(ConvertToM1x4(), ProjMat));
 		x += 1.0f; y += 1.0f;
 		x *= 0.5f * (float)p->ScreenWidth();
 		y *= 0.5f * (float)p->ScreenHeight();
@@ -208,8 +208,19 @@ namespace Math {
 		return s;
 	}
 
+	//conversions
 	static Vector3 vi2dToVector3(olc::vi2d vector, float z = 0) {
 		return Vector3((float)vector.x, (float)vector.y, z);
+	}
+
+	static Vector3 M1x4ToVector3(mat<float, 1, 4> m) {
+		return Vector3(m.a[0][0], m.a[0][1], m.a[0][2]);
+	}
+
+	static mat<float, 1, 4> Vector3ToM1x4(Vector3 v) {
+		mat<float, 1, 4> m;
+		m.a[0][0] = v.x; m.a[0][1] = v.y; m.a[0][2] = v.z; m.a[0][3] = 1;
+		return m;
 	}
 
 	//this function returns a matrix that tells a vector how to look at a specific point in space.

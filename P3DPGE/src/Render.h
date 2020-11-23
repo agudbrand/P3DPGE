@@ -24,14 +24,14 @@ namespace Render {
 	static void Init() {
 		//test lines, remove them if i forget pls
 		//Line2* l1 = new Line2(Vector3(100, 100, 0), 1);
-		Line3* l2 = new Line3(Vector3(10, 10, 4), 1, Vector3(0, 2, 1));
+		//Line3* l2 = new Line3(Vector3(10, 10, 4), 1, Vector3(0, 2, 1));
 		//entities.push_back(l1);
-		entities.push_back(l2);
+		//entities.push_back(l2);
 
 		//test triangle
-		DebugTriangle* test = new DebugTriangle(1);
-		test->SetColor(olc::BLUE);
-		entities.push_back(test);
+		//DebugTriangle* test = new DebugTriangle(1);
+		//test->SetColor(olc::BLUE);
+		//entities.push_back(test);
 	}
 
 	using namespace boost::qvm;

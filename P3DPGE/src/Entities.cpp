@@ -191,8 +191,8 @@ void Line2::Update(float deltaTime) {}
 void Line3::Draw(olc::PixelGameEngine* p, bool wireframe) {
 	//these operations are very gross and could probably be abstracted in Math
 	//TODO(m, sushi) abstract the following functions in Math.h in order to make this not look retarded
-	Vector3 posView = position.GetM1x4ToVector3(position.proj_mult(position.ConvertToM4x4(), mesh->view));
-	Vector3 endView = endPosition.GetM1x4ToVector3(endPosition.proj_mult(endPosition.ConvertToM4x4(), mesh->view));
+	Vector3 posView = position.GetM1x4ToVector3(position.proj_mult(position.ConvertToM1x4(), mesh->view));
+	Vector3 endView = endPosition.GetM1x4ToVector3(endPosition.proj_mult(endPosition.ConvertToM1x4(), mesh->view));
 
 	posView.ProjToScreen(mesh->ProjMat, p);
 	endView.ProjToScreen(mesh->ProjMat, p);

@@ -166,6 +166,7 @@ public:
 			t.copy_points();
 			if (t.get_proj_normal().dot(t.points[0] - camPos) > 0) {
 				float dp = light_direction.dot(t.get_normal());
+				t.set_color(olc::Pixel(50 * abs(dp), 75 * abs(dp), 200 * abs(dp)));
 				visibleTriangles.push_back(t);
 			}
 		}
@@ -173,7 +174,7 @@ public:
 		//project triangles to screen and add them to the draw vector
 		for (Triangle t : visibleTriangles) {
 			for (Vector3& n : t.proj_points) {
-				n.M1x4ToVector3(n.proj_mult(n.ConvertToM4x4(), view));
+				n.M1x4ToVector3(n.proj_mult(n.ConvertToM1x4(), view));
 			}
 
 			int clippedTriangles = 0;
