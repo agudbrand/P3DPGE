@@ -156,7 +156,7 @@ Tags: TODOP, general
 create a debug header for easy printing and such
 
 ~~~~~~~ TODO 18 ~~~~~~~
-Math.h, Line: 261
+Math.h, Line: 272
 Creator:  sushi
 ----------------------
 Tags: TODOP
@@ -164,7 +164,7 @@ Tags: TODOP
 rename these functions to something not retarded
 
 ~~~~~~~ TODO 19 ~~~~~~~
-Math.h, Line: 312
+Math.h, Line: 323
 Creator:  sushi
 ----------------------
 Tags: TODOP, math
@@ -172,7 +172,7 @@ Tags: TODOP, math
 implement Edge in 3D
 
 ~~~~~~~ TODO 20 ~~~~~~~
-Math.h, Line: 330
+Math.h, Line: 341
 Creator:  sushi
 ----------------------
 Tags: TODOP
@@ -190,7 +190,7 @@ abstract out Mesh and split into Mesh2D and Mesh3D
 
 ~~~~~~~ TODO 22 ~~~~~~~
 Title:  Implement Clipping Algorithm
-Mesh.h, Line: 264
+Mesh.h, Line: 265
 Creator:  sushi
 ----------------------
 Date:  11/15/2020
@@ -199,7 +199,7 @@ Tags: TODOP, GitIssue, render, severe
 mesh Javid\'s clipping algorithm with what we already have set up, also rewatch his video to fix the camera not moving the clipping plane.
 
 ~~~~~~~ TODO 23 ~~~~~~~
-Mesh.h, Line: 329
+Mesh.h, Line: 330
 Creator:  sushi
 ----------------------
 Tags: TODOP, clean up
