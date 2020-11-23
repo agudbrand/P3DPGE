@@ -31,23 +31,29 @@ namespace Math {
 }
 
 class Vector3 {
-public:
+	public:
 	float x;
 	float y;
 	float z;
-
+	
 	Vector3() {
 		this->x = 0;
 		this->y = 0;
 		this->z = 0;
 	}
-
+	
 	Vector3(float x, float y, float z) {
 		this->x = x;
 		this->y = y;
 		this->z = z;
 	}
-
+	
+	Vector3(float x, float y) {
+		this->x = x;
+		this->y = y;
+		this->z = 0;
+	}
+	
 	Vector3 operator +  (const Vector3& rhs)		const { return Vector3(this->x + rhs.x, this->y + rhs.y, this->z + rhs.z); }
 	Vector3 operator -  (const Vector3& rhs)		const { return Vector3(this->x - rhs.x, this->y - rhs.y, this->z - rhs.z); }
 	Vector3 operator *  (const float& rhs)			const { return Vector3(this->x * rhs, this->y * rhs, this->z * rhs); }
@@ -63,7 +69,7 @@ public:
 	Vector3 operator -  ()							const { return { -x, -y, -z }; }
 	bool operator	 == (const Vector3& rhs)		const { return (this->x == rhs.x && this->y == rhs.y && this->z == rhs.z); }
 	bool operator	 != (const Vector3& rhs)		const { return (this->x != rhs.x || this->y != rhs.y || this->z != rhs.z); }
-
+	
 	float				dot(const Vector3& rhs)		const { return this->x * rhs.x + this->y * rhs.y + this->z * rhs.z; }
 	Vector3				cross(const Vector3& rhs)	const { return Vector3(this->y * rhs.z - rhs.y * this->z, this->x * rhs.z - rhs.x * this->z, this->x * rhs.y - rhs.x * this->y); }
 	float				mag()						const { return std::sqrtf(x * x + y * y + z * z); }
@@ -81,31 +87,31 @@ public:
 	Vector3				yInvert() { return Vector3(x, -y, z); }
 	Vector3				zInvert() { return Vector3(x, y, -z); }
 	olc::vd2d			Vector3Tovd2d() { return olc::vd2d(x, y); }
-
+	
 	//conversions between qvm's matrices and our vectors and a special mult function
 	mat<float, 1, 4> ConvertToM4x4() {
 		mat<float, 1, 4> m;
 		m.a[0][0] = x; m.a[0][1] = y; m.a[0][2] = z; m.a[0][3] = 1;
 		return m;
 	}
-
+	
 	void M1x4ToVector3(mat<float, 1, 4> m) {
 		x = m.a[0][0]; y = m.a[0][1]; z = m.a[0][2];
 	}
-
+	
 	Vector3 GetM1x4ToVector3(mat<float, 1, 4> m) {
 		x = m.a[0][0]; y = m.a[0][1]; z = m.a[0][2];
 		return Vector3(m.a[0][0], m.a[0][1], m.a[0][2]);
 	}
-
+	
 	mat<float, 1, 4> proj_mult(mat<float, 1, 4> v, mat<float, 4, 4> m) {
 		mat<float, 1, 4> vm = v * m;
 		if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; }
 		return vm;
 	}
-
+	
 	//// Functions pertaining to matrix-vertex manipulation ////
-
+	
 	//translate vector with given translation
 	void translateV3(Vector3 translation) {
 		mat<float, 4, 4> tv{
@@ -116,7 +122,7 @@ public:
 		};
 		this->M1x4ToVector3(proj_mult(ConvertToM4x4(), tv));
 	}
-
+	
 	//scale object
 	void scaleV3(Vector3 scale) {
 		mat<float, 4, 4> sv{
@@ -127,7 +133,7 @@ public:
 		};
 		this->M1x4ToVector3(proj_mult(ConvertToM4x4(), sv));
 	}
-
+	
 	//covert point to WorldSpace
 	void LocalToWorld(Vector3 pos) {
 		mat<float, 4, 4> wtl{
@@ -138,7 +144,7 @@ public:
 		};
 		this->M1x4ToVector3(proj_mult(ConvertToM4x4(), wtl));
 	}
-
+	
 	//convert point to LocalSpace
 	void WorldToLocal(Vector3 pos) {
 		mat<float, 4, 4> ltw{
@@ -149,7 +155,7 @@ public:
 		};
 		this->M1x4ToVector3(proj_mult(ConvertToM4x4(), inverse(ltw)));
 	}
-
+	
 	//basic euler rotations locally
 	void rotateV3_X(float theta, Vector3 pos, Vector3 offset) {
 		theta = Math::to_radians(theta);
@@ -163,7 +169,7 @@ public:
 		this->M1x4ToVector3(proj_mult(ConvertToM4x4(), rvx));
 		LocalToWorld(pos + offset);
 	}
-
+	
 	void rotateV3_Y(float theta, Vector3 pos, Vector3 offset) {
 		theta = Math::to_radians(theta);
 		WorldToLocal(pos + offset);
@@ -176,7 +182,7 @@ public:
 		this->M1x4ToVector3(proj_mult(ConvertToM4x4(), rvy));
 		LocalToWorld(pos + offset);
 	}
-
+	
 	void rotateV3_Z(float theta, Vector3 pos, Vector3 offset) {
 		theta = Math::to_radians(theta);
 		WorldToLocal(pos + offset);
@@ -189,7 +195,7 @@ public:
 		this->M1x4ToVector3(proj_mult(ConvertToM4x4(), rvz));
 		LocalToWorld(pos + offset);
 	}
-
+	
 	//projects a mesh's points to the screen
 	void ProjToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p, Vector3 pos) {
 		this->M1x4ToVector3(proj_mult(ConvertToM4x4(), ProjMat));
@@ -208,27 +214,27 @@ namespace Math {
 		s.pop_back();
 		return s;
 	}
-
+	
 	static Vector3 vi2dToVector3(olc::vi2d vector, float z = 0) {
 		return Vector3((float)vector.x, (float)vector.y, z);
 	}
-
+	
 	//this function returns a matrix that tells a vector how to look at a specific point in space.
 	static mat<float, 4, 4> PointAt(Vector3& pos, Vector3& target, Vector3& up) {
 		up.normalize();
-
+		
 		//get new forward direction
 		Vector3 newFor = target - pos;
 		newFor.normalize();
-
+		
 		//get right direction
 		Vector3 newRight = up.cross(newFor);
 		newRight.normalize();
-
+		
 		//get up direction
 		Vector3 newUp = newRight.cross(newFor);
 		newUp.normalize();
-
+		
 		//make point at matrix
 		mat<float, 4, 4> m{
 			newRight.x, newRight.y, newRight.z, 0,
@@ -236,12 +242,12 @@ namespace Math {
 			newFor.x,	newFor.y,	newFor.z,	0,
 			pos.x,		pos.y,		pos.z,		1
 		};
-
+		
 		return m;
 	}
-
+	
 	static float DistPointToPlane(Vector3 point, Vector3 plane, Vector3 plane_p) { return (plane.x * point.x + plane.y * point.y + plane.z * point.z - plane.dot(plane_p)); }
-
+	
 	//where a line intersects with a plane
 	static Vector3 VectorPlaneIntersect(Vector3 plane_p, Vector3 plane_n, Vector3 line_start, Vector3 line_end) {
 		plane_n.normalize();
@@ -253,7 +259,7 @@ namespace Math {
 		Vector3 line_to_intersect = line_start_to_end * t;
 		return line_start + line_to_intersect;
 	}
-
+	
 	//TODO(, sushi) rename these functions to something not retarded
 	static mat<float, 4, 4> GetRotateV3_X(float theta) {
 		theta = Math::to_radians(theta);
@@ -265,7 +271,7 @@ namespace Math {
 		};
 		return rvx;
 	}
-
+	
 	static mat<float, 4, 4> GetRotateV3_Y(float theta) {
 		theta = Math::to_radians(theta);
 		mat<float, 4, 4> rvy{
@@ -276,7 +282,7 @@ namespace Math {
 		};
 		return rvy;
 	}
-
+	
 	static mat<float, 4, 4> GetRotateV3_Z(float theta) {
 		theta = Math::to_radians(theta);
 		mat<float, 4, 4> rvz{
@@ -287,7 +293,7 @@ namespace Math {
 		};
 		return rvz;
 	}
-
+	
 	//return where two lines intersect on the x axis with slope and the y-intercept
 	static Vector3 LineIntersect(float slope1, float ycross1, float slope2, float ycross2) {
 		mat<float, 2, 2> lhs{ slope1, ycross1, slope2, ycross2 };
@@ -312,7 +318,7 @@ struct Edge {
 	//ditto for high but on y
 	bool lead;
 	bool high;
-
+	
 	Edge() { }
 	Edge(Vector3 point1, Vector3 point2) {
 		p[0] = point1;
@@ -322,7 +328,7 @@ struct Edge {
 		if (point1.y > point2.y) { high = false; }
 		else { high = true; }
 	}
-
+	
 	//TODO(?, sushi) find a good place to update edge, probably in Triangle?
 	void update(Vector3 point1, Vector3 point2) {
 		p[0] = point1;
@@ -332,12 +338,12 @@ struct Edge {
 		if (point1.y > point2.y) { high = false; }
 		else { high = true; }
 	}
-
+	
 	float slope() {
 		if (p[1].x == p[0].x || p[1].y == p[0].y) { return 0; }
 		else { return (p[1].y - p[0].y) / (p[1].x - p[0].x); }
 	}
-
+	
 	//y intercept and range/domain checks
 	float ycross() { return p[!lead].y - slope() * p[!lead].x; }
 	bool within_range(Vector3 point)  { return (point.y < p[high].y&& point.y > p[!high].y); }
@@ -351,35 +357,35 @@ struct Edge {
 		Vector3 v = p[1] - p[0];
 		return Vector3(v.y, -v.x, 0).normalized();
 	}
-
+	
 	//is a point on, above, or below edge
 	bool on_edge(Vector3 point) {
 		if ((point.y == slope() * point.x + ycross()) && within_domain(point)) { return true; }
 		else { return false; }
 	}
-
+	
 	//these signs may look wrong but its to accomidate for the top left coord (maybe)
 	bool above_edge(Vector3 point) {
 		int bp = 0;
 		if (point.y < slope() * point.x + ycross() && within_domain(point)) { return true; }
 		else { return false; }
 	}
-
+	
 	bool below_edge(Vector3 point) {
 		if (point.y > slope() * point.x + ycross() && within_domain(point)) { return true; }
 		else { return false; }
 	}
-
+	
 	bool right_of_edge(Vector3 point) {
 		if ((point.x > (point.y - ycross()) / slope()) && within_range(point)) { return true; }
 		else { return false; }
 	}
-
+	
 	bool left_of_edge(Vector3 point) {
 		if ((point.x < (point.y - ycross()) / slope()) && within_range(point)) { return true; }
 		else { return false; }
 	}
-
+	
 	//checks if two edges intersect by finding their line representation's
 	//intersection and then seeing if that point lies on either of them
 	bool edge_intersect(Edge e) {
