@@ -115,7 +115,7 @@ Tags: TODOP, input
 set up pausing to also pause moving/rotating objects manually
 
 ~~~~~~~ TODO 13 ~~~~~~~
-Input.h, Line: 316
+Input.h, Line: 319
 Creator: delle
 ----------------------
 Date: 11/17/20
@@ -156,7 +156,7 @@ Tags: TODOP, general
 create a debug header for easy printing and such
 
 ~~~~~~~ TODO 18 ~~~~~~~
-Math.h, Line: 256
+Math.h, Line: 255
 Creator:  sushi
 ----------------------
 Tags: TODOP
@@ -164,7 +164,7 @@ Tags: TODOP
 rename these functions to something not retarded
 
 ~~~~~~~ TODO 19 ~~~~~~~
-Math.h, Line: 307
+Math.h, Line: 306
 Creator:  sushi
 ----------------------
 Tags: TODOP, math
@@ -172,7 +172,7 @@ Tags: TODOP, math
 implement Edge in 3D
 
 ~~~~~~~ TODO 20 ~~~~~~~
-Math.h, Line: 325
+Math.h, Line: 324
 Creator:  sushi
 ----------------------
 Tags: TODOP
@@ -181,7 +181,7 @@ find a good place to update edge, probably in Triangle?
 
 ~~~~~~~ TODO 21 ~~~~~~~
 Title:  Implement Clipping Algorithm
-Mesh.h, Line: 226
+Mesh.h, Line: 254
 Creator:  sushi
 ----------------------
 Date:  11/15/2020
@@ -190,7 +190,7 @@ Tags: TODOP, GitIssue, render, severe
 mesh Javid\'s clipping algorithm with what we already have set up, also rewatch his video to fix the camera not moving the clipping plane.
 
 ~~~~~~~ TODO 22 ~~~~~~~
-Mesh.h, Line: 285
+Mesh.h, Line: 313
 Creator:  sushi
 ----------------------
 Tags: TODOP, clean up
@@ -216,7 +216,7 @@ Tags: TODOP, unimportant, physics, optimization
 this could maybe be optimized by having an id counter instead of checking back element
 
 ~~~~~~~ TODO 25 ~~~~~~~
-Render.h, Line: 76
+Render.h, Line: 75
 Creator:  sushi
 ----------------------
 Date:  11/18/2020

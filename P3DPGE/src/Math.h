@@ -100,7 +100,6 @@ class Vector3 {
 	}
 	
 	Vector3 GetM1x4ToVector3(mat<float, 1, 4> m) {
-		x = m.a[0][0]; y = m.a[0][1]; z = m.a[0][2];
 		return Vector3(m.a[0][0], m.a[0][1], m.a[0][2]);
 	}
 	
@@ -197,7 +196,7 @@ class Vector3 {
 	}
 	
 	//projects a mesh's points to the screen
-	void ProjToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p, Vector3 pos) {
+	void ProjToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p) {
 		this->M1x4ToVector3(proj_mult(ConvertToM4x4(), ProjMat));
 		x += 1.0f; y += 1.0f;
 		x *= 0.5f * (float)p->ScreenWidth();
@@ -357,7 +356,11 @@ struct Edge {
 		Vector3 v = p[1] - p[0];
 		return Vector3(v.y, -v.x, 0).normalized();
 	}
-	
+
+	Vector3 edge_midpoint() {
+		return Vector3((p[0].x + p[1].x) / 2, (p[0].y + p[1].y) / 2, 0);
+	}
+
 	//is a point on, above, or below edge
 	bool on_edge(Vector3 point) {
 		if ((point.y == slope() * point.x + ycross()) && within_domain(point)) { return true; }
@@ -367,22 +370,22 @@ struct Edge {
 	//these signs may look wrong but its to accomidate for the top left coord (maybe)
 	bool above_edge(Vector3 point) {
 		int bp = 0;
-		if (point.y < slope() * point.x + ycross() && within_domain(point)) { return true; }
+		if (point.y < slope() * point.x + ycross()) { return true; }
 		else { return false; }
 	}
 	
 	bool below_edge(Vector3 point) {
-		if (point.y > slope() * point.x + ycross() && within_domain(point)) { return true; }
+		if (point.y > slope() * point.x + ycross()) { return true; }
 		else { return false; }
 	}
 	
 	bool right_of_edge(Vector3 point) {
-		if ((point.x > (point.y - ycross()) / slope()) && within_range(point)) { return true; }
+		if ((point.x > (point.y - ycross()) / slope())) { return true; }
 		else { return false; }
 	}
 	
 	bool left_of_edge(Vector3 point) {
-		if ((point.x < (point.y - ycross()) / slope()) && within_range(point)) { return true; }
+		if ((point.x < (point.y - ycross()) / slope())) { return true; }
 		else { return false; }
 	}
 	

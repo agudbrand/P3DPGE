@@ -8,15 +8,20 @@
 
 //collection of 3 points forming the basis of meshes
 struct Triangle {
+	//this can probably be different but it works for now
 	Vector3 points[3];
 	Vector3 proj_points[3];
 	Vector3 proj_persistent[3];
-	
+
+
+	//maybe edges can be cleared when they're not actually needed,
+	//and only spawned when used?
 	Edge edges[3];
 	
 	bool selected = false;
 	olc::Pixel color = olc::WHITE;
-	
+	olc::Pixel debug_color = olc::RED;
+
 	Triangle() {}
 	Triangle(Vector3 p1, Vector3 p2, Vector3 p3) {
 		points[0] = p1;
@@ -40,14 +45,18 @@ struct Triangle {
 	void update_edges() {
 		edges[0].update(proj_persistent[0], proj_persistent[1]);
 		edges[1].update(proj_persistent[1], proj_persistent[2]);
-		edges[2].update(proj_persistent[2], proj_persistent[1]);
+		edges[2].update(proj_persistent[2], proj_persistent[0]);
 	}
 	
 	void set_color(olc::Pixel newColor) {
-		if (selected) { color = olc::RED; }
-		else { color = newColor; }
+		color = newColor; 
 	}
-	
+
+	olc::Pixel get_color() {
+		if (selected) { return debug_color; }
+		else { return color; }
+	}
+
 	Vector3 get_normal() {
 		Vector3 l1 = points[1] - points[0];
 		Vector3 l2 = points[2] - points[0];
@@ -87,11 +96,24 @@ struct Triangle {
 		
 		bool the_final_truth = true;
 		for (bool b : truths) {
-			if (!b) { the_final_truth = false; }
+			if (!b) { 
+				the_final_truth = false; 
+			}
 		}
 		
 		if (the_final_truth) { return true; }
 		else { return false; }
+		
+	}
+
+	void display_edges(olc::PixelGameEngine* p) {
+		update_edges();
+
+		int n = 1;
+		for (Edge e : edges) {
+			p->DrawString((e.edge_midpoint() + e.edge_normal() * -10).Vector3Tovd2d(), std::to_string(n));
+			n++;
+		}
 		
 	}
 };
@@ -109,9 +131,8 @@ struct Mesh{
 class Mesh {
 	public:
 	std::vector<Triangle> triangles;
-	
-	std::vector<Triangle> drawnTriangles_Debug;
-	
+	std::vector<Triangle> drawnTriangles;
+
 	Vector3 camPos;
 	mat<float, 4, 4> ProjMat;
 	mat<float, 4, 4> view;
@@ -136,11 +157,16 @@ class Mesh {
 		this->ProjMat = ProjMat;
 		this->view = view;
 	}
-	
+
+	//NOTE sushi: there is a serious disconnect between drawing and interacting with triangles currently
+	//		because of the way scaling to screen sapce works, it's hard to bridge the gap between interacting with 
+	//		triangles and then drawing them to the screen as the information stored on the triangles themselves
+	//		does not translate to the drawn triangles but the drawn triangles are the only ones we can 
+	//		actually interact with in screenspace so there must be a way to bridge this gap else trouble :/
 	virtual void Draw(olc::PixelGameEngine* p, Vector3 pos, bool wireframe = false, olc::Pixel color = olc::WHITE) {
 		std::vector<Triangle> visibleTriangles;
-		std::vector<Triangle> drawnTriangles;
-		drawnTriangles_Debug.clear();
+		
+		drawnTriangles.clear();
 		//temp lighting set up
 		Vector3 light_direction(0, 0, 1);
 		light_direction = light_direction.normalized();
@@ -153,9 +179,8 @@ class Mesh {
 				visibleTriangles.push_back(t);
 			}
 		}
-		
-		//project triangles to screen and add them to the
-		//draw vector
+
+		//project triangles to screen and add them to the draw vector
 		for (Triangle t : visibleTriangles) {
 			for (Vector3& n : t.proj_points) {
 				n.M1x4ToVector3(n.proj_mult(n.ConvertToM4x4(), view));
@@ -167,20 +192,23 @@ class Mesh {
 			
 			for (int i = 0; i < clippedTriangles; i++) {
 				for (Vector3& n : clipped[i].proj_points) {
-					n.ProjToScreen(ProjMat, p, pos);
+					n.ProjToScreen(ProjMat, p);
 				}
+				clipped[i].set_color(t.get_color());
 				drawnTriangles.push_back(clipped[i]);
-				drawnTriangles_Debug.push_back(clipped[i]);
 			}
 		}
 		
 		std::sort(drawnTriangles.begin(), drawnTriangles.end(), [](Triangle& t1, Triangle& t2) {
-					  float mp1 = (t1.points[0].z + t1.points[1].z + t1.points[2].z) / 3;
-					  float mp2 = (t2.points[0].z + t2.points[1].z + t2.points[2].z) / 3;
-					  return mp1 > mp2;
-				  });
-		
-		for (Triangle t : drawnTriangles) {
+			float mp1 = (t1.points[0].z + t1.points[1].z + t1.points[2].z) / 3;
+			float mp2 = (t2.points[0].z + t2.points[1].z + t2.points[2].z) / 3;
+			return mp1 > mp2;
+			});
+
+		for (Triangle& t : drawnTriangles) {
+			t.copy_persistent();
+			t.display_edges(p);
+
 			Triangle clipped[2];
 			std::list<Triangle> listTriangles;
 			
@@ -195,24 +223,24 @@ class Mesh {
 					newTriangles--;
 					
 					switch (a) {
-						case 0:	trisToAdd = ClipTriangles(Vector3(0, 0, 0), Vector3(0, 1, 0), test, clipped[0], clipped[1]); break;
-						case 1:	trisToAdd = ClipTriangles(Vector3(0, (float)p->ScreenHeight() - 1, 0), Vector3(0, -1, 0), test, clipped[0], clipped[1]); break;
-						case 2:	trisToAdd = ClipTriangles(Vector3(0, 0, 0), Vector3(1, 0, 0), test, clipped[0], clipped[1]); break;
-						case 3: trisToAdd = ClipTriangles(Vector3((float)p->ScreenHeight() - 1, 0, 0), Vector3(-1, 0, 0), test, clipped[0], clipped[1]); break;
+					case 0:	trisToAdd = ClipTriangles(Vector3(0, 0, 0), Vector3(0, 1, 0), test, clipped[0], clipped[1]); break;
+					case 1:	trisToAdd = ClipTriangles(Vector3(0, (float)p->ScreenHeight() - 1, 0), Vector3(0, -1, 0), test, clipped[0], clipped[1]); break;
+					case 2:	trisToAdd = ClipTriangles(Vector3(0, 0, 0), Vector3(1, 0, 0), test, clipped[0], clipped[1]); break;
+					case 3: trisToAdd = ClipTriangles(Vector3((float)p->ScreenHeight() - 1, 0, 0), Vector3(-1, 0, 0), test, clipped[0], clipped[1]); break;
 					}
-					
-					for (int w = 0; w < trisToAdd; w++) { listTriangles.push_back(clipped[w]); }
+
+					for (int w = 0; w < trisToAdd; w++) { clipped[w].set_color(test.get_color()); listTriangles.push_back(clipped[w]); }
 				}
 				newTriangles = listTriangles.size();
 			}
 			
 			for (Triangle& t : listTriangles) {
 				p->FillTriangle(
-								t.proj_points[0].x, t.proj_points[0].y,
-								t.proj_points[1].x, t.proj_points[1].y,
-								t.proj_points[2].x, t.proj_points[2].y,
-								t.color);
-				t.copy_persistent();
+					t.proj_points[0].x, t.proj_points[0].y,
+					t.proj_points[1].x, t.proj_points[1].y,
+					t.proj_points[2].x, t.proj_points[2].y,
+					t.get_color());
+				
 				//std::cout << t.edges[0].edge_normal().str()  << std::endl;
 				
 			}
@@ -221,10 +249,10 @@ class Mesh {
 		if (wireframe) {
 			for (auto& t : drawnTriangles) {
 				p->DrawTriangle(
-								t.proj_points[0].x, t.proj_points[0].y,
-								t.proj_points[1].x, t.proj_points[1].y,
-								t.proj_points[2].x, t.proj_points[2].y,
-								olc::WHITE);
+					t.proj_points[0].x, t.proj_points[0].y,
+					t.proj_points[1].x, t.proj_points[1].y,
+					t.proj_points[2].x, t.proj_points[2].y,
+					olc::WHITE);
 				
 			}
 		}

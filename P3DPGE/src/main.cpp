@@ -48,8 +48,6 @@ public:
 		Physics::Init();
 		Render::Init();
 
-		
-
 		return true;
 	}
 

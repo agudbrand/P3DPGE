@@ -114,80 +114,83 @@ namespace Input {
 		//NOTE InputAction: function, name, key, mouseButton, inputState, shift, ctrl, description
 		
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-											   //Time::deltaTime = 0;
-											   //TODO(i, sushi) set up pausing to also pause moving/rotating objects manually
-										   }, "pause_game_held", olc::P, -1, 1, 0, 0,
-										   "Pauses the game while button is held."));
-		
+			//Time::deltaTime = 0;
+			//TODO(i, sushi) set up pausing to also pause moving/rotating objects manually
+		}, "pause_game_held", olc::P, -1, 1, 0, 0,
+		"Pauses the game while button is held."));
+
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-											   Render::paused = !Render::paused;
-											   Physics::paused = !Physics::paused;
-										   }, "pause_game", olc::SPACE, -1, 0, 0, 0,
-										   "Pauses the game on press."));
-		
+			Render::paused = !Render::paused;
+			Physics::paused = !Physics::paused;
+		}, "pause_game", olc::SPACE, -1, 0, 0, 0,
+		"Pauses the game on press."));
+
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-											   Render::frame = !Render::frame;
-											   Physics::frame = !Physics::frame;
-										   }, "next_frame", olc::F, -1, 0, 0, 0,
-										   "Advances to the next frame if paused."));
-		
+			Render::frame = !Render::frame;
+			Physics::frame = !Physics::frame;
+		}, "next_frame", olc::F, -1, 0, 0, 0,
+		"Advances to the next frame if paused."));
+
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-											   Vector3 pos = GetMousePos(p);
-											   Sphere* sphere = new Sphere(10, 0, pos);
-											   sphere->mass = 10;
-											   sphere->mesh = new CircleMesh(10);
-											   Physics::AddEntity(sphere);
-											   Render::AddEntity(sphere);
-											   std::cout << "Creating Sphere at: " + pos.str() << std::endl;
-										   }, "spawn_sphere", olc::Q, -1, 0, 0, 0,
-										   "Spawns a sphere of radius/mass 10 at the mouse."));
-		
+			Vector3 pos = GetMousePos(p);
+			Sphere* sphere = new Sphere(10, 0, pos);
+			sphere->mass = 10;
+			sphere->mesh = new CircleMesh(10);
+			Physics::AddEntity(sphere);
+			Render::AddEntity(sphere);
+			std::cout << "Creating Sphere at: " + pos.str() << std::endl;
+		}, "spawn_sphere", olc::Q, -1, 0, 0, 0,
+		"Spawns a sphere of radius/mass 10 at the mouse."));
+
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-											   Vector3 pos = GetMousePos(p);
-											   Sphere* sphere = new Sphere(100, 0, pos);
-											   sphere->mass = 100;
-											   sphere->mesh = new CircleMesh(100);
-											   Physics::AddEntity(sphere);
-											   Render::AddEntity(sphere);
-											   std::cout << "Creating Large Sphere at: " + pos.str() << std::endl;
-										   }, "spawn_sphere_large", olc::Q, -1, 0, 1, 0,
-										   "Spawns a large sphere of radius/mass 100 at the mouse."));
-		
+			Vector3 pos = GetMousePos(p);
+			Sphere* sphere = new Sphere(100, 0, pos);
+			sphere->mass = 100;
+			sphere->mesh = new CircleMesh(100);
+			Physics::AddEntity(sphere);
+			Render::AddEntity(sphere);
+			std::cout << "Creating Large Sphere at: " + pos.str() << std::endl;
+		}, "spawn_sphere_large", olc::Q, -1, 0, 1, 0,
+		"Spawns a large sphere of radius/mass 100 at the mouse."));
+
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-											   Complex* complex = new Complex("objects/whale_ship.obj", 0, V3ZERO);
-											   selectedEntity = complex;
-											   Physics::AddEntity(complex);
-											   Render::AddEntity(complex);
-											   std::cout << "Creating " + complex->model_name + " at: " + V3ZERO.str() << std::endl;
-										   }, "spawn_complex", olc::T, -1, 0, 0, 0,
-										   "Spawns a complex object at (0,0,0)"));
-		
+			Complex* complex = new Complex("objects/whale_ship.obj", 0, V3ZERO);
+			selectedEntity = complex;
+			Physics::AddEntity(complex);
+			Render::AddEntity(complex);
+			std::cout << "Creating " + complex->model_name + " at: " + V3ZERO.str() << std::endl;
+		}, "spawn_complex", olc::T, -1, 0, 0, 0,
+		"Spawns a complex object at (0,0,0)"));
+
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-											   Vector3 pos = Vector3(0, 0, 3);
-											   Box* box = new Box(Vector3(1, 1, 1), 0, pos);
-											   selectedEntity = box;
-											   Physics::AddEntity(box);
-											   Render::AddEntity(box);
-											   std::cout << "Creating Box at: " + pos.str() << std::endl;
-										   }, "spawn_complex", olc::E, -1, 0, 0, 0,
-										   "Spawns a box at (0,0,3)"));
-		
+			Vector3 pos = Vector3(0, 0, 3);
+			Box* box = new Box(Vector3(1, 1, 1), 0, pos);
+			selectedEntity = box;
+			Physics::AddEntity(box);
+			Render::AddEntity(box);
+			std::cout << "Creating Box at: " + pos.str() << std::endl;
+		}, "spawn_complex", olc::E, -1, 0, 0, 0,
+		"Spawns a box at (0,0,3)"));
+
 		//could set this up to only select triangles from a selected entity
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-											   
-											   Vector3 pos = GetMousePos(p);
-											   std::cout << pos.str() << std::endl;
-											   if (selectedTriangle) { selectedTriangle->selected = false; }
-											   selectedTriangle = nullptr;
-											   for (Entity* e : Render::entities) {
-												   for (Triangle t : e->mesh->triangles) {
-													   if (t.contains_point(pos)) { selectedTriangle = &t; break; }
-												   }
-											   }
-											   if (selectedTriangle) { selectedTriangle->selected = true; }
-										   }, "select_triangle", olc::NONE, 0, 0, 0, 0,
-										   "Selects a triangle at the mouse position"));
-		
+
+			Vector3 pos = GetMousePos(p);
+			std::cout << pos.str() << std::endl;
+			if (selectedTriangle) { selectedTriangle->selected = false; }
+			selectedTriangle = nullptr;
+			for (auto& e : Render::entities) {
+				for (Triangle& t : e->mesh->drawnTriangles) {
+					if (t.contains_point(pos)) { 
+						selectedTriangle = &t; 
+						break; 
+					}
+				}
+			}
+			if (selectedTriangle) { selectedTriangle->selected = true; }
+		}, "select_triangle", olc::NONE, 0, 0, 0, 0,
+		"Selects a triangle at the mouse position"));
+
 		//inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 		//	Vector3 pos = GetMousePos(p);
 		//	if (selectedEntity) {
@@ -344,24 +347,24 @@ namespace Input {
 		}
 		
 		if (p->GetKey(olc::F).bPressed) { selectedEntity = Render::entities[0]; }
-		
-		if (selectedEntity) {
-			std::string text = "ID: " + std::to_string(selectedEntity->id) + "\tTag: " + selectedEntity->tag + "\n";
-			text += "Position:" + selectedEntity->position.str() + "\nRotation:" + selectedEntity->rotation.str() + "\nScale:" + selectedEntity->scale.str() + "\n";
-			//NOTE this checks if possible and casts Entity* to PhysEntity*
-			if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
-				text += "Is Static: "; text += entity->bStatic ? "true" : "false"; text += "\nMass: " + std::to_string(entity->mass) + "\n";
-				text += "Velocity:" + entity->velocity.str() + " " + std::to_string(entity->velocity.mag()) + "\nAcceleration:" + entity->acceleration.str() + "\n";
-				text += "rotVelocity:" + entity->rotVelocity.str() + "\nrotAcceleration:" + entity->rotAcceleration.str() + "\n";
-			}
-			
-			p->DrawStringDecal(olc::vf2d(0, 0), text);
-		}
-		
+
+		//if (selectedEntity) {
+		//	std::string text = "ID: " + std::to_string(selectedEntity->id) + "\tTag: " + selectedEntity->tag + "\n";
+		//	text += "Position:" + selectedEntity->position.str() + "\nRotation:" + selectedEntity->rotation.str() + "\nScale:" + selectedEntity->scale.str() + "\n";
+		//	//NOTE this checks if possible and casts Entity* to PhysEntity*
+		//	if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
+		//		text += "Is Static: "; text += entity->bStatic ? "true" : "false"; text += "\nMass: " + std::to_string(entity->mass) + "\n";
+		//		text += "Velocity:" + entity->velocity.str() + " " + std::to_string(entity->velocity.mag()) + "\nAcceleration:" + entity->acceleration.str() + "\n";
+		//		text += "rotVelocity:" + entity->rotVelocity.str() + "\nrotAcceleration:" + entity->rotAcceleration.str() + "\n";
+		//	}
+		//
+		//	p->DrawStringDecal(olc::vf2d(0, 0), text);
+		//}
+
 		//point debugging
-		/*if (selectedEntity) {
+		if (selectedEntity) {
 			int i = 0;
-			for (auto& pa : selectedEntity->mesh->drawnTriangles_Debug) {
+			for (auto& pa : selectedEntity->mesh->drawnTriangles) {
 				p->DrawString(olc::vd2d(1, i * 9),
 					"Triangle " + std::to_string(i) + ": " +
 					Math::append_decimal(std::to_string(pa.proj_points[0].x)) + "x " + Math::append_decimal(std::to_string(pa.proj_points[0].y)) + "y " + Math::append_decimal(std::to_string(pa.proj_points[0].z)) + "z " +
@@ -372,8 +375,8 @@ namespace Input {
 			}
 
 			//p->DrawStringDecal(olc::vf2d(0, 0), text);
-		}*/
-		
+		}
+
 		//point debugging
 		//if (selectedEntity) {
 		//	for (int i = 0; i < selectedEntity->mesh.triangles.size(); i++) {
