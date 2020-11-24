@@ -13,7 +13,6 @@ struct Triangle {
 	Vector3 proj_points[3];
 	Vector3 proj_persistent[3];
 
-
 	//maybe edges can be cleared when they're not actually needed,
 	//and only spawned when used?
 	Edge edges[3];
