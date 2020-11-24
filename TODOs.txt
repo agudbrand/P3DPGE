@@ -115,7 +115,7 @@ Tags: TODOP, input
 set up pausing to also pause moving/rotating objects manually
 
 ~~~~~~~ TODO 13 ~~~~~~~
-Input.h, Line: 320
+Input.h, Line: 321
 Creator: delle
 ----------------------
 Date: 11/17/20
@@ -180,7 +180,7 @@ Tags: TODOP
 find a good place to update edge, probably in Triangle?
 
 ~~~~~~~ TODO 21 ~~~~~~~
-Mesh.h, Line: 120
+Mesh.h, Line: 131
 Creator: delle
 ----------------------
 Date: 11/22/20
@@ -190,7 +190,7 @@ abstract out Mesh and split into Mesh2D and Mesh3D
 
 ~~~~~~~ TODO 22 ~~~~~~~
 Title:  Implement Clipping Algorithm
-Mesh.h, Line: 265
+Mesh.h, Line: 273
 Creator:  sushi
 ----------------------
 Date:  11/15/2020
@@ -199,7 +199,7 @@ Tags: TODOP, GitIssue, render, severe
 mesh Javid\'s clipping algorithm with what we already have set up, also rewatch his video to fix the camera not moving the clipping plane.
 
 ~~~~~~~ TODO 23 ~~~~~~~
-Mesh.h, Line: 330
+Mesh.h, Line: 338
 Creator:  sushi
 ----------------------
 Tags: TODOP, clean up
@@ -225,7 +225,7 @@ Tags: TODOP, unimportant, physics, optimization
 this could maybe be optimized by having an id counter instead of checking back element
 
 ~~~~~~~ TODO 26 ~~~~~~~
-Render.h, Line: 75
+Render.h, Line: 88
 Creator:  sushi
 ----------------------
 Date:  11/18/2020
