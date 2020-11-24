@@ -68,7 +68,7 @@ namespace Debug {
 	}
 
 	//Sends a yellow message to console
-	static void Message(olc::PixelGameEngine* p, std::string& str) {
+	static void Message(olc::PixelGameEngine* p, const std::string& str) {
 		color = 6;
 		SetConsoleTextAttribute(hConsole, color);
 		std::cout << str << std::endl;

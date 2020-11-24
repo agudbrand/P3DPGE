@@ -53,7 +53,7 @@ namespace Render {
 			0,					  0,	  farz / (farz - nearz),			1,
 			0,					  0,	  (-farz * nearz) / (farz - nearz), 0
 		};
-
+		
 		return proj;
 	}
 
@@ -65,6 +65,19 @@ namespace Render {
 		for (auto& e : entities) {
 			e->mesh->Update(camera.position, ProjectionMatrix(p), view);
 			e->Draw(p, wireframe);
+
+			//draw normal lines
+			//this really needs to be somewhere else
+			for (Triangle t : e->mesh->drawnTriangles) {
+				//Line3 line = Line3(t.midpoint() + t.get_normal(), -1, t.midpoint());
+				//Line3 line2 = Line3(t.midpoint(), -1, V3ZERO);
+				//line.color = olc::RED;
+				//line2.color = olc::CYAN;
+				//line.mesh->Update(camera.position, ProjectionMatrix(p), view);
+				//line.Draw(p);
+				//line2.mesh->Update(camera.position, ProjectionMatrix(p), view);
+				//line2.Draw(p);
+			}
 		}
 
 		//debug

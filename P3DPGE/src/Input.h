@@ -174,7 +174,6 @@ namespace Input {
 
 		//could set this up to only select triangles from a selected entity
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-
 			Vector3 pos = GetMousePos(p);
 			std::cout << pos.str() << std::endl;
 			if (selectedTriangle) { selectedTriangle->selected = false; }
@@ -291,6 +290,8 @@ namespace Input {
 			Vector3 forward = Render::camera.lookDir * 8 * deltaTimePtr;
 			Render::camera.position -= forward;
 		}
+		
+		if (p->GetKey(olc::Z).bPressed) { Render::camera.position = V3ZERO; Render::yaw = 0; }
 		
 		//rotation
 		if (p->GetKey(olc::RIGHT).bHeld) { Render::yaw -= 50 * deltaTimePtr; }

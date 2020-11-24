@@ -54,39 +54,39 @@ class Vector3 {
 		this->z = 0;
 	}
 	
-	Vector3 operator +  (const Vector3& rhs)		const { return Vector3(this->x + rhs.x, this->y + rhs.y, this->z + rhs.z); }
-	Vector3 operator -  (const Vector3& rhs)		const { return Vector3(this->x - rhs.x, this->y - rhs.y, this->z - rhs.z); }
-	Vector3 operator *  (const float& rhs)			const { return Vector3(this->x * rhs, this->y * rhs, this->z * rhs); }
-	Vector3 operator *  (const Vector3& rhs)		const { return Vector3(this->x * rhs.x, this->y * rhs.y, this->z * rhs.z); }
-	Vector3 operator *  (const mat<float, 4, 4> rhs) { mat<float, 1, 4> v{ x,y,z,1 }; return GetM1x4ToVector3(v * rhs); }
-	Vector3 operator /  (const float& rhs)			const { return Vector3(this->x / rhs, this->y / rhs, this->z / rhs); }
-	Vector3 operator /  (const Vector3& rhs)		const { return Vector3(this->x / rhs.x, this->y / rhs.y, this->z / rhs.z); }
-	Vector3 operator += (const Vector3& rhs) { this->x += rhs.x; this->y += rhs.y; this->z += rhs.z; return *this; }
-	Vector3 operator -= (const Vector3& rhs) { this->x -= rhs.x; this->y -= rhs.y; this->z -= rhs.z; return *this; }
-	Vector3 operator *= (const mat<float, 4, 4> rhs) { mat<float, 1, 4> v{ x,y,z,1 }; return GetM1x4ToVector3(v * rhs); }
-	Vector3 operator /= (const float& rhs) { this->x /= rhs; this->y /= rhs; this->z /= rhs; return *this; }
-	Vector3 operator +  ()							const { return { +x, +y, +z }; }
-	Vector3 operator -  ()							const { return { -x, -y, -z }; }
-	bool operator	 == (const Vector3& rhs)		const { return (this->x == rhs.x && this->y == rhs.y && this->z == rhs.z); }
-	bool operator	 != (const Vector3& rhs)		const { return (this->x != rhs.x || this->y != rhs.y || this->z != rhs.z); }
+	Vector3 operator +  (const Vector3& rhs)		const	{ return Vector3(this->x + rhs.x, this->y + rhs.y, this->z + rhs.z); }
+	Vector3 operator -  (const Vector3& rhs)		const	{ return Vector3(this->x - rhs.x, this->y - rhs.y, this->z - rhs.z); }
+	Vector3 operator *  (const float& rhs)			const	{ return Vector3(this->x * rhs, this->y * rhs, this->z * rhs); }
+	Vector3 operator *  (const Vector3& rhs)		const	{ return Vector3(this->x * rhs.x, this->y * rhs.y, this->z * rhs.z); }
+	Vector3 operator *  (const mat<float, 4, 4> rhs)		{ mat<float, 1, 4> v{ x,y,z,1 }; return GetM1x4ToVector3(v * rhs); }
+	Vector3 operator /  (const float& rhs)			const	{ return Vector3(this->x / rhs, this->y / rhs, this->z / rhs); }
+	Vector3 operator /  (const Vector3& rhs)		const	{ return Vector3(this->x / rhs.x, this->y / rhs.y, this->z / rhs.z); }
+	Vector3 operator += (const Vector3& rhs)				{ this->x += rhs.x; this->y += rhs.y; this->z += rhs.z; return *this; }
+	Vector3 operator -= (const Vector3& rhs)				{ this->x -= rhs.x; this->y -= rhs.y; this->z -= rhs.z; return *this; }
+	Vector3 operator *= (const mat<float, 4, 4> rhs)		{ mat<float, 1, 4> v{ x,y,z,1 }; return GetM1x4ToVector3(v * rhs); }
+	Vector3 operator /= (const float& rhs)					{ this->x /= rhs; this->y /= rhs; this->z /= rhs; return *this; }
+	Vector3 operator +  ()							const	{ return { +x, +y, +z }; }
+	Vector3 operator -  ()							const	{ return { -x, -y, -z }; }
+	bool operator	 == (const Vector3& rhs)		const	{ return (this->x == rhs.x && this->y == rhs.y && this->z == rhs.z); }
+	bool operator	 != (const Vector3& rhs)		const	{ return (this->x != rhs.x || this->y != rhs.y || this->z != rhs.z); }
 	
-	float				dot(const Vector3& rhs)		const { return this->x * rhs.x + this->y * rhs.y + this->z * rhs.z; }
-	Vector3				cross(const Vector3& rhs)	const { return Vector3(this->y * rhs.z - rhs.y * this->z, this->x * rhs.z - rhs.x * this->z, this->x * rhs.y - rhs.x * this->y); }
-	float				mag()						const { return std::sqrtf(x * x + y * y + z * z); }
-	const std::string	str()						const { return std::string("(") + std::to_string(this->x) + "," + std::to_string(this->y) + "," + std::to_string(this->z) + ")"; }
-	Vector3				normalized() { return *this == V3ZERO ? V3ZERO : *this / this->mag(); }
-	void				normalize() { *this == V3ZERO ? *this = V3ZERO : *this = *this / this->mag(); }
-	Vector3				clampMag(float& rhs) { return this->normalized() * rhs; }
-	float				distanceTo(Vector3& rhs) { return (*this - rhs).mag(); }
-	float				projectOn(Vector3& rhs) { return this->dot(rhs.normalized()); }
-	Vector3				componentOn(Vector3& rhs) { return rhs.normalized() * this->dot(rhs.normalized()); }
-	Vector3				xComp() { return Vector3(x, 0, 0); }
-	Vector3				yComp() { return Vector3(0, y, 0); }
-	Vector3				zComp() { return Vector3(0, 0, z); }
-	Vector3				xInvert() { return Vector3(-x, y, z); }
-	Vector3				yInvert() { return Vector3(x, -y, z); }
-	Vector3				zInvert() { return Vector3(x, y, -z); }
-	olc::vd2d			Vector3Tovd2d() { return olc::vd2d(x, y); }
+	float				dot(const Vector3& rhs)		const	{ return this->x * rhs.x + this->y * rhs.y + this->z * rhs.z; }
+	Vector3				cross(const Vector3& rhs)	const	{ return Vector3(this->y * rhs.z - rhs.y * this->z, this->x * rhs.z - rhs.x * this->z, this->x * rhs.y - rhs.x * this->y); }
+	float				mag()						const	{ return std::sqrtf(x * x + y * y + z * z); }
+	const std::string	str()						const	{ return std::string("(") + std::to_string(this->x) + "," + std::to_string(this->y) + "," + std::to_string(this->z) + ")"; }
+	Vector3				normalized()						{ return *this == V3ZERO ? V3ZERO : *this / this->mag(); }
+	void				normalize()							{ *this == V3ZERO ? *this = V3ZERO : *this = *this / this->mag(); }
+	Vector3				clampMag(float& rhs)				{ return this->normalized() * rhs; }
+	float				distanceTo(Vector3& rhs)			{ return (*this - rhs).mag(); }
+	float				projectOn(Vector3& rhs)				{ return this->dot(rhs.normalized()); }
+	Vector3				componentOn(Vector3& rhs)			{ return rhs.normalized() * this->dot(rhs.normalized()); }
+	Vector3				xComp()								{ return Vector3(x, 0, 0); }
+	Vector3				yComp()								{ return Vector3(0, y, 0); }
+	Vector3				zComp()								{ return Vector3(0, 0, z); }
+	Vector3				xInvert()							{ return Vector3(-x, y, z); }
+	Vector3				yInvert()							{ return Vector3(x, -y, z); }
+	Vector3				zInvert()							{ return Vector3(x, y, -z); }
+	olc::vd2d			Vector3Tovd2d()						{ return olc::vd2d(x, y); }
 	
 	//conversions between qvm's matrices and our vectors and a special mult function
 	mat<float, 1, 4> ConvertToM1x4() {

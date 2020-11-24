@@ -59,16 +59,19 @@ struct Triangle {
 	Vector3 get_normal() {
 		Vector3 l1 = points[1] - points[0];
 		Vector3 l2 = points[2] - points[0];
-		return l2.cross(l1).normalized();
+		return l1.cross(l2).yInvert().normalized();
 	}
 	
 	Vector3 get_proj_normal() {
 		Vector3 l1 = proj_points[1] - proj_points[0];
 		Vector3 l2 = proj_points[2] - proj_points[0];
-		return l2.cross(l1).normalized();
+		return l1.cross(l2).yInvert().normalized();
 	}
 	
 	//checks if a triangle contains a point in screen space
+	//this works by forming a line between each point on the triangle
+	//and checks to see if the test point is within the region enclosed
+	//by those three lines
 	bool contains_point(Vector3 point) {
 		
 		update_edges();
@@ -105,6 +108,7 @@ struct Triangle {
 		
 	}
 
+	//debug
 	void display_edges(olc::PixelGameEngine* p) {
 		update_edges();
 
@@ -114,6 +118,14 @@ struct Triangle {
 			n++;
 		}
 		
+	}
+
+	Vector3 midpoint() {
+		float x_mid = (points[0].x + points[1].x + points[2].x) / 3;
+		float y_mid = (points[0].y + points[1].y + points[2].y) / 3;
+		float z_mid = (points[0].z + points[1].z + points[2].z) / 3;
+
+		return Vector3(x_mid, y_mid, z_mid);
 	}
 };
 
@@ -145,10 +157,8 @@ class Mesh {
 		else {
 			for (int v = 0; v < points.size(); v += 3){
 				triangles.push_back(Triangle(points[v], points[v + 1], points[v + 2]));
-				
 			}
 		}
-		
 	}
 	
 	void Update(Vector3 camPos, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
@@ -157,11 +167,6 @@ class Mesh {
 		this->view = view;
 	}
 
-	//NOTE sushi: there is a serious disconnect between drawing and interacting with triangles currently
-	//		because of the way scaling to screen sapce works, it's hard to bridge the gap between interacting with 
-	//		triangles and then drawing them to the screen as the information stored on the triangles themselves
-	//		does not translate to the drawn triangles but the drawn triangles are the only ones we can 
-	//		actually interact with in screenspace so there must be a way to bridge this gap else trouble :/
 	virtual void Draw(olc::PixelGameEngine* p, Vector3 pos, bool wireframe = false, olc::Pixel color = olc::WHITE) {
 		std::vector<Triangle> visibleTriangles;
 		
@@ -173,9 +178,10 @@ class Mesh {
 		//store triangles we want to draw for sorting and copy world points to projected points
 		for (auto& t : triangles) {
 			t.copy_points();
-			if (t.get_proj_normal().dot(t.points[0] - camPos) > 0) {
+			if (t.get_normal().dot(t.midpoint() - camPos) < 0) {
+				
 				float dp = light_direction.dot(t.get_normal());
-				t.set_color(olc::Pixel(50 * abs(dp), 75 * abs(dp), 200 * abs(dp)));
+				//t.set_color(olc::Pixel(50 * abs(dp), 75 * abs(dp), 200 * abs(dp)));
 				visibleTriangles.push_back(t);
 			}
 		}
@@ -199,6 +205,7 @@ class Mesh {
 			}
 		}
 		
+		//sorting is done based off world z not camera z
 		std::sort(drawnTriangles.begin(), drawnTriangles.end(), [](Triangle& t1, Triangle& t2) {
 			float mp1 = (t1.points[0].z + t1.points[1].z + t1.points[2].z) / 3;
 			float mp2 = (t2.points[0].z + t2.points[1].z + t2.points[2].z) / 3;
@@ -207,7 +214,9 @@ class Mesh {
 
 		for (Triangle& t : drawnTriangles) {
 			t.copy_persistent();
-			t.display_edges(p);
+			//t.display_edges(p);
+
+
 
 			Triangle clipped[2];
 			std::list<Triangle> listTriangles;
