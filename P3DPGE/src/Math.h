@@ -88,6 +88,12 @@ class Vector3 {
 	Vector3				zInvert()							{ return Vector3(x, y, -z); }
 	olc::vd2d			Vector3Tovd2d()						{ return olc::vd2d(x, y); }
 	
+	const std::string str2F() {
+		char buffer[50];
+		std::snprintf(buffer, 50, "(%-.2f, %-.2f, %-.2f)", this->x, this->y, this->z);
+		return std::string(buffer);
+	}
+	
 	//conversions between qvm's matrices and our vectors and a special mult function
 	mat<float, 1, 4> ConvertToM1x4() {
 		mat<float, 1, 4> m;

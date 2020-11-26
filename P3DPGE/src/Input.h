@@ -99,22 +99,23 @@ struct InputAction {
 };
 
 namespace Input {
-	static std::vector<InputAction> inputActions;
+	global_variable std::vector<InputAction> inputActions;
 	
-	static Entity* selectedEntity;
-	static Triangle* selectedTriangle;
-	static Vector3 leftClickPos = V3NULL;
+	internal Entity* selectedEntity;
+	internal Triangle* selectedTriangle;
+	internal Vector3 leftClickPos = V3NULL;
 	
-	static Vector3 GetMousePos(olc::PixelGameEngine* p) {
+	internal Vector3 GetMousePos(olc::PixelGameEngine* p) {
 		return Vector3(p->GetMouseX(), p->GetMouseY(), 0);
 	}
 	
 	static void Init() {
 		inputActions = std::vector<InputAction>();
 		//NOTE InputAction: function, name, key, mouseButton, inputState, shift, ctrl, description
-		
+	//// time control ////
+
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-			//Time::deltaTime = 0;
+			Time::deltaTime = 0;
 			//TODO(i, sushi) set up pausing to also pause moving/rotating objects manually
 		}, "pause_game_held", olc::P, -1, 1, 0, 0,
 		"Pauses the game while button is held."));
@@ -130,6 +131,8 @@ namespace Input {
 			Physics::frame = !Physics::frame;
 		}, "next_frame", olc::F, -1, 0, 0, 0,
 		"Advances to the next frame if paused."));
+
+	//// object spawning ////
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Vector3 pos = GetMousePos(p);
@@ -169,8 +172,82 @@ namespace Input {
 			Physics::AddEntity(box);
 			Render::AddEntity(box);
 			std::cout << "Creating Box at: " + pos.str() << std::endl;
-		}, "spawn_complex", olc::E, -1, 0, 0, 0,
+		}, "spawn_box", olc::E, -1, 0, 0, 0,
 		"Spawns a box at (0,0,3)"));
+
+	//// object movement ////
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			for (auto& e : Render::entities) {
+				e->rotation.x = 40 * Time::deltaTime;
+				e->RotateX();
+			}
+			std::cout << "Rotating everything in the positive x" << std::endl;
+			}, "rotate_+x", olc::J, -1, 1, 0, 0,
+		"Rotates all objects around the global x-axis in the positive direction"));
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			for (auto& e : Render::entities) {
+				e->rotation.y = 40 * Time::deltaTime;
+				e->RotateY();
+			}
+			std::cout << "Rotating everything in the positive y" << std::endl;
+			}, "rotate_+y", olc::K, -1, 1, 0, 0,
+		"Rotates all objects around the global y-axis in the positive direction"));
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			for (auto& e : Render::entities) {
+				e->rotation.z = 40 * Time::deltaTime;
+				e->RotateZ();
+			}
+			std::cout << "Rotating everything in the positive z" << std::endl;
+			}, "rotate_+z", olc::L, -1, 1, 0, 0,
+		"Rotates all objects around the global z-axis in the positive direction"));
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			for (auto& e : Render::entities) {
+				e->rotation.x = -40 * Time::deltaTime;
+				e->RotateX();
+			}
+			std::cout << "Rotating everything in the negative x" << std::endl;
+			}, "rotate_-x", olc::M, -1, 1, 0, 0,
+		"Rotates all objects around the global x-axis in the negative direction"));
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			for (auto& e : Render::entities) {
+				e->rotation.y = -40 * Time::deltaTime;
+				e->RotateY();
+			}
+			std::cout << "Rotating everything in the negative y" << std::endl;
+			}, "rotate_-y", olc::COMMA, -1, 1, 0, 0,
+		"Rotates all objects around the global y-axis in the negative direction"));
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			for (auto& e : Render::entities) {
+				e->rotation.z = -40 * Time::deltaTime;
+				e->RotateZ();
+			}
+			std::cout << "Rotating everything in the negative z" << std::endl;
+			}, "rotate_-z", olc::PERIOD, -1, 1, 0, 0,
+		"Rotates all objects around the global z-axis in the negative direction"));
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			for (auto& e : Render::entities) {
+				e->Translate(Vector3(0, 0, 10 * Time::deltaTime));
+			}
+			std::cout << "Translate everything in the positive z" << std::endl;
+			}, "translate_+z", olc::U, -1, 1, 0, 0,
+		"Translates all objects along the positive global z-axis"));
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			for (auto& e : Render::entities) {
+				e->Translate(Vector3(0, 0, -10 * Time::deltaTime));
+			}
+			std::cout << "Translate everything in the negative z" << std::endl;
+			}, "translate_-z", olc::I, -1, 1, 0, 0,
+		"Translates all objects along the negative global z-axis"));
+
+	//// object selection ////
 
 		//could set this up to only select triangles from a selected entity
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
@@ -199,104 +276,80 @@ namespace Input {
 		//	}
 		//
 		//))
+
+	//// camera movement ////
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			Render::camera.position.y -= 8 * Time::deltaTime;
+			std::cout << "Translating the camera in the positive y" << std::endl;
+			}, "camera_translate_+y", olc::W, -1, 1, 0, 0,
+		"Translates the camera along the positive global y-axis"));
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			Render::camera.position.y += 8 * Time::deltaTime;
+			std::cout << "Translating the camera in the negative y" << std::endl;
+			}, "camera_translate_-y", olc::S, -1, 1, 0, 0,
+		"Translates the camera along the negative global y-axis"));
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			Render::camera.position.x -= 8 * Time::deltaTime;
+			std::cout << "Translating the camera in the negative x" << std::endl;
+			}, "camera_translate_-x", olc::A, -1, 1, 0, 0,
+		"Translates the camera along the negative global x-axis"));
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			Render::camera.position.x += 8 * Time::deltaTime;
+			std::cout << "Translating the camera in the positive x" << std::endl;
+			}, "camera_translate_+x", olc::D, -1, 1, 0, 0,
+		"Translates the camera along the positive global y-axis"));
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			Render::camera.position += Render::camera.lookDir * 8 * Time::deltaTime;
+			std::cout << "Translating the camera forward" << std::endl;
+			}, "camera_translate_forward", olc::UP, -1, 1, 0, 0,
+		"Translates the camera along the positive local z-axis"));
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			Render::camera.position -= Render::camera.lookDir * 8 * Time::deltaTime;
+			std::cout << "Translating the camera backward" << std::endl;
+			}, "camera_translate_backward", olc::DOWN, -1, 1, 0, 0,
+		"Translates the camera along the negative local z-axis"));
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			Render::yaw -= 50 * Time::deltaTime;
+			std::cout << "Turning the camera right" << std::endl;
+			}, "camera_turn_right", olc::RIGHT, -1, 1, 0, 0,
+		"Rotates the camera along its local y-axis (yaw) in the positive direction"));
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			Render::yaw += 50 * Time::deltaTime;
+			std::cout << "Turning the camera left" << std::endl;
+			}, "camera_turn_left", olc::LEFT, -1, 1, 0, 0,
+		"Rotates the camera along its local y-axis (yaw) in the negative direction"));
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			Render::camera.position = V3ZERO; 
+			Render::yaw = 0;
+			std::cout << "Resetting camera to pos: (0,0,0) and yaw: 0" << std::endl;
+			}, "camera_reset", olc::Z, -1, 0, 0, 0,
+		"Resets the camera to position: (0,0,0) and yaw: 0"));
+
+	//// render options ////
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			Render::wireframe = !Render::wireframe;
+			std::string output = (Render::wireframe) ? "true" : "false";
+			std::cout << "Toggling wireframe to: " + output << std::endl;
+			}, "toggle_wireframe", olc::C, -1, 0, 0, 0,
+		"Toggles whether the wireframe of objects should be rendered"));
+
 	}
 	
 	static void Update(olc::PixelGameEngine* p, float& deltaTimePtr) {
 		for (InputAction action : inputActions) {
 			action.Update(p);
 		}
-		
-		////    Keyboard Input    /////
-		//G press = pause
-		if (p->GetKey(olc::G).bHeld) {
-			deltaTimePtr = 0;
-		}
-		
-		//rotation over axes
-		if (p->GetKey(olc::J).bHeld) {
-			for (auto& e : Render::entities) {
-				e->rotation.x = 40 * deltaTimePtr;
-				e->RotateX();
-			}
-		}
-		
-		//K held = rotate everything in the positive y
-		if (p->GetKey(olc::K).bHeld) {
-			for (auto& e : Render::entities) {
-				e->rotation.y = 40 * deltaTimePtr;
-				e->RotateY();
-			}
-		}
-		
-		//L held = rotate everything in the positive z
-		if (p->GetKey(olc::L).bHeld) {
-			for (auto& e : Render::entities) {
-				e->rotation.z = 40 * deltaTimePtr;
-				e->RotateZ();
-			}
-		}
-		
-		//M held = rotate everything in the negative x
-		if (p->GetKey(olc::M).bHeld) {
-			for (auto& e : Render::entities) {
-				e->rotation.x = -40 * deltaTimePtr;
-				e->RotateX();
-			}
-		}
-		
-		//COMMA held = rotate everything in the negative y
-		if (p->GetKey(olc::COMMA).bHeld) {
-			for (auto& e : Render::entities) {
-				e->rotation.y = -40 * deltaTimePtr;
-				e->RotateY();
-			}
-		}
-		
-		//PERIOD held = rotate everything in the negative z
-		if (p->GetKey(olc::PERIOD).bHeld) {
-			for (auto& e : Render::entities) {
-				e->rotation.z = -40 * deltaTimePtr;
-				e->RotateZ();
-			}
-		}
-		
-		//NOTE(sushi) don't bind things to shift/ctrl
-		//U held = translate everything in positive z
-		if (p->GetKey(olc::U).bHeld) {
-			for (auto& e : Render::entities) {
-				e->Translate(Vector3(0, 0, 10 * deltaTimePtr));
-			}
-		}
-		
-		//I held = translate everything in negative z
-		if (p->GetKey(olc::I).bHeld) {
-			for (auto& e : Render::entities) {
-				e->Translate(Vector3(0, 0, -10 * deltaTimePtr));
-			}
-		}
-		
-		//Camera movement
-		
-		//translation
-		if (p->GetKey(olc::W).bHeld) { Render::camera.position.y -= 8 * deltaTimePtr; }
-		if (p->GetKey(olc::S).bHeld) { Render::camera.position.y += 8 * deltaTimePtr; }
-		if (p->GetKey(olc::A).bHeld) { Render::camera.position.x -= 8 * deltaTimePtr; }
-		if (p->GetKey(olc::D).bHeld) { Render::camera.position.x += 8 * deltaTimePtr; }
-		if (p->GetKey(olc::UP).bHeld) {
-			Vector3 forward = Render::camera.lookDir * 8 * deltaTimePtr;
-			Render::camera.position += forward;
-		}
-		if (p->GetKey(olc::DOWN).bHeld) {
-			Vector3 forward = Render::camera.lookDir * 8 * deltaTimePtr;
-			Render::camera.position -= forward;
-		}
-		
-		if (p->GetKey(olc::Z).bPressed) { Render::camera.position = V3ZERO; Render::yaw = 0; }
-		
-		//rotation
-		if (p->GetKey(olc::RIGHT).bHeld) { Render::yaw -= 50 * deltaTimePtr; }
-		if (p->GetKey(olc::LEFT).bHeld) { Render::yaw += 50 * deltaTimePtr; }
-		
+
 		////    Mouse Input    /////
 		
 		//LMB press = set click position
@@ -390,8 +443,6 @@ namespace Input {
 		//		);
 		//	}
 		//}
-		
-		if (p->GetKey(olc::C).bPressed) { Render::wireframe = !Render::wireframe; }
 	}
 	
 	//NOTE: selected entity should never point to a NEW object, since Input shouldnt own that object

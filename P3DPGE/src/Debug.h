@@ -1,16 +1,25 @@
 #pragma once
+
 #include "olcPixelGameEngine.h"
 #include <string>
 #include <iostream>
 #include <cstdarg>
 #include <windows.h>
+#include <cstdio>
+
+#define internal static
+#define local_persist static 
+#define global_variable static
 
 namespace Debug {
-
-	namespace {
-		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);;
-		int color = 7;
+	internal HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);;
+	internal int color = 7;
+	internal void ResetCmd() { //resets cmd font color to white
+		color = 7;
+		SetConsoleTextAttribute(hConsole, color);
 	}
+
+	////Console Output////
 
 	/*static void Print(std::string& str, ...) {
 		const char* fmt = str.c_str();
@@ -32,10 +41,10 @@ namespace Debug {
 						int decimals = std::atoi(++fmt);
 					}
 				}
-			} 
+			}
 			++fmt;
 		}
-		
+
 		va_end(args);
 	}*/
 
@@ -54,8 +63,7 @@ namespace Debug {
 		color = 4;
 		SetConsoleTextAttribute(hConsole, color);
 		std::cout << str << std::endl;
-		color = 7;
-		SetConsoleTextAttribute(hConsole, color);
+		ResetCmd();
 	}
 
 	//Sends a red string literal to the console
@@ -63,8 +71,7 @@ namespace Debug {
 		color = 4;
 		SetConsoleTextAttribute(hConsole, color);
 		std::cout << str << std::endl;
-		color = 7;
-		SetConsoleTextAttribute(hConsole, color);
+		ResetCmd();
 	}
 
 	//Sends a yellow message to console
@@ -72,8 +79,7 @@ namespace Debug {
 		color = 6;
 		SetConsoleTextAttribute(hConsole, color);
 		std::cout << str << std::endl;
-		color = 7;
-		SetConsoleTextAttribute(hConsole, color);
+		ResetCmd();
 	}
 
 	//Sends a yellow string literal to console
@@ -81,8 +87,7 @@ namespace Debug {
 		color = 6;
 		SetConsoleTextAttribute(hConsole, color);
 		std::cout << str << std::endl;
-		color = 7;
-		SetConsoleTextAttribute(hConsole, color);
+		ResetCmd();
 	}
 
 	//Sends a green message to console
@@ -90,8 +95,7 @@ namespace Debug {
 		color = 2;
 		SetConsoleTextAttribute(hConsole, color);
 		std::cout << str << std::endl;
-		color = 7;
-		SetConsoleTextAttribute(hConsole, color);
+		ResetCmd();
 	}
 
 	//Sends a green string literal to console
@@ -99,8 +103,7 @@ namespace Debug {
 		color = 2;
 		SetConsoleTextAttribute(hConsole, color);
 		std::cout << str << std::endl;
-		color = 7;
-		SetConsoleTextAttribute(hConsole, color);
+		ResetCmd();
 	}
 
 };

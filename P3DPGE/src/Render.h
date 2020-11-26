@@ -82,7 +82,7 @@ namespace Render {
 
 		//debug
 		//p->DrawStringDecal(olc::vf2d(0, p->ScreenHeight() - 10), "Mouse Pos: " + p->GetMousePos().str());
-		p->DrawStringDecal(olc::vf2d(0, p->ScreenHeight() - 10), "Camera Pos: " + camera.position.str());
+		p->DrawStringDecal(olc::vf2d(p->ScreenWidth()-300, p->ScreenHeight() - 10), "Camera: " + camera.position.strScientific());
 	}
 
 	static void Cleanup() {

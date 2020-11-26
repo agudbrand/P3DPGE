@@ -10,16 +10,14 @@
 //} static deltaTimeException;
 
 namespace Time {
-	static float deltaTime;
-	static float totalTime;
-	static int64_t updateCount;
+	global_variable float deltaTime;
+	global_variable float totalTime;
+	global_variable int64_t updateCount;
 
-	static float fixedTimeStep;
-	static float fixedDeltaTime;
+	global_variable float fixedTimeStep;
+	global_variable float fixedDeltaTime;
 
-	namespace { //private variables
-		static float fixedCounter;
-	}
+	internal float fixedCounter;
 
 	static void Init() {
 		deltaTime = 0;
