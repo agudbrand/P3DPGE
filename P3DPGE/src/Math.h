@@ -53,6 +53,12 @@ class Vector3 {
 		this->y = y;
 		this->z = 0;
 	}
+
+	Vector3(const olc::vf2d& vector2) {
+		this->x = vector2.x;
+		this->y = vector2.y;
+		this->z = 0;
+	}
 	
 	Vector3 operator +  (const Vector3& rhs)		const	{ return Vector3(this->x + rhs.x, this->y + rhs.y, this->z + rhs.z); }
 	Vector3 operator -  (const Vector3& rhs)		const	{ return Vector3(this->x - rhs.x, this->y - rhs.y, this->z - rhs.z); }

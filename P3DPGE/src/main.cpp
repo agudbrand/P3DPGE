@@ -60,6 +60,9 @@ public:
 		//input
 		Input::Update(this, Time::deltaTime);
 
+		//physics
+		Physics::Update(Time::fixedDeltaTime);
+
 		//rendering
 		Render::Update(this);
 

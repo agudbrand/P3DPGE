@@ -104,6 +104,7 @@ namespace Input {
 	internal Entity* selectedEntity;
 	internal Triangle* selectedTriangle;
 	internal Vector3 leftClickPos = V3NULL;
+	internal bool debugInput = true;
 	
 	internal Vector3 GetMousePos(olc::PixelGameEngine* p) {
 		return Vector3(p->GetMouseX(), p->GetMouseY(), 0);
@@ -117,18 +118,24 @@ namespace Input {
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Time::deltaTime = 0;
 			//TODO(i, sushi) set up pausing to also pause moving/rotating objects manually
+			if(debugInput) std::cout << "Pausing the engine" << std::endl;
 		}, "pause_game_held", olc::P, -1, 1, 0, 0,
 		"Pauses the game while button is held."));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Render::paused = !Render::paused;
 			Physics::paused = !Physics::paused;
+			if (debugInput) {
+				std::string output = (Render::paused) ? "true" : "false";
+				std::cout << "Toggling paused to " + output << std::endl;
+			}
 		}, "pause_game", olc::SPACE, -1, 0, 0, 0,
 		"Pauses the game on press."));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Render::frame = !Render::frame;
 			Physics::frame = !Physics::frame;
+			if (debugInput) std::cout << "Advancing one frame forward" << std::endl;
 		}, "next_frame", olc::F, -1, 0, 0, 0,
 		"Advances to the next frame if paused."));
 
@@ -141,7 +148,7 @@ namespace Input {
 			sphere->mesh = new CircleMesh(10);
 			Physics::AddEntity(sphere);
 			Render::AddEntity(sphere);
-			std::cout << "Creating Sphere at: " + pos.str() << std::endl;
+			if (debugInput) std::cout << "Creating Sphere at: " + pos.str() << std::endl;
 		}, "spawn_sphere", olc::Q, -1, 0, 0, 0,
 		"Spawns a sphere of radius/mass 10 at the mouse."));
 
@@ -152,7 +159,7 @@ namespace Input {
 			sphere->mesh = new CircleMesh(100);
 			Physics::AddEntity(sphere);
 			Render::AddEntity(sphere);
-			std::cout << "Creating Large Sphere at: " + pos.str() << std::endl;
+			if (debugInput) std::cout << "Creating Large Sphere at: " + pos.str() << std::endl;
 		}, "spawn_sphere_large", olc::Q, -1, 0, 1, 0,
 		"Spawns a large sphere of radius/mass 100 at the mouse."));
 
@@ -161,7 +168,7 @@ namespace Input {
 			selectedEntity = complex;
 			Physics::AddEntity(complex);
 			Render::AddEntity(complex);
-			std::cout << "Creating " + complex->model_name + " at: " + V3ZERO.str() << std::endl;
+			if (debugInput) std::cout << "Creating " + complex->model_name + " at: " + V3ZERO.str() << std::endl;
 		}, "spawn_complex", olc::T, -1, 0, 0, 0,
 		"Spawns a complex object at (0,0,0)"));
 
@@ -171,7 +178,7 @@ namespace Input {
 			selectedEntity = box;
 			Physics::AddEntity(box);
 			Render::AddEntity(box);
-			std::cout << "Creating Box at: " + pos.str() << std::endl;
+			if (debugInput) std::cout << "Creating Box at: " + pos.str() << std::endl;
 		}, "spawn_box", olc::E, -1, 0, 0, 0,
 		"Spawns a box at (0,0,3)"));
 
@@ -182,7 +189,7 @@ namespace Input {
 				e->rotation.x = 40 * Time::deltaTime;
 				e->RotateX();
 			}
-			std::cout << "Rotating everything in the positive x" << std::endl;
+			if (debugInput) std::cout << "Rotating everything in the positive x" << std::endl;
 			}, "rotate_+x", olc::J, -1, 1, 0, 0,
 		"Rotates all objects around the global x-axis in the positive direction"));
 
@@ -191,7 +198,7 @@ namespace Input {
 				e->rotation.y = 40 * Time::deltaTime;
 				e->RotateY();
 			}
-			std::cout << "Rotating everything in the positive y" << std::endl;
+			if (debugInput) std::cout << "Rotating everything in the positive y" << std::endl;
 			}, "rotate_+y", olc::K, -1, 1, 0, 0,
 		"Rotates all objects around the global y-axis in the positive direction"));
 
@@ -200,7 +207,7 @@ namespace Input {
 				e->rotation.z = 40 * Time::deltaTime;
 				e->RotateZ();
 			}
-			std::cout << "Rotating everything in the positive z" << std::endl;
+			if (debugInput) std::cout << "Rotating everything in the positive z" << std::endl;
 			}, "rotate_+z", olc::L, -1, 1, 0, 0,
 		"Rotates all objects around the global z-axis in the positive direction"));
 
@@ -209,7 +216,7 @@ namespace Input {
 				e->rotation.x = -40 * Time::deltaTime;
 				e->RotateX();
 			}
-			std::cout << "Rotating everything in the negative x" << std::endl;
+			if (debugInput) std::cout << "Rotating everything in the negative x" << std::endl;
 			}, "rotate_-x", olc::M, -1, 1, 0, 0,
 		"Rotates all objects around the global x-axis in the negative direction"));
 
@@ -218,7 +225,7 @@ namespace Input {
 				e->rotation.y = -40 * Time::deltaTime;
 				e->RotateY();
 			}
-			std::cout << "Rotating everything in the negative y" << std::endl;
+			if (debugInput) std::cout << "Rotating everything in the negative y" << std::endl;
 			}, "rotate_-y", olc::COMMA, -1, 1, 0, 0,
 		"Rotates all objects around the global y-axis in the negative direction"));
 
@@ -227,7 +234,7 @@ namespace Input {
 				e->rotation.z = -40 * Time::deltaTime;
 				e->RotateZ();
 			}
-			std::cout << "Rotating everything in the negative z" << std::endl;
+			if (debugInput) std::cout << "Rotating everything in the negative z" << std::endl;
 			}, "rotate_-z", olc::PERIOD, -1, 1, 0, 0,
 		"Rotates all objects around the global z-axis in the negative direction"));
 
@@ -235,7 +242,7 @@ namespace Input {
 			for (auto& e : Render::entities) {
 				e->Translate(Vector3(0, 0, 10 * Time::deltaTime));
 			}
-			std::cout << "Translate everything in the positive z" << std::endl;
+			if (debugInput) std::cout << "Translate everything in the positive z" << std::endl;
 			}, "translate_+z", olc::U, -1, 1, 0, 0,
 		"Translates all objects along the positive global z-axis"));
 
@@ -243,7 +250,7 @@ namespace Input {
 			for (auto& e : Render::entities) {
 				e->Translate(Vector3(0, 0, -10 * Time::deltaTime));
 			}
-			std::cout << "Translate everything in the negative z" << std::endl;
+			if (debugInput) std::cout << "Translate everything in the negative z" << std::endl;
 			}, "translate_-z", olc::I, -1, 1, 0, 0,
 		"Translates all objects along the negative global z-axis"));
 
@@ -281,56 +288,56 @@ namespace Input {
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Render::camera.position.y -= 8 * Time::deltaTime;
-			std::cout << "Translating the camera in the positive y" << std::endl;
+			if (debugInput) std::cout << "Translating the camera in the positive y" << std::endl;
 			}, "camera_translate_+y", olc::W, -1, 1, 0, 0,
 		"Translates the camera along the positive global y-axis"));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Render::camera.position.y += 8 * Time::deltaTime;
-			std::cout << "Translating the camera in the negative y" << std::endl;
+			if (debugInput) std::cout << "Translating the camera in the negative y" << std::endl;
 			}, "camera_translate_-y", olc::S, -1, 1, 0, 0,
 		"Translates the camera along the negative global y-axis"));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Render::camera.position.x -= 8 * Time::deltaTime;
-			std::cout << "Translating the camera in the negative x" << std::endl;
+			if (debugInput) std::cout << "Translating the camera in the negative x" << std::endl;
 			}, "camera_translate_-x", olc::A, -1, 1, 0, 0,
 		"Translates the camera along the negative global x-axis"));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Render::camera.position.x += 8 * Time::deltaTime;
-			std::cout << "Translating the camera in the positive x" << std::endl;
+			if (debugInput) std::cout << "Translating the camera in the positive x" << std::endl;
 			}, "camera_translate_+x", olc::D, -1, 1, 0, 0,
 		"Translates the camera along the positive global y-axis"));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Render::camera.position += Render::camera.lookDir * 8 * Time::deltaTime;
-			std::cout << "Translating the camera forward" << std::endl;
+			if (debugInput) std::cout << "Translating the camera forward" << std::endl;
 			}, "camera_translate_forward", olc::UP, -1, 1, 0, 0,
 		"Translates the camera along the positive local z-axis"));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Render::camera.position -= Render::camera.lookDir * 8 * Time::deltaTime;
-			std::cout << "Translating the camera backward" << std::endl;
+			if (debugInput) std::cout << "Translating the camera backward" << std::endl;
 			}, "camera_translate_backward", olc::DOWN, -1, 1, 0, 0,
 		"Translates the camera along the negative local z-axis"));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Render::yaw -= 50 * Time::deltaTime;
-			std::cout << "Turning the camera right" << std::endl;
+			if (debugInput) std::cout << "Turning the camera right" << std::endl;
 			}, "camera_turn_right", olc::RIGHT, -1, 1, 0, 0,
 		"Rotates the camera along its local y-axis (yaw) in the positive direction"));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Render::yaw += 50 * Time::deltaTime;
-			std::cout << "Turning the camera left" << std::endl;
+			if (debugInput) std::cout << "Turning the camera left" << std::endl;
 			}, "camera_turn_left", olc::LEFT, -1, 1, 0, 0,
 		"Rotates the camera along its local y-axis (yaw) in the negative direction"));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Render::camera.position = V3ZERO; 
 			Render::yaw = 0;
-			std::cout << "Resetting camera to pos: (0,0,0) and yaw: 0" << std::endl;
+			if (debugInput) std::cout << "Resetting camera to pos: (0,0,0) and yaw: 0" << std::endl;
 			}, "camera_reset", olc::Z, -1, 0, 0, 0,
 		"Resets the camera to position: (0,0,0) and yaw: 0"));
 
@@ -339,7 +346,7 @@ namespace Input {
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Render::wireframe = !Render::wireframe;
 			std::string output = (Render::wireframe) ? "true" : "false";
-			std::cout << "Toggling wireframe to: " + output << std::endl;
+			if (debugInput) std::cout << "Toggling wireframe to: " + output << std::endl;
 			}, "toggle_wireframe", olc::C, -1, 0, 0, 0,
 		"Toggles whether the wireframe of objects should be rendered"));
 
