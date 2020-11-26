@@ -179,9 +179,8 @@ class Mesh {
 		for (auto& t : triangles) {
 			t.copy_points();
 			if (t.get_normal().dot(t.midpoint() - camPos) < 0) {
-				
 				float dp = light_direction.dot(t.get_normal());
-				//t.set_color(olc::Pixel(50 * abs(dp), 75 * abs(dp), 200 * abs(dp)));
+				t.set_color(olc::Pixel(50 * abs(dp), 75 * abs(dp), 200 * abs(dp)));
 				visibleTriangles.push_back(t);
 			}
 		}
@@ -212,22 +211,21 @@ class Mesh {
 			return mp1 > mp2;
 			});
 
-		for (Triangle& t : drawnTriangles) {
+		//TODO(o, sushi) optimize this for loop 
+		for (Triangle t : drawnTriangles) {
 			t.copy_persistent();
 			//t.display_edges(p);
 
-
-
 			Triangle clipped[2];
-			std::list<Triangle> listTriangles;
+			std::list<Triangle*> listTriangles;
 			
-			listTriangles.push_back(t);
+			listTriangles.push_back(&t);
 			int newTriangles = 1;
 			
 			for (int a = 0; a < 4; a++) {
 				int trisToAdd = 0;
 				while (newTriangles > 0) {
-					Triangle test = listTriangles.front();
+					Triangle test = *listTriangles.front();
 					listTriangles.pop_front();
 					newTriangles--;
 					
@@ -238,20 +236,20 @@ class Mesh {
 					case 3: trisToAdd = ClipTriangles(Vector3((float)p->ScreenHeight() - 1, 0, 0), Vector3(-1, 0, 0), test, clipped[0], clipped[1]); break;
 					}
 
-					for (int w = 0; w < trisToAdd; w++) { clipped[w].set_color(test.get_color()); listTriangles.push_back(clipped[w]); }
+					for (int w = 0; w < trisToAdd; w++) { 
+						clipped[w].set_color(test.get_color()); 
+						listTriangles.push_back(&clipped[w]); 
+					}
 				}
 				newTriangles = listTriangles.size();
 			}
 			
-			for (Triangle& t : listTriangles) {
+			for (Triangle* t : listTriangles) {
 				p->FillTriangle(
-					t.proj_points[0].x, t.proj_points[0].y,
-					t.proj_points[1].x, t.proj_points[1].y,
-					t.proj_points[2].x, t.proj_points[2].y,
-					t.get_color());
-				
-				//std::cout << t.edges[0].edge_normal().str()  << std::endl;
-				
+					t->proj_points[0].x, t->proj_points[0].y,
+					t->proj_points[1].x, t->proj_points[1].y,
+					t->proj_points[2].x, t->proj_points[2].y,
+					t->get_color());
 			}
 		}
 		
@@ -267,11 +265,6 @@ class Mesh {
 		}
 	}//Draw
 	
-	//virtual void Draw(olc::PixelGameEngine* p, )
-	
-	//this function is really complex and i just pulled it from Javid's video
-	//hopefully later i'll try to understand it better
-	//TODO(+rs, sushi, 11/15/2020, Implement Clipping Algorithm) mesh Javid's clipping algorithm with what we already have set up, also rewatch his video to fix the camera not moving the clipping plane.
 	int ClipTriangles(Vector3 plane_p, Vector3 plane_n, Triangle in_tri, Triangle& out_tri1, Triangle& out_tri2) {
 		plane_n.normalize();
 		

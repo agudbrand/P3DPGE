@@ -36,15 +36,12 @@ namespace Render {
 
 	using namespace boost::qvm;
 	//projection matrix
-	//made as function so that if the screen size changes the projection is recalculated
-	//it may be beneficial to store this result and only recalculate when screen size changes
-	//or when FOV is changed or something
 	//this matrix seems to only work well with 1:1 aspect ratios I think its cause FOV is set to 90
 	mat<float, 4, 4> ProjectionMatrix(olc::PixelGameEngine* p) {
 		float nearz = 0.1;
 		float farz = 1000.0;
 		float fov = 90;
-		float aspectRatio = (float)p->ScreenHeight() / (float)p->ScreenWidth();
+		float aspectRatio = (float)p->ScreenWidth() / (float)p->ScreenHeight();
 		float fovRad = 1.0 / tanf(fov * 0.5 / 180.0 * 3.14159);
 
 		mat<float, 4, 4> proj{

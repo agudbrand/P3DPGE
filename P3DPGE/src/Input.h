@@ -104,7 +104,7 @@ namespace Input {
 	internal Entity* selectedEntity;
 	internal Triangle* selectedTriangle;
 	internal Vector3 leftClickPos = V3NULL;
-	internal bool debugInput = true;
+	internal bool debugInput = false;
 	
 	internal Vector3 GetMousePos(olc::PixelGameEngine* p) {
 		return Vector3(p->GetMouseX(), p->GetMouseY(), 0);
@@ -164,7 +164,7 @@ namespace Input {
 		"Spawns a large sphere of radius/mass 100 at the mouse."));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-			Complex* complex = new Complex("objects/whale_ship.obj", 0, V3ZERO);
+			Complex* complex = new Complex("objects/119k_Triangles.obj", 0, V3ZERO);
 			selectedEntity = complex;
 			Physics::AddEntity(complex);
 			Render::AddEntity(complex);
@@ -423,20 +423,19 @@ namespace Input {
 		//}
 
 		//point debugging
-		if (selectedEntity) {
+		/*if (selectedEntity) {
 			int i = 0;
 			for (auto& pa : selectedEntity->mesh->drawnTriangles) {
 				p->DrawString(olc::vd2d(1, i * 9),
 					"Triangle " + std::to_string(i) + ": " +
 					Math::append_decimal(std::to_string(pa.proj_points[0].x)) + "x " + Math::append_decimal(std::to_string(pa.proj_points[0].y)) + "y " + Math::append_decimal(std::to_string(pa.proj_points[0].z)) + "z " +
 					Math::append_decimal(std::to_string(pa.proj_points[1].x)) + "x " + Math::append_decimal(std::to_string(pa.proj_points[1].y)) + "y " + Math::append_decimal(std::to_string(pa.proj_points[1].z)) + "z " +
-					Math::append_decimal(std::to_string(pa.proj_points[2].x)) + "x " + Math::append_decimal(std::to_string(pa.proj_points[2].y)) + "y " + Math::append_decimal(std::to_string(pa.proj_points[2].z)) + "z " +
-					pa.edges[0].edge_normal().str() + " " + pa.edges[1].edge_normal().str() + " " + pa.edges[2].edge_normal().str());
+					Math::append_decimal(std::to_string(pa.proj_points[2].x)) + "x " + Math::append_decimal(std::to_string(pa.proj_points[2].y)) + "y " + Math::append_decimal(std::to_string(pa.proj_points[2].z)) + "z ");
 					i++;
 			}
 
 			//p->DrawStringDecal(olc::vf2d(0, 0), text);
-		}
+		}*/
 
 		//point debugging
 		//if (selectedEntity) {
