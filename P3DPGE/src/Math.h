@@ -31,7 +31,7 @@ namespace Math {
 }
 
 class Vector3 {
-	public:
+public:
 	float x;
 	float y;
 	float z;

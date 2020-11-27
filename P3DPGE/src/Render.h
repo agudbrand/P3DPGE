@@ -29,9 +29,13 @@ namespace Render {
 		//entities.push_back(l2);
 
 		//test triangle
-		//DebugTriangle* test = new DebugTriangle(1);
+		DebugTriangle* test = new DebugTriangle(
+			Triangle(Vector3(0, 0, 0), Vector3(0, 3, 0), Vector3(2, 3, 0)), 1);
+		DebugTriangle* test2 = new DebugTriangle(
+			Triangle(Vector3(1, 1, 1), Vector3(2, 3, 1), Vector3(2, 3, 1)), 2);
 		//test->SetColor(olc::BLUE);
-		//entities.push_back(test);
+		entities.push_back(test);
+		entities.push_back(test2);
 	}
 
 	using namespace boost::qvm;
@@ -58,6 +62,8 @@ namespace Render {
 	static void Update(olc::PixelGameEngine* p) {
 		view = camera.MakeViewMatrix(yaw);
 
+		
+
 		//draw all entities
 		for (auto& e : entities) {
 			e->mesh->Update(camera.position, ProjectionMatrix(p), view);
@@ -65,7 +71,7 @@ namespace Render {
 
 			//draw normal lines
 			//this really needs to be somewhere else
-			for (Triangle t : e->mesh->drawnTriangles) {
+			//for (Triangle t : e->mesh->drawnTriangles) {
 				//Line3 line = Line3(t.midpoint() + t.get_normal(), -1, t.midpoint());
 				//Line3 line2 = Line3(t.midpoint(), -1, V3ZERO);
 				//line.color = olc::RED;
@@ -74,7 +80,7 @@ namespace Render {
 				//line.Draw(p);
 				//line2.mesh->Update(camera.position, ProjectionMatrix(p), view);
 				//line2.Draw(p);
-			}
+			//}
 		}
 
 		//debug

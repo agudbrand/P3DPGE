@@ -235,13 +235,8 @@ struct Line3 : public Entity {
 //for spawning single triangles
 struct DebugTriangle : public Entity {
 	
-	DebugTriangle(int id, EntityParams) : Entity(EntityArgs) {
-		
-		std::vector<Vector3> v = {
-			Vector3(0, 0, 0), Vector3(0, 2, 0), Vector3(1, 2, 0)
-		};
-		
-		mesh = new Mesh(v);
+	DebugTriangle(Triangle triangle, int id, EntityParams) : Entity(EntityArgs) {
+		mesh = new Mesh(triangle);
 		
 	}
 	

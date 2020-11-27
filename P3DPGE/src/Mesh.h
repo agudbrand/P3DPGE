@@ -160,6 +160,9 @@ class Mesh {
 			}
 		}
 	}
+
+	//for making a single triangle. debug type shtuff
+	Mesh(Triangle t) { triangles.push_back(t); }
 	
 	void Update(Vector3 camPos, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
 		this->camPos = camPos;
@@ -204,10 +207,11 @@ class Mesh {
 			}
 		}
 		
-		//sorting is done based off world z not camera z
+		//this is only sorting Triangles for a single mesh and not actually sorting them
+		//relative to other meshes
 		std::sort(drawnTriangles.begin(), drawnTriangles.end(), [](Triangle& t1, Triangle& t2) {
-			float mp1 = (t1.points[0].z + t1.points[1].z + t1.points[2].z) / 3;
-			float mp2 = (t2.points[0].z + t2.points[1].z + t2.points[2].z) / 3;
+			float mp1 = (t1.proj_points[0].z + t1.proj_points[1].z + t1.proj_points[2].z) / 3;
+			float mp2 = (t2.proj_points[0].z + t2.proj_points[1].z + t2.proj_points[2].z) / 3;
 			return mp1 > mp2;
 			});
 
@@ -217,15 +221,15 @@ class Mesh {
 			//t.display_edges(p);
 
 			Triangle clipped[2];
-			std::list<Triangle*> listTriangles;
+			std::list<Triangle> listTriangles;
 			
-			listTriangles.push_back(&t);
+			listTriangles.push_back(t);
 			int newTriangles = 1;
 			
 			for (int a = 0; a < 4; a++) {
 				int trisToAdd = 0;
 				while (newTriangles > 0) {
-					Triangle test = *listTriangles.front();
+					Triangle test = listTriangles.front();
 					listTriangles.pop_front();
 					newTriangles--;
 					
@@ -238,18 +242,18 @@ class Mesh {
 
 					for (int w = 0; w < trisToAdd; w++) { 
 						clipped[w].set_color(test.get_color()); 
-						listTriangles.push_back(&clipped[w]); 
+						listTriangles.push_back(clipped[w]); 
 					}
 				}
 				newTriangles = listTriangles.size();
 			}
 			
-			for (Triangle* t : listTriangles) {
+			for (Triangle t : listTriangles) {
 				p->FillTriangle(
-					t->proj_points[0].x, t->proj_points[0].y,
-					t->proj_points[1].x, t->proj_points[1].y,
-					t->proj_points[2].x, t->proj_points[2].y,
-					t->get_color());
+					t.proj_points[0].x, t.proj_points[0].y,
+					t.proj_points[1].x, t.proj_points[1].y,
+					t.proj_points[2].x, t.proj_points[2].y,
+					t.get_color());
 			}
 		}
 		
