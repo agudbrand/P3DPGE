@@ -20,6 +20,8 @@
 #define V3YU	Vector3(0, 1, 0)
 #define V3ZU	Vector3(0, 0, 1)
 
+#define Vector2 olc::vf2d
+
 //physics constants
 #define GRAVITY 9.81f
 
@@ -28,6 +30,9 @@ using namespace boost::qvm;
 namespace Math {
 	static float to_radians(float angle) { return angle * (M_PI / 180); }
 	static float to_degrees(float angle) { return angle * (180 / M_PI); }
+
+	//TODO(m, sushi) make lerp for Vector3
+	static float lerp(float p1, float p2, float t) { return (1.f - t) * p1 + t * p2; }
 }
 
 class Vector3 {
@@ -118,6 +123,13 @@ public:
 	mat<float, 1, 4> proj_mult(mat<float, 1, 4> v, mat<float, 4, 4> m) {
 		mat<float, 1, 4> vm = v * m;
 		if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; }
+		return vm;
+	}
+
+	//optional overload that 'returns' the w value
+	mat<float, 1, 4> proj_mult(mat<float, 1, 4> v, mat<float, 4, 4> m, float& w) {
+		mat<float, 1, 4> vm = v * m;
+		if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; w = vm.a[0][3]; }
 		return vm;
 	}
 	
@@ -214,6 +226,16 @@ public:
 		x *= 0.5f * (float)p->ScreenWidth();
 		y *= 0.5f * (float)p->ScreenHeight();
 	}
+
+	//overload that returns the resulting w value
+	void ProjToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p, float& w) {
+		float _w;
+		this->M1x4ToVector3(proj_mult(ConvertToM1x4(), ProjMat, _w));
+		x += 1.0f; y += 1.0f;
+		x *= 0.5f * (float)p->ScreenWidth();
+		y *= 0.5f * (float)p->ScreenHeight();
+		w = _w;
+	}
 };
 
 namespace Math {
@@ -271,12 +293,13 @@ namespace Math {
 	static float DistPointToPlane(Vector3 point, Vector3 plane, Vector3 plane_p) { return (plane.x * point.x + plane.y * point.y + plane.z * point.z - plane.dot(plane_p)); }
 	
 	//where a line intersects with a plane
-	static Vector3 VectorPlaneIntersect(Vector3 plane_p, Vector3 plane_n, Vector3 line_start, Vector3 line_end) {
+	//TODO(m, sushi) maybe rewrite this? this may be able to be interweaved with Edge math and this way edge will have this function as well.
+	static Vector3 VectorPlaneIntersect(Vector3 plane_p, Vector3 plane_n, Vector3 line_start, Vector3 line_end, float& t) {
 		plane_n.normalize();
 		float plane_d = -plane_n.dot(plane_p);
 		float ad = line_start.dot(plane_n);
 		float bd = line_end.dot(plane_n);
-		float t = (-plane_d - ad) / (bd - ad);
+		t = (-plane_d - ad) / (bd - ad);
 		Vector3 line_start_to_end = line_end - line_start;
 		Vector3 line_to_intersect = line_start_to_end * t;
 		return line_start + line_to_intersect;

@@ -164,7 +164,7 @@ namespace Input {
 		"Spawns a large sphere of radius/mass 100 at the mouse."));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-			Complex* complex = new Complex("objects/119k_Triangles.obj", 0, V3ZERO);
+			Complex* complex = new Complex("objects/24k_Triangles.obj", 0, V3ZERO);
 			selectedEntity = complex;
 			Physics::AddEntity(complex);
 			Render::AddEntity(complex);
@@ -256,6 +256,8 @@ namespace Input {
 
 	//// object selection ////
 
+		//TODO(i, sushi) make this work with new drawing system
+		/*
 		//could set this up to only select triangles from a selected entity
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Vector3 pos = GetMousePos(p);
@@ -273,7 +275,7 @@ namespace Input {
 			if (selectedTriangle) { selectedTriangle->selected = true; }
 		}, "select_triangle", olc::NONE, 0, 0, 0, 0,
 		"Selects a triangle at the mouse position"));
-
+		*/
 		//inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 		//	Vector3 pos = GetMousePos(p);
 		//	if (selectedEntity) {
@@ -344,11 +346,18 @@ namespace Input {
 	//// render options ////
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-			Render::wireframe = !Render::wireframe;
-			std::string output = (Render::wireframe) ? "true" : "false";
+			Render::WIRE_FRAME = !Render::WIRE_FRAME;
+			std::string output = (Render::WIRE_FRAME) ? "true" : "false";
 			if (debugInput) std::cout << "Toggling wireframe to: " + output << std::endl;
-			}, "toggle_wireframe", olc::C, -1, 0, 0, 0,
+			}, "TOGGLE_WIRE_FRAME", olc::C, -1, 0, 0, 0,
 		"Toggles whether the wireframe of objects should be rendered"));
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			Render::DISP_EDGES = !Render::DISP_EDGES;
+			std::string output = (Render::DISP_EDGES) ? "true" : "false";
+			if (debugInput) std::cout << "Toggling wireframe to: " + output << std::endl;
+			}, "TOGGLE_DISP_EDGES", olc::V, -1, 0, 0, 0,
+		"Toggles whether the edges of objects are numbered"));
 
 	}
 	
@@ -423,6 +432,7 @@ namespace Input {
 		//}
 
 		//point debugging
+		/* TODO(i, sushi) figure out how to make this work with only drawn triangles
 		if (selectedEntity) {
 			int i = 0;
 			for (auto& pa : selectedEntity->mesh->drawnTriangles) {
@@ -435,7 +445,7 @@ namespace Input {
 			}
 
 			//p->DrawStringDecal(olc::vf2d(0, 0), text);
-		}
+		}*/
 
 		//point debugging
 		//if (selectedEntity) {

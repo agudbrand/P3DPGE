@@ -22,6 +22,10 @@ class Entity {
 	
 	//mesh
 	Mesh* mesh;
+	olc::Sprite* sprite;
+
+	//TODO(reo, sushi) implement this eventually
+	olc::Decal* decal;
 	
 	Entity() {}
 	Entity(int id, EntityParams) {
@@ -42,7 +46,8 @@ class Entity {
 	virtual bool ContainsPoint(Vector3 point) = 0;
 	virtual bool ContainsScreenPoint(Vector3 point) = 0;
 	
-	virtual void Draw(olc::PixelGameEngine* p, bool wireframe = false);
+	virtual void Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view);
+	virtual bool SpecialDraw();
 	
 	//these functions are virtual but aren't implemented
 	//in any child yet as I see no use for differenciating
@@ -207,8 +212,8 @@ struct Line2 : public Entity {
 	void Update(float deltaTime) override;
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
-	void Draw(olc::PixelGameEngine* p, bool wireframe = false) override;
-	
+	void Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) override;
+	bool SpecialDraw() override;
 	void SetColor(olc::Pixel newColor) override;
 };
 
@@ -227,8 +232,8 @@ struct Line3 : public Entity {
 	void Update(float deltaTime) override;
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
-	void Draw(olc::PixelGameEngine* p, bool wireframe = false) override;
-	
+	void Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) override;
+	bool SpecialDraw() override;
 	void SetColor(olc::Pixel newColor) override;
 };
 
@@ -237,7 +242,6 @@ struct DebugTriangle : public Entity {
 	
 	DebugTriangle(Triangle triangle, int id, EntityParams) : Entity(EntityArgs) {
 		mesh = new Mesh(triangle);
-		
 	}
 	
 	void Update(float deltaTime) override;

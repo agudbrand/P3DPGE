@@ -10,9 +10,11 @@ void Entity::SetColor(olc::Pixel newColor) {
 	for (Triangle& t : mesh->triangles) { t.color = newColor; }
 }
 
-void Entity::Draw(olc::PixelGameEngine* p, bool wireframe) {
-	mesh->Draw(p, position, wireframe);
+void Entity::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
+	//do nothing if not SpecialDraw
 }
+
+bool Entity::SpecialDraw() { return false; }
 
 void Entity::RotateX(Vector3 offset) {
 	for (auto& m : mesh->triangles) {
@@ -198,27 +200,29 @@ void Complex::ResolveCollision(PhysEntity* entity) {
 
 //// Line2 and Line3 ////
 
-void Line2::Draw(olc::PixelGameEngine* p, bool wireframe) {
+void Line2::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
 	p->DrawLine(position.Vector3Tovd2d(), endPosition.Vector3Tovd2d(), color);
 }
+bool Line2::SpecialDraw() { return true; }
+
 
 void Line2::SetColor(olc::Pixel newColor) { color = newColor; }
 bool Line2::ContainsPoint(Vector3 point) { return false; }
 bool Line2::ContainsScreenPoint(Vector3 point) { return false; }
 void Line2::Update(float deltaTime) {}
 
-//TODO(re, sushi, 11/18/2020) for some reason this seems to have the same projecting problem as meshes did but idk y yet so fix it
-void Line3::Draw(olc::PixelGameEngine* p, bool wireframe) {
+void Line3::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
 	//these operations are very gross and could probably be abstracted in Math
 	//TODO(m, sushi) abstract the following functions in Math.h in order to make this not look retarded
-	Vector3 posView = position.GetM1x4ToVector3(position.proj_mult(position.ConvertToM1x4(), mesh->view));
-	Vector3 endView = endPosition.GetM1x4ToVector3(endPosition.proj_mult(endPosition.ConvertToM1x4(), mesh->view));
+	Vector3 posView = position.GetM1x4ToVector3(position.proj_mult(position.ConvertToM1x4(), view));
+	Vector3 endView = endPosition.GetM1x4ToVector3(endPosition.proj_mult(endPosition.ConvertToM1x4(), view));
 
-	posView.ProjToScreen(mesh->ProjMat, p);
-	endView.ProjToScreen(mesh->ProjMat, p);
+	posView.ProjToScreen(ProjMat, p);
+	endView.ProjToScreen(ProjMat, p);
 
 	p->DrawLine(posView.Vector3Tovd2d(), endView.Vector3Tovd2d(), color);
 }
+bool Line3::SpecialDraw() { return true; }
 
 void Line3::SetColor(olc::Pixel newColor) { color = newColor; }
 bool Line3::ContainsPoint(Vector3 point) { return false; }
