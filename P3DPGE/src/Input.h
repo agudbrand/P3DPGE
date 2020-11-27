@@ -423,7 +423,7 @@ namespace Input {
 		//}
 
 		//point debugging
-		/*if (selectedEntity) {
+		if (selectedEntity) {
 			int i = 0;
 			for (auto& pa : selectedEntity->mesh->drawnTriangles) {
 				p->DrawString(olc::vd2d(1, i * 9),
@@ -435,7 +435,7 @@ namespace Input {
 			}
 
 			//p->DrawStringDecal(olc::vf2d(0, 0), text);
-		}*/
+		}
 
 		//point debugging
 		//if (selectedEntity) {
