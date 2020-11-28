@@ -113,7 +113,8 @@ namespace Input {
 	static void Init() {
 		inputActions = std::vector<InputAction>();
 		//NOTE InputAction: function, name, key, mouseButton, inputState, shift, ctrl, description
-	//// time control ////
+	
+		//// time control ////
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Time::deltaTime = 0;
@@ -256,35 +257,34 @@ namespace Input {
 
 	//// object selection ////
 
-		//TODO(i, sushi) make this work with new drawing system
-		/*
-		//could set this up to only select triangles from a selected entity
+		
+		//TODO(o, sushi) write this to skip objects who aren't close to the line
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Vector3 pos = GetMousePos(p);
-			std::cout << pos.str() << std::endl;
-			if (selectedTriangle) { selectedTriangle->selected = false; }
-			selectedTriangle = nullptr;
-			for (auto& e : Render::entities) {
-				for (Triangle& t : e->mesh->drawnTriangles) {
-					if (t.contains_point(pos)) { 
-						selectedTriangle = &t; 
-						break; 
-					}
+			pos.unProjToScreen(Render::ProjectionMatrix(p), p);
+			Vector3 unview = Math::M1x4ToVector3(Math::Vector3ToM1x4(pos) * inverse(Render::view));
+			if (selectedEntity) {
+				selectedEntity = nullptr;
+			}
+
+			Debug::Message(unview.str());
+
+			Line3* ray = new Line3(Render::camera.lookDir * 10, -1, unview);
+
+			for (Entity* e : Render::entities) {
+				if (e->LineIntersect(&ray->edge) && e->id != -1) {
+					selectedEntity = e;
+					break;
 				}
 			}
-			if (selectedTriangle) { selectedTriangle->selected = true; }
-		}, "select_triangle", olc::NONE, 0, 0, 0, 0,
-		"Selects a triangle at the mouse position"));
-		*/
-		//inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-		//	Vector3 pos = GetMousePos(p);
-		//	if (selectedEntity) {
-		//		selectedEntity->ContainsPoint(pos);
-		//	}
-		//
-		//	}
-		//
-		//))
+
+			ray->color = RANDCOLOR;
+			Render::sentities.push_back(ray);
+
+			if (selectedEntity == nullptr) { Debug::Error("No object selected"); }
+
+			}, "select_entity", olc::NONE, 0, 0, 0, 0,
+			"Selects an entity"));
 
 	//// camera movement ////
 

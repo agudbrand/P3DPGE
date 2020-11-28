@@ -122,10 +122,24 @@ struct Triangle {
 		
 	}
 
-	//triangle maths
-	//this can either stay here or be put into Math.h later
+	float get_area() { return Math::TriangleArea((points[1] - points[0]).mag(), (points[2] - points[1]).mag(), (points[0] - points[2]).mag()); }
 
+	//TODO(m, sushi) make this take just a line when we get forward declaring
+	bool line_intersect(Edge3* e) {
+		float t = 0;
 
+		Vector3 i = Math::VectorPlaneIntersect(points[0], get_normal(), e->p[0], e->p[1], t);
+		
+		float a1 = Triangle(i, points[0], points[2]).get_area();
+		float a2 = Triangle(i, points[2], points[1]).get_area();
+		float a3 = Triangle(i, points[1], points[0]).get_area();
+
+		float ta = Math::roundf_two((a1 + a2 + a3));
+
+		if (ta > Math::roundf_two(get_area())) { return false; }
+		else { return true; }
+	
+	}
 
 	//debug
 	void display_edges(olc::PixelGameEngine* p) {
@@ -146,6 +160,9 @@ struct Triangle {
 
 		return Vector3(x_mid, y_mid, z_mid);
 	}
+
+	std::string str() { return "{(" + points[0].str() + "), (" + points[1].str() + "), (" + points[2].str() + ")}"; }
+	std::string rndstr() { return "{(" + points[0].rndstr() + "), (" + points[1].rndstr() + "), (" + points[2].rndstr() + ")}"; }
 };
 
 //TODO(,delle,11/22/20) abstract out Mesh and split into Mesh2D and Mesh3D

@@ -7,6 +7,10 @@ namespace Render {
 
 	static std::vector<Entity*> entities;
 
+	//special entities that should not be interacted with like
+	//normal entities. this is probably temporary
+	static std::vector<Entity*> sentities;
+
 	//this list can most likely be optimized by keeping triangles in it
 	//that we know havent been deleted but do that later
 	static std::vector<Triangle> triangles;
@@ -39,9 +43,7 @@ namespace Render {
 		//entities.push_back(l2);
 
 		//test triangle
-		//DebugTriangle* test = new DebugTriangle(
-		//	Triangle(Vector3(1, 0, 1), Vector3(2, 0, 1), Vector3(3, 0, 1),
-		//			 Vector3(3, 0, 1), Vector3(2, 0, 1), Vector3(3, 0, 1)), 1);
+		DebugTriangle* test = new DebugTriangle(Triangle(Vector3(0, 0, 0), Vector3(2, 0, 1), Vector3(3, 3, 1)), 1);
 		//temporary permanent Sprite because with the way we are drawing triangles 
 		//currently theres no way to know what the Entity's sprite is and I have a couple
 		//of ideas on how to solve this but later.
@@ -412,6 +414,7 @@ namespace Render {
 
 	//draw all entities to screen
 	static void Update(olc::PixelGameEngine* p) {
+		//Debug::StartTimer();
 		view = camera.MakeViewMatrix(yaw);
 
 		//get triangles from all entities
@@ -428,6 +431,16 @@ namespace Render {
 			}
 		}
 
+		//draw special entities
+		for (auto& se : sentities) {
+			if (se->SpecialDraw()) {
+				se->Draw(p, ProjectionMatrix(p), view);
+			}
+			else {
+				for (auto& t : se->mesh->triangles) { triangles.push_back(t); }
+			}
+		}
+
 		Draw(p);
 
 		triangles.clear();
@@ -435,6 +448,10 @@ namespace Render {
 		//debug
 		p->DrawStringDecal(olc::vf2d(p->ScreenWidth() - 300, p->ScreenHeight() - 20), "Mouse: " + Vector3(p->GetMousePos()).str2F());
 		p->DrawStringDecal(olc::vf2d(p->ScreenWidth()-300, p->ScreenHeight() - 10), "Camera: " + camera.position.str2F());
+	
+		//Debug::EndTimerAverage(p, 10, "", 10);
+
+		Debug::Message(camera.lookDir.str());
 	}
 
 	static void Cleanup() {

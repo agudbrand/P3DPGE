@@ -1,6 +1,7 @@
 #pragma once
 #include <math.h>
 #include <algorithm>
+#include <numeric>
 #include "Time.h"
 #include "boost/qvm/mat.hpp"
 #include "boost/qvm/vec.hpp"
@@ -22,6 +23,8 @@
 
 #define Vector2 olc::vf2d
 
+#define RANDCOLOR olc::Pixel(rand() % 255 + 1, rand() % 255 + 1, rand() % 255 + 1)
+
 //physics constants
 #define GRAVITY 9.81f
 
@@ -31,8 +34,47 @@ namespace Math {
 	static float to_radians(float angle) { return angle * (M_PI / 180); }
 	static float to_degrees(float angle) { return angle * (180 / M_PI); }
 
+	//for debugging with floats or doubles
+	static std::string append_decimal(std::string s) {
+		while (s.back() != '.') {
+			s.pop_back();
+		}
+		s.pop_back();
+		return s;
+	}
+
+	//append all trailing zeros
+	static std::string append_zeroes(std::string s) {
+		while (s.back() == '0') {
+			s.pop_back();
+		}
+		s.pop_back();
+		return s;
+	}
+
+	//append to two decimal places
+	static std::string append_two_decimal(std::string s) {
+		if(s.length() >= 2){
+			while (s.at(s.length() - 4) != '.') {
+				s.pop_back();
+			}
+			s.pop_back();
+		}
+		return s;
+	}
+
+	//round a float to two decimal places
+	static float roundf_two(float f) { return (float)((int)(f * 100 + .5)) / 100; }
+
 	//TODO(m, sushi) make lerp for Vector3
 	static float lerp(float p1, float p2, float t) { return (1.f - t) * p1 + t * p2; }
+
+	//average any std container probably
+	template<class FWIt>
+	static float average(FWIt a, const FWIt b, int size) { return std::accumulate(a, b, 0.0) / size; }
+
+	template<class T>
+	static double average(const T& container, int size) { return average(std::begin(container), std::end(container), size); }
 }
 
 class Vector3 {
@@ -85,6 +127,7 @@ public:
 	Vector3				cross(const Vector3& rhs)	const	{ return Vector3(this->y * rhs.z - rhs.y * this->z, this->x * rhs.z - rhs.x * this->z, this->x * rhs.y - rhs.x * this->y); }
 	float				mag()						const	{ return std::sqrtf(x * x + y * y + z * z); }
 	const std::string	str()						const	{ return std::string("(") + std::to_string(this->x) + "," + std::to_string(this->y) + "," + std::to_string(this->z) + ")"; }
+	const std::string	rndstr()					const	{ return std::string("(") + Math::append_two_decimal(std::to_string(Math::roundf_two(this->x))) + "," + Math::append_two_decimal(std::to_string(Math::roundf_two(this->y))) + "," + Math::append_two_decimal(std::to_string(Math::roundf_two(this->z))) + ")"; }
 	Vector3				normalized()						{ return *this == V3ZERO ? V3ZERO : *this / this->mag(); }
 	void				normalize()							{ *this == V3ZERO ? *this = V3ZERO : *this = *this / this->mag(); }
 	Vector3				clampMag(float& rhs)				{ return this->normalized() * rhs; }
@@ -143,7 +186,7 @@ public:
 			0,			   0,			  1,			 0,
 			translation.x, translation.y, translation.z, 1
 		};
-		this->M1x4ToVector3(proj_mult(ConvertToM1x4(), tv));
+		M1x4ToVector3(proj_mult(ConvertToM1x4(), tv));
 	}
 	
 	//scale object
@@ -154,7 +197,7 @@ public:
 			0,		 0,		  scale.z, 0,
 			0,		 0,		  0,	   1
 		};
-		this->M1x4ToVector3(proj_mult(ConvertToM1x4(), sv));
+		M1x4ToVector3(proj_mult(ConvertToM1x4(), sv));
 	}
 	
 	//covert point to WorldSpace
@@ -165,7 +208,7 @@ public:
 			0,	   0,	  1,	 0,
 			pos.x, pos.y, pos.z, 1
 		};
-		this->M1x4ToVector3(proj_mult(ConvertToM1x4(), wtl));
+		M1x4ToVector3(proj_mult(ConvertToM1x4(), wtl));
 	}
 	
 	//convert point to LocalSpace
@@ -176,7 +219,7 @@ public:
 			0,	   0,	  1,	 0,
 			pos.x, pos.y, pos.z, 1
 		};
-		this->M1x4ToVector3(proj_mult(ConvertToM1x4(), inverse(ltw)));
+		M1x4ToVector3(proj_mult(ConvertToM1x4(), inverse(ltw)));
 	}
 	
 	//basic euler rotations locally
@@ -189,7 +232,7 @@ public:
 			0,		sin(theta),	cos(theta),  0,
 			0,		0,			0,			 1
 		};
-		this->M1x4ToVector3(proj_mult(ConvertToM1x4(), rvx));
+		M1x4ToVector3(proj_mult(ConvertToM1x4(), rvx));
 		LocalToWorld(pos + offset);
 	}
 	
@@ -202,7 +245,7 @@ public:
 			-sin(theta),0,	cos(theta),  0,
 			0,			0,	0,			 1
 		};
-		this->M1x4ToVector3(proj_mult(ConvertToM1x4(), rvy));
+		M1x4ToVector3(proj_mult(ConvertToM1x4(), rvy));
 		LocalToWorld(pos + offset);
 	}
 	
@@ -215,13 +258,13 @@ public:
 			0,			0,				1, 0,
 			0,			0,				0, 1
 		};
-		this->M1x4ToVector3(proj_mult(ConvertToM1x4(), rvz));
+		M1x4ToVector3(proj_mult(ConvertToM1x4(), rvz));
 		LocalToWorld(pos + offset);
 	}
 	
 	//projects a mesh's points to the screen
 	void ProjToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p) {
-		this->M1x4ToVector3(proj_mult(ConvertToM1x4(), ProjMat));
+		M1x4ToVector3(proj_mult(ConvertToM1x4(), ProjMat));
 		x += 1.0f; y += 1.0f;
 		x *= 0.5f * (float)p->ScreenWidth();
 		y *= 0.5f * (float)p->ScreenHeight();
@@ -230,23 +273,24 @@ public:
 	//overload that returns the resulting w value
 	void ProjToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p, float& w) {
 		float _w;
-		this->M1x4ToVector3(proj_mult(ConvertToM1x4(), ProjMat, _w));
-		x += 1.0f; y += 1.0f;
+		M1x4ToVector3(proj_mult(ConvertToM1x4(), ProjMat, _w));
+		x += 1.f; y += 1.f;
 		x *= 0.5f * (float)p->ScreenWidth();
 		y *= 0.5f * (float)p->ScreenHeight();
 		w = _w;
 	}
+
+	//reverse projection
+	void unProjToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p) {
+		M1x4ToVector3(proj_mult(ConvertToM1x4(), inverse(ProjMat)));
+		x /= .5f * (float)p->ScreenWidth();
+		y /= .5f * (float)p->ScreenHeight();
+		x -= 1.f; y -= 1.f;
+	}
 };
 
 namespace Math {
-	//for debugging with floats or doubles
-	static std::string append_decimal(std::string s) {
-		while (s.back() != '.') {
-			s.pop_back();
-		}
-		s.pop_back();
-		return s;
-	}
+	
 
 	//conversions
 	static Vector3 vi2dToVector3(olc::vi2d vector, float z = 0) {
@@ -290,10 +334,9 @@ namespace Math {
 		return m;
 	}
 	
-	static float DistPointToPlane(Vector3 point, Vector3 plane, Vector3 plane_p) { return (plane.x * point.x + plane.y * point.y + plane.z * point.z - plane.dot(plane_p)); }
+	static float DistPointToPlane(Vector3 point, Vector3 plane_n, Vector3 plane_p) { return (plane_n.x * point.x + plane_n.y * point.y + plane_n.z * point.z - plane_n.dot(plane_p)); }
 	
 	//where a line intersects with a plane
-	//TODO(m, sushi) maybe rewrite this? this may be able to be interweaved with Edge math and this way edge will have this function as well.
 	static Vector3 VectorPlaneIntersect(Vector3 plane_p, Vector3 plane_n, Vector3 line_start, Vector3 line_end, float& t) {
 		plane_n.normalize();
 		float plane_d = -plane_n.dot(plane_p);
@@ -340,29 +383,36 @@ namespace Math {
 	}
 	
 	//return where two lines intersect on the x axis with slope and the y-intercept
-	static Vector3 LineIntersect(float slope1, float ycross1, float slope2, float ycross2) {
+	static Vector3 LineIntersect2(float slope1, float ycross1, float slope2, float ycross2) {
 		mat<float, 2, 2> lhs{ slope1, ycross1, slope2, ycross2 };
 		mat<float, 2, 1> rhs{ 1, 1 };
 		mat<float, 2, 1> det = inverse(lhs) * rhs;
 		float x = 1 / (det.a[0][1]) * det.a[0][0];
 		float y = slope1 * x + ycross1;
-		return Vector3(x, y, 0);
+		return Vector3(x, y);
 	}
+
+	//returns where two lines intersect in 3D space
+	static Vector3 LineIntersect3(Vector3 adir, Vector3 ap, Vector3 bdir, Vector3 bp) {
+
+	}
+
+	//returns area of a triangle of sides a, b and c
+	static float TriangleArea(float a, float b, float c) {
+		float s = (a + b + c) / 2;
+		float test = s * (s - a) * (s - b) * (s - c);
+		return std::sqrt(s * (s - a) * (s - b) * (s - c));
+	}
+
 };
 
 //attached to entities to allow different forms of checking sides of more complex objects
-//NOTE: there's probably a better way to update the edges for triangles
-//		currently Triangle has a function that calls Edge's update function
-//		and the edge update function might not even be necessary but idk yet
-//		Triangle can also just not store edges and only have them when it needs them,
-//		but I don't know how much we're gonna be using them yet
 //TODO(m, sushi) implement Edge in 3D
 struct Edge {
 	Vector3 p[2];
 	//if lead is true then p[1] is the right most point.
 	//ditto for high but on y
-	bool lead;
-	bool high;
+	bool lead, high;
 	
 	Edge() { }
 	Edge(Vector3 point1, Vector3 point2) {
@@ -397,7 +447,7 @@ struct Edge {
 	bool within_domain(float x_point) { return (x_point < p[lead].x&& x_point > p[!lead].x); }
 	
 	//returns edge's normal
-	//this only works for 2D and returns a normal rotated -90
+	//returns a normal rotated -90
 	Vector3 edge_normal() {
 		Vector3 v = p[1] - p[0];
 		return Vector3(v.y, -v.x, 0).normalized();
@@ -439,7 +489,7 @@ struct Edge {
 	//intersection and then seeing if that point lies on either of them
 	bool edge_intersect(Edge e) {
 		if (slope() == e.slope() && (!on_edge(e.p[0]) || !on_edge(e.p[1]))) { return false; }
-		Vector3 cross = Math::LineIntersect(slope(), ycross(), e.slope(), e.ycross());
+		Vector3 cross = Math::LineIntersect2(slope(), ycross(), e.slope(), e.ycross());
 		if (within_domain(cross) && within_range(cross) &&
 			e.within_domain(cross) && e.within_range(cross)) {
 			return true;
@@ -448,5 +498,37 @@ struct Edge {
 			return false;
 		}
 	}
+};
+
+struct Edge3 {
+	Vector3 p[2];
+	//if lead is true then p[1] is the right most point.
+	//ditto for high but on y and for deep on z
+	bool lead, high, deep;
+
+	Edge3() { }
+	Edge3(Vector3 point1, Vector3 point2) {
+		p[0] = point1;
+		p[1] = point2;
+		if (point1.x > point2.x) { lead = false; }
+		else { lead = true; }
+		if (point1.y > point2.y) { high = false; }
+		else { high = true; }
+		if (point1.z > point2.z) { deep = false; }
+		else { deep = true; }
+	}
+
+	std::string str() { return "{(" + p[0].str() + "), (" + p[1].str() + ")}"; }
+	std::string rndstr() { return "{(" + p[0].rndstr() + "), (" + p[1].rndstr() + ")}"; }
+
+	Vector3 edge_midpoint() {
+		return Vector3((p[0].x + p[1].x) / 2, (p[0].y + p[1].y) / 2, (p[0].z + p[1].z) / 2);
+	}
+
+	Vector3 direction() { return p[1] - p[0]; }
+
+
+
+
 };
 

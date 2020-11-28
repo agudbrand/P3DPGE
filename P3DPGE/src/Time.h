@@ -1,5 +1,6 @@
 #pragma once
 #include "Debug.h"
+#include <time.h>
 //#include <exception>
 
 //TODO(u,delle,11/17/20) look into this exception and whether it is necessary
@@ -49,6 +50,8 @@ namespace Time {
 			FixedUpdate();
 		}
 		//std::cout << deltaTime << std::endl;
+
+		srand(time(NULL));
 	}
 
 	static void Cleanup() {}

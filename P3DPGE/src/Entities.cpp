@@ -10,6 +10,14 @@ void Entity::SetColor(olc::Pixel newColor) {
 	for (Triangle& t : mesh->triangles) { t.color = newColor; }
 }
 
+//override this later please
+bool Entity::LineIntersect(Edge3* e) {
+	for (Triangle& t : mesh->triangles) {
+		if (t.line_intersect(e)) { return true; }
+	}
+	return false;
+}
+
 void Entity::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
 	//do nothing if not SpecialDraw
 }
@@ -217,10 +225,36 @@ void Line3::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4
 	Vector3 posView = position.GetM1x4ToVector3(position.proj_mult(position.ConvertToM1x4(), view));
 	Vector3 endView = endPosition.GetM1x4ToVector3(endPosition.proj_mult(endPosition.ConvertToM1x4(), view));
 
-	posView.ProjToScreen(ProjMat, p);
-	endView.ProjToScreen(ProjMat, p);
+	
+	
+	float d1 = Math::DistPointToPlane(posView, Vector3(0, 0, 0.01), Vector3(0, 0, 1));
+	float d2 = Math::DistPointToPlane(endView, Vector3(0, 0, 0.01), Vector3(0, 0, 1));
 
-	p->DrawLine(posView.Vector3Tovd2d(), endView.Vector3Tovd2d(), color);
+	float t;
+	
+	if (d1 > 0 && d2 > 0) {
+		posView.ProjToScreen(ProjMat, p);
+		endView.ProjToScreen(ProjMat, p);
+		p->DrawLine(posView.Vector3Tovd2d(), endView.Vector3Tovd2d(), color);
+	}
+	else if(d1 < 0 && d2 > 0){
+		posView = Math::VectorPlaneIntersect(Vector3(0, 0, 0.01), Vector3(0, 0, 1), posView, endView, t);
+		posView.ProjToScreen(ProjMat, p);
+		endView.ProjToScreen(ProjMat, p);
+		p->DrawLine(posView.Vector3Tovd2d(), endView.Vector3Tovd2d(), color);
+	}
+	else if (d2 < 0 && d1 > 0) {
+		endView = Math::VectorPlaneIntersect(Vector3(0, 0, 0.01), Vector3(0, 0, 1), posView, endView, t);
+		posView.ProjToScreen(ProjMat, p);
+		endView.ProjToScreen(ProjMat, p);
+		p->DrawLine(posView.Vector3Tovd2d(), endView.Vector3Tovd2d(), color);
+	}
+	else {
+		Debug::Error("yep its behind you");
+	}
+
+
+	
 }
 bool Line3::SpecialDraw() { return true; }
 

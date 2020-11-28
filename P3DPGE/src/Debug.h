@@ -6,10 +6,18 @@
 #include <cstdarg>
 #include <windows.h>
 #include <cstdio>
+#include <chrono>
 
 #define internal static
 #define local_persist static 
 #define global_variable static
+
+using namespace std::chrono;
+
+namespace Math { //forward declare average
+	template<class T>
+	static double average(const T& container, int size);
+}
 
 namespace Debug {
 	internal HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);;
@@ -59,7 +67,7 @@ namespace Debug {
 	}*/
 
 	//Sends a red string to the console
-	static void Error(olc::PixelGameEngine* p, std::string& str) {
+	static void Error(const std::string& str) {
 		color = 4;
 		SetConsoleTextAttribute(hConsole, color);
 		std::cout << str << std::endl;
@@ -67,7 +75,7 @@ namespace Debug {
 	}
 
 	//Sends a red string literal to the console
-	static void Error(olc::PixelGameEngine* p, const char* str) {
+	static void Error(const char* str) {
 		color = 4;
 		SetConsoleTextAttribute(hConsole, color);
 		std::cout << str << std::endl;
@@ -75,7 +83,7 @@ namespace Debug {
 	}
 
 	//Sends a yellow message to console
-	static void Message(olc::PixelGameEngine* p, const std::string& str) {
+	static void Message(const std::string& str) {
 		color = 6;
 		SetConsoleTextAttribute(hConsole, color);
 		std::cout << str << std::endl;
@@ -83,7 +91,7 @@ namespace Debug {
 	}
 
 	//Sends a yellow string literal to console
-	static void Message(olc::PixelGameEngine* p, const char* str) {
+	static void Message(const char* str) {
 		color = 6;
 		SetConsoleTextAttribute(hConsole, color);
 		std::cout << str << std::endl;
@@ -91,7 +99,7 @@ namespace Debug {
 	}
 
 	//Sends a green message to console
-	static void Success(olc::PixelGameEngine* p, std::string& str) {
+	static void Success(const std::string& str) {
 		color = 2;
 		SetConsoleTextAttribute(hConsole, color);
 		std::cout << str << std::endl;
@@ -99,11 +107,51 @@ namespace Debug {
 	}
 
 	//Sends a green string literal to console
-	static void Success(olc::PixelGameEngine* p, const char* str) {
+	static void Success(const char* str) {
 		color = 2;
 		SetConsoleTextAttribute(hConsole, color);
 		std::cout << str << std::endl;
 		ResetCmd();
+	}
+
+
+	//// Timer ////
+
+	static steady_clock::time_point start;
+	static steady_clock::time_point end;
+	static std::list<double> times;
+	static int elapsedFrames = 0;
+
+	static void StartTimer() { start = steady_clock::now(); }
+
+	static void EndTimer(olc::PixelGameEngine* p, std::string message = "") {
+		end = steady_clock::now();
+		duration<double> time_span = duration_cast<duration<double>>(end - start);
+		Message(message + std::to_string(time_span.count()));
+	}
+
+	static void EndTimer(olc::PixelGameEngine* p, double goodTime, std::string message = "") {
+		end = steady_clock::now();
+		duration<double> time_span = duration_cast<duration<double>>(end - start);
+		double t = time_span.count();
+		if (t > goodTime) { Error(message + std::to_string(t)); }
+		else if (t < goodTime) { Success(message + std::to_string(t)); }
+		else { Message(message + std::to_string(t)); }
+	}
+
+	//prints an average time every nFrames
+	//dunno if this would be useful, also probably not the most efficient thing ever
+	//could make a conditional version but idk yet
+	static void EndTimerAverage(olc::PixelGameEngine* p, int num, std::string message, int nFrames = 1) {
+		end = steady_clock::now();
+		duration<double> time_span = duration_cast<duration<double>>(end - start);
+		double t = time_span.count();
+
+		if (times.size() < num) { times.push_back(t); }
+		else { times.pop_front(); times.push_back(t); }
+
+		if (elapsedFrames >= nFrames) { Message(message + std::to_string(Math::average(times, times.size()))); elapsedFrames = 0; }
+		else { elapsedFrames++; }
 	}
 
 };
