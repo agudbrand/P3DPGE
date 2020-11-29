@@ -47,11 +47,11 @@ namespace Render {
 		//temporary permanent Sprite because with the way we are drawing triangles 
 		//currently theres no way to know what the Entity's sprite is and I have a couple
 		//of ideas on how to solve this but later.
-		Box* b = new Box(V3NULL, -1, V3NULL);
-		b->sprite = new olc::Sprite("sprites/UV_Grid_Sm.jpg");
-		entities.push_back(b);
+		//Box* b = new Box(V3NULL, -1, V3NULL);
+		//b->sprite = new olc::Sprite("sprites/UV_Grid_Sm.jpg");
+		//entities.push_back(b);
 
-
+		entities.push_back(new Line3(V3ZERO, -1, V3ZERO));
 
 	}
 
@@ -62,8 +62,8 @@ namespace Render {
 		float nearz = 0.1;
 		float farz = 1000.0;
 		float fov = 90;
-		float aspectRatio = (float)p->ScreenWidth() / (float)p->ScreenHeight();
-		float fovRad = 1.0 / tanf(fov * 0.5 / 180.0 * 3.14159);
+		float aspectRatio = (float)p->ScreenHeight() / (float)p->ScreenWidth();
+		float fovRad = 1.0 / tanf(fov * 0.5 / 180.0 * M_PI);
 
 		mat<float, 4, 4> proj{
 			aspectRatio * fovRad, 0,	  0,								0,
@@ -269,6 +269,8 @@ namespace Render {
 			//triangle will be clipped and becomes a quad which is
 			//cut into two more triagles.
 
+			
+
 			out_tri1.color = in_tri.color;
 			out_tri2.color = in_tri.color;
 
@@ -340,8 +342,8 @@ namespace Render {
 		}
 
 		std::sort(drawnTriangles.begin(), drawnTriangles.end(), [](Triangle& t1, Triangle& t2) {
-			float mp1 = (t1.proj_points[0].z + t1.proj_points[1].z + t1.proj_points[2].z) / 3;
-			float mp2 = (t2.proj_points[0].z + t2.proj_points[1].z + t2.proj_points[2].z) / 3;
+			float mp1 = (t1.points[0].z + t1.points[1].z + t1.points[2].z) / 3;
+			float mp2 = (t2.points[0].z + t2.points[1].z + t2.points[2].z) / 3;
 			return mp1 > mp2;
 			});
 
@@ -364,7 +366,7 @@ namespace Render {
 					case 0:	trisToAdd = ClipTriangles(Vector3(0, 0, 0), Vector3(0, 1, 0), test, clipped[0], clipped[1]); break;
 					case 1:	trisToAdd = ClipTriangles(Vector3(0, (float)p->ScreenHeight() - 1, 0), Vector3(0, -1, 0), test, clipped[0], clipped[1]); break;
 					case 2:	trisToAdd = ClipTriangles(Vector3(0, 0, 0), Vector3(1, 0, 0), test, clipped[0], clipped[1]); break;
-					case 3: trisToAdd = ClipTriangles(Vector3((float)p->ScreenHeight() - 1, 0, 0), Vector3(-1, 0, 0), test, clipped[0], clipped[1]); break;
+					case 3: trisToAdd = ClipTriangles(Vector3((float)p->ScreenWidth() - 1, 0, 0), Vector3(-1, 0, 0), test, clipped[0], clipped[1]); break;
 					}
 
 					for (int w = 0; w < trisToAdd; w++) {
@@ -375,7 +377,7 @@ namespace Render {
 				newTriangles = listTriangles.size();
 			}
 
-			for (Triangle t : listTriangles) {
+			for (Triangle& t : listTriangles) {
 
 				//TexturedTriangle(p,
 				//	t.proj_points[0].x, t.proj_points[0].y, t.tex_points[0].x, t.tex_points[0].y, t.tex_points[0].z,
@@ -416,6 +418,7 @@ namespace Render {
 	static void Update(olc::PixelGameEngine* p) {
 		//Debug::StartTimer();
 		view = camera.MakeViewMatrix(yaw);
+		
 
 		//get triangles from all entities
 		for (auto& e : entities) {
@@ -425,8 +428,6 @@ namespace Render {
 				e->Draw(p, ProjectionMatrix(p), view);
 			}
 			else {
-				//make this work at some point :)
-				//triangles.insert(triangles.end(), e->mesh->triangles.begin(), e->mesh->triangles.begin());
 				for (auto& t : e->mesh->triangles) { triangles.push_back(t); }
 			}
 		}
@@ -450,8 +451,6 @@ namespace Render {
 		p->DrawStringDecal(olc::vf2d(p->ScreenWidth()-300, p->ScreenHeight() - 10), "Camera: " + camera.position.str2F());
 	
 		//Debug::EndTimerAverage(p, 10, "", 10);
-
-		Debug::Message(camera.lookDir.str());
 	}
 
 	static void Cleanup() {

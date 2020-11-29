@@ -114,6 +114,13 @@ namespace Debug {
 		ResetCmd();
 	}
 
+	static void Error(void* a) {
+		color = 2;
+		SetConsoleTextAttribute(hConsole, color);
+		if (int* i = (int*)a) { std::cout << std::to_string(*i) << std::endl; }
+		if (float* f = (float*)a) { std::cout << std::to_string(*f) << std::endl; }
+		if (bool* b = (bool*)b) { std::cout << (*b ? "true" : "false") << std::endl; }
+	}
 
 	//// Timer ////
 
@@ -124,13 +131,13 @@ namespace Debug {
 
 	static void StartTimer() { start = steady_clock::now(); }
 
-	static void EndTimer(olc::PixelGameEngine* p, std::string message = "") {
+	static void EndTimer(std::string message = "") {
 		end = steady_clock::now();
 		duration<double> time_span = duration_cast<duration<double>>(end - start);
 		Message(message + std::to_string(time_span.count()));
 	}
 
-	static void EndTimer(olc::PixelGameEngine* p, double goodTime, std::string message = "") {
+	static void EndTimer(double goodTime, std::string message = "") {
 		end = steady_clock::now();
 		duration<double> time_span = duration_cast<duration<double>>(end - start);
 		double t = time_span.count();
@@ -142,7 +149,7 @@ namespace Debug {
 	//prints an average time every nFrames
 	//dunno if this would be useful, also probably not the most efficient thing ever
 	//could make a conditional version but idk yet
-	static void EndTimerAverage(olc::PixelGameEngine* p, int num, std::string message, int nFrames = 1) {
+	static void EndTimerAverage(int num, std::string message, int nFrames = 1) {
 		end = steady_clock::now();
 		duration<double> time_span = duration_cast<duration<double>>(end - start);
 		double t = time_span.count();

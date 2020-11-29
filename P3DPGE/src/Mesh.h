@@ -122,7 +122,8 @@ struct Triangle {
 		
 	}
 
-	float get_area() { return Math::TriangleArea((points[1] - points[0]).mag(), (points[2] - points[1]).mag(), (points[0] - points[2]).mag()); }
+
+	float get_area() { return Math::TriangleArea(points[1] - points[0], points[2] - points[0]); }
 
 	//TODO(m, sushi) make this take just a line when we get forward declaring
 	bool line_intersect(Edge3* e) {
@@ -223,23 +224,23 @@ struct BoxMesh : public Mesh {
 		
 		//TODO(c, sushi) do this better later
 		//west
-		triangles.push_back(Triangle(p3, p1, p4, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1))); //p3 - position, p1 - position, V3ZERO));//p4 - position));
-		triangles.push_back(Triangle(p3, p4, p5, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1)));  //p3 - position, p4 - position, V3ZERO));//p5 - position));
+		triangles.push_back(Triangle(p3, p1, p4, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1))); 
+		triangles.push_back(Triangle(p3, p4, p5, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1))); 
 		//top									 
-		triangles.push_back(Triangle(p4, p1, p2, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1)));  //p4 - position, p1 - position, V3ZERO));//p2 - position));
-		triangles.push_back(Triangle(p4, p2, p6, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1)));  //p4 - position, p2 - position, V3ZERO));//p6 - position));
+		triangles.push_back(Triangle(p4, p1, p2, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1))); 
+		triangles.push_back(Triangle(p4, p2, p6, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1))); 
 		//east									 
-		triangles.push_back(Triangle(p8, p6, p2, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1)));  //p8 - position, p6 - position, V3ZERO));//p2 - position));
-		triangles.push_back(Triangle(p8, p2, p7, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1)));  //p8 - position, p2 - position, V3ZERO));//p7 - position));
+		triangles.push_back(Triangle(p8, p6, p2, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1))); 
+		triangles.push_back(Triangle(p8, p2, p7, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1))); 
 		//bottom								 
-		triangles.push_back(Triangle(p3, p5, p8, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1)));  //p3 - position, p5 - position, V3ZERO));//p8 - position));
-		triangles.push_back(Triangle(p3, p8, p7, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1)));  //p3 - position, p8 - position, V3ZERO));//p7 - position));
+		triangles.push_back(Triangle(p3, p5, p8, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1))); 
+		triangles.push_back(Triangle(p3, p8, p7, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1))); 
 		//south									 
-		triangles.push_back(Triangle(p5, p4, p6, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1)));  //p5 - position, p4 - position, V3ZERO));//p6 - position));
-		triangles.push_back(Triangle(p5, p6, p8, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1)));  //p5 - position, p6 - position, V3ZERO));//p8 - position));
+		triangles.push_back(Triangle(p5, p4, p6, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1))); 
+		triangles.push_back(Triangle(p5, p6, p8, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1))); 
 		//north									 
-		triangles.push_back(Triangle(p7, p2, p1, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1)));  //p7 - position, p2 - position, V3ZERO));//p1 - position));
-		triangles.push_back(Triangle(p7, p1, p3, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1)));  //p7 - position, p1 - position, V3ZERO));//p3 - position));
+		triangles.push_back(Triangle(p7, p2, p1, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1))); 
+		triangles.push_back(Triangle(p7, p1, p3, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1))); 
 
 
 	}

@@ -224,13 +224,12 @@ void Line3::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4
 	//TODO(m, sushi) abstract the following functions in Math.h in order to make this not look retarded
 	Vector3 posView = position.GetM1x4ToVector3(position.proj_mult(position.ConvertToM1x4(), view));
 	Vector3 endView = endPosition.GetM1x4ToVector3(endPosition.proj_mult(endPosition.ConvertToM1x4(), view));
-
-	
 	
 	float d1 = Math::DistPointToPlane(posView, Vector3(0, 0, 0.01), Vector3(0, 0, 1));
 	float d2 = Math::DistPointToPlane(endView, Vector3(0, 0, 0.01), Vector3(0, 0, 1));
 
 	float t;
+	//TODO(sr, delle) implement line3 clipping
 	
 	if (d1 > 0 && d2 > 0) {
 		posView.ProjToScreen(ProjMat, p);
@@ -249,12 +248,6 @@ void Line3::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4
 		endView.ProjToScreen(ProjMat, p);
 		p->DrawLine(posView.Vector3Tovd2d(), endView.Vector3Tovd2d(), color);
 	}
-	else {
-		Debug::Error("yep its behind you");
-	}
-
-
-	
 }
 bool Line3::SpecialDraw() { return true; }
 

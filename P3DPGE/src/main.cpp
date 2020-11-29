@@ -84,5 +84,5 @@ public:
 
 int main() {
 	P3DPGE game;
-	if (game.Construct(800, 800, 1, 1, false, false)) { game.Start(); }
+	if (game.Construct(1280, 720, 1, 1, false, false)) { game.Start(); }
 }

@@ -199,8 +199,6 @@ struct Line2 : public Entity {
 	
 	olc::Pixel color = olc::WHITE;
 	
-	Edge edge;
-	
 	Line2(Vector3 endPosition, int id, EntityParams) : Entity(EntityArgs) {
 		//just so no RAV
 		mesh = new Mesh();
@@ -208,7 +206,6 @@ struct Line2 : public Entity {
 		endPosition.z = 0; this->endPosition = endPosition;
 		this->id = id;
 		
-		edge = Edge(position, endPosition);
 	}
 	
 	void Update(float deltaTime) override;

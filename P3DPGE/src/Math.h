@@ -21,9 +21,11 @@
 #define V3YU	Vector3(0, 1, 0)
 #define V3ZU	Vector3(0, 0, 1)
 
-#define Vector2 olc::vf2d
 
+//qol defines
+#define Vector2 olc::vf2d
 #define RANDCOLOR olc::Pixel(rand() % 255 + 1, rand() % 255 + 1, rand() % 255 + 1)
+#define RANDVEC(a) Vector3(rand() % a + 1, rand() % a + 1, rand() % a + 1)
 
 //physics constants
 #define GRAVITY 9.81f
@@ -175,6 +177,12 @@ public:
 		if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; w = vm.a[0][3]; }
 		return vm;
 	}
+
+	mat<float, 1, 4> unproj_mult(mat<float, 1, 4> v, mat<float, 4, 4> m) {
+		mat<float, 1, 4> vm = v * m;
+		if (vm.a[0][3] != 0) { vm.a[0][0] *= vm.a[0][3]; vm.a[0][1] *= vm.a[0][3]; vm.a[0][2] *= vm.a[0][3]; }
+		return vm;
+	}
 	
 	//// Functions pertaining to matrix-vertex manipulation ////
 	
@@ -282,10 +290,15 @@ public:
 
 	//reverse projection
 	void unProjToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p) {
-		M1x4ToVector3(proj_mult(ConvertToM1x4(), inverse(ProjMat)));
 		x /= .5f * (float)p->ScreenWidth();
 		y /= .5f * (float)p->ScreenHeight();
 		x -= 1.f; y -= 1.f;
+		M1x4ToVector3(unproj_mult(ConvertToM1x4(), inverse(ProjMat)));
+	}
+
+	void ScreenToWorld(mat<float, 4, 4> ProjMat, mat<float,4,4> view, olc::PixelGameEngine* p) {
+		unProjToScreen(ProjMat, p);
+		M1x4ToVector3(this->ConvertToM1x4() * inverse(view));
 	}
 };
 
@@ -397,12 +410,8 @@ namespace Math {
 
 	}
 
-	//returns area of a triangle of sides a, b and c
-	static float TriangleArea(float a, float b, float c) {
-		float s = (a + b + c) / 2;
-		float test = s * (s - a) * (s - b) * (s - c);
-		return std::sqrt(s * (s - a) * (s - b) * (s - c));
-	}
+	//returns area of a triangle of sides a and b
+	static float TriangleArea(Vector3 a, Vector3 b) { return a.cross(b).mag() / 2; }
 
 };
 
