@@ -1,7 +1,7 @@
-TODO List successfully generated with 35 TODOs found.
+TODO List successfully generated with 36 TODOs found.
 
 ~~~~~~~ TODO 0 ~~~~~~~
-Entities.cpp, Line: 82
+Entities.cpp, Line: 90
 Creator: delle
 ----------------------
 Date: 11/13/20
@@ -10,7 +10,7 @@ Tags: TODOP, unimportant, physics
 change air friction to calculate for shape of object
 
 ~~~~~~~ TODO 1 ~~~~~~~
-Entities.cpp, Line: 98
+Entities.cpp, Line: 106
 Creator: delle
 ----------------------
 Date: 11/13/20
@@ -19,7 +19,7 @@ Tags: TODOP, unimportant, physics
 create the GenerateRadialForce function
 
 ~~~~~~~ TODO 2 ~~~~~~~
-Entities.cpp, Line: 117
+Entities.cpp, Line: 125
 Creator: delle
 ----------------------
 Date: 11/9/20
@@ -28,7 +28,7 @@ Tags: TODOP, severe, physics
 expand this to a general entity check, but right now it just checks circles
 
 ~~~~~~~ TODO 3 ~~~~~~~
-Entities.cpp, Line: 118
+Entities.cpp, Line: 126
 Creator: delle
 ----------------------
 Date: 11/9/20
@@ -37,7 +37,7 @@ Tags: TODOP, optimization, unimportant, physics
 if other object is sphere, can optimize the equation to not use sqrt
 
 ~~~~~~~ TODO 4 ~~~~~~~
-Entities.cpp, Line: 130
+Entities.cpp, Line: 138
 Creator: delle
 ----------------------
 Date: 11/9/20
@@ -46,7 +46,7 @@ Tags: TODOP, severe, physics
 expand this to a general entity check, but right now it just checks circles
 
 ~~~~~~~ TODO 5 ~~~~~~~
-Entities.cpp, Line: 131
+Entities.cpp, Line: 139
 Creator: delle
 ----------------------
 Date: 11/17/20
@@ -55,7 +55,7 @@ Tags: TODOP, optimization, unimportant, physics
 can optimize this by recieving info from CheckCollision
 
 ~~~~~~~ TODO 6 ~~~~~~~
-Entities.cpp, Line: 170
+Entities.cpp, Line: 178
 Creator: delle
 ----------------------
 Date: 11/9/20
@@ -64,7 +64,7 @@ Tags: TODOP, severe, physics
 expand this to a general entity check
 
 ~~~~~~~ TODO 7 ~~~~~~~
-Entities.cpp, Line: 175
+Entities.cpp, Line: 183
 Creator: delle
 ----------------------
 Date: 11/9/20
@@ -73,7 +73,7 @@ Tags: TODOP, severe, physics
 expand this to a general entity check
 
 ~~~~~~~ TODO 8 ~~~~~~~
-Entities.cpp, Line: 215
+Entities.cpp, Line: 223
 Creator:  sushi
 ----------------------
 Tags: TODOP, math
@@ -81,6 +81,14 @@ Tags: TODOP, math
 abstract the following functions in Math.h in order to make this not look retarded
 
 ~~~~~~~ TODO 9 ~~~~~~~
+Entities.cpp, Line: 231
+Creator:  delle
+----------------------
+Tags: TODOP, severe, render
+----------------------
+implement line3 clipping
+
+~~~~~~~ TODO 10 ~~~~~~~
 Entities.h, Line: 26
 Creator:  sushi
 ----------------------
@@ -88,15 +96,15 @@ Tags: TODOP, render, entity, optimization
 ----------------------
 implement this eventually
 
-~~~~~~~ TODO 10 ~~~~~~~
-Entities.h, Line: 152
+~~~~~~~ TODO 11 ~~~~~~~
+Entities.h, Line: 154
 Creator:  sushi
 ----------------------
-Tags: TODOP, GitIssue, entity
+Tags: TODOP, entity
 ----------------------
 generate complex object relative to input position
 
-~~~~~~~ TODO 11 ~~~~~~~
+~~~~~~~ TODO 12 ~~~~~~~
 Input.h, Line: 5
 Creator: delle
 ----------------------
@@ -105,24 +113,24 @@ Tags: TODOP, input, optimization
 ----------------------
 look into heap vs stack memory allocation for the func pointer
 
-~~~~~~~ TODO 12 ~~~~~~~
-Input.h, Line: 119
+~~~~~~~ TODO 13 ~~~~~~~
+Input.h, Line: 120
 Creator:  sushi
 ----------------------
 Tags: TODOP, input
 ----------------------
 set up pausing to also pause moving/rotating objects manually
 
-~~~~~~~ TODO 13 ~~~~~~~
-Input.h, Line: 258
+~~~~~~~ TODO 14 ~~~~~~~
+Input.h, Line: 259
 Creator:  sushi
 ----------------------
-Tags: TODOP, input
+Tags: TODOP, optimization
 ----------------------
-make this work with new drawing system
+write this to skip objects who aren\'t close to the line
 
-~~~~~~~ TODO 14 ~~~~~~~
-Input.h, Line: 390
+~~~~~~~ TODO 15 ~~~~~~~
+Input.h, Line: 427
 Creator: delle
 ----------------------
 Date: 11/17/20
@@ -130,15 +138,15 @@ Tags: TODOP, severe, input
 ----------------------
 change this so it checks objects in screen space
 
-~~~~~~~ TODO 15 ~~~~~~~
-Input.h, Line: 444
+~~~~~~~ TODO 16 ~~~~~~~
+Input.h, Line: 481
 Creator:  sushi
 ----------------------
 Tags: TODOP, input
 ----------------------
 figure out how to make this work with only drawn triangles
 
-~~~~~~~ TODO 16 ~~~~~~~
+~~~~~~~ TODO 17 ~~~~~~~
 main.cpp, Line: 15
 Creator:  sushi
 ----------------------
@@ -146,7 +154,7 @@ Tags: TODOP, general
 ----------------------
 create a WorldMatrix that takes in several matrix operations and
 
-~~~~~~~ TODO 17 ~~~~~~~
+~~~~~~~ TODO 18 ~~~~~~~
 main.cpp, Line: 21
 Creator: delle
 ----------------------
@@ -154,7 +162,7 @@ Tags: TODOP, physics
 ----------------------
 add physics based collision resolution for all entities
 
-~~~~~~~ TODO 18 ~~~~~~~
+~~~~~~~ TODO 19 ~~~~~~~
 main.cpp, Line: 23
 Creator: delle
 ----------------------
@@ -162,7 +170,7 @@ Tags: TODOP, input
 ----------------------
 convert inputs to new format, method to add and remove inputs
 
-~~~~~~~ TODO 19 ~~~~~~~
+~~~~~~~ TODO 20 ~~~~~~~
 main.cpp, Line: 25
 Creator: delle
 ----------------------
@@ -170,24 +178,16 @@ Tags: TODOP, general
 ----------------------
 create a debug header for easy printing and such
 
-~~~~~~~ TODO 20 ~~~~~~~
-Math.h, Line: 33
+~~~~~~~ TODO 21 ~~~~~~~
+Math.h, Line: 70
 Creator:  sushi
 ----------------------
 Tags: TODOP, math
 ----------------------
 make lerp for Vector3
 
-~~~~~~~ TODO 21 ~~~~~~~
-Math.h, Line: 295
-Creator:  sushi
-----------------------
-Tags: TODOP, math
-----------------------
-maybe rewrite this? this may be able to be interweaved with Edge math and this way edge will have this function as well.
-
 ~~~~~~~ TODO 22 ~~~~~~~
-Math.h, Line: 307
+Math.h, Line: 363
 Creator:  sushi
 ----------------------
 Tags: TODOP
@@ -195,7 +195,7 @@ Tags: TODOP
 rename these functions to something not retarded
 
 ~~~~~~~ TODO 23 ~~~~~~~
-Math.h, Line: 358
+Math.h, Line: 418
 Creator:  sushi
 ----------------------
 Tags: TODOP, math
@@ -203,7 +203,7 @@ Tags: TODOP, math
 implement Edge in 3D
 
 ~~~~~~~ TODO 24 ~~~~~~~
-Math.h, Line: 376
+Math.h, Line: 435
 Creator:  sushi
 ----------------------
 Tags: TODOP
@@ -211,7 +211,15 @@ Tags: TODOP
 find a good place to update edge, probably in Triangle?
 
 ~~~~~~~ TODO 25 ~~~~~~~
-Mesh.h, Line: 150
+Mesh.h, Line: 127
+Creator:  sushi
+----------------------
+Tags: TODOP, math
+----------------------
+make this take just a line when we get forward declaring
+
+~~~~~~~ TODO 26 ~~~~~~~
+Mesh.h, Line: 168
 Creator: delle
 ----------------------
 Date: 11/22/20
@@ -219,15 +227,15 @@ Tags: TODOP
 ----------------------
 abstract out Mesh and split into Mesh2D and Mesh3D
 
-~~~~~~~ TODO 26 ~~~~~~~
-Mesh.h, Line: 206
+~~~~~~~ TODO 27 ~~~~~~~
+Mesh.h, Line: 224
 Creator:  sushi
 ----------------------
 Tags: TODOP, clean up
 ----------------------
 do this better later
 
-~~~~~~~ TODO 27 ~~~~~~~
+~~~~~~~ TODO 28 ~~~~~~~
 Physics.h, Line: 5
 Creator: delle
 ----------------------
@@ -236,7 +244,7 @@ Tags: TODOP, optimization, unimportant
 ----------------------
 optimize by using arrays rather than vectors,
 
-~~~~~~~ TODO 28 ~~~~~~~
+~~~~~~~ TODO 29 ~~~~~~~
 Physics.h, Line: 48
 Creator: delle
 ----------------------
@@ -245,40 +253,40 @@ Tags: TODOP, unimportant, physics, optimization
 ----------------------
 this could maybe be optimized by having an id counter instead of checking back element
 
-~~~~~~~ TODO 29 ~~~~~~~
-Render.h, Line: 18
+~~~~~~~ TODO 30 ~~~~~~~
+Render.h, Line: 22
 Creator:  sushi
 ----------------------
 Tags: TODOP, render
 ----------------------
 set up a way that debug can be applied to certain objects. this is important in the case of edge numbers
 
-~~~~~~~ TODO 30 ~~~~~~~
-Render.h, Line: 75
+~~~~~~~ TODO 31 ~~~~~~~
+Render.h, Line: 77
 Creator:  sushi
 ----------------------
 Tags: TODOP, render, clean up
 ----------------------
 change this to take in types and not individual values
 
-~~~~~~~ TODO 31 ~~~~~~~
-Render.h, Line: 290
+~~~~~~~ TODO 32 ~~~~~~~
+Render.h, Line: 294
 Creator:  sushi
 ----------------------
 Tags: TODOP, render
 ----------------------
 this still needs abstracted
 
-~~~~~~~ TODO 32 ~~~~~~~
-Render.h, Line: 345
+~~~~~~~ TODO 33 ~~~~~~~
+Render.h, Line: 349
 Creator:  sushi
 ----------------------
 Tags: TODOP, optimization
 ----------------------
 optimize this for loop 
 
-~~~~~~~ TODO 33 ~~~~~~~
-Render.h, Line: 440
+~~~~~~~ TODO 34 ~~~~~~~
+Render.h, Line: 456
 Creator:  sushi
 ----------------------
 Date:  11/18/2020
@@ -286,8 +294,8 @@ Tags: TODOP, render
 ----------------------
 writing this is probably important
 
-~~~~~~~ TODO 34 ~~~~~~~
-Time.h, Line: 4
+~~~~~~~ TODO 35 ~~~~~~~
+Time.h, Line: 5
 Creator: delle
 ----------------------
 Date: 11/17/20
