@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Collider.h" />
     <ClInclude Include="src\Debug.h" />
     <ClInclude Include="src\Entities.h" />
     <ClInclude Include="src\HandmadeMath.h" />
@@ -31,6 +32,7 @@
     <ClInclude Include="src\Time.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Collider.cpp" />
     <ClCompile Include="src\Entities.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>

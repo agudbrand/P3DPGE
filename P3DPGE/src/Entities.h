@@ -21,11 +21,11 @@ class Entity {
 	std::string tag;
 	
 	//mesh
-	Mesh* mesh;
-	olc::Sprite* sprite;
+	Mesh* mesh = 0;
+	olc::Sprite* sprite = 0;
 
 	//TODO(reo, sushi) implement this eventually
-	olc::Decal* decal;
+	olc::Decal* decal = 0;
 	
 	Entity() {}
 	Entity(int id, EntityParams) {
@@ -35,7 +35,9 @@ class Entity {
 		this->scale = scale;
 	}
 	virtual ~Entity() {
-		delete mesh;
+		if (mesh) delete mesh;
+		if (sprite) delete sprite;
+		if (decal) delete decal;
 	}
 	
 	// User must override these functions as required. I have not made
