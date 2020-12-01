@@ -109,6 +109,7 @@ public:
 		this->z = 0;
 	}
 	
+	void operator	 =	(const Vector3& rhs)				{ this->x = rhs.x; this->y = rhs.y; this->z = rhs.z;  }
 	Vector3 operator +  (const Vector3& rhs)		const	{ return Vector3(this->x + rhs.x, this->y + rhs.y, this->z + rhs.z); }
 	Vector3 operator -  (const Vector3& rhs)		const	{ return Vector3(this->x - rhs.x, this->y - rhs.y, this->z - rhs.z); }
 	Vector3 operator *  (const float& rhs)			const	{ return Vector3(this->x * rhs, this->y * rhs, this->z * rhs); }

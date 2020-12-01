@@ -3,6 +3,8 @@
 #include "Physics.h"
 #include "olcPixelGameEngine.h"
 
+#include "Collider.h" //TODO(i,delle) remove this
+
 //TODO(io,delle,11/17/20) look into heap vs stack memory allocation for the func pointer
 typedef void (*Action)(olc::PixelGameEngine* p);
 
@@ -104,7 +106,8 @@ namespace Input {
 	internal Entity* selectedEntity;
 	internal Triangle* selectedTriangle;
 	internal Vector3 leftClickPos = V3NULL;
-	internal bool debugInput = false;
+	internal bool debugInput = true;
+#define LOG if(debugInput) Debug::Message
 	
 	internal Vector3 GetMousePos(olc::PixelGameEngine* p) {
 		return Vector3(p->GetMouseX(), p->GetMouseY(), 0);
@@ -392,12 +395,40 @@ namespace Input {
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Render::DISP_EDGES = !Render::DISP_EDGES;
 			std::string output = (Render::DISP_EDGES) ? "true" : "false";
-			if (debugInput) std::cout << "Toggling wireframe to: " + output << std::endl;
+			if (debugInput) std::cout << "Toggling display edge numbers to: " + output << std::endl;
 			}, "TOGGLE_DISP_EDGES", olc::V, -1, 0, 0, 0,
 		"Toggles whether the edges of objects are numbered"));
 
+
+	//// temp debugging ////
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			AABBCollider aabb = AABBCollider(&Box(), Vector3(1, 1, 1));
+			SphereCollider sphere = SphereCollider(&Sphere(1, -1, Vector3(1, 1, 0)));
+			bool test = aabb.CheckCollision(&sphere, true);
+			if (test) {
+				LOG("test: true");
+			} else {
+				LOG("test: false");
+			}
+			}, "test_colliders", olc::F1, -1, 0, 1, 0,
+		"n/a"));
+
+	//// input management ////
+		//loop through all the input actions and unbind duplicate binds
+		for (InputAction& action : inputActions) {
+			for (InputAction& action2 : inputActions) {
+				if (&action != &action2 && action.key != olc::NONE) {
+					if (action.key == action2.key && action.bCtrlHeld == action2.bCtrlHeld && action.bShiftHeld == action2.bShiftHeld) {
+						Debug::Error("Actions " + action.name + " and " + action2.name + " were both bound to " + std::to_string(action.key) + "\n\tBoth have been unbound because of this");
+						action.key = olc::NONE; action2.key = olc::NONE;
+					}
+				}
+			}
+		}
+		
+
 	}
-	
+
 	static void Update(olc::PixelGameEngine* p, float& deltaTimePtr) {
 		for (InputAction action : inputActions) {
 			action.Update(p);
