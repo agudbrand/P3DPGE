@@ -36,6 +36,8 @@ class Entity {
 	}
 	virtual ~Entity() {
 		delete mesh;
+		delete sprite;
+		delete decal;
 	}
 	
 	// User must override these functions as required. I have not made

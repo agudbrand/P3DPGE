@@ -35,8 +35,8 @@ namespace Render {
 	static void AddEntity(Entity* e) { entities.push_back(e); }
 
 	static void Init() {
-
-		//test lines, remove them if i forget pls
+		
+		//test lines
 		//Line2* l1 = new Line2(Vector3(100, 100, 0), 1);
 		//Line3* l2 = new Line3(Vector3(10, 10, 4), 1, Vector3(0, 2, 1));
 		//entities.push_back(l1);
@@ -50,8 +50,6 @@ namespace Render {
 		//Box* b = new Box(V3NULL, -1, V3NULL);
 		//b->sprite = new olc::Sprite("sprites/UV_Grid_Sm.jpg");
 		//entities.push_back(b);
-
-		entities.push_back(new Line3(V3ZERO, -1, V3ZERO));
 
 	}
 

@@ -18,9 +18,6 @@
     <ClInclude Include="src\Entities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\HandmadeMath.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Input.h">
       <Filter>Header Files</Filter>
     </ClInclude>

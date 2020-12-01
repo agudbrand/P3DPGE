@@ -268,7 +268,7 @@ namespace Input {
 			
 			Vector3 ctox = unview - Render::camera.position;
 
-			Line3* ray = new Line3(ctox * 10, -1, Render::camera.position);
+			Line3* ray = new Line3(Render::camera.lookDir * 100, -1, Render::camera.position);
 			//Box* b = new Box(Vector3(0.3, 0.3, 0.3), -1, ctox * 10);
 			Box* b2 = new Box(Vector3(0.3, 0.3, 0.3), -1, ctox * 10);
 
