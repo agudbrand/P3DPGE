@@ -29,7 +29,7 @@ bool AABBAABBCollision(AABBCollider* first, AABBCollider* second, bool resolveCo
 	return false;
 }
 
-//TODO(p,delle) implement sphere-aabb collision and resolution
+//TODO(p,delle) implement sphere-aabb dynamic resolution
 //TODO(p,delle) maybe abstract out closest point calculations for each collider
 //Returns true if the closest point to the sphere on the AABB is within the sphere
 bool AABBSphereCollision(AABBCollider* aabb, Sphere* sphere, bool resolveCollision) {
@@ -42,6 +42,11 @@ bool AABBSphereCollision(AABBCollider* aabb, Sphere* sphere, bool resolveCollisi
 	if (distanceBetween < sphere->radius) {
 		if (resolveCollision) {
 			//static resolution
+			if (closestAABBPoint == sphere->position) { 
+				//NOTE if the closest point is the same, the vector between will have no direction; this 
+				//is supposed to be a remedy to that by offsetting in the direction between thier centers
+				vectorBetween = aabb->entity->position - sphere->position;
+			}
 			float overlap = .5f * (sphere->radius - distanceBetween);
 			vectorBetween = vectorBetween.normalized() * overlap;
 			aabb->entity->position += vectorBetween; //TODO(p,delle) test this
