@@ -53,7 +53,7 @@ bool AABBSphereCollision(AABBCollider* aabb, Sphere* sphere, bool resolveCollisi
 			sphere->position -= vectorBetween;
 
 			//dynamic resolution
-			mat<float, 3, 3> sphereInertiaTensorInverse = boost::qvm::inverse(InertiaTensors::SolidSphere(sphere->radius, sphere->mass));
+			mat<float, 3, 3> sphereInertiaTensorInverse = boost::qvm::inverse(InertiaTensors::LocalToWorld(sphere, InertiaTensors::SolidSphere(sphere->radius, sphere->mass)));
 			Vector3 normal = vectorBetween.normalized();
 
 		}

@@ -127,7 +127,14 @@ namespace InertiaTensors {
 		};
 	}
 
-	static mat<float, 3, 3> LocalToWorld(PhysEntity* entity, mat<float, 3, 3> inertiaTensor) {
-		
+	static mat<float, 3, 3> LocalToWorldTransformation(PhysEntity* entity, mat<float, 3, 3> inertiaTensor) {
+		mat<float, 4, 4> it4x4 = Math::M3x3ToM4x4(inertiaTensor);
+		it4x4 *= Math::Get_TranslateM4x4(entity->position);
+		it4x4 *= boost::qvm::rot_mat_xyx<4, float>(entity->rotation.x, entity->rotation.y, entity->rotation.z);
+		return mat<float, 3, 3>{
+			it4x4.a[0][0] * entity->scale.x, 0, 0,
+			0, it4x4.a[1][1] * entity->scale.y, 0,
+			0, 0, it4x4.a[2][2] * entity->scale.z
+		};
 	}
 };

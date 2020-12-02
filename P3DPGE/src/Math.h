@@ -151,6 +151,7 @@ public:
 		return std::string(buffer);
 	}
 	
+
 	//conversions between qvm's matrices and our vectors and a special mult function
 	mat<float, 1, 4> ConvertToM1x4() {
 		mat<float, 1, 4> m;
@@ -329,6 +330,24 @@ namespace Math {
 			translation.x, translation.y, translation.z, 1
 		};
 		return tv;
+	}
+
+	mat<float, 4, 4> M3x3ToM4x4(mat<float,3,3> inMat) {
+		return mat<float, 4, 4>{
+			inMat.a[0][0],	inMat.a[0][1],	inMat.a[0][2],	0,
+			inMat.a[1][0],	inMat.a[1][1],	inMat.a[1][2],	0,
+			inMat.a[2][0],	inMat.a[2][1],	inMat.a[2][2],	0,
+			0,				0,				0,				1
+		};
+	}
+
+	mat<float, 4, 4> M3x3ToM4x4(mat<float, 3, 3> inMat) {
+		return mat<float, 4, 4>{
+			inMat.a[0][0], inMat.a[0][1], inMat.a[0][2], 0,
+				inMat.a[1][0], inMat.a[1][1], inMat.a[1][2], 0,
+				inMat.a[2][0], inMat.a[2][1], inMat.a[2][2], 0,
+				0, 0, 0, 1
+		};
 	}
 
 	//this function returns a matrix that tells a vector how to look at a specific point in space.
