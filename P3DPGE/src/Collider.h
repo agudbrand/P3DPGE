@@ -3,8 +3,6 @@
 #include <stdint.h>
 #include <vector>
 
-#define mat boost::qvm::mat
-
 struct PhysEntity;
 struct Sphere;
 struct Box;
@@ -37,6 +35,7 @@ struct AABBCollider : public Collider {
 	~AABBCollider() {}
 
 	bool ContainsPoint(Vector3 point) override;
+	Vector3 ClosestPointOnSurface(Vector3 target);
 	bool CheckCollision(Collider* other, bool resolveCollision = true) override;
 };
 
@@ -47,6 +46,8 @@ struct SphereCollider : public Collider {
 
 	bool ContainsPoint(Vector3 point) override;
 	bool CheckCollision(Collider* other, bool resolveCollision = true) override;
+
+	static Vector3 ClosestPointOnSurface(Sphere* sphere, Vector3 target);
 };
 
 //NOTE this could instead be any kind of collider and just check contains point 
@@ -124,17 +125,6 @@ namespace InertiaTensors {
 			value, 0, 0,
 			0, value, 0,
 			0, 0, .5f * mass * rSqrd
-		};
-	}
-
-	static mat<float, 3, 3> LocalToWorldTransformation(PhysEntity* entity, mat<float, 3, 3> inertiaTensor) {
-		mat<float, 4, 4> it4x4 = Math::M3x3ToM4x4(inertiaTensor);
-		it4x4 *= Math::Get_TranslateM4x4(entity->position);
-		it4x4 *= boost::qvm::rot_mat_xyx<4, float>(entity->rotation.x, entity->rotation.y, entity->rotation.z);
-		return mat<float, 3, 3>{
-			it4x4.a[0][0] * entity->scale.x, 0, 0,
-			0, it4x4.a[1][1] * entity->scale.y, 0,
-			0, 0, it4x4.a[2][2] * entity->scale.z
 		};
 	}
 };

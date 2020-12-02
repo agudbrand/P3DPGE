@@ -209,7 +209,7 @@ void Complex::ResolveCollision(PhysEntity* entity) {
 //// Line2 and Line3 ////
 
 void Line2::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
-	p->DrawLine(position.Vector3Tovd2d(), endPosition.Vector3Tovd2d(), color);
+	p->DrawLine(position.toVector2(), endPosition.toVector2(), color);
 }
 bool Line2::SpecialDraw() { return true; }
 
@@ -234,19 +234,19 @@ void Line3::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4
 	if (d1 > 0 && d2 > 0) {
 		posView.ProjToScreen(ProjMat, p);
 		endView.ProjToScreen(ProjMat, p);
-		p->DrawLine(posView.Vector3Tovd2d(), endView.Vector3Tovd2d(), color);
+		p->DrawLine(posView.toVector2(), endView.toVector2(), color);
 	}
 	else if(d1 < 0 && d2 > 0){
 		posView = Math::VectorPlaneIntersect(Vector3(0, 0, 0.01), Vector3(0, 0, 1), posView, endView, t);
 		posView.ProjToScreen(ProjMat, p);
 		endView.ProjToScreen(ProjMat, p);
-		p->DrawLine(posView.Vector3Tovd2d(), endView.Vector3Tovd2d(), color);
+		p->DrawLine(posView.toVector2(), endView.toVector2(), color);
 	}
 	else if (d2 < 0 && d1 > 0) {
 		endView = Math::VectorPlaneIntersect(Vector3(0, 0, 0.01), Vector3(0, 0, 1), posView, endView, t);
 		posView.ProjToScreen(ProjMat, p);
 		endView.ProjToScreen(ProjMat, p);
-		p->DrawLine(posView.Vector3Tovd2d(), endView.Vector3Tovd2d(), color);
+		p->DrawLine(posView.toVector2(), endView.toVector2(), color);
 	}
 }
 bool Line3::SpecialDraw() { return true; }

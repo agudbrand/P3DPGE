@@ -6,7 +6,9 @@
 #include "boost/qvm/mat.hpp"
 #include "boost/qvm/vec.hpp"
 #include "boost/qvm/map_vec_mat.hpp"
+#include "boost/qvm/map_mat_mat.hpp"
 #include "boost/qvm/mat_operations.hpp"
+#include "boost/qvm/vec_mat_operations.hpp"
 #include "olcPixelGameEngine.h"
 
 //math constants
@@ -143,7 +145,7 @@ public:
 	Vector3				xInvert()							{ return Vector3(-x, y, z); }
 	Vector3				yInvert()							{ return Vector3(x, -y, z); }
 	Vector3				zInvert()							{ return Vector3(x, y, -z); }
-	olc::vd2d			Vector3Tovd2d()						{ return olc::vd2d(x, y); }
+	Vector2				toVector2()							{ return Vector2(x, y); }
 	
 	const std::string str2F() {
 		char buffer[50];
@@ -187,7 +189,7 @@ public:
 	}
 	
 	//// Functions pertaining to matrix-vertex manipulation ////
-	
+
 	//translate vector with given translation
 	void translateV3(Vector3 translation) {
 		mat<float, 4, 4> tv{
@@ -338,22 +340,20 @@ namespace Math {
 		return sv;
 	}
 
-	mat<float, 4, 4> M3x3ToM4x4(mat<float,3,3> inMat) {
+	/*mat<float, 4, 4> M3x3ToM4x4(mat<float,3,3> inMat) {
 		return mat<float, 4, 4>{
 			inMat.a[0][0],	inMat.a[0][1],	inMat.a[0][2],	0,
 			inMat.a[1][0],	inMat.a[1][1],	inMat.a[1][2],	0,
 			inMat.a[2][0],	inMat.a[2][1],	inMat.a[2][2],	0,
 			0,				0,				0,				1
 		};
-	}
+	}*/
 
-	mat<float, 4, 4> M3x3ToM4x4(mat<float, 3, 3> inMat) {
-		return mat<float, 4, 4>{
-			inMat.a[0][0], inMat.a[0][1], inMat.a[0][2], 0,
-				inMat.a[1][0], inMat.a[1][1], inMat.a[1][2], 0,
-				inMat.a[2][0], inMat.a[2][1], inMat.a[2][2], 0,
-				0, 0, 0, 1
-		};
+	static mat<float, 4, 4> WorldMatrix4x4(Vector3 translation, Vector3 rotation, Vector3 scale) {
+		mat<float, 4, 4> matrix = boost::qvm::rot_mat_xyx<4, float>(rotation.x, rotation.y, rotation.z);
+		matrix.a[0][3] = translation.x; matrix.a[1][3] = translation.y; matrix.a[2][3] = translation.z;
+		*matrix.a[0, 0] *= scale.x; *matrix.a[1, 1] *= scale.y; *matrix.a[2, 2] *= scale.z;
+		return matrix;
 	}
 
 	//this function returns a matrix that tells a vector how to look at a specific point in space.

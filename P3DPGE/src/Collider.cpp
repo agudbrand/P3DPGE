@@ -2,6 +2,11 @@
 
 #include "Entities.h"
 
+//mat<float, 3, 3> LocalToWorldInertiaTensor(PhysEntity* entity, mat<float, 3, 3> inertiaTensor) {
+//	mat<float, 4, 4> inverseTransformation = boost::qvm::inverse(Math::WorldMatrix4x4(entity->position, entity->rotation, entity->scale));
+//	return inverseTransformation * Math::M3x3ToM4x4(inertiaTensor) * boost::qvm::transposed(inverseTransformation);
+//}
+
 //// AABB ////
 
 AABBCollider::AABBCollider(PhysEntity* entity, Vector3 halfDimenstions) {
@@ -23,6 +28,13 @@ bool AABBCollider::ContainsPoint(Vector3 point) {
 	return checkX && checkY && checkZ;
 }
 
+//Returns the point on this AABBs surface closest to target point
+Vector3 AABBCollider::ClosestPointOnSurface(Vector3 target) {
+	return Vector3(fmaxf(-halfDims.x, fminf(target.x, halfDims.x)),
+					fmaxf(-halfDims.y, fminf(target.y, halfDims.y)),
+					fmaxf(-halfDims.z, fminf(target.z, halfDims.z)));
+}
+
 //TODO(p,delle) implement aabb-aabb collision and resolution
 bool AABBAABBCollision(AABBCollider* first, AABBCollider* second, bool resolveCollision) {
 	Debug::Error("AABB-AABB collision not implemented in Collider.cpp");
@@ -34,9 +46,7 @@ bool AABBAABBCollision(AABBCollider* first, AABBCollider* second, bool resolveCo
 //Returns true if the closest point to the sphere on the AABB is within the sphere
 bool AABBSphereCollision(AABBCollider* aabb, Sphere* sphere, bool resolveCollision) {
 	Debug::Error("AABB-Sphere collision resolution not implemented in Collider.cpp");
-	Vector3 closestAABBPoint(fmaxf(-aabb->halfDims.x, fminf(sphere->position.x, aabb->halfDims.x)),
-							 fmaxf(-aabb->halfDims.y, fminf(sphere->position.y, aabb->halfDims.y)),
-							 fmaxf(-aabb->halfDims.z, fminf(sphere->position.z, aabb->halfDims.z)));
+	Vector3 closestAABBPoint = aabb->ClosestPointOnSurface(sphere->position);
 	Vector3 vectorBetween = closestAABBPoint - sphere->position; //sphere towards aabb
 	float distanceBetween = vectorBetween.mag();
 	if (distanceBetween < sphere->radius) {
@@ -52,10 +62,29 @@ bool AABBSphereCollision(AABBCollider* aabb, Sphere* sphere, bool resolveCollisi
 			aabb->entity->position += vectorBetween; //TODO(p,delle) test this
 			sphere->position -= vectorBetween;
 
-			//dynamic resolution
-			mat<float, 3, 3> sphereInertiaTensorInverse = boost::qvm::inverse(InertiaTensors::LocalToWorld(sphere, InertiaTensors::SolidSphere(sphere->radius, sphere->mass)));
-			Vector3 normal = vectorBetween.normalized();
+			////dynamic resolution
+			//mat<float, 3, 3> sphereInertiaTensorInverse = boost::qvm::inverse(LocalToWorldInertiaTensor(sphere, InertiaTensors::SolidSphere(sphere->radius, sphere->mass)));
+			//Vector3 normal = vectorBetween.normalized();
+			//Vector3 ra = sphere->position + SphereCollider::ClosestPointOnSurface(sphere, closestAABBPoint);
+			//Vector3 sphereAngularVelocityChange = normal.cross(ra);
+			//boost::qvm::transform_vector(Math::M3x3ToM4x4(sphereInertiaTensorInverse), boost::qvm::vec<float, 3>{sphereAngularVelocityChange.x, sphereAngularVelocityChange.y, sphereAngularVelocityChange.z});
+			//float inverseMassA = 1.f / sphere->mass;
+			//float scalar = inverseMassA + sphereAngularVelocityChange.cross(ra).dot(normal);
 
+			//mat<float, 3, 3> aabbInertiaTensorInverse = boost::qvm::inverse(LocalToWorldInertiaTensor(sphere, InertiaTensors::SolidSphere(sphere->radius, sphere->mass)));
+			//Vector3 rb = aabb->entity->position + closestAABBPoint;
+			//Vector3 aabbAngularVelocityChange = normal.cross(rb);
+			//boost::qvm::transform_vector(Math::M3x3ToM4x4(aabbInertiaTensorInverse), boost::qvm::vec<float, 3>{aabbAngularVelocityChange.x, aabbAngularVelocityChange.y, aabbAngularVelocityChange.z});
+			//float inverseMassB = 1.f / aabb->entity->mass;
+			//scalar += inverseMassB + aabbAngularVelocityChange.cross(rb).dot(normal);
+			//	
+			//float coefRest = 1.f; //TODO(c,delle) remove this, only for testing
+			//float impulseMod = (coefRest + 1) * (sphere->velocity - aabb->entity->velocity).mag() / scalar;
+			//Vector3 impulse = normal * impulseMod;
+			//sphere->velocity -= impulse * inverseMassA; //TODO(p,delle) test this
+			//aabb->entity->velocity -= impulse * inverseMassB;
+			//sphere->rotVelocity -= sphereAngularVelocityChange;
+			////aabb->entity->rotVelocity -= aabbAngularVelocityChange; //we dont do this because AABB shouldnt rotate
 		}
 		return true;
 	}
@@ -112,6 +141,11 @@ SphereCollider::SphereCollider(Sphere* sphere) {
 //Returns true if the distance between the point and the sphere's position is less than or equal to the sphere's radius
 bool SphereCollider::ContainsPoint(Vector3 point) {
 	return point.distanceTo(sphere->position) <= sphere->radius;
+}
+
+//Returns the point on this spheres surface closest to target point
+Vector3 SphereCollider::ClosestPointOnSurface(Sphere* sphere, Vector3 target) {
+	return (target - sphere->position).clampMag(sphere->radius);
 }
 
 //TODO(p,delle) implement rotational collision resolution
