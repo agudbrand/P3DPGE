@@ -321,6 +321,16 @@ namespace Math {
 		return m;
 	}
 
+	mat<float,4,4> Get_TranslateM4x4(Vector3 translation) {
+		mat<float, 4, 4> tv{
+			1,			   0,			  0,			 0,
+			0,			   1,			  0,			 0,
+			0,			   0,			  1,			 0,
+			translation.x, translation.y, translation.z, 1
+		};
+		return tv;
+	}
+
 	//this function returns a matrix that tells a vector how to look at a specific point in space.
 	static mat<float, 4, 4> PointAt(Vector3& pos, Vector3& target, Vector3& up) {
 		up.normalize();

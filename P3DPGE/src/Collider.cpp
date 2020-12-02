@@ -35,8 +35,8 @@ bool AABBAABBCollision(AABBCollider* first, AABBCollider* second, bool resolveCo
 bool AABBSphereCollision(AABBCollider* aabb, Sphere* sphere, bool resolveCollision) {
 	Debug::Error("AABB-Sphere collision resolution not implemented in Collider.cpp");
 	Vector3 closestAABBPoint(fmaxf(-aabb->halfDims.x, fminf(sphere->position.x, aabb->halfDims.x)),
-							fmaxf(-aabb->halfDims.y, fminf(sphere->position.y, aabb->halfDims.y)),
-							fmaxf(-aabb->halfDims.z, fminf(sphere->position.z, aabb->halfDims.z)));
+							 fmaxf(-aabb->halfDims.y, fminf(sphere->position.y, aabb->halfDims.y)),
+							 fmaxf(-aabb->halfDims.z, fminf(sphere->position.z, aabb->halfDims.z)));
 	Vector3 vectorBetween = closestAABBPoint - sphere->position; //sphere towards aabb
 	float distanceBetween = vectorBetween.mag();
 	if (distanceBetween < sphere->radius) {
