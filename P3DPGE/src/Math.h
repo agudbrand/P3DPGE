@@ -30,7 +30,7 @@
 //physics constants
 #define GRAVITY 9.81f
 
-using namespace boost::qvm;
+#define mat boost::qvm::mat
 
 namespace Math {
 	static float to_radians(float angle) { return angle * (M_PI / 180); }
@@ -202,7 +202,7 @@ public:
 	//scale object
 	void scaleV3(Vector3 scale) {
 		mat<float, 4, 4> sv{
-			scale.x,0,		  0,	   0,
+			scale.x, 0,		  0,	   0,
 			0,		 scale.y, 0,	   0,
 			0,		 0,		  scale.z, 0,
 			0,		 0,		  0,	   1
@@ -308,21 +308,17 @@ namespace Math {
 	
 
 	//conversions
-	static Vector3 vi2dToVector3(olc::vi2d vector, float z = 0) {
-		return Vector3((float)vector.x, (float)vector.y, z);
-	}
+	static Vector3 vi2dToVector3(olc::vi2d vector, float z = 0) { return Vector3((float)vector.x, (float)vector.y, z); }
 
-	static Vector3 M1x4ToVector3(mat<float, 1, 4> m) {
-		return Vector3(m.a[0][0], m.a[0][1], m.a[0][2]);
-	}
+	static Vector3 M1x4ToVector3(mat<float, 1, 4> m) { return Vector3(m.a[0][0], m.a[0][1], m.a[0][2]); }
 
 	static mat<float, 1, 4> Vector3ToM1x4(Vector3 v) {
 		mat<float, 1, 4> m;
 		m.a[0][0] = v.x; m.a[0][1] = v.y; m.a[0][2] = v.z; m.a[0][3] = 1;
 		return m;
 	}
-
-	mat<float,4,4> Get_TranslateM4x4(Vector3 translation) {
+	
+	static mat<float, 4, 4> GetTranslateM4x4(Vector3 translation) {
 		mat<float, 4, 4> tv{
 			1,			   0,			  0,			 0,
 			0,			   1,			  0,			 0,
@@ -330,6 +326,16 @@ namespace Math {
 			translation.x, translation.y, translation.z, 1
 		};
 		return tv;
+	}
+	
+	static mat<float, 4, 4> GetScaleMat(Vector3 scale) {
+		mat<float, 4, 4> sv{
+			scale.x, 0,		  0,	   0,
+			0,		 scale.y, 0,	   0,
+			0,		 0,		  scale.z, 0,
+			0,		 0,		  0,	   1
+		};
+		return sv;
 	}
 
 	mat<float, 4, 4> M3x3ToM4x4(mat<float,3,3> inMat) {
