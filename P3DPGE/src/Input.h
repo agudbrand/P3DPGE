@@ -402,8 +402,8 @@ namespace Input {
 
 	//// temp debugging ////
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-			AABBCollider aabb = AABBCollider(&Box(), Vector3(1, 1, 1));
-			SphereCollider sphere = SphereCollider(&Sphere(1, -1, Vector3(1, 1, 0)));
+			AABBCollider aabb = AABBCollider(new Box(), Vector3(1, 1, 1));
+			SphereCollider sphere = SphereCollider(new Sphere(1, -1, Vector3(1, 1, 0)));
 			bool test = aabb.CheckCollision(&sphere, true);
 			if (test) {
 				LOG("test: true");
