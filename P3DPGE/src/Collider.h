@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <vector>
 
+#define mat boost::qvm::mat
+
 struct PhysEntity;
 struct Sphere;
 struct Box;
@@ -64,3 +66,68 @@ struct ComplexCollider : public Collider {
 //
 //
 //};
+
+//struct CapsuleCollider : public Collider {
+//
+//};
+
+namespace InertiaTensors {
+	static float twoThirds = (2.f / 3.f);
+	static float oneTwelfth = (1.f / 12.f);
+
+	static mat<float, 3, 3> SolidSphere(float radius, float mass) {
+		float value = .4f * mass * radius * radius;
+		return mat<float, 3, 3>{
+			value,	0,		0,
+			0,		value,	0,
+			0,		0,		value
+		};
+	}
+
+	static mat<float, 3, 3> HollowSphere(float radius, float mass) {
+		float value = twoThirds * mass * radius * radius;
+		return mat<float, 3, 3>{
+			value,	0,		0,
+			0,		value,	0,
+			0,		0,		value
+		};
+	}
+
+	static mat<float, 3, 3> SolidEllipsoid(Vector3 halfDimensions, float mass) {
+		float oneFifthMass = .2f * mass;
+		float aSqrd = halfDimensions.x * halfDimensions.x;
+		float bSqrd = halfDimensions.y * halfDimensions.y;
+		float cSqrd = halfDimensions.z * halfDimensions.z;
+		return mat<float, 3, 3>{
+			oneFifthMass * (bSqrd + cSqrd),	0, 0,
+			0, oneFifthMass * (bSqrd + cSqrd), 0,
+			0, 0, oneFifthMass * (bSqrd + cSqrd)
+		};
+	}
+
+	static mat<float, 3, 3> SolidCuboid(float width, float height, float depth, float mass) {
+		float oneTwelfthMass = oneTwelfth * mass;
+		float wSqrd = width * width;
+		float hSqrd = height * height;
+		float dSqrd = depth * depth;
+		return mat<float, 3, 3>{
+			oneTwelfthMass * (hSqrd + dSqrd), 0, 0,
+			0, oneTwelfthMass * (wSqrd + dSqrd), 0,
+			0, 0, oneTwelfthMass * (wSqrd + hSqrd)
+		};
+	}
+
+	static mat<float, 3, 3> SolidCylinder(float radius, float height, float mass) {
+		float rSqrd = radius * radius;
+		float value = oneTwelfth * mass * (3*rSqrd + height * height);
+		return mat<float, 3, 3>{
+			value, 0, 0,
+			0, value, 0,
+			0, 0, .5f * mass * rSqrd
+		};
+	}
+
+	static mat<float, 3, 3> LocalToWorld(PhysEntity* entity, mat<float, 3, 3> inertiaTensor) {
+		
+	}
+};
