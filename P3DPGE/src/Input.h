@@ -106,18 +106,22 @@ namespace Input {
 	internal Entity* selectedEntity;
 	internal Triangle* selectedTriangle;
 	internal Vector3 leftClickPos = V3NULL;
-	internal bool debugInput = true;
+	internal bool debugInput = false;
 #define LOG if(debugInput) Debug::Message
 	
 	internal Vector3 GetMousePos(olc::PixelGameEngine* p) {
-		return Vector3(p->GetMouseX(), p->GetMouseY(), 0);
+		return Vector3(p->GetMouseX(), p->GetMouseY());
 	}
 	
+	internal Vector3 GetMousePosNormalized(olc::PixelGameEngine* p) {
+		return Vector3((float)p->GetMouseX() / (float)p->ScreenWidth(), (float)p->GetMouseY() / (float)p->ScreenHeight());
+	}
+
 	static void Init() {
 		inputActions = std::vector<InputAction>();
 		//NOTE InputAction: function, name, key, mouseButton, inputState, shift, ctrl, description
 	
-		//// time control ////
+	//// time control ////
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Time::deltaTime = 0;
@@ -258,25 +262,34 @@ namespace Input {
 			}, "translate_-z", olc::I, -1, 1, 0, 0,
 		"Translates all objects along the negative global z-axis"));
 
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			Render::entities.clear();
+			Render::sentities.clear();
+			}, "clear_entities", olc::C, -1, 1, 1, 0,
+		"Delete all entities"));
+
 	//// object selection ////
 		
 		//TODO(o, sushi) write this to skip objects who aren't close to the line
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Vector3 pos = GetMousePos(p);
-			pos.unProjToScreen(Render::ProjectionMatrix(p), p);
+			//Debug::Message("pos    " + pos.str());
+			//pos.unProjToScreen(Render::ProjectionMatrix(p), p);
 			Vector3 unview = Math::M1x4ToVector3(Math::Vector3ToM1x4(pos) * inverse(Render::view));
 			
 			if (selectedEntity) { selectedEntity = nullptr; }
 
+			pos.ScreenToWorld(Render::ProjectionMatrix(p), Render::camera.MakeViewMatrix(Render::yaw), p);
 			
-			Vector3 ctox = unview - Render::camera.position;
+			Vector3 ctox = pos - Render::camera.position;
 
-			Line3* ray = new Line3(Render::camera.lookDir * 100, -1, Render::camera.position);
+			Line3* ray = new Line3(ctox.normalized() * 100, -1, Render::camera.position);
 			//Box* b = new Box(Vector3(0.3, 0.3, 0.3), -1, ctox * 10);
-			Box* b2 = new Box(Vector3(0.3, 0.3, 0.3), -1, ctox * 10);
+			Box* b2 = new Box(Vector3(0.1, 0.1, 0.1), -1, ctox * 10);
 
-			Debug::Message(pos.str());
-			Debug::Message(unview.str());
+			Debug::Message("pos    " + pos.str());
+			//Debug::Message("unview " + unview.str());
+			Debug::Message("ctox   " + ctox.str());
 
 			for (Entity* e : Render::entities) {
 				if (e->LineIntersect(&ray->edge) && e->id != -1) {

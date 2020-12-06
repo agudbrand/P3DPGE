@@ -301,8 +301,12 @@ public:
 	}
 
 	void ScreenToWorld(mat<float, 4, 4> ProjMat, mat<float,4,4> view, olc::PixelGameEngine* p) {
-		unProjToScreen(ProjMat, p);
-		M1x4ToVector3(this->ConvertToM1x4() * inverse(view));
+		mat<float, 4, 4> pxv = view * ProjMat;
+		x /= .5f * (float)p->ScreenWidth();
+		y /= .5f * (float)p->ScreenHeight();
+		x -= 1.f; y -= 1.f;
+		pxv = inverse(pxv);
+		M1x4ToVector3(unproj_mult(ConvertToM1x4(), pxv));
 	}
 };
 

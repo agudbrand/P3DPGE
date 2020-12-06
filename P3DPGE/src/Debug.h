@@ -114,14 +114,6 @@ namespace Debug {
 		ResetCmd();
 	}
 
-	static void Error(void* a) {
-		color = 2;
-		SetConsoleTextAttribute(hConsole, color);
-		if (int* i = (int*)a) { std::cout << std::to_string(*i) << std::endl; }
-		if (float* f = (float*)a) { std::cout << std::to_string(*f) << std::endl; }
-		if (bool* b = (bool*)b) { std::cout << (*b ? "true" : "false") << std::endl; }
-	}
-
 	//// Timer ////
 
 	static steady_clock::time_point start;
@@ -159,6 +151,16 @@ namespace Debug {
 
 		if (elapsedFrames >= nFrames) { Message(message + std::to_string(Math::average(times, times.size()))); elapsedFrames = 0; }
 		else { elapsedFrames++; }
+	}
+
+	//for timing things
+	//this can potentially become innaccurate in certain situations
+	//like with frame rate issues and such
+	static double GetEndTimer(bool restart) {
+		end = steady_clock::now();
+		duration<double> time_span = duration_cast<duration<double>>(end - start);
+		if (restart) { start = steady_clock::now(); }
+		return time_span.count();
 	}
 
 };

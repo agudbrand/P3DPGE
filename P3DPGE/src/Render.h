@@ -55,7 +55,6 @@ namespace Render {
 
 	using namespace boost::qvm;
 	//projection matrix
-	//this matrix seems to only work well with 1:1 aspect ratios I think its cause FOV is set to 90
 	mat<float, 4, 4> ProjectionMatrix(olc::PixelGameEngine* p) {
 		float nearz = 0.1;
 		float farz = 1000.0;
