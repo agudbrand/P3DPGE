@@ -2,6 +2,7 @@
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
 #include "Input.h"
+#include "Matrix.h"
 using namespace olc;
 
 //// Requires boost library 1.74.0 ////
@@ -47,6 +48,9 @@ public:
 		Input::Init();
 		Physics::Init();
 		Render::Init();
+
+		Debug::Message("matrix struct size: " + std::to_string(sizeof(Matrix)));
+		Debug::Message("matrix struct size: " + std::to_string(sizeof(Matrix(1, 1, {0,1,2,3}))));
 
 		return true;
 	}

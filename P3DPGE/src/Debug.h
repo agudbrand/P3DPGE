@@ -5,12 +5,33 @@
 #include <iostream>
 #include <cstdarg>
 #include <windows.h>
-#include <cstdio>
 #include <chrono>
 
 #define internal static
 #define local_persist static 
 #define global_variable static
+
+#ifndef NDEBUG
+#   define ASSERT(condition, message) \
+    do { \
+        if (! (condition)) { \
+            std::cerr << "Assertion `" #condition "` failed in " << __FILE__ \
+                      << " line " << __LINE__ << ": " << message << std::endl; \
+            std::terminate(); \
+        } \
+    } while (false)
+#else
+#   define ASSERT(condition, message) do { } while (false)
+#endif
+
+typedef signed char		int8;
+typedef signed short	int16;
+typedef signed int		int32;
+typedef signed long		int64;
+typedef unsigned char	uint8;
+typedef unsigned short	uint16;
+typedef unsigned int	uint32;
+typedef unsigned long	uint64;
 
 using namespace std::chrono;
 

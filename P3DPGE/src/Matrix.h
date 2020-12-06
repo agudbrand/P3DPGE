@@ -1,29 +1,170 @@
 #pragma once
+#include "Debug.h"
 
 struct Matrix {
-	int rows;
-	int columns;
+	uint32 rows;
+	uint32 cols;
+	uint32 elementCount; //this might be convinient to have, but it increases size by 8 bytes?
+	float* data;
+
+	Matrix(uint32 inRows, uint32 inCols);
+	Matrix(uint32 inRows, uint32 inCols, float inData[]);
+	Matrix(uint32 inRows, uint32 inCols, std::initializer_list<float> list);
+	Matrix(const Matrix& m);
+	~Matrix();
+
+	float&	operator () (uint32 row, uint32 col);
+	Matrix&	operator =	(const Matrix& rhs);
+	Matrix  operator *  (const float& rhs) const;
+	Matrix& operator *= (const float& rhs);
+	Matrix  operator /  (const float& rhs) const;
+	Matrix& operator /= (const float& rhs);
+	Matrix  operator +  (const Matrix& rhs) const;
+	Matrix& operator += (const Matrix& rhs);
+	Matrix  operator -  (const Matrix& rhs) const;
+	Matrix& operator -= (const Matrix& rhs);
+	Matrix  operator *  (const Matrix& rhs) const;
+	Matrix& operator *= (const Matrix& rhs);
+	Matrix  operator ^  (const Matrix& rhs) const;
+	Matrix& operator ^= (const Matrix& rhs);
+	Matrix  operator %  (const Matrix& rhs) const; 
+	Matrix& operator %= (const Matrix& rhs);
+	bool	operator == (const Matrix& rhs) const;
+	bool	operator != (const Matrix& rhs) const;
+
+	void copy(const Matrix& m);
+	const std::string str() const;
+	const std::string str2F() const;
 };
 
-struct Matrix4x4 : public Matrix {
-	float a[4][4] = {0};
+//// Constructors ////
 
-	Matrix4x4() {
-		rows = 4;
-		columns = 4;
+inline Matrix::Matrix(uint32 inRows, uint32 inCols) : rows(inRows), cols(inCols) {
+	ASSERT(inRows != 0 && inCols != 0, "Matrix constructor was given zero size");
+	this->elementCount = inRows * inCols;
+	this->data = new float[elementCount];
+}
+
+inline Matrix::Matrix(uint32 inRows, uint32 inCols, float inData[]) : rows(inRows), cols(inCols) {
+	ASSERT(inRows != 0 && inCols != 0, "Matrix constructor was given zero size");
+	this->elementCount = inRows * inCols;
+	uint32 inCount = sizeof(*inData) / sizeof(float);
+	ASSERT(inCount <= elementCount, "Matrix constructor was given too many elements for given dimensions");
+	this->data = new float[elementCount];
+	for (uint32 i = 0; i < inCount; ++i) {
+		*(this->data+i) = inData[i];
 	}
+}
 
-	Matrix4x4(float a00, float a01, float a02, float a03,
-			float a10, float a11, float a12, float a13, 
-			float a20, float a21, float a22, float a23, 
-			float a30, float a31, float a32, float a33){
-		rows = 4; columns = 4;
-
-		a[0][0] = a00; a[0][1] = a01; a[0][2] = a02; a[0][3] = a03;
-		a[1][0] = a10; a[1][1] = a11; a[1][2] = a12; a[1][3] = a13;
-		a[2][0] = a20; a[2][1] = a21; a[2][2] = a22; a[2][3] = a23;
-		a[3][0] = a30; a[3][1] = a31; a[3][2] = a32; a[3][3] = a33;
+inline Matrix::Matrix(uint32 inRows, uint32 inCols, std::initializer_list<float> list) : rows(inRows), cols(inCols) {
+	ASSERT(inRows != 0 && inCols != 0, "Matrix constructor was given zero size");
+	this->elementCount = inRows * inCols;
+	uint32 inCount = list.size();
+	ASSERT(inCount <= elementCount, "Matrix constructor was given too many elements for given dimensions");
+	this->data = new float[elementCount];
+	int i = 0;
+	for (auto& f : list) {
+		this->data[i] = f;
+		++i;
 	}
+}
 
+inline Matrix::Matrix(const Matrix& m) {
+	this->rows = m.rows;
+	this->cols = m.cols;
+	this->elementCount = rows * cols;
+	this->data = new float[elementCount];
+	copy(m);
+}
 
-};
+inline Matrix::~Matrix() {
+	delete data;
+}
+
+//// Operators ////
+
+inline float& Matrix::operator () (uint32 row, uint32 col) {
+	ASSERT(row <= rows && col <= cols, "Matrix subscript out of bounds");
+	return data[cols*row + col];
+}
+
+inline Matrix& Matrix::operator =  (const Matrix& rhs) {
+	if (this->data != rhs.data) {
+		this->rows = rhs.rows;
+		this->cols = rhs.cols;
+		this->elementCount = rows * cols;
+		if (data) { delete[] data; }
+		this->data = new float[elementCount];
+		copy(rhs);
+	}
+	return *this;
+}
+
+inline Matrix  Matrix::operator *  (const float& rhs) const {
+	Matrix newMatrix(*this);
+	for (uint32 i = 0; i < newMatrix.elementCount; ++i) {
+		*(newMatrix.data+i) *= rhs;
+	}
+	return newMatrix;
+}
+
+inline Matrix& Matrix::operator *= (const float& rhs) {
+	for (uint32 i = 0; i < elementCount; ++i) {
+		*(this->data+i) *= rhs;
+	}
+}
+
+inline Matrix  Matrix::operator /  (const float& rhs) const {
+	Matrix newMatrix(*this);
+	for (uint32 i = 0; i < newMatrix.elementCount; ++i) {
+		*(newMatrix.data+i) /= rhs;
+	}
+	return newMatrix;
+}
+
+inline Matrix& Matrix::operator /= (const float& rhs){
+	for (uint32 i = 0; i < sizeof(*data) / sizeof(float); ++i) {
+		*(this->data+i) /= rhs;
+	}
+}
+
+inline Matrix  Matrix::operator +  (const Matrix& rhs) const{}
+
+inline Matrix& Matrix::operator += (const Matrix& rhs){}
+
+inline Matrix  Matrix::operator -  (const Matrix& rhs) const{}
+
+inline Matrix& Matrix::operator -= (const Matrix& rhs){}
+
+inline Matrix  Matrix::operator *  (const Matrix& rhs) const{}
+
+inline Matrix& Matrix::operator *= (const Matrix& rhs){}
+
+//element-wise multiplication
+inline Matrix  Matrix::operator ^  (const Matrix& rhs) const{} 
+
+//element-wise multiplication and assignment
+inline Matrix& Matrix::operator ^= (const Matrix& rhs){} 
+
+//element-wise division
+inline Matrix  Matrix::operator %  (const Matrix& rhs) const{} 
+
+//element-wise division and assignment
+inline Matrix& Matrix::operator %= (const Matrix& rhs){}
+
+inline bool Matrix::operator			== (const Matrix& rhs) const { return false; }
+
+inline bool Matrix::operator			!= (const Matrix& rhs) const { return false; }
+
+//// Functions ////
+
+//copys the data from one matrix to the other
+//REQUIRES both to have the same dimensions
+inline void Matrix::copy(const Matrix& m) {
+	ASSERT(rows == m.rows && cols == m.cols, "Cant copy matrices of unequal dimensions");
+	float* p = data + (elementCount);
+	float* q = m.data + (elementCount);
+	while (p > data) {
+		*--p = *--q;
+	}
+}

@@ -59,8 +59,5 @@
     <ClCompile Include="src\Collider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Matrix.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>
