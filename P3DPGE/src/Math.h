@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <numeric>
 #include "Time.h"
+#include "boost/qvm/mat_access.hpp"
 #include "boost/qvm/mat.hpp"
 #include "boost/qvm/vec.hpp"
 #include "boost/qvm/map_vec_mat.hpp"
@@ -22,7 +23,12 @@
 #define V3XU	Vector3(1, 0, 0)
 #define V3YU	Vector3(0, 1, 0)
 #define V3ZU	Vector3(0, 0, 1)
-
+#define V3RIGHT		Vector3(1, 0, 0)
+#define V3LEFT		Vector3(-1, 0, 0)
+#define V3UP		Vector3(0, 1, 0) //TODO verify this
+#define V3DOWN		Vector3(0, -1, 0)
+#define V3FORWARD	Vector3(0, 0, 1)
+#define V3BACKWARD	Vector3(0, 0, -1)
 
 //qol defines
 #define Vector2 olc::vf2d
@@ -110,6 +116,14 @@ public:
 		this->y = vector2.y;
 		this->z = 0;
 	}
+
+	Vector3(mat<float,1,4> m) {
+		x = m.a[0][0]; y = m.a[0][1]; z = m.a[0][2];
+	}
+
+	Vector3(boost::qvm::vec<float, 3> vector) {
+		x = vector.a[0]; y = vector.a[1]; z = vector.a[2];
+	}
 	
 	void operator	 =	(const Vector3& rhs)				{ this->x = rhs.x; this->y = rhs.y; this->z = rhs.z;  }
 	Vector3 operator +  (const Vector3& rhs)		const	{ return Vector3(this->x + rhs.x, this->y + rhs.y, this->z + rhs.z); }
@@ -146,6 +160,7 @@ public:
 	Vector3				yInvert()							{ return Vector3(x, -y, z); }
 	Vector3				zInvert()							{ return Vector3(x, y, -z); }
 	Vector2				toVector2()							{ return Vector2(x, y); }
+	Vector3				copy()								{ return Vector3(x, y, z); }
 	
 	const std::string str2F() {
 		char buffer[50];
@@ -159,6 +174,10 @@ public:
 		mat<float, 1, 4> m;
 		m.a[0][0] = x; m.a[0][1] = y; m.a[0][2] = z; m.a[0][3] = 1;
 		return m;
+	}
+
+	boost::qvm::vec<float, 3> ConvertToVec3() {
+		return boost::qvm::vec<float, 3>{x, y, z};
 	}
 	
 	void M1x4ToVector3(mat<float, 1, 4> m) {
@@ -306,9 +325,11 @@ public:
 	}
 };
 
-namespace Math {
-	
+struct Vector4 : public Vector3 {
+	float w;
+};
 
+namespace Math {
 	//conversions
 	static Vector3 vi2dToVector3(olc::vi2d vector, float z = 0) { return Vector3((float)vector.x, (float)vector.y, z); }
 
@@ -340,19 +361,19 @@ namespace Math {
 		return sv;
 	}
 
-	/*mat<float, 4, 4> M3x3ToM4x4(mat<float,3,3> inMat) {
+	static mat<float, 4, 4> M3x3ToM4x4(mat<float,3,3> inMat) {
 		return mat<float, 4, 4>{
 			inMat.a[0][0],	inMat.a[0][1],	inMat.a[0][2],	0,
 			inMat.a[1][0],	inMat.a[1][1],	inMat.a[1][2],	0,
 			inMat.a[2][0],	inMat.a[2][1],	inMat.a[2][2],	0,
 			0,				0,				0,				1
 		};
-	}*/
+	}
 
 	static mat<float, 4, 4> WorldMatrix4x4(Vector3 translation, Vector3 rotation, Vector3 scale) {
 		mat<float, 4, 4> matrix = boost::qvm::rot_mat_xyx<4, float>(rotation.x, rotation.y, rotation.z);
 		matrix.a[0][3] = translation.x; matrix.a[1][3] = translation.y; matrix.a[2][3] = translation.z;
-		*matrix.a[0, 0] *= scale.x; *matrix.a[1, 1] *= scale.y; *matrix.a[2, 2] *= scale.z;
+		matrix.a[0][0] *= scale.x; matrix.a[1][1] *= scale.y; matrix.a[2][2] *= scale.z;
 		return matrix;
 	}
 
@@ -383,7 +404,9 @@ namespace Math {
 		return m;
 	}
 	
-	static float DistPointToPlane(Vector3 point, Vector3 plane_n, Vector3 plane_p) { return (plane_n.x * point.x + plane_n.y * point.y + plane_n.z * point.z - plane_n.dot(plane_p)); }
+	static float DistPointToPlane(Vector3 point, Vector3 plane_n, Vector3 plane_p) { 
+		return (plane_n.x * point.x + plane_n.y * point.y + plane_n.z * point.z - plane_n.dot(plane_p)); 
+	}
 	
 	//where a line intersects with a plane
 	static Vector3 VectorPlaneIntersect(Vector3 plane_p, Vector3 plane_n, Vector3 line_start, Vector3 line_end, float& t) {
@@ -449,6 +472,130 @@ namespace Math {
 	//returns area of a triangle of sides a and b
 	static float TriangleArea(Vector3 a, Vector3 b) { return a.cross(b).mag() / 2; }
 
+};
+
+namespace Render {
+	//the input vector should be in world space
+	static Vector3 WorldSpaceToCameraSpace(Vector3 vertex, mat<float, 4, 4> viewMatrix) {
+		mat<float, 1, 4> vm = vertex.ConvertToM1x4() * viewMatrix;
+		if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; }
+		return Vector3(vm);
+	}
+
+	//the input vectors should be in view/camera space
+	//returns true if the line can be rendered after clipping, false otherwise
+	static bool ClipLineToZPlanes(Vector3& lineStart, Vector3& lineEnd, float nearZ, float farZ) {
+		//clip to the near plane
+		Vector3 planePoint = Vector3(0, 0, nearZ);
+		Vector3 planeNormal = V3FORWARD;
+		float d = planeNormal.dot(planePoint);
+		bool startBeyondPlane = planeNormal.dot(lineStart) - d < 0;
+		bool endBeyondPlane = planeNormal.dot(lineEnd) - d < 0;
+		float t;
+		if (startBeyondPlane && !endBeyondPlane) {
+			lineStart = Math::VectorPlaneIntersect(planePoint, planeNormal, lineStart, lineEnd, t);
+		} else if (!startBeyondPlane && endBeyondPlane) {
+			lineEnd = Math::VectorPlaneIntersect(planePoint, planeNormal, lineStart, lineEnd, t);
+		} else if (startBeyondPlane && endBeyondPlane) {
+			return false;
+		}
+
+		//clip to the far plane
+		planePoint = Vector3(0, 0, farZ);
+		planeNormal = V3BACKWARD;
+		d = planeNormal.dot(planePoint);
+		startBeyondPlane = planeNormal.dot(lineStart) - d < 0; //TODO(r,delle) test whether this is right
+		endBeyondPlane = planeNormal.dot(lineEnd) - d < 0;
+		if (startBeyondPlane && !endBeyondPlane) {
+			lineStart = Math::VectorPlaneIntersect(planePoint, planeNormal, lineStart, lineEnd, t);
+		} else if (!startBeyondPlane && endBeyondPlane) {
+			lineEnd = Math::VectorPlaneIntersect(planePoint, planeNormal, lineStart, lineEnd, t);
+		} else if (startBeyondPlane && endBeyondPlane) {
+			return false;
+		}
+		return true;
+	}
+
+	//the input matrixes should be in view/camera space 
+	static Vector3 CameraSpaceToScreenSpace(Vector3 csVertex, mat<float, 4, 4> projectionMatrix, Vector2 dimensions) {
+		mat<float, 1, 4> vm = csVertex.ConvertToM1x4() * projectionMatrix;
+		if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; }
+		Vector3 out(vm);
+		out.x += 1.0f; out.y += 1.0f;
+		out.x *= 0.5f * dimensions.x;
+		out.y *= 0.5f * dimensions.y;
+		return out;
+	}
+
+	//cohen-sutherland algorithm https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
+	//the input vectors should be in screen space
+	//returns true if the line can be rendered after clipping, false otherwise
+	static bool ClipLineToBorderPlanes(Vector3& ssLineStart, Vector3& ssLineEnd, Vector2 screenDimensions) {
+		//clip to the vertical and horizontal planes
+		const int CLIP_INSIDE = 0;
+		const int CLIP_LEFT = 1;
+		const int CLIP_RIGHT = 2;
+		const int CLIP_BOTTOM = 4;
+		const int CLIP_TOP = 8;
+		auto ComputeOutCode = [&](Vector3& vertex) {
+			int code = CLIP_INSIDE;
+			if (vertex.x < 0) {
+				code |= CLIP_LEFT;
+			} else if (vertex.x > screenDimensions.x) {
+				code |= CLIP_RIGHT;
+			}
+			if (vertex.y < 0) { //these are inverted because we are in screen space
+				code |= CLIP_TOP;
+			} else if (vertex.y > screenDimensions.y) {
+				code |= CLIP_BOTTOM;
+			}
+			return code;
+		};
+
+		int lineStartCode = ComputeOutCode(ssLineStart);
+		int lineEndCode = ComputeOutCode(ssLineEnd);
+
+		//loop until all points are within or outside the screen zone
+		while (true) {
+			if (!(lineStartCode | lineEndCode)) {
+				//both points are inside the screen zone
+				return true;
+			} else if (lineStartCode & lineEndCode) {
+				//both points are in the same outside zone
+				return false;
+			} else {
+				float x, y;
+				//select one of the points outside
+				int code = lineEndCode > lineStartCode ? lineEndCode : lineStartCode;
+
+				//clip the points the the screen bounds by finding the intersection point
+				if (code & CLIP_TOP) { //point is above screen
+					x = ssLineStart.x + (ssLineEnd.x - ssLineStart.x) * (-ssLineStart.y) / (ssLineEnd.y - ssLineStart.y);
+					y = 0;
+				} else if (code & CLIP_BOTTOM) { //point is below screen
+					x = ssLineStart.x + (ssLineEnd.x - ssLineStart.x) * (screenDimensions.y - ssLineStart.y) / (ssLineEnd.y - ssLineStart.y);
+					y = screenDimensions.y;
+				} else if (code & CLIP_RIGHT) { //point is right of screen
+					y = ssLineStart.y + (ssLineEnd.y - ssLineStart.y) * (screenDimensions.x - ssLineStart.x) / (ssLineEnd.x - ssLineStart.x);
+					x = screenDimensions.x;
+				} else if (code & CLIP_LEFT) { //point is left of screen
+					y = ssLineStart.y + (ssLineEnd.y - ssLineStart.y) * (-ssLineStart.x) / (ssLineEnd.x - ssLineStart.x);
+					x = 0;
+				}
+
+				//update the vector's points and restart loop
+				if (code == lineStartCode) {
+					ssLineStart.x = x;
+					ssLineStart.y = y;
+					lineStartCode = ComputeOutCode(ssLineStart);
+				} else {
+					ssLineEnd.x = x;
+					ssLineEnd.y = y;
+					lineEndCode = ComputeOutCode(ssLineEnd);
+				}
+			}
+		}
+	}
 };
 
 //attached to entities to allow different forms of checking sides of more complex objects
@@ -577,3 +724,8 @@ struct Edge3 {
 
 };
 
+namespace Debug {
+	static std::string M1x4ToString(mat<float, 1, 4> matrix) {
+		return "(" + std::to_string(matrix.a[0][0]) + ", " + std::to_string(matrix.a[0][1]) + ", " + std::to_string(matrix.a[0][2]) + ", " + std::to_string(matrix.a[0][3]) + ")";
+	}
+};

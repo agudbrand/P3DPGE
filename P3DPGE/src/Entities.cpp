@@ -1,6 +1,21 @@
 #include "Entities.h"
+#include "Mesh.h"
+#include "Collider.h"
 
 //// Entity	////
+
+Entity::Entity(int id, EntityParams) {
+	this->id = id;
+	this->position = position;
+	this->rotation = rotation;
+	this->scale = scale;
+}
+
+Entity::~Entity() {
+	if (mesh) delete mesh;
+	if (sprite) delete sprite;
+	if (decal) delete decal;
+}
 
 void Entity::SetTag(std::string newTag) {
 	tag = newTag;
@@ -59,6 +74,16 @@ void Entity::Translate(Vector3 translation) {
 
 //// Physics Entity ////
 
+PhysEntity::PhysEntity(int id, EntityParams, PhysEntityParams) : Entity(EntityArgs) {
+	this->velocity = velocity;
+	this->acceleration = acceleration;
+	this->rotVelocity = rotVelocity;
+	this->rotAcceleration = rotAcceleration;
+	this->mass = mass;
+	this->elasticity = elasticity;
+	this->bStatic = bStatic;
+};
+
 void PhysEntity::Update(float deltaTime) {
 	if (!bStatic) {
 		//Vector3 velLast = velocity;
@@ -110,6 +135,10 @@ void PhysEntity::GenerateRadialForce(Vector3 position, float radius, float stren
 
 //// Sphere	////
 
+Sphere::Sphere(float r, int id, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
+	this->radius = r;
+}
+
 bool Sphere::ContainsPoint(Vector3 point) {
 	return point.distanceTo(position) <= radius;
 }
@@ -160,6 +189,11 @@ void Sphere::ResolveCollision(PhysEntity* other) {
 
 //// Box ////
 
+Box::Box(Vector3 dimensions, int id, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
+	this->dimensions = dimensions;
+	mesh = new BoxMesh(dimensions, position);
+}
+
 //not sure if this still works or not, when I was trying to select boxes
 //it wouldn't do anything but i feel it should still work
 bool Box::ContainsPoint(Vector3 point) {
@@ -187,6 +221,52 @@ void Box::ResolveCollision(PhysEntity* entity) {
 
 //// Complex ////
 
+Complex::Complex(std::string file_name, int id, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
+	mesh = new Mesh();
+	if (!LoadFromObjectFile(file_name)) {
+		std::cout << "OBJ LOAD ERROR" << std::endl;
+	}
+	model_name = Math::append_decimal(file_name);
+
+	for (Triangle& t : mesh->triangles) {
+		t.set_color(olc::Pixel(rand() % 255 + 1, rand() % 255 + 1, rand() % 255 + 1));
+	}
+}
+
+bool Complex::LoadFromObjectFile(std::string file_name) {
+	std::ifstream f(file_name);
+	if (!f.is_open()) { return false; }
+
+	std::vector<Vector3> vertices;
+
+	while (!f.eof()) {
+		char line[128];
+		f.getline(line, 128);
+
+		std::strstream s;
+
+		s << line;
+
+		char junk;
+
+		if (line[0] == 'v') {
+			Vector3 v;
+
+			s >> junk >> v.x >> v.y >> v.z;
+			vertices.push_back(v);
+		}
+
+		if (line[0] == 'f') {
+			int f[3];
+			s >> junk >> f[0] >> f[1] >> f[2];
+
+			mesh->triangles.push_back(Triangle(vertices[f[0] - 1], vertices[f[1] - 1], vertices[f[2] - 1]));
+		}
+	}
+
+	return true;
+}
+
 bool Complex::ContainsPoint(Vector3 point) {
 	for (Triangle& t : mesh->triangles) {
 		if (t.selected) { t.selected = false; }
@@ -208,6 +288,15 @@ void Complex::ResolveCollision(PhysEntity* entity) {
 
 //// Line2 and Line3 ////
 
+Line2::Line2(Vector3 endPosition, int id, EntityParams) : Entity(EntityArgs) {
+	//just so no RAV
+	mesh = new Mesh();
+
+	endPosition.z = 0; this->endPosition = endPosition;
+	this->id = id;
+
+}
+
 void Line2::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
 	p->DrawLine(position.toVector2(), endPosition.toVector2(), color);
 }
@@ -219,35 +308,33 @@ bool Line2::ContainsPoint(Vector3 point) { return false; }
 bool Line2::ContainsScreenPoint(Vector3 point) { return false; }
 void Line2::Update(float deltaTime) {}
 
-void Line3::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
-	//these operations are very gross and could probably be abstracted in Math
-	//TODO(m, sushi) abstract the following functions in Math.h in order to make this not look retarded
-	Vector3 posView = position.GetM1x4ToVector3(position.proj_mult(position.ConvertToM1x4(), view));
-	Vector3 endView = endPosition.GetM1x4ToVector3(endPosition.proj_mult(endPosition.ConvertToM1x4(), view));
-	
-	float d1 = Math::DistPointToPlane(posView, Vector3(0, 0, 0.01), Vector3(0, 0, 1));
-	float d2 = Math::DistPointToPlane(endView, Vector3(0, 0, 0.01), Vector3(0, 0, 1));
+Line3::Line3(Vector3 endPosition, int id, EntityParams) : Entity(EntityArgs) {
+	mesh = new Mesh();
+	this->endPosition = endPosition;
+	this->id = id;
 
-	float t;
-	//TODO(sr, delle) implement line3 clipping
+	edge = Edge3(position, endPosition);
+}
+
+//TODO(r,delle) test that this works
+void Line3::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
+	Vector2 screenDimensions = Vector2(p->ScreenWidth(), p->ScreenHeight());
+	//convert vertexes from world to camera/view space
+	Vector3 startVertex = Render::WorldSpaceToCameraSpace(position, view);
+	Vector3 endVertex = Render::WorldSpaceToCameraSpace(endPosition, view);
 	
-	if (d1 > 0 && d2 > 0) {
-		posView.ProjToScreen(ProjMat, p);
-		endView.ProjToScreen(ProjMat, p);
-		p->DrawLine(posView.toVector2(), endView.toVector2(), color);
-	}
-	else if(d1 < 0 && d2 > 0){
-		posView = Math::VectorPlaneIntersect(Vector3(0, 0, 0.01), Vector3(0, 0, 1), posView, endView, t);
-		posView.ProjToScreen(ProjMat, p);
-		endView.ProjToScreen(ProjMat, p);
-		p->DrawLine(posView.toVector2(), endView.toVector2(), color);
-	}
-	else if (d2 < 0 && d1 > 0) {
-		endView = Math::VectorPlaneIntersect(Vector3(0, 0, 0.01), Vector3(0, 0, 1), posView, endView, t);
-		posView.ProjToScreen(ProjMat, p);
-		endView.ProjToScreen(ProjMat, p);
-		p->DrawLine(posView.toVector2(), endView.toVector2(), color);
-	}
+	//clip vertexes to the near and far z planes in camera/view space
+	if (!Render::ClipLineToZPlanes(startVertex, endVertex, .1f, 1000.1f)) { return; } //TODO(r,delle) change the third parameter to the camera variable
+	
+	//convert vertexes from camera/view space to clip space
+	startVertex = Render::CameraSpaceToScreenSpace(startVertex, ProjMat, screenDimensions);
+	endVertex = Render::CameraSpaceToScreenSpace(endVertex, ProjMat, screenDimensions);
+
+	//clip vertexes to border planes in clip space
+	if (!Render::ClipLineToBorderPlanes(startVertex, endVertex, screenDimensions)) { return; }
+
+	//draw the lines after all clipping and space conversion
+	p->DrawLine(startVertex.toVector2(), endVertex.toVector2(), color);
 }
 bool Line3::SpecialDraw() { return true; }
 
@@ -257,6 +344,10 @@ bool Line3::ContainsScreenPoint(Vector3 point) { return false; }
 void Line3::Update(float deltaTime) {}
 
 //// Debug Triangle ////
+
+DebugTriangle::DebugTriangle(Triangle triangle, int id, EntityParams) : Entity(EntityArgs) {
+	mesh = new Mesh(triangle);
+}
 
 bool DebugTriangle::ContainsPoint(Vector3 point) {
 	return false;
@@ -278,6 +369,22 @@ mat<float, 4, 4> Camera::MakeViewMatrix(float yaw) {
 	mat<float, 4, 4> view = inverse(Math::PointAt(position, target, up));
 	
 	return view;
+}
+
+//this matrix seems to only work well with 1:1 aspect ratios I think its cause FOV is set to 90
+mat<float, 4, 4> Camera::ProjectionMatrix(olc::PixelGameEngine* p) {
+	float renderToView = farZ - nearZ;
+	float aspectRatio = (float)p->ScreenHeight() / (float)p->ScreenWidth();
+	float fovRad = 1.f / tanf(fieldOfView * .5f / 180.f * M_PI);
+
+	mat<float, 4, 4> proj{
+		aspectRatio * fovRad, 0, 0,	0,
+		0, fovRad, 0, 0,
+		0, 0, farZ / renderToView, 1,
+		0, 0, (-farZ * nearZ) / renderToView, 0
+	};
+
+	return proj;
 }
 
 bool Camera::ContainsPoint(Vector3 point) {

@@ -1,5 +1,6 @@
 #pragma once
 #include "Entities.h"
+#include "Mesh.h"
 #include "olcPixelGameEngine.h"
 
 namespace Render {
@@ -54,24 +55,6 @@ namespace Render {
 	}
 
 	using namespace boost::qvm;
-	//projection matrix
-	//this matrix seems to only work well with 1:1 aspect ratios I think its cause FOV is set to 90
-	mat<float, 4, 4> ProjectionMatrix(olc::PixelGameEngine* p) {
-		float nearz = 0.1;
-		float farz = 1000.0;
-		float fov = 90;
-		float aspectRatio = (float)p->ScreenHeight() / (float)p->ScreenWidth();
-		float fovRad = 1.0 / tanf(fov * 0.5 / 180.0 * M_PI);
-
-		mat<float, 4, 4> proj{
-			aspectRatio * fovRad, 0,	  0,								0,
-			0,					  fovRad, 0,								0,
-			0,					  0,	  farz / (farz - nearz),			1,
-			0,					  0,	  (-farz * nearz) / (farz - nearz), 0
-		};
-		
-		return proj;
-	}
 
 	//TODO(rc, sushi) change this to take in types and not individual values
 	//in essence this algorithm scans down a triangle and fills each row it occupies
@@ -217,7 +200,7 @@ namespace Render {
 		Vector3* outside_points[3]; int nOutsidePointCount = 0;
 		Vector3* inside_tex[3]; int nInsideTexCount = 0;
 		Vector3* outside_tex[3]; int nOutsideTexCount = 0;
-
+		
 		auto dist = [&](Vector3& p)
 		{
 			Vector3 n = p.normalized();
@@ -326,7 +309,7 @@ namespace Render {
 			for (int i = 0; i < clippedTriangles; i++) {
 				float w;
 				for (Vector3& n : clipped[i].proj_points) {
-					n.ProjToScreen(ProjectionMatrix(p), p, w);
+					n.ProjToScreen(Render::camera.ProjectionMatrix(p), p, w);
 				}
 				//clipped[i].set_color(t.get_color());
 				
@@ -423,7 +406,7 @@ namespace Render {
 			//SpecialDraw is used for determining if its just an object
 			//drawn with triangles or if its special eg. a 2D object or Line3
 			if (e->SpecialDraw()) {
-				e->Draw(p, ProjectionMatrix(p), view);
+				e->Draw(p, Render::camera.ProjectionMatrix(p), view);
 			}
 			else {
 				for (auto& t : e->mesh->triangles) { triangles.push_back(t); }
@@ -433,7 +416,7 @@ namespace Render {
 		//draw special entities
 		for (auto& se : sentities) {
 			if (se->SpecialDraw()) {
-				se->Draw(p, ProjectionMatrix(p), view);
+				se->Draw(p, Render::camera.ProjectionMatrix(p), view);
 			}
 			else {
 				for (auto& t : se->mesh->triangles) { triangles.push_back(t); }

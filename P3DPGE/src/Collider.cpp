@@ -2,16 +2,16 @@
 
 #include "Entities.h"
 
-//mat<float, 3, 3> LocalToWorldInertiaTensor(PhysEntity* entity, mat<float, 3, 3> inertiaTensor) {
-//	mat<float, 4, 4> inverseTransformation = boost::qvm::inverse(Math::WorldMatrix4x4(entity->position, entity->rotation, entity->scale));
-//	return inverseTransformation * Math::M3x3ToM4x4(inertiaTensor) * boost::qvm::transposed(inverseTransformation);
-//}
+mat<float, 4, 4> LocalToWorldInertiaTensor(PhysEntity* entity, mat<float, 3, 3> inertiaTensor) {
+	mat<float, 4, 4> inverseTransformation = boost::qvm::inverse(Math::WorldMatrix4x4(entity->position, entity->rotation, entity->scale));
+	return inverseTransformation * Math::M3x3ToM4x4(inertiaTensor) * boost::qvm::transposed(inverseTransformation);
+}
 
 //// AABB ////
 
-AABBCollider::AABBCollider(PhysEntity* entity, Vector3 halfDimenstions) {
+AABBCollider::AABBCollider(PhysEntity* entity, Vector3 halfDimensions) {
 	this->entity = entity;
-	this->halfDims = halfDimenstions;
+	this->halfDims = halfDimensions;
 }
 
 AABBCollider::AABBCollider(BoxCollider* boxCollider) {
@@ -62,29 +62,29 @@ bool AABBSphereCollision(AABBCollider* aabb, Sphere* sphere, bool resolveCollisi
 			aabb->entity->position += vectorBetween; //TODO(p,delle) test this
 			sphere->position -= vectorBetween;
 
-			////dynamic resolution
-			//mat<float, 3, 3> sphereInertiaTensorInverse = boost::qvm::inverse(LocalToWorldInertiaTensor(sphere, InertiaTensors::SolidSphere(sphere->radius, sphere->mass)));
-			//Vector3 normal = vectorBetween.normalized();
-			//Vector3 ra = sphere->position + SphereCollider::ClosestPointOnSurface(sphere, closestAABBPoint);
-			//Vector3 sphereAngularVelocityChange = normal.cross(ra);
-			//boost::qvm::transform_vector(Math::M3x3ToM4x4(sphereInertiaTensorInverse), boost::qvm::vec<float, 3>{sphereAngularVelocityChange.x, sphereAngularVelocityChange.y, sphereAngularVelocityChange.z});
-			//float inverseMassA = 1.f / sphere->mass;
-			//float scalar = inverseMassA + sphereAngularVelocityChange.cross(ra).dot(normal);
+			//dynamic resolution
+			mat<float, 4, 4> sphereInertiaTensorInverse = boost::qvm::inverse(LocalToWorldInertiaTensor(sphere, InertiaTensors::SolidSphere(sphere->radius, sphere->mass)));
+			Vector3 normal = vectorBetween.normalized();
+			Vector3 ra = sphere->position + SphereCollider::ClosestPointOnSurface(sphere, closestAABBPoint);
+			boost::qvm::vec<float,3> sphereAngularVelocityChange = normal.cross(ra).ConvertToVec3();
+			sphereAngularVelocityChange = boost::qvm::transform_vector(sphereInertiaTensorInverse, sphereAngularVelocityChange);
+			float inverseMassA = 1.f / sphere->mass;
+			float scalar = inverseMassA + Vector3(sphereAngularVelocityChange).cross(ra).dot(normal);
 
-			//mat<float, 3, 3> aabbInertiaTensorInverse = boost::qvm::inverse(LocalToWorldInertiaTensor(sphere, InertiaTensors::SolidSphere(sphere->radius, sphere->mass)));
-			//Vector3 rb = aabb->entity->position + closestAABBPoint;
-			//Vector3 aabbAngularVelocityChange = normal.cross(rb);
-			//boost::qvm::transform_vector(Math::M3x3ToM4x4(aabbInertiaTensorInverse), boost::qvm::vec<float, 3>{aabbAngularVelocityChange.x, aabbAngularVelocityChange.y, aabbAngularVelocityChange.z});
-			//float inverseMassB = 1.f / aabb->entity->mass;
-			//scalar += inverseMassB + aabbAngularVelocityChange.cross(rb).dot(normal);
-			//	
-			//float coefRest = 1.f; //TODO(c,delle) remove this, only for testing
-			//float impulseMod = (coefRest + 1) * (sphere->velocity - aabb->entity->velocity).mag() / scalar;
-			//Vector3 impulse = normal * impulseMod;
-			//sphere->velocity -= impulse * inverseMassA; //TODO(p,delle) test this
-			//aabb->entity->velocity -= impulse * inverseMassB;
-			//sphere->rotVelocity -= sphereAngularVelocityChange;
-			////aabb->entity->rotVelocity -= aabbAngularVelocityChange; //we dont do this because AABB shouldnt rotate
+			mat<float, 4, 4> aabbInertiaTensorInverse = boost::qvm::inverse(LocalToWorldInertiaTensor(sphere, InertiaTensors::SolidSphere(sphere->radius, sphere->mass)));
+			Vector3 rb = aabb->entity->position + closestAABBPoint;
+			boost::qvm::vec<float, 3> aabbAngularVelocityChange = normal.cross(rb).ConvertToVec3();
+			aabbAngularVelocityChange = boost::qvm::transform_vector(aabbInertiaTensorInverse, aabbAngularVelocityChange);
+			float inverseMassB = 1.f / aabb->entity->mass;
+			scalar += inverseMassB + Vector3(aabbAngularVelocityChange).cross(rb).dot(normal);
+				
+			float coefRest = 1.f; //TODO(c,delle) remove this, only for testing
+			float impulseMod = (coefRest + 1) * (sphere->velocity - aabb->entity->velocity).mag() / scalar;
+			Vector3 impulse = normal * impulseMod;
+			sphere->velocity -= impulse * inverseMassA; //TODO(p,delle) test this
+			aabb->entity->velocity -= impulse * inverseMassB;
+			sphere->rotVelocity -= sphereAngularVelocityChange;
+			//aabb->entity->rotVelocity -= aabbAngularVelocityChange; //we dont do this because AABB shouldnt rotate
 		}
 		return true;
 	}

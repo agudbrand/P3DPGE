@@ -1,59 +1,37 @@
 #pragma once
 #include <fstream>
 #include <strstream>
-#include "Mesh.h"
+#include "Math.h"
 #include "olcPixelGameEngine.h"
 
+struct Mesh;
+struct BoxMesh;
+struct Triangle;
+struct Collider;
+
 #define EntityArgs id, position, rotation, scale
-#define EntityParams Vector3 position = V3ZERO, Vector3 rotation = V3ZERO, Vector3 scale = V3ONE
+#define EntityParams Vector3 position, Vector3 rotation, Vector3 scale
+#define EntityDefaultParams Vector3 position = V3ZERO, Vector3 rotation = V3ZERO, Vector3 scale = V3ONE
 //the basis of all objects drawn on screen or otherwise, includes basic information such
 //as position, rotation, scale, tags, etc.
 class Entity {
 	public:
-	
-	//transform
+	int id;
+	std::string tag;
 	Vector3 position;
 	Vector3 rotation;
 	Vector3 scale;
-	
-	//info
-	int id;
-	std::string tag;
-	
-	//mesh
 	Mesh* mesh = 0;
 	olc::Sprite* sprite = 0;
-
 	//TODO(reo, sushi) implement this eventually
 	olc::Decal* decal = 0;
 	
 	Entity() {}
-	Entity(int id, EntityParams) {
-		this->id = id;
-		this->position = position;
-		this->rotation = rotation;
-		this->scale = scale;
-	}
-	virtual ~Entity() {
-		if (mesh) delete mesh;
-		if (sprite) delete sprite;
-		if (decal) delete decal;
-
-	}
-	
-	// User must override these functions as required. I have not made
-	// them abstract because I do need a default behaviour to occur if
-	// they are not overwritten
-	//TODO: this ^
-	virtual void Update(float deltaTime) = 0;
-	virtual bool ContainsPoint(Vector3 point) = 0;
-	virtual bool ContainsScreenPoint(Vector3 point) = 0;
-	
+	Entity(int id, EntityDefaultParams);
+	virtual ~Entity();
 	virtual bool LineIntersect(Edge3* e);
-
 	virtual void Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view);
 	virtual bool SpecialDraw();
-	
 	//these functions are virtual but aren't implemented
 	//in any child yet as I see no use for differenciating
 	//between them yet
@@ -61,13 +39,21 @@ class Entity {
 	virtual void RotateY(Vector3 offset = V3ZERO);
 	virtual void RotateZ(Vector3 offset = V3ZERO);
 	virtual void Translate(Vector3 translation);
-	
 	void SetTag(std::string newTag);
 	virtual void SetColor(olc::Pixel newColor);
+
+	// User must override these functions as required. I have not made
+	// them abstract because I do need a default behaviour to occur if
+	// they are not overwritten
+	//TODO: this ^
+	virtual void Update(float deltaTime) = 0;
+	virtual bool ContainsPoint(Vector3 point) = 0;
+	virtual bool ContainsScreenPoint(Vector3 point) = 0;
 };
 
 #define PhysEntityArgs velocity, acceleration, rotVelocity, rotAcceleration, mass, bStatic
-#define PhysEntityParams Vector3 velocity = V3ZERO, Vector3 acceleration = V3ZERO, Vector3 rotVelocity = V3ZERO, Vector3 rotAcceleration = V3ZERO, float mass = 1, float elasticity = 1, bool bStatic = false
+#define PhysEntityParams Vector3 velocity, Vector3 acceleration, Vector3 rotVelocity, Vector3 rotAcceleration, float mass, float elasticity, bool bStatic
+#define PhysEntityDefaultParams Vector3 velocity = V3ZERO, Vector3 acceleration = V3ZERO, Vector3 rotVelocity = V3ZERO, Vector3 rotAcceleration = V3ZERO, float mass = 1, float elasticity = 1, bool bStatic = false
 //the physics based implentation of Entity, anything that moves in time is this
 class PhysEntity : public Entity {
 	public:
@@ -78,26 +64,17 @@ class PhysEntity : public Entity {
 	float mass;
 	float elasticity;
 	bool bStatic;
-	
+	Collider* collider;
 	std::vector<Vector3> forces;
 	
 	PhysEntity() : Entity() {}
-	PhysEntity(int id, EntityParams, PhysEntityParams) : Entity(EntityArgs) {
-		this->velocity = velocity;
-		this->acceleration = acceleration;
-		this->rotVelocity = rotVelocity;
-		this->rotAcceleration = rotAcceleration;
-		this->mass = mass;
-		this->elasticity = elasticity;
-		this->bStatic = bStatic;
-	};
-	
+	PhysEntity(int id, EntityDefaultParams, PhysEntityDefaultParams);
 	void Update(float deltaTime) override;
-	
 	void AddForce(PhysEntity* creator, Vector3 force, bool bIgnoreMass = false);
 	void AddFrictionForce(PhysEntity* creator, float frictionCoef, float deltaTime, bool bIngoreMass = false);
 	void AddImpulse(PhysEntity* creator, Vector3 impulse, bool bIgnoreMass = false);
 	void GenerateRadialForce(Vector3 position, float radius, float strength, float falloff, bool bIgnoreMass);
+
 	virtual bool CheckCollision(Entity* entity) = 0;
 	virtual void ResolveCollision(PhysEntity* entity) = 0;
 };
@@ -106,10 +83,7 @@ struct Sphere : public PhysEntity {
 	float radius;
 	
 	Sphere() : PhysEntity() {}
-	Sphere(float r, int id, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
-		this->radius = r;
-	}
-	
+	Sphere(float r, int id, EntityDefaultParams, PhysEntityDefaultParams);
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
 	bool CheckCollision(Entity* entity) override;
@@ -121,11 +95,7 @@ struct Box : public PhysEntity {
 	Vector3 dimensions; //full dimensions
 	
 	Box() : PhysEntity() {}
-	Box(Vector3 dimensions, int id, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
-		this->dimensions = dimensions;
-		mesh = new BoxMesh(dimensions, position);
-	}
-	
+	Box(Vector3 dimensions, int id, EntityDefaultParams, PhysEntityDefaultParams);
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
 	bool CheckCollision(Entity* entity) override;
@@ -139,57 +109,13 @@ struct Box : public PhysEntity {
 struct Complex : public PhysEntity {
 	std::string model_name;
 	
-	Complex(std::string file_name, int id, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
-		mesh = new Mesh();
-		if (!LoadFromObjectFile(file_name)) {
-			std::cout << "OBJ LOAD ERROR" << std::endl;
-		}
-		model_name = Math::append_decimal(file_name);
-		
-		for (Triangle& t : mesh->triangles) {
-			t.set_color(olc::Pixel(rand() % 255 + 1, rand() % 255 + 1, rand() % 255 + 1));
-		}
-	}
-	
+	Complex(std::string file_name, int id, EntityDefaultParams, PhysEntityDefaultParams);
 	//this function is done exactly how Javid does it in
 	//his video and should probably be redone later
 	//for ex he uses a lot of weird ways to get strings
 	//from the obj file that may not be necessary
 	//TODO(e, sushi) generate complex object relative to input position
-	bool LoadFromObjectFile(std::string file_name) {
-		std::ifstream f(file_name);
-		if (!f.is_open()) { return false; }
-		
-		std::vector<Vector3> vertices;
-		
-		while (!f.eof()) {
-			char line[128];
-			f.getline(line, 128);
-			
-			std::strstream s;
-			
-			s << line;
-			
-			char junk;
-			
-			if (line[0] == 'v') {
-				Vector3 v;
-				
-				s >> junk >> v.x >> v.y >> v.z;
-				vertices.push_back(v);
-			}
-			
-			if (line[0] == 'f') {
-				int f[3];
-				s >> junk >> f[0] >> f[1] >> f[2];
-				
-				mesh->triangles.push_back(Triangle(vertices[f[0] - 1], vertices[f[1] - 1], vertices[f[2] - 1]));
-			}
-		}
-		
-		return true;
-	}
-	
+	bool LoadFromObjectFile(std::string file_name);
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
 	bool CheckCollision(Entity* entity) override;
@@ -199,18 +125,9 @@ struct Complex : public PhysEntity {
 //should there be 2 vf2d's instead of a Vector3 pos and Vector3 endPos?
 struct Line2 : public Entity {
 	Vector3 endPosition;
-	
 	olc::Pixel color = olc::WHITE;
 	
-	Line2(Vector3 endPosition, int id, EntityParams) : Entity(EntityArgs) {
-		//just so no RAV
-		mesh = new Mesh();
-		
-		endPosition.z = 0; this->endPosition = endPosition;
-		this->id = id;
-		
-	}
-	
+	Line2(Vector3 endPosition, int id, EntityDefaultParams);
 	void Update(float deltaTime) override;
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
@@ -222,19 +139,10 @@ struct Line2 : public Entity {
 //edge is not yet implemented here yet
 struct Line3 : public Entity {
 	Vector3 endPosition;
-	
 	olc::Pixel color = olc::WHITE;
-
 	Edge3 edge;
 	
-	Line3(Vector3 endPosition, int id, EntityParams) : Entity(EntityArgs) {
-		mesh = new Mesh();
-		this->endPosition = endPosition;
-		this->id = id;
-
-		edge = Edge3(position, endPosition);
-	}
-	
+	Line3(Vector3 endPosition, int id, EntityDefaultParams);
 	void Update(float deltaTime) override;
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
@@ -246,9 +154,7 @@ struct Line3 : public Entity {
 //for spawning single triangles
 struct DebugTriangle : public Entity {
 	
-	DebugTriangle(Triangle triangle, int id, EntityParams) : Entity(EntityArgs) {
-		mesh = new Mesh(triangle);
-	}
+	DebugTriangle(Triangle triangle, int id, EntityDefaultParams);
 	
 	void Update(float deltaTime) override;
 	bool ContainsPoint(Vector3 point) override;
@@ -258,12 +164,16 @@ struct DebugTriangle : public Entity {
 
 struct Camera : public Entity {
 	Vector3 lookDir;
+	float nearZ = .1f; //the distance from the camera's position to screen plane
+	float farZ = 1000.1f; //the maximum render distance
+	float fieldOfView = 90.f;
 	
 	Camera() {
 		position = V3ZERO;
 	}
 	
 	mat<float, 4, 4> MakeViewMatrix(float yaw);
+	mat<float, 4, 4> ProjectionMatrix(olc::PixelGameEngine* p);
 	
 	void Update(float deltaTime) override;
 	bool ContainsPoint(Vector3 point) override;
