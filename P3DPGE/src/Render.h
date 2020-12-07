@@ -6,7 +6,7 @@
 namespace Render {
 	//NOTE sushi: do we want Render to be this bloated? Or organized it elsewhere?
 
-	internal bool DEBUG_RENDER = false;
+	internal bool DEBUG_RENDER = 1;
 
 #define DEBUGR DEBUG if(DEBUG_RENDER)
 
@@ -382,7 +382,7 @@ namespace Render {
 		}
 
 		//debug drawing
-		if(DEBUG){
+		DEBUGR{
 			if (WIRE_FRAME) {
 				for (auto& t : drawnTriangles) {
 					p->DrawTriangle(
@@ -398,7 +398,7 @@ namespace Render {
 					t.display_edges(p);
 				}
 			}
-		}
+		};
 		
 	}//Draw
 
@@ -409,6 +409,9 @@ namespace Render {
 
 		//get triangles from all entities
 		for (auto& e : entities) {
+
+			e->Update(Time::deltaTime);
+
 			//SpecialDraw is used for determining if its just an object
 			//drawn with triangles or if its special eg. a 2D object or Line3
 			if (e->SpecialDraw()) {

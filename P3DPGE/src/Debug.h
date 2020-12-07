@@ -12,12 +12,12 @@
 #define global_variable static
 
 //global debug macros
-#define DEBUG Debug::GLOBAL_DEBUG
-#define IFDEBUG if(Debug::GLOBAL_DEBUG) //probably only use for single line debug code
-#define DEBUG_S IFDEBUG Debug::Success
-#define DEBUG_M IFDEBUG Debug::Message
-#define DEBUG_E IFDEBUG Debug::Error
-//"force" debug message
+#define DEBUG if(Debug::GLOBAL_DEBUG)
+//debug message
+#define DEBUG_S DEBUG Debug::Success
+#define DEBUG_M DEBUG Debug::Message
+#define DEBUG_E DEBUG Debug::Error
+//force debug message
 #define DEBUG_SF Debug::Success
 #define DEBUG_MF Debug::Message
 #define DEBUG_EF Debug::Error
@@ -69,56 +69,15 @@ namespace Debug {
 
 	static bool GLOBAL_DEBUG = 1;
 
-	//// String Char Conversions ////
-
 	////Console Output////
 
-	/*static void Print(std::string& str, ...) {
-		const char* fmt = str.c_str();
-		va_list args;
-		va_start(args, fmt);
-
-		while (*fmt != '\0') {
-			if (*fmt == '%') {
-				++fmt;
-				if(*fmt == 's'){
-					std::string s = va_arg(args, std::string);
-					std::cout << s;
-				} else if (*fmt == 'i' || *fmt == 'd') {
-					int i = va_arg(args, int);
-					std::cout << i;
-				} else if (*fmt == 'f' || *fmt == '.') {
-					double f = va_arg(args, double);
-					if (*fmt == '.') {
-						int decimals = std::atoi(++fmt);
-					}
-				}
-			}
-			++fmt;
-		}
-
-		va_end(args);
-	}*/
-
-	/*static void Print(std::string& str, ...) {
-		va_list args;
-		std::vprintf(str.c_str(), args);
-	}
-
-	static void Print(const char* str, ...) {
-		va_list args;
-		std::vprintf(str, args);
-	}*/
-	
-	static void Print(int color, const char* str) {
+	static void Print(int color, const char* str, int frame_skip = 0) {
 		SetConsoleTextAttribute(hConsole, color);
 		std::cout << str << std::endl;
 		ResetCmd();
 	}
 
 	//template magic thanks to fux#2562
-
-	//TODO(c, sushi) write a function that just takes anything and converts it to char*
 
 	//sends a green message to the console
 	static void Success(const char* str) { Print(2, str); }

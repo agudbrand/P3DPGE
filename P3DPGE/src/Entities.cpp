@@ -63,13 +63,34 @@ void Entity::RotateZ(Vector3 offset) {
 	}
 }
 
-void Entity::Translate(Vector3 translation) {
-	for (auto& m : mesh->triangles) {
-		for (auto& n : m.points) {
-			n.translateV3(translation);
+void Entity::Rotate(Vector3 offset) {
+	if (rotation != prev_rotation) {
+		for (auto& m : mesh->triangles) {
+			for (auto& n : m.points) {
+				n.rotateV3_X(rotation.x, position, offset);
+				n.rotateV3_Y(rotation.y, position, offset);
+				n.rotateV3_Z(rotation.z, position, offset);
+			}
 		}
 	}
-	position += translation;
+	prev_rotation = rotation;
+}
+
+void Entity::Translate() {	
+
+	PTIMER_COND(1.f, 
+		DEBUG_M("test"); 
+		DEBUG_M("test2");
+	);
+
+	if (position != prev_position) {
+		for (auto& m : mesh->triangles) {
+			for (auto& n : m.points) {
+				n = n * Math::GetTranslateM4x4(position);
+			}
+		}
+	}
+	prev_position = position;
 }
 
 std::string Entity::str() {
@@ -82,6 +103,11 @@ std::string Entity::str() {
 		"entity_type: base_entity";
 		return s;
  
+}
+
+void Entity::Update(float deltaTime) {
+	PTIMER_S;
+	Translate(); Rotate();
 }
 
 //// Physics Entity ////
@@ -97,6 +123,7 @@ PhysEntity::PhysEntity(int id, EntityParams, PhysEntityParams) : Entity(EntityAr
 };
 
 void PhysEntity::Update(float deltaTime) {
+	PTIMER_S;
 	if (!bStatic) {
 		//Vector3 velLast = velocity;
 		//if (acceleration.mag() < .01f) { acceleration = V3ZERO; }
@@ -113,6 +140,7 @@ void PhysEntity::Update(float deltaTime) {
 		rotVelocity += rotAcceleration * deltaTime;
 		rotation += rotVelocity * deltaTime;
 	}
+	Translate(); Rotate();
 }
 
 //adds a force to this entity, and this entity applies that force back on the sending object
@@ -459,8 +487,7 @@ std::string DebugTriangle::str() {
 
 mat<float, 4, 4> Camera::MakeViewMatrix(float yaw) {
 	Vector3 target(0, 0, 1);
-	Vector3 up(0, 1, 0);
-	
+
 	lookDir = target * Math::GetRotateV3_Y(yaw);
 	target = position + lookDir;
 	
@@ -469,7 +496,6 @@ mat<float, 4, 4> Camera::MakeViewMatrix(float yaw) {
 	return view;
 }
 
-//this matrix seems to only work well with 1:1 aspect ratios I think its cause FOV is set to 90
 mat<float, 4, 4> Camera::ProjectionMatrix(olc::PixelGameEngine* p) {
 	float renderToView = farZ - nearZ;
 	float aspectRatio = (float)p->ScreenHeight() / (float)p->ScreenWidth();
