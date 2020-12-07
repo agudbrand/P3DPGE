@@ -1,6 +1,8 @@
 #pragma once
 #include "Debug.h"
 
+struct Vector3;
+
 struct Matrix {
 	uint32 rows;
 	uint32 cols;
@@ -11,6 +13,8 @@ struct Matrix {
 	Matrix(uint32 inRows, uint32 inCols, float inData[]);
 	Matrix(uint32 inRows, uint32 inCols, std::initializer_list<float> list);
 	Matrix(const Matrix& m);
+	Matrix(Vector3 v); //TODO(delle) define this in Math.h
+	Matrix(Vector3 v, float w); //TODO(delle) define this in Math.h
 	~Matrix();
 
 	float&	operator () (uint32 row, uint32 col);
@@ -33,9 +37,15 @@ struct Matrix {
 	bool	operator != (const Matrix& rhs) const;
 	friend Matrix operator* (const float& lhs, const Matrix& rhs) { return rhs * lhs; }
 
-	void Copy(const Matrix& m);
 	const std::string str() const;
 	const std::string str2F() const;
+	void Copy(const Matrix& m);
+	Matrix Transpose();
+	Matrix Submatrix(std::initializer_list<float> inRows, std::initializer_list<float> inCols);
+	float Determinant();
+	Matrix Inverse();
+
+	static Matrix Identity(int rows, int cols);
 };
 
 //// Constructors ////
@@ -256,6 +266,75 @@ inline bool    Matrix::operator	!= (const Matrix& rhs) const {
 
 //// Functions ////
 
+//TODO(c,delle) clean up Matrix.str() and Matrix.str2F()
+const std::string Matrix::str() const {
+	if (rows == 0 || cols == 0) {
+		return "|Zero dimension matrix|";
+	}
+
+	std::string str = std::to_string(rows) + "x" + std::to_string(cols) + " Matrix:\n|";
+	if (rows == 1) {
+		for (int i = 0; i < cols-1; ++i) {
+			char buffer[15];
+			std::snprintf(buffer, 15, "%+.6f", data[i]);
+			str += std::string(buffer) + ", ";
+		}
+		char buffer[15];
+		std::snprintf(buffer, 15, "%+.6f", data[elementCount - 1]);
+		str += std::string(buffer) + "|";
+		return str;
+	}
+
+	for (int i = 0; i < elementCount-1; ++i) {
+		char buffer[15];
+		std::snprintf(buffer, 15, "%+.6f", data[i]);
+		str += std::string(buffer);
+		if ((i+1) % cols != 0) {
+			str += ", ";
+		} else {
+			str += "|\n|";
+		}
+	}
+	char buffer[15];
+	std::snprintf(buffer, 15, "%+.6f", data[elementCount - 1]);
+	str += std::string(buffer) + "|";
+	return str;
+};
+
+const std::string Matrix::str2F() const {
+	if (rows == 0 || cols == 0) {
+		return "|Zero dimension matrix|";
+	}
+
+	std::string str = std::to_string(rows) + "x" + std::to_string(cols) + " Matrix:\n|";
+	if (rows == 1) {
+		for (int i = 0; i < cols - 1; ++i) {
+			char buffer[15];
+			std::snprintf(buffer, 15, "%+.2f", data[i]);
+			str += std::string(buffer) + ", ";
+		}
+		char buffer[15];
+		std::snprintf(buffer, 15, "%+.2f", data[elementCount - 1]);
+		str += std::string(buffer) + "|";
+		return str;
+	}
+
+	for (int i = 0; i < elementCount - 1; ++i) {
+		char buffer[15];
+		std::snprintf(buffer, 15, "%+.2f", data[i]);
+		str += std::string(buffer);
+		if ((i + 1) % cols != 0) {
+			str += ", ";
+		} else {
+			str += "|\n|";
+		}
+	}
+	char buffer[15];
+	std::snprintf(buffer, 15, "%+.2f", data[elementCount - 1]);
+	str += std::string(buffer) + "|";
+	return str;
+};
+
 //copys the data from one matrix to the other
 //REQUIRES both to have the same dimensions
 inline void Matrix::Copy(const Matrix& m) {
@@ -266,3 +345,21 @@ inline void Matrix::Copy(const Matrix& m) {
 		*--p = *--q;
 	}
 }
+
+//converts the rows into columns and vice-versa
+inline Matrix Matrix::Transpose() {
+	Matrix newMatrix(cols, rows);
+	for (int i = 0; i < elementCount; ++i) {
+		newMatrix.data[i] = data[cols * (i%rows) + (i/rows)];
+	}
+	return newMatrix;
+}
+
+//returns a matrix only with the specified rows and cols
+//inline Matrix Matrix::Submatrix(std::initializer_list<float> inRows, std::initializer_list<float> inCols) {
+//	Matrix newMatrix(inRows.size(), inCols.size());
+//	for (int i = 0; i < newMatrix.elementCount; ++i) {
+//		newMatrix.data[i]
+//	}
+//	return newMatrix;
+//}
