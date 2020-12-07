@@ -11,6 +11,17 @@
 #define local_persist static 
 #define global_variable static
 
+//global debug macros
+#define DEBUG Debug::GLOBAL_DEBUG
+#define IFDEBUG if(Debug::GLOBAL_DEBUG) //probably only use for single line debug code
+#define DEBUG_S IFDEBUG Debug::Success
+#define DEBUG_M IFDEBUG Debug::Message
+#define DEBUG_E IFDEBUG Debug::Error
+//"force" debug message
+#define DEBUG_SF Debug::Success
+#define DEBUG_MF Debug::Message
+#define DEBUG_EF Debug::Error
+
 #ifndef NDEBUG
 #   define ASSERT(condition, message) \
     do { \
@@ -40,6 +51,14 @@ namespace Math { //forward declare average
 	static double average(const T& container, int size);
 }
 
+//template magic thanks to fux#2562
+template<class T>
+struct has_str_method {
+	template<class U> static decltype(&U::str, std::true_type{}) test(int);
+	template<class> static std::false_type test(...);
+	static constexpr bool value = decltype(test<T>(0))::value;
+};
+
 namespace Debug {
 	internal HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);;
 	internal int color = 7;
@@ -47,6 +66,10 @@ namespace Debug {
 		color = 7;
 		SetConsoleTextAttribute(hConsole, color);
 	}
+
+	static bool GLOBAL_DEBUG = 1;
+
+	//// String Char Conversions ////
 
 	////Console Output////
 
@@ -86,102 +109,50 @@ namespace Debug {
 		va_list args;
 		std::vprintf(str, args);
 	}*/
-
-	//Sends a red string to the console
-	static void Error(const std::string& str) {
-		color = 4;
+	
+	static void Print(int color, const char* str) {
 		SetConsoleTextAttribute(hConsole, color);
 		std::cout << str << std::endl;
 		ResetCmd();
 	}
 
-	//Sends a red string literal to the console
-	static void Error(const char* str) {
-		color = 4;
-		SetConsoleTextAttribute(hConsole, color);
-		std::cout << str << std::endl;
-		ResetCmd();
-	}
+	//template magic thanks to fux#2562
 
-	//Sends a yellow message to console
-	static void Message(const std::string& str) {
-		color = 6;
-		SetConsoleTextAttribute(hConsole, color);
-		std::cout << str << std::endl;
-		ResetCmd();
-	}
+	//TODO(c, sushi) write a function that just takes anything and converts it to char*
 
-	//Sends a yellow string literal to console
-	static void Message(const char* str) {
-		color = 6;
-		SetConsoleTextAttribute(hConsole, color);
-		std::cout << str << std::endl;
-		ResetCmd();
-	}
+	//sends a green message to the console
+	static void Success(const char* str) { Print(2, str); }
 
-	//Sends a green message to console
-	static void Success(const std::string& str) {
-		color = 2;
-		SetConsoleTextAttribute(hConsole, color);
-		std::cout << str << std::endl;
-		ResetCmd();
-	}
+	static void Success(const std::string& str) { Print(2, str.c_str()); }
 
-	//Sends a green string literal to console
-	static void Success(const char* str) {
-		color = 2;
-		SetConsoleTextAttribute(hConsole, color);
-		std::cout << str << std::endl;
-		ResetCmd();
-	}
+	template<class T, typename std::enable_if<!has_str_method<T>::value, bool>::type = true>
+	static void Success(T t) { Success(std::to_string(t)); }
 
-	//// Timer ////
+	template<class T, typename std::enable_if<has_str_method<T>::value, bool>::type = true>
+	static void Success(T t) { Success(t.str()); }
 
-	static steady_clock::time_point start;
-	static steady_clock::time_point end;
-	static std::list<double> times;
-	static int elapsedFrames = 0;
+	//sends a yellow message to the console
+	static void Message(const char* str) { Print(2, str); }
 
-	static void StartTimer() { start = steady_clock::now(); }
+	static void Message(const std::string& str) { Print(6, str.c_str()); }
 
-	static void EndTimer(std::string message = "") {
-		end = steady_clock::now();
-		duration<double> time_span = duration_cast<duration<double>>(end - start);
-		Message(message + std::to_string(time_span.count()));
-	}
+	template<class T, typename std::enable_if<!has_str_method<T>::value, bool>::type = true>
+	static void Message(T t) { Message(std::to_string(t)); }
 
-	static void EndTimer(double goodTime, std::string message = "") {
-		end = steady_clock::now();
-		duration<double> time_span = duration_cast<duration<double>>(end - start);
-		double t = time_span.count();
-		if (t > goodTime) { Error(message + std::to_string(t)); }
-		else if (t < goodTime) { Success(message + std::to_string(t)); }
-		else { Message(message + std::to_string(t)); }
-	}
+	template<class T, typename std::enable_if<has_str_method<T>::value, bool>::type = true>
+	static void Message(T t) { Message(t.str()); }
 
-	//prints an average time every nFrames
-	//dunno if this would be useful, also probably not the most efficient thing ever
-	//could make a conditional version but idk yet
-	static void EndTimerAverage(int num, std::string message, int nFrames = 1) {
-		end = steady_clock::now();
-		duration<double> time_span = duration_cast<duration<double>>(end - start);
-		double t = time_span.count();
+	//sends a red message to the console
+	static void Error(const char* str) { Print(2, str); }
 
-		if (times.size() < num) { times.push_back(t); }
-		else { times.pop_front(); times.push_back(t); }
+	static void Error(const std::string& str) { Print(4, str.c_str()); }
+	
+	template<class T, typename std::enable_if<!has_str_method<T>::value, bool>::type = true>
+	static void Error(T t) { Error(std::to_string(t)); }
 
-		if (elapsedFrames >= nFrames) { Message(message + std::to_string(Math::average(times, times.size()))); elapsedFrames = 0; }
-		else { elapsedFrames++; }
-	}
+	template<class T, typename std::enable_if<has_str_method<T>::value, bool>::type = true>
+	static void Error(T t) { Error(t.str()); }
 
-	//for timing things
-	//this can potentially become innaccurate in certain situations
-	//like with frame rate issues and such
-	static double GetEndTimer(bool restart) {
-		end = steady_clock::now();
-		duration<double> time_span = duration_cast<duration<double>>(end - start);
-		if (restart) { start = steady_clock::now(); }
-		return time_span.count();
-	}
+	
 
 };

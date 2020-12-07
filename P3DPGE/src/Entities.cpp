@@ -72,6 +72,18 @@ void Entity::Translate(Vector3 translation) {
 	position += translation;
 }
 
+std::string Entity::str() {
+	std::string s =
+		"tag         " + tag					+ "\n" +
+		"id          " + std::to_string(id)		+ "\n" +
+		"position    " + position.str2f()		+ "\n" +
+		"rotation    " + rotation.str2f()		+ "\n" +
+		"scale       " + scale.str2f()			+ "\n" +
+		"entity_type: base_entity";
+		return s;
+ 
+}
+
 //// Physics Entity ////
 
 PhysEntity::PhysEntity(int id, EntityParams, PhysEntityParams) : Entity(EntityArgs) {
@@ -187,6 +199,18 @@ void Sphere::ResolveCollision(PhysEntity* other) {
 	}
 }
 
+std::string Sphere::str() {
+	std::string s =
+		"tag         " + tag + "\n" +
+		"id          " + std::to_string(id) + "\n" +
+		"position    " + position.str2f() + "\n" +
+		"rotation    " + rotation.str2f() + "\n" +
+		"scale       " + scale.str2f() + "\n" +
+		"entity_type: sphere";
+	return s;
+
+}
+
 //// Box ////
 
 Box::Box(Vector3 dimensions, int id, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
@@ -217,6 +241,18 @@ bool Box::CheckCollision(Entity* entity) {
 
 //TODO(sp,delle,11/9/20) expand this to a general entity check
 void Box::ResolveCollision(PhysEntity* entity) {
+}
+
+std::string Box::str() {
+	std::string s =
+		"tag         " + tag + "\n" +
+		"id          " + std::to_string(id) + "\n" +
+		"position    " + position.str2f() + "\n" +
+		"rotation    " + rotation.str2f() + "\n" +
+		"scale       " + scale.str2f() + "\n" +
+		"entity_type: box";
+	return s;
+
 }
 
 //// Complex ////
@@ -286,6 +322,18 @@ bool Complex::CheckCollision(Entity* entity) {
 void Complex::ResolveCollision(PhysEntity* entity) {
 }
 
+std::string Complex::str() {
+	std::string s =
+		"tag         " + tag + "\n" +
+		"id          " + std::to_string(id) + "\n" +
+		"position    " + position.str2f() + "\n" +
+		"rotation    " + rotation.str2f() + "\n" +
+		"scale       " + scale.str2f() + "\n" +
+		"entity_type: complex";
+	return s;
+
+}
+
 //// Line2 and Line3 ////
 
 Line2::Line2(Vector3 endPosition, int id, EntityParams) : Entity(EntityArgs) {
@@ -307,6 +355,18 @@ void Line2::SetColor(olc::Pixel newColor) { color = newColor; }
 bool Line2::ContainsPoint(Vector3 point) { return false; }
 bool Line2::ContainsScreenPoint(Vector3 point) { return false; }
 void Line2::Update(float deltaTime) {}
+
+std::string Line2::str() {
+	std::string s =
+		"tag         " + tag + "\n" +
+		"id          " + std::to_string(id) + "\n" +
+		"position    " + position.str2f() + "\n" +
+		"rotation    " + rotation.str2f() + "\n" +
+		"scale       " + scale.str2f() + "\n" +
+		"entity_type: line_2";
+	return s;
+
+}
 
 Line3::Line3(Vector3 endPosition, int id, EntityParams) : Entity(EntityArgs) {
 	mesh = new Mesh();
@@ -343,6 +403,18 @@ bool Line3::ContainsPoint(Vector3 point) { return false; }
 bool Line3::ContainsScreenPoint(Vector3 point) { return false; }
 void Line3::Update(float deltaTime) {}
 
+std::string Line3::str() {
+	std::string s =
+		"tag         " + tag + "\n" +
+		"id          " + std::to_string(id) + "\n" +
+		"position    " + position.str2f() + "\n" +
+		"rotation    " + rotation.str2f() + "\n" +
+		"scale       " + scale.str2f() + "\n" +
+		"entity_type: line_3";
+	return s;
+
+}
+
 //// Debug Triangle ////
 
 DebugTriangle::DebugTriangle(Triangle triangle, int id, EntityParams) : Entity(EntityArgs) {
@@ -355,6 +427,18 @@ bool DebugTriangle::ContainsPoint(Vector3 point) {
 bool DebugTriangle::ContainsScreenPoint(Vector3 point) { return false; }
 
 void DebugTriangle::Update(float deltaTime) {
+}
+
+std::string DebugTriangle::str() {
+	std::string s =
+		"tag         " + tag + "\n" +
+		"id          " + std::to_string(id) + "\n" +
+		"position    " + position.str2f() + "\n" +
+		"rotation    " + rotation.str2f() + "\n" +
+		"scale       " + scale.str2f() + "\n" +
+		"entity_type: debug_triangle";
+	return s;
+
 }
 
 //// Camera ////
@@ -393,4 +477,16 @@ bool Camera::ContainsPoint(Vector3 point) {
 bool Camera::ContainsScreenPoint(Vector3 point) { return false; }
 
 void Camera::Update(float deltaTime) {
+}
+
+std::string Camera::str() {
+	std::string s =
+		"tag         " + tag + "\n" +
+		"id          " + std::to_string(id) + "\n" +
+		"position    " + position.str2f() + "\n" +
+		"rotation    " + rotation.str2f() + "\n" +
+		"scale       " + scale.str2f() + "\n" +
+		"entity_type: camera";
+	return s;
+
 }

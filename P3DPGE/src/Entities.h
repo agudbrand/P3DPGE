@@ -49,6 +49,8 @@ class Entity {
 	virtual void Update(float deltaTime) = 0;
 	virtual bool ContainsPoint(Vector3 point) = 0;
 	virtual bool ContainsScreenPoint(Vector3 point) = 0;
+
+	virtual std::string str();
 };
 
 #define PhysEntityArgs velocity, acceleration, rotVelocity, rotAcceleration, mass, bStatic
@@ -88,6 +90,8 @@ struct Sphere : public PhysEntity {
 	bool ContainsScreenPoint(Vector3 point) override;
 	bool CheckCollision(Entity* entity) override;
 	void ResolveCollision(PhysEntity* entity) override;
+
+	virtual std::string str() override;
 };
 
 //formed by a single dimension vector
@@ -100,6 +104,8 @@ struct Box : public PhysEntity {
 	bool ContainsScreenPoint(Vector3 point) override;
 	bool CheckCollision(Entity* entity) override;
 	void ResolveCollision(PhysEntity* entity) override;
+
+	virtual std::string str() override;
 };
 
 //struct convexPoly
@@ -120,6 +126,8 @@ struct Complex : public PhysEntity {
 	bool ContainsScreenPoint(Vector3 point) override;
 	bool CheckCollision(Entity* entity) override;
 	void ResolveCollision(PhysEntity* entity) override;
+
+	virtual std::string str() override;
 };
 
 //should there be 2 vf2d's instead of a Vector3 pos and Vector3 endPos?
@@ -127,6 +135,8 @@ struct Line2 : public Entity {
 	Vector3 endPosition;
 	olc::Pixel color = olc::WHITE;
 	
+	Edge edge;
+
 	Line2(Vector3 endPosition, int id, EntityDefaultParams);
 	void Update(float deltaTime) override;
 	bool ContainsPoint(Vector3 point) override;
@@ -134,6 +144,9 @@ struct Line2 : public Entity {
 	void Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) override;
 	bool SpecialDraw() override;
 	void SetColor(olc::Pixel newColor) override;
+
+	virtual std::string str() override;
+
 };
 
 //edge is not yet implemented here yet
@@ -149,6 +162,9 @@ struct Line3 : public Entity {
 	void Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) override;
 	bool SpecialDraw() override;
 	void SetColor(olc::Pixel newColor) override;
+
+	virtual std::string str() override;
+
 };
 
 //for spawning single triangles
@@ -159,6 +175,8 @@ struct DebugTriangle : public Entity {
 	void Update(float deltaTime) override;
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
+
+	virtual std::string str() override;
 	
 };
 
@@ -178,6 +196,8 @@ struct Camera : public Entity {
 	void Update(float deltaTime) override;
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
+
+	virtual std::string str() override;
 };
 
 //archaic light class

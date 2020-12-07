@@ -6,6 +6,10 @@
 namespace Render {
 	//NOTE sushi: do we want Render to be this bloated? Or organized it elsewhere?
 
+	internal bool DEBUG_RENDER = false;
+
+#define DEBUGR DEBUG if(DEBUG_RENDER)
+
 	static std::vector<Entity*> entities;
 
 	//special entities that should not be interacted with like
@@ -378,28 +382,30 @@ namespace Render {
 		}
 
 		//debug drawing
-		if (WIRE_FRAME) {
-			for (auto& t : drawnTriangles) {
-				p->DrawTriangle(
-					t.proj_points[0].x, t.proj_points[0].y,
-					t.proj_points[1].x, t.proj_points[1].y,
-					t.proj_points[2].x, t.proj_points[2].y,
-					olc::WHITE);
+		if(DEBUG){
+			if (WIRE_FRAME) {
+				for (auto& t : drawnTriangles) {
+					p->DrawTriangle(
+						t.proj_points[0].x, t.proj_points[0].y,
+						t.proj_points[1].x, t.proj_points[1].y,
+						t.proj_points[2].x, t.proj_points[2].y,
+						olc::WHITE);
+				}
 			}
-		}
 
-		if (DISP_EDGES) {
-			for (Triangle& t : drawnTriangles) {
-				t.display_edges(p);
+			if (DISP_EDGES) {
+				for (Triangle& t : drawnTriangles) {
+					t.display_edges(p);
+				}
 			}
 		}
+		
 	}//Draw
 
 	//draw all entities to screen
 	static void Update(olc::PixelGameEngine* p) {
 		//Debug::StartTimer();
 		view = camera.MakeViewMatrix(yaw);
-		
 
 		//get triangles from all entities
 		for (auto& e : entities) {
@@ -428,9 +434,25 @@ namespace Render {
 		triangles.clear();
 
 		//debug
-		p->DrawStringDecal(olc::vf2d(p->ScreenWidth() - 300, p->ScreenHeight() - 20), "Mouse: " + Vector3(p->GetMousePos()).str2F());
-		p->DrawStringDecal(olc::vf2d(p->ScreenWidth()-300, p->ScreenHeight() - 10), "Camera: " + camera.position.str2F());
-	
+		p->DrawStringDecal(olc::vf2d(p->ScreenWidth() - 300, p->ScreenHeight() - 20), "Mouse: " + Vector3(p->GetMousePos()).str2f());
+		p->DrawStringDecal(olc::vf2d(p->ScreenWidth()-300, p->ScreenHeight() - 10), "Camera: " + camera.position.str2f());
+
+
+		//debug examples
+		DEBUG_M(camera);
+		
+		IFDEBUG int do_something;
+
+		if(DEBUG){
+			int do_;
+			int more;
+		}
+
+		DEBUG_PTS;
+		std::cout << "timer!" << std::endl;
+		DEBUG_PTE();
+
+
 		//Debug::EndTimerAverage(p, 10, "", 10);
 	}
 
