@@ -1,7 +1,7 @@
-TODO List successfully generated with 53 TODOs found.
+TODO List successfully generated with 57 TODOs found.
 
 ~~~~~~~ TODO 0 ~~~~~~~
-Collider.cpp, Line: 16
+Collider.cpp, Line: 21
 Creator: delle
 ----------------------
 Tags: TODOP, optimization
@@ -9,7 +9,7 @@ Tags: TODOP, optimization
 check if the compiler optimizes this to be inline
 
 ~~~~~~~ TODO 1 ~~~~~~~
-Collider.cpp, Line: 25
+Collider.cpp, Line: 37
 Creator: delle
 ----------------------
 Tags: TODOP, physics
@@ -17,7 +17,7 @@ Tags: TODOP, physics
 implement aabb-aabb collision and resolution
 
 ~~~~~~~ TODO 2 ~~~~~~~
-Collider.cpp, Line: 31
+Collider.cpp, Line: 43
 Creator: delle
 ----------------------
 Tags: TODOP, physics
@@ -25,7 +25,7 @@ Tags: TODOP, physics
 implement sphere-aabb dynamic resolution
 
 ~~~~~~~ TODO 3 ~~~~~~~
-Collider.cpp, Line: 32
+Collider.cpp, Line: 44
 Creator: delle
 ----------------------
 Tags: TODOP, physics
@@ -33,7 +33,7 @@ Tags: TODOP, physics
 maybe abstract out closest point calculations for each collider
 
 ~~~~~~~ TODO 4 ~~~~~~~
-Collider.cpp, Line: 51
+Collider.cpp, Line: 61
 Creator: delle
 ----------------------
 Tags: TODOP, physics
@@ -41,95 +41,119 @@ Tags: TODOP, physics
 test this
 
 ~~~~~~~ TODO 5 ~~~~~~~
-Collider.cpp, Line: 64
+Collider.cpp, Line: 80
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: TODOP, clean up
 ----------------------
-implement aabb-box collision and resolution
+remove this, only for testing
 
 ~~~~~~~ TODO 6 ~~~~~~~
-Collider.cpp, Line: 70
-Creator: delle
-----------------------
-Tags: TODOP, physics
-----------------------
-implement aabb-complex collision and resolution
-
-~~~~~~~ TODO 7 ~~~~~~~
-Collider.cpp, Line: 87
+Collider.cpp, Line: 83
 Creator: delle
 ----------------------
 Tags: TODOP, physics
 ----------------------
 test this
 
+~~~~~~~ TODO 7 ~~~~~~~
+Collider.cpp, Line: 93
+Creator: delle
+----------------------
+Tags: TODOP, physics
+----------------------
+implement aabb-box collision and resolution
+
 ~~~~~~~ TODO 8 ~~~~~~~
+Collider.cpp, Line: 99
+Creator: delle
+----------------------
+Tags: TODOP, physics
+----------------------
+implement aabb-complex collision and resolution
+
+~~~~~~~ TODO 9 ~~~~~~~
 Collider.cpp, Line: 116
+Creator: delle
+----------------------
+Tags: TODOP, physics
+----------------------
+test this
+
+~~~~~~~ TODO 10 ~~~~~~~
+Collider.cpp, Line: 150
 Creator: delle
 ----------------------
 Tags: TODOP, physics
 ----------------------
 implement rotational collision resolution
 
-~~~~~~~ TODO 9 ~~~~~~~
-Collider.cpp, Line: 134
+~~~~~~~ TODO 11 ~~~~~~~
+Collider.cpp, Line: 168
 Creator: delle
 ----------------------
 Tags: TODOP, physics
 ----------------------
 test this in 3d
 
-~~~~~~~ TODO 10 ~~~~~~~
-Collider.cpp, Line: 141
+~~~~~~~ TODO 12 ~~~~~~~
+Collider.cpp, Line: 175
 Creator: delle
 ----------------------
 Tags: TODOP, physics
 ----------------------
 implement sphere-box collision and resolution
 
-~~~~~~~ TODO 11 ~~~~~~~
-Collider.cpp, Line: 147
+~~~~~~~ TODO 13 ~~~~~~~
+Collider.cpp, Line: 181
 Creator: delle
 ----------------------
 Tags: TODOP, physics
 ----------------------
 implement sphere-complex collision and resolution
 
-~~~~~~~ TODO 12 ~~~~~~~
-Collider.cpp, Line: 188
+~~~~~~~ TODO 14 ~~~~~~~
+Collider.cpp, Line: 222
 Creator: delle
 ----------------------
 Tags: TODOP, physics
 ----------------------
 implement 
 
-~~~~~~~ TODO 13 ~~~~~~~
-Collider.cpp, Line: 194
+~~~~~~~ TODO 15 ~~~~~~~
+Collider.cpp, Line: 228
 Creator: delle
 ----------------------
 Tags: TODOP, physics
 ----------------------
 implement box-box collision and resolution
 
-~~~~~~~ TODO 14 ~~~~~~~
-Collider.cpp, Line: 200
+~~~~~~~ TODO 16 ~~~~~~~
+Collider.cpp, Line: 234
 Creator: delle
 ----------------------
 Tags: TODOP, physics
 ----------------------
 implement box-complex collision and resolution
 
-~~~~~~~ TODO 15 ~~~~~~~
-Collider.cpp, Line: 284
+~~~~~~~ TODO 17 ~~~~~~~
+Collider.cpp, Line: 318
 Creator: delle
 ----------------------
 Tags: TODOP, physics
 ----------------------
 implement complex-complex collision and resolution
 
-~~~~~~~ TODO 16 ~~~~~~~
-Entities.cpp, Line: 90
+~~~~~~~ TODO 18 ~~~~~~~
+Debug.h, Line: 120
+Creator:  sushi
+----------------------
+Tags: TODOP, clean up
+----------------------
+write a function that just takes anything and converts it to char*
+
+~~~~~~~ TODO 19 ~~~~~~~
+Entities.cpp, Line: 132
 Creator: delle
 ----------------------
 Date: 11/13/20
@@ -137,8 +161,8 @@ Tags: TODOP, unimportant, physics
 ----------------------
 change air friction to calculate for shape of object
 
-~~~~~~~ TODO 17 ~~~~~~~
-Entities.cpp, Line: 106
+~~~~~~~ TODO 20 ~~~~~~~
+Entities.cpp, Line: 148
 Creator: delle
 ----------------------
 Date: 11/13/20
@@ -146,8 +170,8 @@ Tags: TODOP, unimportant, physics
 ----------------------
 create the GenerateRadialForce function
 
-~~~~~~~ TODO 18 ~~~~~~~
-Entities.cpp, Line: 125
+~~~~~~~ TODO 21 ~~~~~~~
+Entities.cpp, Line: 171
 Creator: delle
 ----------------------
 Date: 11/9/20
@@ -155,8 +179,8 @@ Tags: TODOP, severe, physics
 ----------------------
 expand this to a general entity check, but right now it just checks circles
 
-~~~~~~~ TODO 19 ~~~~~~~
-Entities.cpp, Line: 126
+~~~~~~~ TODO 22 ~~~~~~~
+Entities.cpp, Line: 172
 Creator: delle
 ----------------------
 Date: 11/9/20
@@ -164,8 +188,8 @@ Tags: TODOP, optimization, unimportant, physics
 ----------------------
 if other object is sphere, can optimize the equation to not use sqrt
 
-~~~~~~~ TODO 20 ~~~~~~~
-Entities.cpp, Line: 138
+~~~~~~~ TODO 23 ~~~~~~~
+Entities.cpp, Line: 184
 Creator: delle
 ----------------------
 Date: 11/9/20
@@ -173,8 +197,8 @@ Tags: TODOP, severe, physics
 ----------------------
 expand this to a general entity check, but right now it just checks circles
 
-~~~~~~~ TODO 21 ~~~~~~~
-Entities.cpp, Line: 139
+~~~~~~~ TODO 24 ~~~~~~~
+Entities.cpp, Line: 185
 Creator: delle
 ----------------------
 Date: 11/17/20
@@ -182,57 +206,57 @@ Tags: TODOP, optimization, unimportant, physics
 ----------------------
 can optimize this by recieving info from CheckCollision
 
-~~~~~~~ TODO 22 ~~~~~~~
-Entities.cpp, Line: 178
-Creator: delle
-----------------------
-Date: 11/9/20
-Tags: TODOP, severe, physics
-----------------------
-expand this to a general entity check
-
-~~~~~~~ TODO 23 ~~~~~~~
-Entities.cpp, Line: 183
-Creator: delle
-----------------------
-Date: 11/9/20
-Tags: TODOP, severe, physics
-----------------------
-expand this to a general entity check
-
-~~~~~~~ TODO 24 ~~~~~~~
-Entities.cpp, Line: 223
-Creator:  sushi
-----------------------
-Tags: TODOP, math
-----------------------
-abstract the following functions in Math.h in order to make this not look retarded
-
 ~~~~~~~ TODO 25 ~~~~~~~
-Entities.cpp, Line: 231
-Creator:  delle
+Entities.cpp, Line: 256
+Creator: delle
 ----------------------
-Tags: TODOP, severe, render
+Date: 11/9/20
+Tags: TODOP, severe, physics
 ----------------------
-implement line3 clipping
+expand this to a general entity check
 
 ~~~~~~~ TODO 26 ~~~~~~~
-Entities.h, Line: 26
+Entities.cpp, Line: 261
+Creator: delle
+----------------------
+Date: 11/9/20
+Tags: TODOP, severe, physics
+----------------------
+expand this to a general entity check
+
+~~~~~~~ TODO 27 ~~~~~~~
+Entities.cpp, Line: 433
+Creator: delle
+----------------------
+Tags: TODOP, render
+----------------------
+test that this works
+
+~~~~~~~ TODO 28 ~~~~~~~
+Entities.cpp, Line: 441
+Creator: delle
+----------------------
+Tags: TODOP, render
+----------------------
+change the third parameter to the camera variable
+
+~~~~~~~ TODO 29 ~~~~~~~
+Entities.h, Line: 25
 Creator:  sushi
 ----------------------
 Tags: TODOP, render, entity, optimization
 ----------------------
 implement this eventually
 
-~~~~~~~ TODO 27 ~~~~~~~
-Entities.h, Line: 157
+~~~~~~~ TODO 30 ~~~~~~~
+Entities.h, Line: 122
 Creator:  sushi
 ----------------------
 Tags: TODOP, entity
 ----------------------
 generate complex object relative to input position
 
-~~~~~~~ TODO 28 ~~~~~~~
+~~~~~~~ TODO 31 ~~~~~~~
 Input.h, Line: 5
 Creator: delle
 ----------------------
@@ -240,7 +264,7 @@ Tags: TODOP, input
 ----------------------
 remove this
 
-~~~~~~~ TODO 29 ~~~~~~~
+~~~~~~~ TODO 32 ~~~~~~~
 Input.h, Line: 7
 Creator: delle
 ----------------------
@@ -249,24 +273,24 @@ Tags: TODOP, input, optimization
 ----------------------
 look into heap vs stack memory allocation for the func pointer
 
-~~~~~~~ TODO 30 ~~~~~~~
-Input.h, Line: 123
+~~~~~~~ TODO 33 ~~~~~~~
+Input.h, Line: 126
 Creator:  sushi
 ----------------------
 Tags: TODOP, input
 ----------------------
 set up pausing to also pause moving/rotating objects manually
 
-~~~~~~~ TODO 31 ~~~~~~~
-Input.h, Line: 262
+~~~~~~~ TODO 34 ~~~~~~~
+Input.h, Line: 271
 Creator:  sushi
 ----------------------
 Tags: TODOP, optimization
 ----------------------
 write this to skip objects who aren\'t close to the line
 
-~~~~~~~ TODO 32 ~~~~~~~
-Input.h, Line: 459
+~~~~~~~ TODO 35 ~~~~~~~
+Input.h, Line: 469
 Creator: delle
 ----------------------
 Date: 11/17/20
@@ -274,79 +298,87 @@ Tags: TODOP, severe, input
 ----------------------
 change this so it checks objects in screen space
 
-~~~~~~~ TODO 33 ~~~~~~~
-Input.h, Line: 513
+~~~~~~~ TODO 36 ~~~~~~~
+Input.h, Line: 527
 Creator:  sushi
 ----------------------
 Tags: TODOP, input
 ----------------------
 figure out how to make this work with only drawn triangles
 
-~~~~~~~ TODO 34 ~~~~~~~
-main.cpp, Line: 15
+~~~~~~~ TODO 37 ~~~~~~~
+main.cpp, Line: 16
 Creator:  sushi
 ----------------------
 Tags: TODOP, general
 ----------------------
 create a WorldMatrix that takes in several matrix operations and
 
-~~~~~~~ TODO 35 ~~~~~~~
-main.cpp, Line: 21
+~~~~~~~ TODO 38 ~~~~~~~
+main.cpp, Line: 22
 Creator: delle
 ----------------------
 Tags: TODOP, physics
 ----------------------
 add physics based collision resolution for all entities
 
-~~~~~~~ TODO 36 ~~~~~~~
-main.cpp, Line: 23
+~~~~~~~ TODO 39 ~~~~~~~
+main.cpp, Line: 24
 Creator: delle
 ----------------------
 Tags: TODOP, input
 ----------------------
 convert inputs to new format, method to add and remove inputs
 
-~~~~~~~ TODO 37 ~~~~~~~
-main.cpp, Line: 25
+~~~~~~~ TODO 40 ~~~~~~~
+main.cpp, Line: 26
 Creator: delle
 ----------------------
 Tags: TODOP, general
 ----------------------
 create a debug header for easy printing and such
 
-~~~~~~~ TODO 38 ~~~~~~~
-Math.h, Line: 70
+~~~~~~~ TODO 41 ~~~~~~~
+Math.h, Line: 84
 Creator:  sushi
 ----------------------
 Tags: TODOP, math
 ----------------------
 make lerp for Vector3
 
-~~~~~~~ TODO 39 ~~~~~~~
-Math.h, Line: 380
+~~~~~~~ TODO 42 ~~~~~~~
+Math.h, Line: 433
 Creator:  sushi
 ----------------------
 Tags: TODOP
 ----------------------
 rename these functions to something not retarded
 
-~~~~~~~ TODO 40 ~~~~~~~
-Math.h, Line: 435
+~~~~~~~ TODO 43 ~~~~~~~
+Math.h, Line: 517
+Creator: delle
+----------------------
+Tags: TODOP, render
+----------------------
+test whether this is right
+
+~~~~~~~ TODO 44 ~~~~~~~
+Math.h, Line: 612
 Creator:  sushi
 ----------------------
 Tags: TODOP, math
 ----------------------
 implement Edge in 3D
 
-~~~~~~~ TODO 41 ~~~~~~~
-Math.h, Line: 452
+~~~~~~~ TODO 45 ~~~~~~~
+Math.h, Line: 629
 Creator:  sushi
 ----------------------
 Tags: TODOP
 ----------------------
 find a good place to update edge, probably in Triangle?
 
-~~~~~~~ TODO 42 ~~~~~~~
+~~~~~~~ TODO 46 ~~~~~~~
 Mesh.h, Line: 127
 Creator:  sushi
 ----------------------
@@ -354,7 +386,7 @@ Tags: TODOP, math
 ----------------------
 make this take just a line when we get forward declaring
 
-~~~~~~~ TODO 43 ~~~~~~~
+~~~~~~~ TODO 47 ~~~~~~~
 Mesh.h, Line: 168
 Creator: delle
 ----------------------
@@ -363,7 +395,7 @@ Tags: TODOP
 ----------------------
 abstract out Mesh and split into Mesh2D and Mesh3D
 
-~~~~~~~ TODO 44 ~~~~~~~
+~~~~~~~ TODO 48 ~~~~~~~
 Mesh.h, Line: 224
 Creator:  sushi
 ----------------------
@@ -371,7 +403,7 @@ Tags: TODOP, clean up
 ----------------------
 do this better later
 
-~~~~~~~ TODO 45 ~~~~~~~
+~~~~~~~ TODO 49 ~~~~~~~
 Physics.h, Line: 5
 Creator: delle
 ----------------------
@@ -380,7 +412,7 @@ Tags: TODOP, optimization, unimportant
 ----------------------
 optimize by using arrays rather than vectors,
 
-~~~~~~~ TODO 46 ~~~~~~~
+~~~~~~~ TODO 50 ~~~~~~~
 Physics.h, Line: 48
 Creator: delle
 ----------------------
@@ -389,40 +421,40 @@ Tags: TODOP, unimportant, physics, optimization
 ----------------------
 this could maybe be optimized by having an id counter instead of checking back element
 
-~~~~~~~ TODO 47 ~~~~~~~
-Render.h, Line: 22
+~~~~~~~ TODO 51 ~~~~~~~
+Render.h, Line: 27
 Creator:  sushi
 ----------------------
 Tags: TODOP, render
 ----------------------
 set up a way that debug can be applied to certain objects. this is important in the case of edge numbers
 
-~~~~~~~ TODO 48 ~~~~~~~
-Render.h, Line: 75
+~~~~~~~ TODO 52 ~~~~~~~
+Render.h, Line: 62
 Creator:  sushi
 ----------------------
 Tags: TODOP, render, clean up
 ----------------------
 change this to take in types and not individual values
 
-~~~~~~~ TODO 49 ~~~~~~~
-Render.h, Line: 292
+~~~~~~~ TODO 53 ~~~~~~~
+Render.h, Line: 279
 Creator:  sushi
 ----------------------
 Tags: TODOP, render
 ----------------------
 this still needs abstracted
 
-~~~~~~~ TODO 50 ~~~~~~~
-Render.h, Line: 347
+~~~~~~~ TODO 54 ~~~~~~~
+Render.h, Line: 334
 Creator:  sushi
 ----------------------
 Tags: TODOP, optimization
 ----------------------
 optimize this for loop 
 
-~~~~~~~ TODO 51 ~~~~~~~
-Render.h, Line: 454
+~~~~~~~ TODO 55 ~~~~~~~
+Render.h, Line: 443
 Creator:  sushi
 ----------------------
 Date:  11/18/2020
@@ -430,8 +462,8 @@ Tags: TODOP, render
 ----------------------
 writing this is probably important
 
-~~~~~~~ TODO 52 ~~~~~~~
-Time.h, Line: 5
+~~~~~~~ TODO 56 ~~~~~~~
+Time.h, Line: 19
 Creator: delle
 ----------------------
 Date: 11/17/20
