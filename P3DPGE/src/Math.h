@@ -73,6 +73,12 @@ namespace Math {
 		return s;
 	}
 
+	static std::string str2f(float s) {
+		char buffer[50];
+		std::snprintf(buffer, 50, "%-.2f", s);
+		return std::string(buffer);
+	}
+
 	//round a float to two decimal places
 	static float roundf_two(float f) { return (float)((int)(f * 100 + .5)) / 100; }
 
@@ -136,6 +142,7 @@ public:
 	Vector3 operator += (const Vector3& rhs)				{ this->x += rhs.x; this->y += rhs.y; this->z += rhs.z; return *this; }
 	Vector3 operator -= (const Vector3& rhs)				{ this->x -= rhs.x; this->y -= rhs.y; this->z -= rhs.z; return *this; }
 	Vector3 operator *= (const mat<float, 4, 4> rhs)		{ mat<float, 1, 4> v{ x,y,z,1 }; return GetM1x4ToVector3(v * rhs); }
+	Vector3 operator *= (const float rhs)					{ this->x *= rhs; this->y *= rhs; this->z *= rhs; return *this; }
 	Vector3 operator /= (const float& rhs)					{ this->x /= rhs; this->y /= rhs; this->z /= rhs; return *this; }
 	Vector3 operator +  ()							const	{ return { +x, +y, +z }; }
 	Vector3 operator -  ()							const	{ return { -x, -y, -z }; }
@@ -145,9 +152,7 @@ public:
 	float				dot(const Vector3& rhs)		const	{ return this->x * rhs.x + this->y * rhs.y + this->z * rhs.z; }
 	Vector3				cross(const Vector3& rhs)	const	{ return Vector3(this->y * rhs.z - rhs.y * this->z, this->x * rhs.z - rhs.x * this->z, this->x * rhs.y - rhs.x * this->y); }
 	float				mag()						const	{ return std::sqrtf(x * x + y * y + z * z); }
-	const std::string	str()						const	{ return std::string("(") + std::to_string(this->x) + "," + std::to_string(this->y) + "," + std::to_string(this->z) + ")"; }
-	const std::string	rndstr()					const	{ return std::string("(") + Math::append_two_decimal(std::to_string(Math::roundf_two(this->x))) + "," + Math::append_two_decimal(std::to_string(Math::roundf_two(this->y))) + "," + Math::append_two_decimal(std::to_string(Math::roundf_two(this->z))) + ")"; }
-	Vector3				normalized()						{ return *this == V3ZERO ? V3ZERO : *this / this->mag(); }
+	const std::string	str()						const	{ return std::string("(") + std::to_string(this->x) + "," + std::to_string(this->y) + "," + std::to_string(this->z) + ")"; }	Vector3				normalized()						{ return *this == V3ZERO ? V3ZERO : *this / this->mag(); }
 	void				normalize()							{ *this == V3ZERO ? *this = V3ZERO : *this = *this / this->mag(); }
 	Vector3				clampMag(float& rhs)				{ return this->normalized() * rhs; }
 	float				distanceTo(Vector3& rhs)			{ return (*this - rhs).mag(); }
@@ -162,13 +167,12 @@ public:
 	Vector2				toVector2()							{ return Vector2(x, y); }
 	Vector3				copy()								{ return Vector3(x, y, z); }
 	
-	const std::string str2F() {
+	const std::string str2f() {
 		char buffer[50];
 		std::snprintf(buffer, 50, "(%-.2f, %-.2f, %-.2f)", this->x, this->y, this->z);
 		return std::string(buffer);
 	}
 	
-
 	//conversions between qvm's matrices and our vectors and a special mult function
 	mat<float, 1, 4> ConvertToM1x4() {
 		mat<float, 1, 4> m;
@@ -203,7 +207,7 @@ public:
 
 	mat<float, 1, 4> unproj_mult(mat<float, 1, 4> v, mat<float, 4, 4> m) {
 		mat<float, 1, 4> vm = v * m;
-		if (vm.a[0][3] != 0) { vm.a[0][0] *= vm.a[0][3]; vm.a[0][1] *= vm.a[0][3]; vm.a[0][2] *= vm.a[0][3]; }
+		if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; }
 		return vm;
 	}
 	
@@ -320,12 +324,15 @@ public:
 	}
 
 	void ScreenToWorld(mat<float, 4, 4> ProjMat, mat<float,4,4> view, olc::PixelGameEngine* p) {
-		mat<float, 4, 4> pxv = view * ProjMat;
 		x /= .5f * (float)p->ScreenWidth();
 		y /= .5f * (float)p->ScreenHeight();
-		x -= 1.f; y -= 1.f;
-		pxv = inverse(pxv);
-		M1x4ToVector3(unproj_mult(ConvertToM1x4(), pxv));
+		x -= 1.f; y -= 1.f; z = -1.f;
+		Debug::Message(*this);
+		M1x4ToVector3(unproj_mult(ConvertToM1x4(), inverse(ProjMat)));
+		Debug::Message(*this);
+		M1x4ToVector3(unproj_mult(ConvertToM1x4(), inverse(view)));
+		Debug::Message(*this);
+
 	}
 };
 
@@ -694,6 +701,9 @@ struct Edge {
 			return false;
 		}
 	}
+
+	std::string str() { return "{(" + p[0].str() + "), (" + p[1].str() + ")}"; }
+	std::string str2f() { return "{(" + p[0].str2f() + "), (" + p[1].str2f() + ")}"; }
 };
 
 struct Edge3 {
@@ -715,7 +725,7 @@ struct Edge3 {
 	}
 
 	std::string str() { return "{(" + p[0].str() + "), (" + p[1].str() + ")}"; }
-	std::string rndstr() { return "{(" + p[0].rndstr() + "), (" + p[1].rndstr() + ")}"; }
+	std::string str2f() { return "{(" + p[0].str2f() + "), (" + p[1].str2f() + ")}"; }
 
 	Vector3 edge_midpoint() {
 		return Vector3((p[0].x + p[1].x) / 2, (p[0].y + p[1].y) / 2, (p[0].z + p[1].z) / 2);

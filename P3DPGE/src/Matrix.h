@@ -34,7 +34,7 @@ struct Matrix {
 
 	void copy(const Matrix& m);
 	const std::string str() const;
-	const std::string str2F() const;
+	const std::string str2f() const;
 };
 
 //// Constructors ////
@@ -54,6 +54,7 @@ inline Matrix::Matrix(uint32 inRows, uint32 inCols, float inData[]) : rows(inRow
 	for (uint32 i = 0; i < inCount; ++i) {
 		this->data[i] = inData[i];
 	}
+
 }
 
 inline Matrix::Matrix(uint32 inRows, uint32 inCols, std::initializer_list<float> list) : rows(inRows), cols(inCols) {
@@ -100,6 +101,7 @@ inline Matrix& Matrix::operator =  (const Matrix& rhs) {
 	return *this;
 }
 
+
 inline Matrix  Matrix::operator *  (const float& rhs) const {
 	Matrix newMatrix(*this);
 	for (uint32 i = 0; i < newMatrix.elementCount; ++i) {
@@ -135,6 +137,11 @@ inline Matrix& Matrix::operator += (const Matrix& rhs){}
 inline Matrix  Matrix::operator -  (const Matrix& rhs) const{}
 
 inline Matrix& Matrix::operator -= (const Matrix& rhs){}
+
+//NOTE sushi: you will probably want to throw an exception if you attempt to 
+//			  do an invalid matrix multiplication eg. 
+//			  when you have matrix axb and matrix cxd, if b is not equal to c
+//			  throw exception
 
 inline Matrix  Matrix::operator *  (const Matrix& rhs) const{}
 

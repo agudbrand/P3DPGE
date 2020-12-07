@@ -163,7 +163,7 @@ struct Triangle {
 	}
 
 	std::string str() { return "{(" + points[0].str() + "), (" + points[1].str() + "), (" + points[2].str() + ")}"; }
-	std::string rndstr() { return "{(" + points[0].rndstr() + "), (" + points[1].rndstr() + "), (" + points[2].rndstr() + ")}"; }
+	std::string rndstr() { return "{(" + points[0].str2f() + "), (" + points[1].str2f() + "), (" + points[2].str2f() + ")}"; }
 };
 
 //TODO(,delle,11/22/20) abstract out Mesh and split into Mesh2D and Mesh3D
