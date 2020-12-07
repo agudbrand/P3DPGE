@@ -50,8 +50,7 @@ public:
 		Render::Init();
 
 		Debug::Message("matrix struct size: " + std::to_string(sizeof(Matrix)));
-		Debug::Message("matrix struct size: " + std::to_string(sizeof(Matrix(1, 1, {0,1,2,3}))));
-
+		Matrix test(1, 4, { 0,1,2,3 });
 		return true;
 	}
 

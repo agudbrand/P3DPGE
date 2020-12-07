@@ -42,7 +42,7 @@ struct Matrix {
 inline Matrix::Matrix(uint32 inRows, uint32 inCols) : rows(inRows), cols(inCols) {
 	ASSERT(inRows != 0 && inCols != 0, "Matrix constructor was given zero size");
 	this->elementCount = inRows * inCols;
-	this->data = new float[elementCount];
+	this->data = new float[elementCount]();
 }
 
 inline Matrix::Matrix(uint32 inRows, uint32 inCols, float inData[]) : rows(inRows), cols(inCols) {
@@ -50,9 +50,9 @@ inline Matrix::Matrix(uint32 inRows, uint32 inCols, float inData[]) : rows(inRow
 	this->elementCount = inRows * inCols;
 	uint32 inCount = sizeof(*inData) / sizeof(float);
 	ASSERT(inCount <= elementCount, "Matrix constructor was given too many elements for given dimensions");
-	this->data = new float[elementCount];
+	this->data = new float[elementCount]();
 	for (uint32 i = 0; i < inCount; ++i) {
-		*(this->data+i) = inData[i];
+		this->data[i] = inData[i];
 	}
 }
 
@@ -61,7 +61,7 @@ inline Matrix::Matrix(uint32 inRows, uint32 inCols, std::initializer_list<float>
 	this->elementCount = inRows * inCols;
 	uint32 inCount = list.size();
 	ASSERT(inCount <= elementCount, "Matrix constructor was given too many elements for given dimensions");
-	this->data = new float[elementCount];
+	this->data = new float[elementCount]();
 	int i = 0;
 	for (auto& f : list) {
 		this->data[i] = f;
@@ -73,7 +73,7 @@ inline Matrix::Matrix(const Matrix& m) {
 	this->rows = m.rows;
 	this->cols = m.cols;
 	this->elementCount = rows * cols;
-	this->data = new float[elementCount];
+	this->data = new float[elementCount]();
 	copy(m);
 }
 

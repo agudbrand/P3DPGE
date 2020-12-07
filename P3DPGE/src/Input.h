@@ -279,7 +279,7 @@ namespace Input {
 			
 			if (selectedEntity) { selectedEntity = nullptr; }
 
-			pos.ScreenToWorld(Render::ProjectionMatrix(p), Render::camera.MakeViewMatrix(Render::yaw), p);
+			pos.ScreenToWorld(Render::camera.ProjectionMatrix(p), Render::camera.MakeViewMatrix(Render::yaw), p);
 			
 			Vector3 ctox = pos - Render::camera.position;
 
