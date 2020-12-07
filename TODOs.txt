@@ -217,22 +217,14 @@ Tags: TODOP, severe, physics
 expand this to a general entity check
 
 ~~~~~~~ TODO 26 ~~~~~~~
-Entities.cpp, Line: 461
-Creator: delle
-----------------------
-Tags: TODOP, render
-----------------------
-test that this works
-
-~~~~~~~ TODO 27 ~~~~~~~
-Entities.cpp, Line: 469
+Entities.cpp, Line: 468
 Creator: delle
 ----------------------
 Tags: TODOP, render
 ----------------------
 change the third parameter to the camera variable
 
-~~~~~~~ TODO 28 ~~~~~~~
+~~~~~~~ TODO 27 ~~~~~~~
 Entities.h, Line: 27
 Creator:  sushi
 ----------------------
@@ -240,7 +232,7 @@ Tags: TODOP, render, entity, optimization
 ----------------------
 implement this eventually
 
-~~~~~~~ TODO 29 ~~~~~~~
+~~~~~~~ TODO 28 ~~~~~~~
 Entities.h, Line: 125
 Creator:  sushi
 ----------------------
@@ -248,7 +240,7 @@ Tags: TODOP, entity
 ----------------------
 generate complex object relative to input position
 
-~~~~~~~ TODO 30 ~~~~~~~
+~~~~~~~ TODO 29 ~~~~~~~
 Input.h, Line: 5
 Creator: delle
 ----------------------
@@ -256,7 +248,7 @@ Tags: TODOP, input
 ----------------------
 remove this
 
-~~~~~~~ TODO 31 ~~~~~~~
+~~~~~~~ TODO 30 ~~~~~~~
 Input.h, Line: 7
 Creator: delle
 ----------------------
@@ -265,7 +257,7 @@ Tags: TODOP, input, optimization
 ----------------------
 look into heap vs stack memory allocation for the func pointer
 
-~~~~~~~ TODO 32 ~~~~~~~
+~~~~~~~ TODO 31 ~~~~~~~
 Input.h, Line: 132
 Creator:  sushi
 ----------------------
@@ -273,7 +265,7 @@ Tags: TODOP, input
 ----------------------
 set up pausing to also pause moving/rotating objects manually
 
-~~~~~~~ TODO 33 ~~~~~~~
+~~~~~~~ TODO 32 ~~~~~~~
 Input.h, Line: 271
 Creator:  sushi
 ----------------------
@@ -281,8 +273,17 @@ Tags: TODOP, optimization
 ----------------------
 write this to skip objects who aren\'t close to the line
 
+~~~~~~~ TODO 33 ~~~~~~~
+Input.h, Line: 303
+Creator: 
+----------------------
+Date: 
+Tags: TODOP, input
+----------------------
+change camera movement to W-forward, S-backward, Q-down, E-up
+
 ~~~~~~~ TODO 34 ~~~~~~~
-Input.h, Line: 469
+Input.h, Line: 471
 Creator: delle
 ----------------------
 Date: 11/17/20
@@ -363,6 +364,14 @@ Tags: TODOP
 find a good place to update edge, probably in Triangle?
 
 ~~~~~~~ TODO 44 ~~~~~~~
+Matrix.h, Line: 175
+Creator: delle
+----------------------
+Tags: TODOP, optimization
+----------------------
+look into optimizing this by transposing to remove a loop, see Unreal implementation
+
+~~~~~~~ TODO 45 ~~~~~~~
 Mesh.h, Line: 127
 Creator:  sushi
 ----------------------
@@ -370,7 +379,7 @@ Tags: TODOP, math
 ----------------------
 make this take just a line when we get forward declaring
 
-~~~~~~~ TODO 45 ~~~~~~~
+~~~~~~~ TODO 46 ~~~~~~~
 Mesh.h, Line: 168
 Creator: delle
 ----------------------
@@ -379,7 +388,7 @@ Tags: TODOP
 ----------------------
 abstract out Mesh and split into Mesh2D and Mesh3D
 
-~~~~~~~ TODO 46 ~~~~~~~
+~~~~~~~ TODO 47 ~~~~~~~
 Mesh.h, Line: 224
 Creator:  sushi
 ----------------------
@@ -387,7 +396,7 @@ Tags: TODOP, clean up
 ----------------------
 do this better later
 
-~~~~~~~ TODO 47 ~~~~~~~
+~~~~~~~ TODO 48 ~~~~~~~
 Physics.h, Line: 5
 Creator: delle
 ----------------------
@@ -396,7 +405,7 @@ Tags: TODOP, optimization, unimportant
 ----------------------
 optimize by using arrays rather than vectors,
 
-~~~~~~~ TODO 48 ~~~~~~~
+~~~~~~~ TODO 49 ~~~~~~~
 Physics.h, Line: 48
 Creator: delle
 ----------------------
@@ -405,7 +414,7 @@ Tags: TODOP, unimportant, physics, optimization
 ----------------------
 this could maybe be optimized by having an id counter instead of checking back element
 
-~~~~~~~ TODO 49 ~~~~~~~
+~~~~~~~ TODO 50 ~~~~~~~
 Render.h, Line: 27
 Creator:  sushi
 ----------------------
@@ -413,7 +422,7 @@ Tags: TODOP, render
 ----------------------
 set up a way that debug can be applied to certain objects. this is important in the case of edge numbers
 
-~~~~~~~ TODO 50 ~~~~~~~
+~~~~~~~ TODO 51 ~~~~~~~
 Render.h, Line: 62
 Creator:  sushi
 ----------------------
@@ -421,7 +430,7 @@ Tags: TODOP, render, clean up
 ----------------------
 change this to take in types and not individual values
 
-~~~~~~~ TODO 51 ~~~~~~~
+~~~~~~~ TODO 52 ~~~~~~~
 Render.h, Line: 279
 Creator:  sushi
 ----------------------
@@ -429,7 +438,7 @@ Tags: TODOP, render
 ----------------------
 this still needs abstracted
 
-~~~~~~~ TODO 52 ~~~~~~~
+~~~~~~~ TODO 53 ~~~~~~~
 Render.h, Line: 334
 Creator:  sushi
 ----------------------
@@ -437,7 +446,7 @@ Tags: TODOP, optimization
 ----------------------
 optimize this for loop 
 
-~~~~~~~ TODO 53 ~~~~~~~
+~~~~~~~ TODO 54 ~~~~~~~
 Render.h, Line: 446
 Creator:  sushi
 ----------------------
@@ -445,13 +454,4 @@ Date:  11/18/2020
 Tags: TODOP, render
 ----------------------
 writing this is probably important
-
-~~~~~~~ TODO 54 ~~~~~~~
-Time.h, Line: 27
-Creator: delle
-----------------------
-Date: 11/17/20
-Tags: TODOP, unimportant
-----------------------
-look into this exception and whether it is necessary
 
