@@ -17,13 +17,6 @@
 #define DEBUG_TEA Time::EndTimerAverage //must pass number to average by
 #define DEBUG_TEG Time::GetEndTimer()
 
-//TODO(u,delle,11/17/20) look into this exception and whether it is necessary
-//class DeltaTimeException : public std::exception {
-//	virtual const char* print() const throw() {
-//		return "The delta time of the program went less than the fixed delta time, which should never happen.";
-//	}
-//} static deltaTimeException;
-
 namespace Time {
 	global_variable float deltaTime;
 	global_variable float totalTime;

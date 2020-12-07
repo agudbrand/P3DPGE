@@ -391,7 +391,6 @@ Line3::Line3(Vector3 endPosition, int id, EntityParams) : Entity(EntityArgs) {
 	edge = Edge3(position, endPosition);
 }
 
-//TODO(r,delle) test that this works
 void Line3::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
 	Vector2 screenDimensions = Vector2(p->ScreenWidth(), p->ScreenHeight());
 	//convert vertexes from world to camera/view space

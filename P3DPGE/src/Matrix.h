@@ -14,27 +14,28 @@ struct Matrix {
 	~Matrix();
 
 	float&	operator () (uint32 row, uint32 col);
-	Matrix&	operator =	(const Matrix& rhs);
+	void	operator =	(const Matrix& rhs);
 	Matrix  operator *  (const float& rhs) const;
-	Matrix& operator *= (const float& rhs);
+	void	operator *= (const float& rhs);
 	Matrix  operator /  (const float& rhs) const;
-	Matrix& operator /= (const float& rhs);
+	void	operator /= (const float& rhs);
 	Matrix  operator +  (const Matrix& rhs) const;
-	Matrix& operator += (const Matrix& rhs);
+	void	operator += (const Matrix& rhs);
 	Matrix  operator -  (const Matrix& rhs) const;
-	Matrix& operator -= (const Matrix& rhs);
+	void	operator -= (const Matrix& rhs);
 	Matrix  operator *  (const Matrix& rhs) const;
-	Matrix& operator *= (const Matrix& rhs);
+	void	operator *= (const Matrix& rhs);
 	Matrix  operator ^  (const Matrix& rhs) const;
-	Matrix& operator ^= (const Matrix& rhs);
+	void	operator ^= (const Matrix& rhs);
 	Matrix  operator %  (const Matrix& rhs) const; 
-	Matrix& operator %= (const Matrix& rhs);
+	void	operator %= (const Matrix& rhs);
 	bool	operator == (const Matrix& rhs) const;
 	bool	operator != (const Matrix& rhs) const;
+	friend Matrix operator* (const float& lhs, const Matrix& rhs) { return rhs * lhs; }
 
-	void copy(const Matrix& m);
+	void Copy(const Matrix& m);
 	const std::string str() const;
-	const std::string str2f() const;
+	const std::string str2F() const;
 };
 
 //// Constructors ////
@@ -75,99 +76,189 @@ inline Matrix::Matrix(const Matrix& m) {
 	this->cols = m.cols;
 	this->elementCount = rows * cols;
 	this->data = new float[elementCount]();
-	copy(m);
+	Copy(m);
 }
 
 inline Matrix::~Matrix() {
-	delete data;
+	delete[] data;
 }
 
 //// Operators ////
 
+//element accessor: matrix(row,col)
 inline float& Matrix::operator () (uint32 row, uint32 col) {
 	ASSERT(row <= rows && col <= cols, "Matrix subscript out of bounds");
 	return data[cols*row + col];
 }
 
-inline Matrix& Matrix::operator =  (const Matrix& rhs) {
+//deletes current data, copies properties from rhs, creates a new copy of the data from rhs
+inline void	   Matrix::operator =  (const Matrix& rhs) {
 	if (this->data != rhs.data) {
 		this->rows = rhs.rows;
 		this->cols = rhs.cols;
 		this->elementCount = rows * cols;
-		if (data) { delete[] data; }
-		this->data = new float[elementCount];
-		copy(rhs);
+		this->~Matrix();
+		this->data = new float[elementCount]();
+		Copy(rhs);
 	}
-	return *this;
 }
 
-
+//scalar multiplication
 inline Matrix  Matrix::operator *  (const float& rhs) const {
 	Matrix newMatrix(*this);
-	for (uint32 i = 0; i < newMatrix.elementCount; ++i) {
-		*(newMatrix.data+i) *= rhs;
+	for (int i = 0; i < newMatrix.elementCount; ++i) {
+		newMatrix.data[i] *= rhs;
 	}
 	return newMatrix;
 }
 
-inline Matrix& Matrix::operator *= (const float& rhs) {
-	for (uint32 i = 0; i < elementCount; ++i) {
-		*(this->data+i) *= rhs;
+//scalar multiplication and assignment
+inline void    Matrix::operator *= (const float& rhs) {
+	for (int i = 0; i < elementCount; ++i) {
+		this->data[i] *= rhs;
 	}
 }
 
+//scalar division
 inline Matrix  Matrix::operator /  (const float& rhs) const {
+	ASSERT(rhs != 0, "Matrix elements cant be divided by zero");
 	Matrix newMatrix(*this);
-	for (uint32 i = 0; i < newMatrix.elementCount; ++i) {
-		*(newMatrix.data+i) /= rhs;
+	for (int i = 0; i < newMatrix.elementCount; ++i) {
+		newMatrix.data[i] /= rhs;
 	}
 	return newMatrix;
 }
 
-inline Matrix& Matrix::operator /= (const float& rhs){
-	for (uint32 i = 0; i < sizeof(*data) / sizeof(float); ++i) {
-		*(this->data+i) /= rhs;
+//scalar division and assignment
+inline void    Matrix::operator /= (const float& rhs){
+	ASSERT(rhs != 0, "Matrix elements cant be divided by zero");
+	for (int i = 0; i < elementCount; ++i) {
+		this->data[i] /= rhs;
 	}
 }
 
-inline Matrix  Matrix::operator +  (const Matrix& rhs) const{}
+//element-wise addition
+inline Matrix  Matrix::operator +  (const Matrix& rhs) const{
+	ASSERT(rows == rhs.rows && cols == rhs.cols, "Matrix addition requires the same dimensions");
+	Matrix newMatrix(*this);
+	for (int i = 0; i < newMatrix.elementCount; ++i) {
+		newMatrix.data[i] += rhs.data[i];
+	}
+	return newMatrix;
+}
 
-inline Matrix& Matrix::operator += (const Matrix& rhs){}
+//element-wise addition and assignment
+inline void    Matrix::operator += (const Matrix& rhs){
+	ASSERT(rows == rhs.rows && cols == rhs.cols, "Matrix addition requires the same dimensions");
+	for (int i = 0; i < elementCount; ++i) {
+		this->data[i] += rhs.data[i];
+	}
+}
 
-inline Matrix  Matrix::operator -  (const Matrix& rhs) const{}
+//element-wise substraction
+inline Matrix  Matrix::operator -  (const Matrix& rhs) const{
+	ASSERT(rows == rhs.rows && cols == rhs.cols, "Matrix subtraction requires the same dimensions");
+	Matrix newMatrix(*this);
+	for (int i = 0; i < newMatrix.elementCount; ++i) {
+		newMatrix.data[i] -= rhs.data[i];
+	}
+	return newMatrix;
+}
 
-inline Matrix& Matrix::operator -= (const Matrix& rhs){}
+//element-wise substraction and assignment
+inline void    Matrix::operator -= (const Matrix& rhs){
+	ASSERT(rows == rhs.rows && cols == rhs.cols, "Matrix subtraction requires the same dimensions");
+	for (int i = 0; i < elementCount; ++i) {
+		this->data[i] -= rhs.data[i];
+	}
+}
 
-//NOTE sushi: you will probably want to throw an exception if you attempt to 
-//			  do an invalid matrix multiplication eg. 
-//			  when you have matrix axb and matrix cxd, if b is not equal to c
-//			  throw exception
+//TODO(o,delle) look into optimizing this by transposing to remove a loop, see Unreal implementation
+inline Matrix  Matrix::operator *  (const Matrix& rhs) const{
+	ASSERT(cols == rhs.rows, "Matrix multiplication requires the columns of the left matrix to equal the rows of the right matrix");
+	Matrix newMatrix(rows, rhs.cols);
+	for (int i = 0; i < this->rows; ++i) { //i=m
+		for (int j = 0; j < rhs.cols; ++j) { //j=p
+			for (int k = 0; k < rhs.rows; ++k) { //k=n
+				newMatrix.data[rhs.cols * i + j] += this->data[this->cols * i + k] * rhs.data[rhs.cols * k + j];
+			}
+		}
+	}
+	return newMatrix;
+}
 
-inline Matrix  Matrix::operator *  (const Matrix& rhs) const{}
-
-inline Matrix& Matrix::operator *= (const Matrix& rhs){}
+inline void    Matrix::operator *= (const Matrix& rhs){
+	ASSERT(cols == rhs.rows, "Matrix multiplication requires the columns of the left matrix to equal the rows of the right matrix");
+	Matrix newMatrix(rows, rhs.cols);
+	for (int i = 0; i < this->rows; ++i) { //i=m
+		for (int j = 0; j < rhs.cols; ++j) { //j=p
+			for (int k = 0; k < rhs.rows; ++k) { //k=n
+				newMatrix.data[rhs.cols * i + j] += this->data[this->cols * i + k] * rhs.data[rhs.cols * k + j];
+			}
+		}
+	}
+	*this = newMatrix;
+}
 
 //element-wise multiplication
-inline Matrix  Matrix::operator ^  (const Matrix& rhs) const{} 
+inline Matrix  Matrix::operator ^  (const Matrix& rhs) const{
+	ASSERT(rows == rhs.rows && cols == rhs.cols, "Matrix element-wise multiplication requires the same dimensions");
+	Matrix newMatrix(*this);
+	for (int i = 0; i < newMatrix.elementCount; ++i) {
+		newMatrix.data[i] *= rhs.data[i];
+	}
+	return newMatrix;
+} 
 
 //element-wise multiplication and assignment
-inline Matrix& Matrix::operator ^= (const Matrix& rhs){} 
+inline void    Matrix::operator ^= (const Matrix& rhs){
+	ASSERT(rows == rhs.rows && cols == rhs.cols, "Matrix element-wise multiplication requires the same dimensions");
+	for (int i = 0; i < elementCount; ++i) {
+		this->data[i] *= rhs.data[i];
+	}
+}
 
 //element-wise division
-inline Matrix  Matrix::operator %  (const Matrix& rhs) const{} 
+inline Matrix  Matrix::operator %  (const Matrix& rhs) const{
+	ASSERT(rows == rhs.rows && cols == rhs.cols, "Matrix element-wise division requires the same dimensions");
+	Matrix newMatrix(*this);
+	for (int i = 0; i < newMatrix.elementCount; ++i) {
+		ASSERT(rhs.data[i] != 0, "Matrix element-wise division doesnt allow zeros in the right matrix");
+		newMatrix.data[i] /= rhs.data[i];
+	}
+	return newMatrix;
+} 
 
 //element-wise division and assignment
-inline Matrix& Matrix::operator %= (const Matrix& rhs){}
+inline void    Matrix::operator %= (const Matrix& rhs){
+	ASSERT(rows == rhs.rows && cols == rhs.cols, "Matrix element-wise division requires the same dimensions");
+	for (int i = 0; i < elementCount; ++i) {
+		ASSERT(rhs.data[i] != 0, "Matrix element-wise division doesnt allow zeros in the right matrix");
+		this->data[i] /= rhs.data[i];
+	}
+}
 
-inline bool Matrix::operator			== (const Matrix& rhs) const { return false; }
+inline bool	   Matrix::operator	== (const Matrix& rhs) const { 
+	if (this->rows != rhs.rows || this->cols != rhs.cols || this->elementCount != rhs.elementCount) {
+		return false;
+	}
+	for (int i = 0; i < elementCount; ++i) {
+		if (this->data[i] != rhs.data[i]) {
+			return false;
+		}
+	}
+	return true;
+}
 
-inline bool Matrix::operator			!= (const Matrix& rhs) const { return false; }
+inline bool    Matrix::operator	!= (const Matrix& rhs) const { 
+	return !(*this == rhs); 
+}
 
 //// Functions ////
 
 //copys the data from one matrix to the other
 //REQUIRES both to have the same dimensions
-inline void Matrix::copy(const Matrix& m) {
+inline void Matrix::Copy(const Matrix& m) {
 	ASSERT(rows == m.rows && cols == m.cols, "Cant copy matrices of unequal dimensions");
 	float* p = data + (elementCount);
 	float* q = m.data + (elementCount);

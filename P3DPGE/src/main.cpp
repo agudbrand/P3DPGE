@@ -49,8 +49,9 @@ public:
 		Physics::Init();
 		Render::Init();
 
-		Debug::Message("matrix struct size: " + std::to_string(sizeof(Matrix)));
-		Matrix test(1, 4, { 0,1,2,3 });
+		//Matrix test1(1, 4, { 2,1,2,3 });
+		//Matrix test2(1, 4, { 1,2,3,4 });
+		
 		return true;
 	}
 
