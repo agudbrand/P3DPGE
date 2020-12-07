@@ -136,8 +136,7 @@ public:
 	Vector3 operator -  (const Vector3& rhs)		const	{ return Vector3(this->x - rhs.x, this->y - rhs.y, this->z - rhs.z); }
 	Vector3 operator *  (const float& rhs)			const	{ return Vector3(this->x * rhs, this->y * rhs, this->z * rhs); }
 	Vector3 operator *  (const Vector3& rhs)		const	{ return Vector3(this->x * rhs.x, this->y * rhs.y, this->z * rhs.z); }
-	Vector3 operator *  (const mat<float, 4, 4> rhs)		{ mat<float, 1, 4> v{ x,y,z,1 }; return GetM1x4ToVector3(v * rhs); }
-	Vector3 operator /  (const float& rhs)			const	{ return Vector3(this->x / rhs, this->y / rhs, this->z / rhs); }
+	Vector3 operator *  (const mat<float, 4, 4> rhs)		{ mat<float, 1, 4> v{ x,y,z,1 }; return GetM1x4ToVector3(v * rhs); }	Vector3 operator /  (const float& rhs)			const	{ return Vector3(this->x / rhs, this->y / rhs, this->z / rhs); }
 	Vector3 operator /  (const Vector3& rhs)		const	{ return Vector3(this->x / rhs.x, this->y / rhs.y, this->z / rhs.z); }
 	Vector3 operator += (const Vector3& rhs)				{ this->x += rhs.x; this->y += rhs.y; this->z += rhs.z; return *this; }
 	Vector3 operator -= (const Vector3& rhs)				{ this->x -= rhs.x; this->y -= rhs.y; this->z -= rhs.z; return *this; }
@@ -221,7 +220,7 @@ public:
 			0,			   0,			  1,			 0,
 			translation.x, translation.y, translation.z, 1
 		};
-		M1x4ToVector3(proj_mult(ConvertToM1x4(), tv));
+		M1x4ToVector3(ConvertToM1x4() * tv);
 	}
 	
 	//scale object
@@ -267,7 +266,7 @@ public:
 			0,		sin(theta),	cos(theta),  0,
 			0,		0,			0,			 1
 		};
-		M1x4ToVector3(proj_mult(ConvertToM1x4(), rvx));
+		M1x4ToVector3(ConvertToM1x4() * rvx);
 		LocalToWorld(pos + offset);
 	}
 	
@@ -280,7 +279,7 @@ public:
 			-sin(theta),0,	cos(theta),  0,
 			0,			0,	0,			 1
 		};
-		M1x4ToVector3(proj_mult(ConvertToM1x4(), rvy));
+		M1x4ToVector3(ConvertToM1x4() * rvy);
 		LocalToWorld(pos + offset);
 	}
 	
@@ -293,7 +292,7 @@ public:
 			0,			0,				1, 0,
 			0,			0,				0, 1
 		};
-		M1x4ToVector3(proj_mult(ConvertToM1x4(), rvz));
+		M1x4ToVector3(ConvertToM1x4() * rvz);
 		LocalToWorld(pos + offset);
 	}
 	
@@ -315,24 +314,12 @@ public:
 		w = _w;
 	}
 
-	//reverse projection
-	void unProjToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p) {
-		x /= .5f * (float)p->ScreenWidth();
-		y /= .5f * (float)p->ScreenHeight();
-		x -= 1.f; y -= 1.f;
-		M1x4ToVector3(unproj_mult(ConvertToM1x4(), inverse(ProjMat)));
-	}
-
 	void ScreenToWorld(mat<float, 4, 4> ProjMat, mat<float,4,4> view, olc::PixelGameEngine* p) {
 		x /= .5f * (float)p->ScreenWidth();
 		y /= .5f * (float)p->ScreenHeight();
 		x -= 1.f; y -= 1.f; z = -1.f;
-		Debug::Message(*this);
 		M1x4ToVector3(unproj_mult(ConvertToM1x4(), inverse(ProjMat)));
-		Debug::Message(*this);
 		M1x4ToVector3(unproj_mult(ConvertToM1x4(), inverse(view)));
-		Debug::Message(*this);
-
 	}
 };
 

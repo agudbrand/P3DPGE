@@ -19,7 +19,9 @@ class Entity {
 	int id;
 	std::string tag;
 	Vector3 position;
+	Vector3 prev_position;
 	Vector3 rotation;
+	Vector3 prev_rotation;
 	Vector3 scale;
 	Mesh* mesh = 0;
 	olc::Sprite* sprite = 0;
@@ -38,7 +40,8 @@ class Entity {
 	virtual void RotateX(Vector3 offset = V3ZERO);
 	virtual void RotateY(Vector3 offset = V3ZERO);
 	virtual void RotateZ(Vector3 offset = V3ZERO);
-	virtual void Translate(Vector3 translation);
+	virtual void Rotate(Vector3 offset = V3ZERO);
+	virtual void Translate();
 	void SetTag(std::string newTag);
 	virtual void SetColor(olc::Pixel newColor);
 
@@ -46,7 +49,7 @@ class Entity {
 	// them abstract because I do need a default behaviour to occur if
 	// they are not overwritten
 	//TODO: this ^
-	virtual void Update(float deltaTime) = 0;
+	virtual void Update(float deltaTime);
 	virtual bool ContainsPoint(Vector3 point) = 0;
 	virtual bool ContainsScreenPoint(Vector3 point) = 0;
 
@@ -182,6 +185,7 @@ struct DebugTriangle : public Entity {
 
 struct Camera : public Entity {
 	Vector3 lookDir;
+	Vector3 up = V3UP;
 	float nearZ = .1f; //the distance from the camera's position to screen plane
 	float farZ = 1000.1f; //the maximum render distance
 	float fieldOfView = 90.f;
