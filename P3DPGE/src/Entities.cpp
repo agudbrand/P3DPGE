@@ -201,11 +201,16 @@ void Sphere::ResolveCollision(PhysEntity* other) {
 
 std::string Sphere::str() {
 	std::string s =
-		"tag         " + tag + "\n" +
-		"id          " + std::to_string(id) + "\n" +
-		"position    " + position.str2f() + "\n" +
-		"rotation    " + rotation.str2f() + "\n" +
-		"scale       " + scale.str2f() + "\n" +
+		"tag             " + tag						+ "\n" +
+		"id              " + std::to_string(id)			+ "\n" +
+		"position        " + position.str2f()			+ "\n" +
+		"rotation        " + rotation.str2f()			+ "\n" +
+		"scale           " + scale.str2f()				+ "\n" +
+		"mass            " + std::to_string(mass)		+ "\n" +
+		"velocity        " + velocity.str2f()			+ "\n" +
+		"acceleration    " + acceleration.str2f()		+ "\n" +
+		"rotVelocity     " + rotVelocity.str2f()		+ "\n" +
+		"rotAcceleration " + rotAcceleration.str2f()	+ "\n" +
 		"entity_type: sphere";
 	return s;
 
@@ -245,11 +250,16 @@ void Box::ResolveCollision(PhysEntity* entity) {
 
 std::string Box::str() {
 	std::string s =
-		"tag         " + tag + "\n" +
-		"id          " + std::to_string(id) + "\n" +
-		"position    " + position.str2f() + "\n" +
-		"rotation    " + rotation.str2f() + "\n" +
-		"scale       " + scale.str2f() + "\n" +
+		"tag             " + tag						+ "\n" +
+		"id              " + std::to_string(id)			+ "\n" +
+		"position        " + position.str2f()			+ "\n" +
+		"rotation        " + rotation.str2f()			+ "\n" +
+		"scale           " + scale.str2f()				+ "\n" +
+		"mass            " + std::to_string(mass)		+ "\n" +
+		"velocity        " + velocity.str2f()			+ "\n" +
+		"acceleration    " + acceleration.str2f()		+ "\n" +
+		"rotVelocity     " + rotVelocity.str2f()		+ "\n" +
+		"rotAcceleration " + rotAcceleration.str2f()	+ "\n" +
 		"entity_type: box";
 	return s;
 
@@ -324,11 +334,16 @@ void Complex::ResolveCollision(PhysEntity* entity) {
 
 std::string Complex::str() {
 	std::string s =
-		"tag         " + tag + "\n" +
-		"id          " + std::to_string(id) + "\n" +
-		"position    " + position.str2f() + "\n" +
-		"rotation    " + rotation.str2f() + "\n" +
-		"scale       " + scale.str2f() + "\n" +
+		"tag             " + tag						+ "\n" +
+		"id              " + std::to_string(id)			+ "\n" +
+		"position        " + position.str2f()			+ "\n" +
+		"rotation        " + rotation.str2f()			+ "\n" +
+		"scale           " + scale.str2f()				+ "\n" +
+		"mass            " + std::to_string(mass)		+ "\n" +
+		"velocity        " + velocity.str2f()			+ "\n" +
+		"acceleration    " + acceleration.str2f()		+ "\n" +
+		"rotVelocity     " + rotVelocity.str2f()		+ "\n" +
+		"rotAcceleration " + rotAcceleration.str2f()	+ "\n" +
 		"entity_type: complex";
 	return s;
 

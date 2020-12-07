@@ -437,22 +437,6 @@ namespace Render {
 		p->DrawStringDecal(olc::vf2d(p->ScreenWidth() - 300, p->ScreenHeight() - 20), "Mouse: " + Vector3(p->GetMousePos()).str2f());
 		p->DrawStringDecal(olc::vf2d(p->ScreenWidth()-300, p->ScreenHeight() - 10), "Camera: " + camera.position.str2f());
 
-
-		//debug examples
-		DEBUG_M(camera);
-		
-		IFDEBUG int do_something;
-
-		if(DEBUG){
-			int do_;
-			int more;
-		}
-
-		DEBUG_PTS;
-		std::cout << "timer!" << std::endl;
-		DEBUG_PTE();
-
-
 		//Debug::EndTimerAverage(p, 10, "", 10);
 	}
 
