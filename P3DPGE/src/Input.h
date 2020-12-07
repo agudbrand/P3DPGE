@@ -283,12 +283,7 @@ namespace Input {
 			Line3* ray = new Line3(pos, -1, Render::camera.position);
 
 			//draw ray if debugging
-			if (DEBUG) {
-
-			}
-			
-
-			//Debug::Message("pos    " + pos.str());
+			IFDEBUG Render::entities.push_back(ray);
 
 			for (Entity* e : Render::entities) {
 				if (e->LineIntersect(&ray->edge) && e->id != -1) {
@@ -513,6 +508,10 @@ namespace Input {
 		//
 		//	p->DrawStringDecal(olc::vf2d(0, 0), text);
 		//}
+
+		if (selectedEntity) {
+			p->DrawStringDecal(Vector2(0, 0), selectedEntity->str());
+		}
 
 		//point debugging
 		/* TODO(i, sushi) figure out how to make this work with only drawn triangles
