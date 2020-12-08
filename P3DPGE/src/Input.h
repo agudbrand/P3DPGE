@@ -312,38 +312,38 @@ namespace Input {
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			c->position.y -=  8 * Time::deltaTime;
 			DEBUGI std::cout << "Translating the camera in the positive y" << std::endl;
-			}, "camera_translate_+y", olc::W, -1, 1, 0, 0,
+			}, "camera_translate_+y", olc::E, -1, 1, 0, 0,
 		"Translates the camera along the positive global y-axis"));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			c->position.y += 8 * Time::deltaTime;
 			DEBUGI std::cout << "Translating the camera in the negative y" << std::endl;
-			}, "camera_translate_-y", olc::S, -1, 1, 0, 0,
+			}, "camera_translate_-y", olc::Q, -1, 1, 0, 0,
 		"Translates the camera along the negative global y-axis"));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			c->position += c->lookDir.cross(c->up) * 8 * Time::deltaTime;
 			DEBUGI std::cout << "Translating the camera in the negative x" << std::endl;
-			}, "camera_translate_-x", olc::A, -1, 1, 0, 0,
-		"Translates the camera along the negative global x-axis"));
+			}, "camera_translate_left", olc::A, -1, 1, 0, 0,
+		"Translates the camera left"));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			c->position -= c->lookDir.cross(c->up) * 8 * Time::deltaTime;
 			DEBUGI std::cout << "Translating the camera in the positive x" << std::endl;
-			}, "camera_translate_+x", olc::D, -1, 1, 0, 0,
-		"Translates the camera along the positive global y-axis"));
+			}, "camera_translate_right", olc::D, -1, 1, 0, 0,
+		"Translates the camera right"));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			c->position += c->lookDir * 8 * Time::deltaTime;
 			DEBUGI std::cout << "Translating the camera forward" << std::endl;
-			}, "camera_translate_forward", olc::UP, -1, 1, 0, 0,
-		"Translates the camera along the positive local z-axis"));
+			}, "camera_translate_forward", olc::W, -1, 1, 0, 0,
+		"Translates the camera forwards"));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			c->position -= c->lookDir * 8 * Time::deltaTime;
 			DEBUGI std::cout << "Translating the camera backward" << std::endl;
-			}, "camera_translate_backward", olc::DOWN, -1, 1, 0, 0,
-		"Translates the camera along the negative local z-axis"));
+			}, "camera_translate_backward", olc::S, -1, 1, 0, 0,
+		"Translates the camera backwards"));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Render::yaw -= 50 * Time::deltaTime;
