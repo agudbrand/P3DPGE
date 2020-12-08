@@ -49,7 +49,7 @@
         } \
     } while (false)
 #else
-#   define ASSERT(condition, message) do { } while (false)
+#   define ASSERT(condition, message) condition;
 #endif
 
 
@@ -101,7 +101,7 @@ struct Camera;
 
 namespace Debug{
 
-	global_variable bool GLOBAL_DEBUG = true;
+	global_variable bool GLOBAL_DEBUG = false;
 
 //// Console Output////
 

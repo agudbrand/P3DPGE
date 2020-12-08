@@ -9,6 +9,9 @@ struct BoxMesh;
 struct Triangle;
 struct Collider;
 
+//global campos variable until I figured out a better way to do that
+extern Vector3 g_campos;
+
 #define EntityArgs id, position, rotation, scale
 #define EntityParams Vector3 position, Vector3 rotation, Vector3 scale
 #define EntityDefaultParams Vector3 position = V3ZERO, Vector3 rotation = V3ZERO, Vector3 scale = V3ONE
@@ -224,6 +227,5 @@ struct Camera : public Entity {
 struct Light : public Entity {
 }; 
 
-namespace EntityDat {
-	static Vector3 campos;
-}
+
+

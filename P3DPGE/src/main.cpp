@@ -26,18 +26,7 @@ TODO(g, sushi) create a WorldMatrix that takes in several matrix operations and
 
 TODO(p,delle) add physics based collision resolution for all entities
 
-TODO(i,delle) convert mouse inputs to new format, method to add and remove inputs
-
-NOTE sushi: it may be benefitial to have an objects triangles always be defined in
-	  local space so we don't have to keep translating between world and local
-	  everytime we do something to it. but this may cause other issues
-
-NOTE sushi: should we use Blender to import objects or make our own tool?
-	  maybe use Blender then make a custom one later? dunno, it'd
-	  be a fun project to build our own tool
-
-NOTE sushi: currently, generating an object relative to mouse position
-	  does not work in 3D
+TODO(i,delle) convert inputs to new format, method to add and remove inputs
 
 */
 

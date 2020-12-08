@@ -406,6 +406,14 @@ namespace Math {
 		return m;
 	}
 	
+	static float DistTwoPoints(Vector3 a, Vector3 b) {
+		return sqrtf(
+			(a.x - b.x) * (a.x - b.x) +
+			(a.y - b.y) * (a.y - b.y) +
+			(a.z - b.z) * (a.z - b.z)
+		);
+	}
+
 	static float DistPointToPlane(Vector3 point, Vector3 plane_n, Vector3 plane_p) { 
 		return (plane_n.x * point.x + plane_n.y * point.y + plane_n.z * point.z - plane_n.dot(plane_p)); 
 	}
