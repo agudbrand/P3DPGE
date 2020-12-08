@@ -2,14 +2,15 @@
 #include "Mesh.h"
 #include "Collider.h"
 
-
-
 //// Entity	////
+
+Vector3 g_campos;
 
 Entity::Entity(int id, EntityParams) {
 	this->id = id;
 	this->position = position;
 	this->rotation = rotation;
+	prev_position = position;
 	this->scale = scale;
 	timer = new Timer;
 }
@@ -39,7 +40,7 @@ bool Entity::LineIntersect(Edge3* e) {
 void Entity::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
 	//do nothing if not SpecialDraw unless debug is enabled
 	DEBUGE DrawPosition(p, ProjMat, view);
-	DEBUGE DrawVertices(p, ProjMat, view);
+	//DEBUGE DrawVertices(p, ProjMat, view);
 
 }
 bool Entity::SpecialDraw() { return false; }
@@ -53,11 +54,10 @@ void Entity::DrawPosition(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat
 
 void Entity::DrawVertices(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
 
-	LOG("Entity shows: ");
-	LOG(EntityDat::campos);
+	LOG(g_campos);
 
 	for (Triangle t : mesh->triangles) {
-		if (t.get_normal().dot(t.midpoint() - EntityDat::campos) < 0) {
+		if (t.get_normal().dot(t.midpoint() - g_campos) < 0) {
 			for (Vector3 v : t.points) {
 				Vector3 nuv = Math::ProjMult(v.ConvertToM1x4(), view);
 						nuv.ProjToScreen(ProjMat, p);
@@ -103,6 +103,7 @@ void Entity::Rotate(Vector3 offset) {
 					Math::GetRotateV3_X(rotation.x - prev_rotation.x) *
 					Math::GetRotateV3_Y(rotation.y - prev_rotation.y) *
 					Math::GetRotateV3_Z(rotation.z - prev_rotation.z);
+
 				Vector3 n_local = Math::ProjMult(n.ConvertToM1x4(), Math::GetWorldToLocal(position));
 				n_local = Math::ProjMult(n_local.ConvertToM1x4(), rot_mat);
 				n = Math::ProjMult(n_local.ConvertToM1x4(), Math::GetLocalToWorld(position));
@@ -113,16 +114,14 @@ void Entity::Rotate(Vector3 offset) {
 }
 
 void Entity::Translate() {	
-
-	/*PTIMER_COND(1.f, 
-		LOG("test"); 
-		LOG("test2");
-	);*/
-
 	if (position != prev_position) {
 		for (auto& m : mesh->triangles) {
 			for (auto& n : m.points) {
-				n = n * Math::GetTranslate(position - prev_position);
+				//n = n * Math::GetTranslate(position - prev_position);
+
+				Vector3 n_local = Math::ProjMult(n.ConvertToM1x4(), Math::GetWorldToLocal(position));
+				n_local = Math::ProjMult(n_local.ConvertToM1x4(), Math::GetTranslate(position - prev_position));
+				n = Math::ProjMult(n_local.ConvertToM1x4(), Math::GetLocalToWorld(position));
 			}
 		}
 	}
@@ -144,6 +143,7 @@ std::string Entity::str() {
 
 
 void Entity::Update(float deltaTime) {
+
 	Translate(); Rotate();
 }
 
@@ -335,14 +335,12 @@ std::string Box::str() {
 
 Complex::Complex(std::string file_name, int id, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
 	mesh = new Mesh();
-	if (!LoadFromObjectFile(file_name)) {
-		std::cout << "OBJ LOAD ERROR" << std::endl;
-	}
+	ASSERT(LoadFromObjectFile(file_name), "OBJ_LOAD_ERROR");
 	model_name = Math::append_decimal(file_name);
+	//temp fix i guess
+	prev_position = V3ZERO;
+	Translate();
 
-	for (Triangle& t : mesh->triangles) {
-		t.set_color(olc::Pixel(rand() % 255 + 1, rand() % 255 + 1, rand() % 255 + 1));
-	}
 }
 
 bool Complex::LoadFromObjectFile(std::string file_name) {
@@ -354,8 +352,6 @@ bool Complex::LoadFromObjectFile(std::string file_name) {
 	while (!f.eof()) {
 		char line[128];
 		f.getline(line, 128);
-
-		//this is deprecated and should be changed
 
 		std::stringstream s;
 
@@ -404,6 +400,7 @@ std::string Complex::str() {
 	std::string s =
 		"tag             " + tag						+ "\n" +
 		"id              " + std::to_string(id)			+ "\n" +
+		"model_name      " + model_name                 + "\n" +
 		"position        " + position.str2f()			+ "\n" +
 		"rotation        " + rotation.str2f()			+ "\n" +
 		"scale           " + scale.str2f()				+ "\n" +

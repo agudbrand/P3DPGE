@@ -181,7 +181,7 @@ namespace Input {
 		"Spawns a large sphere of radius/mass 100 at the mouse."));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-			Complex* complex = new Complex("objects/bmonkey.obj", 0, V3ZERO);
+			Complex* complex = new Complex("objects/24k_Triangles.obj", 0, Vector3(0,0,3));
 			selectedEntity = complex;
 			Physics::AddEntity(complex);
 			Render::AddEntity(complex);
@@ -286,6 +286,7 @@ namespace Input {
 			pos *= 1000;
 			pos.LocalToWorld(c->position);
 
+			//make function somehere that returns a ray cast for ease of use later maybe
 			Line3* ray = new Line3(pos, -1, c->position);
 
 			//draw ray if debugging
@@ -499,11 +500,22 @@ namespace Input {
 		
 		//RMB hold = set the position of selected entity to mouse
 		if (selectedEntity && p->GetMouse(1).bHeld) {
-			selectedEntity->position = Math::vi2dToVector3(p->GetMousePos(), selectedEntity->position.z);
+			Vector3 pos = GetMousePos(p);
+			pos.ScreenToWorld(c->ProjectionMatrix(p), c->MakeViewMatrix(Render::yaw), p);
+			pos.WorldToLocal(c->position);
+			pos.normalize();
+			pos *= 1000;
+			pos.LocalToWorld(c->position);
+
+
+
+			selectedEntity->position.x = pos.x;
+			selectedEntity->position.y = pos.y;
+
 		}
 
 		if (selectedEntity) {
-			p->DrawStringDecal(Vector2(0, 0), selectedEntity->str());
+			DEBUGI p->DrawStringDecal(Vector2(0, 0), selectedEntity->str());
 		}
 	}
 	

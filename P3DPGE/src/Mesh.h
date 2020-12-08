@@ -138,10 +138,8 @@ struct Triangle {
 		
 	}
 
-
 	float get_area() { return Math::TriangleArea(points[1] - points[0], points[2] - points[0]); }
 
-	//TODO(m, sushi) make this take just a line when we get forward declaring
 	bool line_intersect(Edge3* e) {
 		float t = 0;
 
@@ -175,12 +173,14 @@ struct Triangle {
 		float y_mid = (points[0].y + points[1].y + points[2].y) / 3;
 		float z_mid = (points[0].z + points[1].z + points[2].z) / 3;
 
-		return Vector3(x_mid, y_mid, z_mid);
+		return (points[0] + points[1] + points[2]) / 3;
 	}
 
 	std::string str() { return "{(" + points[0].str() + "), (" + points[1].str() + "), (" + points[2].str() + ")}"; }
 	std::string str2f() { return "{(" + points[0].str2f() + "), (" + points[1].str2f() + "), (" + points[2].str2f() + ")}"; }
 };
+
+
 
 //TODO(,delle,11/22/20) abstract out Mesh and split into Mesh2D and Mesh3D
 /*

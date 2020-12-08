@@ -30,6 +30,8 @@ namespace Render {
 	static float yaw;
 	static float pitch;
 
+	Vector3 light_direction(0, 0, -1);
+
 	//TODO(r, sushi) set up a way that debug can be applied to certain objects. this is important in the case of edge numbers
 	//debug booleans go here
 	bool WIRE_FRAME = false;
@@ -301,7 +303,9 @@ namespace Render {
 		//olc::Sprite* sprite = new olc::Sprite("sprites/test.png");
 
 		//temp lighting set up
-		Vector3 light_direction(0, 0, 1);
+		
+		//light_direction *= sinf(Time::totalTime);
+		light_direction = V3FORWARD * Math::GetRotateV3_Y(200 * Time::totalTime);
 		light_direction = light_direction.normalized();
 
 		//store triangles we want to draw for sorting and copy world points to projected points
@@ -309,7 +313,11 @@ namespace Render {
 			t.copy_points();
 			if (t.get_normal().dot(t.midpoint() - camera.position) < 0) {
 				float dp = light_direction.dot(t.get_normal());
-				t.set_color(olc::Pixel(50 * abs(dp), 75 * abs(dp), 200 * abs(dp)));
+				t.set_color(olc::Pixel(
+					std::clamp(50 * dp,  0.f, 50.f), 
+					std::clamp(75 * dp,  0.f, 75.f),
+					std::clamp(200 * dp, 0.f, 200.f)
+				));
 				visibleTriangles.push_back(t);
 			}
 		}
@@ -342,8 +350,8 @@ namespace Render {
 		}
 
 		std::sort(drawnTriangles.begin(), drawnTriangles.end(), [](Triangle& t1, Triangle& t2) {
-			float mp1 = (t1.points[0].z + t1.points[1].z + t1.points[2].z) / 3;
-			float mp2 = (t2.points[0].z + t2.points[1].z + t2.points[2].z) / 3;
+			float mp1 = Math::DistTwoPoints(t1.midpoint(), camera.position);
+			float mp2 = Math::DistTwoPoints(t2.midpoint(), camera.position);
 			return mp1 > mp2;
 			});
 
@@ -422,7 +430,7 @@ namespace Render {
 		//Debug::StartTimer();
 		view = camera.MakeViewMatrix(yaw);
 		
-		DEBUG EntityDat::campos = camera.position;
+		DEBUG g_campos = camera.position;
 
 		//get triangles from all entities
 		for (auto& e : entities) {
@@ -455,8 +463,8 @@ namespace Render {
 		triangles.clear();
 
 		//debug
-		p->DrawStringDecal(olc::vf2d(p->ScreenWidth() - 300, p->ScreenHeight() - 20), "Mouse: " + Vector3(p->GetMousePos()).str2f());
-		p->DrawStringDecal(olc::vf2d(p->ScreenWidth()-300, p->ScreenHeight() - 10), "Camera: " + Render::camera.position.str2f());
+		DEBUGR p->DrawStringDecal(olc::vf2d(p->ScreenWidth() - 300, p->ScreenHeight() - 20), "Mouse: " + Vector3(p->GetMousePos()).str2f());
+		DEBUGR p->DrawStringDecal(olc::vf2d(p->ScreenWidth()-300, p->ScreenHeight() - 10), "Camera: " + Render::camera.position.str2f());
 
 		//Debug::EndTimerAverage(p, 10, "", 10);
 	}
