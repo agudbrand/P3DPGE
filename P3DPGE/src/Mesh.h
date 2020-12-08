@@ -1,12 +1,12 @@
 #pragma once
 #include "Math.h"
-#include "olcPixelGameEngine.h"
+#include "internal/olcPixelGameEngine.h"
 
 //this will currently only be set up to facilitate 2D
 //also this could probably be stored in math
 //this is primarily for calculations and doesn't actually do anything
 
-
+class Entity;
 
 //collection of 3 points forming the basis of meshes
 struct Triangle {
@@ -15,6 +15,7 @@ struct Triangle {
 	Vector3 proj_points[3];
 
 	Vector3 tex_points[3];
+	Entity* e;
 
 	//maybe edges can be cleared when they're not actually needed,
 	//and only spawned when used?
@@ -25,7 +26,18 @@ struct Triangle {
 	olc::Pixel debug_color = olc::RED;
 
 	Triangle() {}
+	//constructing triangles without attached entity
 	Triangle(Vector3 p1, Vector3 p2, Vector3 p3) {
+		points[0] = p1;
+		points[1] = p2;
+		points[2] = p3;
+		copy_points();
+
+		edges[0] = Edge(p1, p2);
+		edges[1] = Edge(p2, p3);
+		edges[2] = Edge(p3, p1);
+	}
+	Triangle(Vector3 p1, Vector3 p2, Vector3 p3, Entity* e) {
 		points[0] = p1;
 		points[1] = p2;
 		points[2] = p3;
@@ -34,9 +46,11 @@ struct Triangle {
 		edges[0] = Edge(p1, p2);
 		edges[1] = Edge(p2, p3);
 		edges[2] = Edge(p3, p1);
+
+		this->e = e;
 	}
 	//for constructing a triangle with texture points
-	Triangle(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 t1, Vector3 t2, Vector3 t3) {
+	Triangle(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 t1, Vector3 t2, Vector3 t3, Entity* e) {
 		points[0] = p1;
 		points[1] = p2;
 		points[2] = p3;
@@ -49,6 +63,8 @@ struct Triangle {
 		edges[0] = Edge(p1, p2);
 		edges[1] = Edge(p2, p3);
 		edges[2] = Edge(p3, p1);
+
+		this->e = e;
 	}
 	
 	void copy_points() {
@@ -177,7 +193,7 @@ struct Mesh{
 
 //a collection of triangles that make up the geomery of objects in space
 class Mesh {
-	public:
+public:
 	std::vector<Triangle> triangles;
 	
 	Mesh() { triangles = std::vector<Triangle>(); }
@@ -211,7 +227,7 @@ struct CircleMesh : public Mesh {
 };
 
 struct BoxMesh : public Mesh {
-	BoxMesh(Vector3 dimensions, Vector3 position) {
+	BoxMesh(Vector3 dimensions, Vector3 position, Entity* e) {
 		//vertices making up the box
 		Vector3 p1 = position + dimensions.xInvert().yInvert().zInvert();
 		Vector3 p2 = position + dimensions.yInvert().zInvert();
@@ -224,24 +240,22 @@ struct BoxMesh : public Mesh {
 		
 		//TODO(c, sushi) do this better later
 		//west
-		triangles.push_back(Triangle(p3, p1, p4, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1))); 
-		triangles.push_back(Triangle(p3, p4, p5, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1))); 
-		//top									 
-		triangles.push_back(Triangle(p4, p1, p2, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1))); 
-		triangles.push_back(Triangle(p4, p2, p6, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1))); 
-		//east									 
-		triangles.push_back(Triangle(p8, p6, p2, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1))); 
-		triangles.push_back(Triangle(p8, p2, p7, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1))); 
-		//bottom								 
-		triangles.push_back(Triangle(p3, p5, p8, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1))); 
-		triangles.push_back(Triangle(p3, p8, p7, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1))); 
-		//south									 
-		triangles.push_back(Triangle(p5, p4, p6, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1))); 
-		triangles.push_back(Triangle(p5, p6, p8, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1))); 
-		//north									 
-		triangles.push_back(Triangle(p7, p2, p1, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1))); 
-		triangles.push_back(Triangle(p7, p1, p3, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1))); 
-
-
+		triangles.push_back(Triangle(p3, p1, p4, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1), e)); 
+		triangles.push_back(Triangle(p3, p4, p5, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1), e)); 
+		//top	
+		triangles.push_back(Triangle(p4, p1, p2, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1), e)); 
+		triangles.push_back(Triangle(p4, p2, p6, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1), e)); 
+		//east	
+		triangles.push_back(Triangle(p8, p6, p2, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1), e)); 
+		triangles.push_back(Triangle(p8, p2, p7, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1), e)); 
+		//bottom
+		triangles.push_back(Triangle(p3, p5, p8, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1), e)); 
+		triangles.push_back(Triangle(p3, p8, p7, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1), e)); 
+		//south	
+		triangles.push_back(Triangle(p5, p4, p6, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1), e)); 
+		triangles.push_back(Triangle(p5, p6, p8, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1), e)); 
+		//north	
+		triangles.push_back(Triangle(p7, p2, p1, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1), e)); 
+		triangles.push_back(Triangle(p7, p1, p3, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1), e)); 
 	}
 };

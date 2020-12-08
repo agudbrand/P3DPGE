@@ -1,6 +1,6 @@
 #pragma once
 #define OLC_PGE_APPLICATION
-#include "olcPixelGameEngine.h"
+#include "internal/olcPixelGameEngine.h"
 #include "Input.h"
 #include "Matrix.h"
 using namespace olc;
@@ -41,7 +41,8 @@ NOTE sushi: currently, generating an object relative to mouse position
 
 class P3DPGE : public PixelGameEngine {
 public:
-	P3DPGE() { sAppName = "P3DPGE"; }
+	Timer* timer;
+	P3DPGE() { sAppName = "P3DPGE"; timer = new Timer; }
 
 	bool OnUserCreate() override {
 		Time::Init();
@@ -51,11 +52,12 @@ public:
 
 		//Matrix test1(1, 4, { 2,1,2,3 });
 		//Matrix test2(1, 4, { 1,2,3,4 });
-		
+
 		return true;
 	}
 
 	bool OnUserUpdate(float deltaTime) {
+
 		Clear(olc::BLACK);
 
 		//time

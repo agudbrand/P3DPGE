@@ -2,12 +2,14 @@
 #include <fstream>
 #include <strstream>
 #include "Math.h"
-#include "olcPixelGameEngine.h"
+#include "internal/olcPixelGameEngine.h"
 
 struct Mesh;
 struct BoxMesh;
 struct Triangle;
 struct Collider;
+
+
 
 #define EntityArgs id, position, rotation, scale
 #define EntityParams Vector3 position, Vector3 rotation, Vector3 scale
@@ -15,7 +17,7 @@ struct Collider;
 //the basis of all objects drawn on screen or otherwise, includes basic information such
 //as position, rotation, scale, tags, etc.
 class Entity {
-	public:
+public:
 	int id;
 	std::string tag;
 	Vector3 position;
@@ -27,8 +29,14 @@ class Entity {
 	olc::Sprite* sprite = 0;
 	//TODO(reo, sushi) implement this eventually
 	olc::Decal* decal = 0;
+
+	Timer* timer;
+
+	bool ENTITY_DEBUG = 1;
+
+#define DEBUGE DEBUG if(ENTITY_DEBUG)
 	
-	Entity() {}
+	Entity();
 	Entity(int id, EntityDefaultParams);
 	virtual ~Entity();
 	virtual bool LineIntersect(Edge3* e);
@@ -53,6 +61,9 @@ class Entity {
 	virtual bool ContainsPoint(Vector3 point) = 0;
 	virtual bool ContainsScreenPoint(Vector3 point) = 0;
 
+	virtual void DrawPosition(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view);
+	virtual void DrawVertices(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view);
+
 	virtual std::string str();
 };
 
@@ -61,7 +72,7 @@ class Entity {
 #define PhysEntityDefaultParams Vector3 velocity = V3ZERO, Vector3 acceleration = V3ZERO, Vector3 rotVelocity = V3ZERO, Vector3 rotAcceleration = V3ZERO, float mass = 1, float elasticity = 1, bool bStatic = false
 //the physics based implentation of Entity, anything that moves in time is this
 class PhysEntity : public Entity {
-	public:
+public:
 	Vector3 velocity;
 	Vector3 acceleration;
 	Vector3 rotVelocity;
@@ -190,7 +201,7 @@ struct Camera : public Entity {
 	float farZ = 1000.1f; //the maximum render distance
 	float fieldOfView = 90.f;
 	
-	Camera() {
+	Camera(int id = -1, EntityDefaultParams) : Entity(EntityArgs) {
 		position = V3ZERO;
 	}
 	
@@ -207,3 +218,4 @@ struct Camera : public Entity {
 //archaic light class
 struct Light : public Entity {
 }; 
+

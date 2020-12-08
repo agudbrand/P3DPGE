@@ -1,10 +1,12 @@
 #pragma once
 #include "Entities.h"
 #include "Mesh.h"
-#include "olcPixelGameEngine.h"
+#include "internal/olcPixelGameEngine.h"
 
 namespace Render {
 	//NOTE sushi: do we want Render to be this bloated? Or organized it elsewhere?
+
+	//TODO(r, sushi) separate objects into different layers like debug, main, etc. to be drawn in certain orders
 
 	internal bool DEBUG_RENDER = 1;
 
@@ -18,7 +20,10 @@ namespace Render {
 
 	//this list can most likely be optimized by keeping triangles in it
 	//that we know havent been deleted but do that later
+	//implement pointers here at some point 
 	static std::vector<Triangle> triangles;
+
+	static Timer* timer;
 
 	static mat<float, 4, 4> view;
 	static Camera camera;
@@ -39,6 +44,8 @@ namespace Render {
 	//just shove all entities into here, then draw them
 	static void AddEntity(Entity* e) { entities.push_back(e); }
 
+	static Camera* GetCamera() { return &camera; }
+
 	static void Init() {
 		
 		//test lines
@@ -48,7 +55,7 @@ namespace Render {
 		//entities.push_back(l2);
 
 		//test triangle
-		DebugTriangle* test = new DebugTriangle(Triangle(Vector3(0, 0, 0), Vector3(2, 0, 1), Vector3(3, 3, 1)), 1);
+		//DebugTriangle* test = new DebugTriangle(Triangle(Vector3(0, 0, 0), Vector3(2, 0, 1), Vector3(3, 3, 1)), 1);
 		//temporary permanent Sprite because with the way we are drawing triangles 
 		//currently theres no way to know what the Entity's sprite is and I have a couple
 		//of ideas on how to solve this but later.
@@ -56,6 +63,7 @@ namespace Render {
 		//b->sprite = new olc::Sprite("sprites/UV_Grid_Sm.jpg");
 		//entities.push_back(b);
 
+		timer = new Timer;
 	}
 
 	using namespace boost::qvm;
@@ -315,7 +323,7 @@ namespace Render {
 				for (Vector3& n : clipped[i].proj_points) {
 					n.ProjToScreen(Render::camera.ProjectionMatrix(p), p, w);
 				}
-				//clipped[i].set_color(t.get_color());
+				clipped[i].e = t.e;
 				
 				//projecting texture
 				for (Vector3& v : clipped[i].tex_points) {
@@ -355,7 +363,7 @@ namespace Render {
 					}
 
 					for (int w = 0; w < trisToAdd; w++) {
-						//clipped[w].set_color(test.get_color());
+						clipped[w].e = t.e;
 						listTriangles.push_back(clipped[w]);
 					}
 				}
@@ -368,7 +376,7 @@ namespace Render {
 				//	t.proj_points[0].x, t.proj_points[0].y, t.tex_points[0].x, t.tex_points[0].y, t.tex_points[0].z,
 				//	t.proj_points[1].x, t.proj_points[1].y, t.tex_points[1].x, t.tex_points[1].y, t.tex_points[1].z,
 				//	t.proj_points[2].x, t.proj_points[2].y, t.tex_points[2].x, t.tex_points[2].y, t.tex_points[2].z,
-				//	entities[0]->sprite);
+				//	t.e->sprite);
 
 
 				//This has been rendered (lol) useless by textures but
@@ -418,6 +426,7 @@ namespace Render {
 				e->Draw(p, Render::camera.ProjectionMatrix(p), view);
 			}
 			else {
+				DEBUG e->Draw(p, Render::camera.ProjectionMatrix(p), view); //for accessing entity debug drawing
 				for (auto& t : e->mesh->triangles) { triangles.push_back(t); }
 			}
 		}
@@ -438,7 +447,7 @@ namespace Render {
 
 		//debug
 		p->DrawStringDecal(olc::vf2d(p->ScreenWidth() - 300, p->ScreenHeight() - 20), "Mouse: " + Vector3(p->GetMousePos()).str2f());
-		p->DrawStringDecal(olc::vf2d(p->ScreenWidth()-300, p->ScreenHeight() - 10), "Camera: " + camera.position.str2f());
+		p->DrawStringDecal(olc::vf2d(p->ScreenWidth()-300, p->ScreenHeight() - 10), "Camera: " + Render::camera.position.str2f());
 
 		//Debug::EndTimerAverage(p, 10, "", 10);
 	}
@@ -447,7 +456,7 @@ namespace Render {
 		//TODO(r, sushi, 11/18/2020) writing this is probably important
 	}
 
-
+	
 
 	
 };

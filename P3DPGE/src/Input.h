@@ -1,7 +1,7 @@
 #pragma once
 #include "Render.h"
 #include "Physics.h"
-#include "olcPixelGameEngine.h"
+#include "internal/olcPixelGameEngine.h"
 
 //#include "Collider.h" //TODO(i,delle) remove this
 
@@ -108,6 +108,8 @@ namespace Input {
 	internal Vector3 leftClickPos = V3NULL;
 	internal bool DEBUG_INPUT = false;
 
+	Timer* timer;
+
 #define DEBUGI DEBUG if(DEBUG_INPUT)
 	
 	internal Vector3 GetMousePos(olc::PixelGameEngine* p) {
@@ -122,6 +124,8 @@ namespace Input {
 
 	static void Init() {
 		c = &Render::camera;
+
+		timer = new Timer;
 
 		inputActions = std::vector<InputAction>();
 		//NOTE InputAction: function, name, key, mouseButton, inputState, shift, ctrl, description
@@ -177,7 +181,7 @@ namespace Input {
 		"Spawns a large sphere of radius/mass 100 at the mouse."));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-			Complex* complex = new Complex("objects/24k_Triangles.obj", 0, V3ZERO);
+			Complex* complex = new Complex("objects/bmonkey.obj", 0, V3ZERO);
 			selectedEntity = complex;
 			Physics::AddEntity(complex);
 			Render::AddEntity(complex);
@@ -199,7 +203,7 @@ namespace Input {
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			for (auto& e : Render::entities) {
-				e->rotation.x += 3 * Time::deltaTime;
+				e->rotation.x += 30 * Time::deltaTime;
 			}
 			DEBUGI std::cout << "Rotating everything in the positive x" << std::endl;
 			}, "rotate_+x", olc::J, -1, 1, 0, 0,
@@ -207,7 +211,7 @@ namespace Input {
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			for (auto& e : Render::entities) {
-				e->rotation.y += 3 * Time::deltaTime;
+				e->rotation.y += 30 * Time::deltaTime;
 			}
 			DEBUGI std::cout << "Rotating everything in the positive y" << std::endl;
 			}, "rotate_+y", olc::K, -1, 1, 0, 0,
@@ -215,7 +219,7 @@ namespace Input {
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			for (auto& e : Render::entities) {
-				e->rotation.z += 3 * Time::deltaTime;
+				e->rotation.z += 30 * Time::deltaTime;
 			}
 			DEBUGI std::cout << "Rotating everything in the positive z" << std::endl;
 			}, "rotate_+z", olc::L, -1, 1, 0, 0,
@@ -223,7 +227,7 @@ namespace Input {
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			for (auto& e : Render::entities) {
-				e->rotation.x -= 3 * Time::deltaTime;
+				e->rotation.x -= 30 * Time::deltaTime;
 			}
 			DEBUGI std::cout << "Rotating everything in the negative x" << std::endl;
 			}, "rotate_-x", olc::M, -1, 1, 0, 0,
@@ -231,7 +235,7 @@ namespace Input {
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			for (auto& e : Render::entities) {
-				e->rotation.y -= 3 * Time::deltaTime;
+				e->rotation.y -= 30 * Time::deltaTime;
 			}
 			DEBUGI std::cout << "Rotating everything in the negative y" << std::endl;
 			}, "rotate_-y", olc::COMMA, -1, 1, 0, 0,
@@ -239,7 +243,7 @@ namespace Input {
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			for (auto& e : Render::entities) {
-				e->rotation.z -= 3 * Time::deltaTime;
+				e->rotation.z -= 30 * Time::deltaTime;
 			}
 			DEBUGI std::cout << "Rotating everything in the negative z" << std::endl;
 			}, "rotate_-z", olc::PERIOD, -1, 1, 0, 0,
@@ -272,7 +276,9 @@ namespace Input {
 		//TODO(o, sushi) write this to skip objects who aren't close to the line
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Vector3 pos = GetMousePos(p);
-			if (selectedEntity) { selectedEntity = nullptr; }
+			if (selectedEntity) { selectedEntity->ENTITY_DEBUG = false; selectedEntity = nullptr; }
+
+			
 
 			pos.ScreenToWorld(c->ProjectionMatrix(p), c->MakeViewMatrix(Render::yaw), p);
 			pos.WorldToLocal(c->position);
@@ -288,6 +294,7 @@ namespace Input {
 			for (Entity* e : Render::entities) {
 				if (e->LineIntersect(&ray->edge) && e->id != -1) {
 					selectedEntity = e;
+					selectedEntity->ENTITY_DEBUG = true;
 					break;
 				}
 			}
@@ -296,10 +303,9 @@ namespace Input {
 			if (selectedEntity == nullptr) { Debug::Error("No object selected"); }
 
 			}, "select_entity", olc::NONE, 0, 0, 0, 0,
-			"Selects an entity"));
+		"Selects an entity"));
 
 	//// camera movement ////
-
 
 		//TODO(i,,) change camera movement to W-forward, S-backward, Q-down, E-up
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {

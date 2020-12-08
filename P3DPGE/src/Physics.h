@@ -12,8 +12,11 @@ namespace Physics {
 	static bool paused = false;
 	static bool frame = false;
 
+	static Timer* timer;
+
 	static void Init() {
 		physEntities = std::vector<PhysEntity*>();
+		timer = new Timer;
 	}
 
 	static void Update(float deltaTime) {

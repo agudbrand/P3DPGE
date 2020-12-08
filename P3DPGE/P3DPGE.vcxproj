@@ -23,10 +23,10 @@
     <ClInclude Include="src\Debug.h" />
     <ClInclude Include="src\Entities.h" />
     <ClInclude Include="src\Input.h" />
+    <ClInclude Include="src\internal\olcPixelGameEngine.h" />
     <ClInclude Include="src\Math.h" />
     <ClInclude Include="src\Matrix.h" />
     <ClInclude Include="src\Mesh.h" />
-    <ClInclude Include="src\olcPixelGameEngine.h" />
     <ClInclude Include="src\Physics.h" />
     <ClInclude Include="src\Render.h" />
     <ClInclude Include="src\Time.h" />
@@ -109,6 +109,7 @@
       <AdditionalIncludeDirectories>C:\src\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>Default</LanguageStandard>
       <SuppressStartupBanner>false</SuppressStartupBanner>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,6 +128,7 @@
       <AdditionalIncludeDirectories>C:\src\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>Default</LanguageStandard>
       <SuppressStartupBanner>false</SuppressStartupBanner>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -146,6 +148,7 @@
       <LanguageStandard>Default</LanguageStandard>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <SuppressStartupBanner>false</SuppressStartupBanner>
+      <UseFullPaths>false</UseFullPaths>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -164,6 +167,7 @@
       <AdditionalIncludeDirectories>C:\src\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>Default</LanguageStandard>
       <SuppressStartupBanner>false</SuppressStartupBanner>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

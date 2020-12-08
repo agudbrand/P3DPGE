@@ -10,7 +10,7 @@
 #include "boost/qvm/map_mat_mat.hpp"
 #include "boost/qvm/mat_operations.hpp"
 #include "boost/qvm/vec_mat_operations.hpp"
-#include "olcPixelGameEngine.h"
+#include "internal/olcPixelGameEngine.h"
 
 //math constants
 #define M_PI 3.14159265359f
@@ -25,7 +25,7 @@
 #define V3ZU	Vector3(0, 0, 1)
 #define V3RIGHT		Vector3(1, 0, 0)
 #define V3LEFT		Vector3(-1, 0, 0)
-#define V3UP		Vector3(0, 1, 0) //TODO verify this
+#define V3UP		Vector3(0, 1, 0)
 #define V3DOWN		Vector3(0, -1, 0)
 #define V3FORWARD	Vector3(0, 0, 1)
 #define V3BACKWARD	Vector3(0, 0, -1)
@@ -91,6 +91,9 @@ namespace Math {
 
 	template<class T>
 	static double average(const T& container, int size) { return average(std::begin(container), std::end(container), size); }
+	
+	//TODO(g, sushi) write a function for indexing vectors/any container for some consistent data type we define like id.
+
 }
 
 class Vector3 {
@@ -131,7 +134,8 @@ public:
 		x = vector.a[0]; y = vector.a[1]; z = vector.a[2];
 	}
 	
-	void operator	 =	(const Vector3& rhs)				{ this->x = rhs.x; this->y = rhs.y; this->z = rhs.z;  }
+	void    operator =	(const Vector3& rhs)				{ this->x = rhs.x; this->y = rhs.y; this->z = rhs.z;  }
+	void    operator =	(const mat<float, 1, 4>& rhs)		{ this->x = rhs.a[0][0]; this->y = rhs.a[0][1]; this->z = rhs.a[0][2]; }
 	Vector3 operator +  (const Vector3& rhs)		const	{ return Vector3(this->x + rhs.x, this->y + rhs.y, this->z + rhs.z); }
 	Vector3 operator -  (const Vector3& rhs)		const	{ return Vector3(this->x - rhs.x, this->y - rhs.y, this->z - rhs.z); }
 	Vector3 operator *  (const float& rhs)			const	{ return Vector3(this->x * rhs, this->y * rhs, this->z * rhs); }
@@ -145,8 +149,8 @@ public:
 	Vector3 operator /= (const float& rhs)					{ this->x /= rhs; this->y /= rhs; this->z /= rhs; return *this; }
 	Vector3 operator +  ()							const	{ return { +x, +y, +z }; }
 	Vector3 operator -  ()							const	{ return { -x, -y, -z }; }
-	bool operator	 == (const Vector3& rhs)		const	{ return (this->x == rhs.x && this->y == rhs.y && this->z == rhs.z); }
-	bool operator	 != (const Vector3& rhs)		const	{ return (this->x != rhs.x || this->y != rhs.y || this->z != rhs.z); }
+	bool    operator == (const Vector3& rhs)		const	{ return (this->x == rhs.x && this->y == rhs.y && this->z == rhs.z); }
+	bool    operator != (const Vector3& rhs)		const	{ return (this->x != rhs.x || this->y != rhs.y || this->z != rhs.z); }
 	
 	float				dot(const Vector3& rhs)		const	{ return this->x * rhs.x + this->y * rhs.y + this->z * rhs.z; }
 	Vector3				cross(const Vector3& rhs)	const	{ return Vector3(this->y * rhs.z - rhs.y * this->z, this->x * rhs.z - rhs.x * this->z, this->x * rhs.y - rhs.x * this->y); }
@@ -339,7 +343,7 @@ namespace Math {
 		return m;
 	}
 	
-	static mat<float, 4, 4> GetTranslateM4x4(Vector3 translation) {
+	static mat<float, 4, 4> GetTranslate(Vector3 translation) {
 		mat<float, 4, 4> tv{
 			1,			   0,			  0,			 0,
 			0,			   1,			  0,			 0,
@@ -451,7 +455,46 @@ namespace Math {
 		};
 		return rvz;
 	}
-	
+
+	static mat<float, 4, 4> GetLocalToWorld(static Vector3 pos) {
+		mat<float, 4, 4> wtl{
+			1,	   0,	  0,	 0,
+			0,	   1,	  0,	 0,
+			0,	   0,	  1,	 0,
+			pos.x, pos.y, pos.z, 1
+		};
+		return wtl;
+	}
+
+	static mat<float, 4, 4> GetWorldToLocal(Vector3 pos) {
+		mat<float, 4, 4> ltw{
+			1,	   0,	  0,	 0,
+			0,	   1,	  0,	 0,
+			0,	   0,	  1,	 0,
+			pos.x, pos.y, pos.z, 1
+		};
+		return inverse(ltw);
+	}
+
+	static mat<float, 1, 4> ProjMult(mat<float, 1, 4> v, mat<float, 4, 4> m) {
+		mat<float, 1, 4> vm = v * m;
+		if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; }
+		return vm;
+	}
+
+	//optional overload that 'returns' the w value
+	static mat<float, 1, 4> ProjMult(mat<float, 1, 4> v, mat<float, 4, 4> m, float& w) {
+		mat<float, 1, 4> vm = v * m;
+		if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; w = vm.a[0][3]; }
+		return vm;
+	}
+
+	static mat<float, 1, 4> unProjMult(mat<float, 1, 4> v, mat<float, 4, 4> m) {
+		mat<float, 1, 4> vm = v * m;
+		if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; }
+		return vm;
+	}
+
 	//return where two lines intersect on the x axis with slope and the y-intercept
 	static Vector3 LineIntersect2(float slope1, float ycross1, float slope2, float ycross2) {
 		mat<float, 2, 2> lhs{ slope1, ycross1, slope2, ycross2 };
@@ -470,11 +513,12 @@ namespace Math {
 	//returns area of a triangle of sides a and b
 	static float TriangleArea(Vector3 a, Vector3 b) { return a.cross(b).mag() / 2; }
 
-};
+//};
 
-namespace Render {
+//namespace Render {
+
 	//the input vector should be in world space
-	static Vector3 WorldSpaceToCameraSpace(Vector3 vertex, mat<float, 4, 4> viewMatrix) {
+	static Vector3 WorldToCamera(Vector3 vertex, mat<float, 4, 4> viewMatrix) {
 		mat<float, 1, 4> vm = vertex.ConvertToM1x4() * viewMatrix;
 		if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; }
 		return Vector3(vm);
@@ -515,7 +559,7 @@ namespace Render {
 	}
 
 	//the input matrixes should be in view/camera space 
-	static Vector3 CameraSpaceToScreenSpace(Vector3 csVertex, mat<float, 4, 4> projectionMatrix, Vector2 dimensions) {
+	static Vector3 CameraToScreen(Vector3 csVertex, mat<float, 4, 4> projectionMatrix, Vector2 dimensions) {
 		mat<float, 1, 4> vm = csVertex.ConvertToM1x4() * projectionMatrix;
 		if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; }
 		Vector3 out(vm);

@@ -9,6 +9,7 @@ Entity::Entity(int id, EntityParams) {
 	this->position = position;
 	this->rotation = rotation;
 	this->scale = scale;
+	timer = new Timer;
 }
 
 Entity::~Entity() {
@@ -34,10 +35,34 @@ bool Entity::LineIntersect(Edge3* e) {
 }
 
 void Entity::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
-	//do nothing if not SpecialDraw
+	//do nothing if not SpecialDraw unless debug is enabled
+	DEBUGE DrawPosition(p, ProjMat, view);
+	DEBUGE DrawVertices(p, ProjMat, view);
+
+}
+bool Entity::SpecialDraw() { return false; }
+
+void Entity::DrawPosition(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
+	
+	Vector3 nuposition = Math::ProjMult(position.ConvertToM1x4(), view);
+			nuposition.ProjToScreen(ProjMat, p);
+	p->DrawString(nuposition.toVector2(), position.str2f());
 }
 
-bool Entity::SpecialDraw() { return false; }
+void Entity::DrawVertices(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
+	
+	for (Triangle t : mesh->triangles) {
+		//if (t.get_normal().dot(t.midpoint() - Render::GetCamera()->position) < 0) {
+			for (Vector3 v : t.points) {
+				Vector3 nuv = Math::ProjMult(v.ConvertToM1x4(), view);
+						nuv.ProjToScreen(ProjMat, p);
+				p->DrawString(nuv.toVector2(), v.str2f());
+			}
+		//}
+	}
+
+	
+}
 
 void Entity::RotateX(Vector3 offset) {
 	for (auto& m : mesh->triangles) {
@@ -67,9 +92,18 @@ void Entity::Rotate(Vector3 offset) {
 	if (rotation != prev_rotation) {
 		for (auto& m : mesh->triangles) {
 			for (auto& n : m.points) {
-				n.rotateV3_X(rotation.x, position, offset);
-				n.rotateV3_Y(rotation.y, position, offset);
-				n.rotateV3_Z(rotation.z, position, offset);
+				
+
+				mat<float, 4, 4> rot_mat =
+					Math::GetRotateV3_X(rotation.x - prev_rotation.x) *
+					Math::GetRotateV3_Y(rotation.y - prev_rotation.y) *
+					Math::GetRotateV3_Z(rotation.z - prev_rotation.z);
+				Vector3 n_local = Math::ProjMult(n.ConvertToM1x4(), Math::GetWorldToLocal(position));
+				LOG(n_local);
+				n_local = Math::ProjMult(n_local.ConvertToM1x4(), rot_mat);
+				LOG(n_local);
+				n = Math::ProjMult(n_local.ConvertToM1x4(), Math::GetLocalToWorld(position));
+				LOG(n);
 			}
 		}
 	}
@@ -78,15 +112,15 @@ void Entity::Rotate(Vector3 offset) {
 
 void Entity::Translate() {	
 
-	PTIMER_COND(1.f, 
-		DEBUG_M("test"); 
-		DEBUG_M("test2");
-	);
+	/*PTIMER_COND(1.f, 
+		LOG("test"); 
+		LOG("test2");
+	);*/
 
 	if (position != prev_position) {
 		for (auto& m : mesh->triangles) {
 			for (auto& n : m.points) {
-				n = n * Math::GetTranslateM4x4(position);
+				n = n * Math::GetTranslate(position - prev_position);
 			}
 		}
 	}
@@ -105,8 +139,9 @@ std::string Entity::str() {
  
 }
 
+
+
 void Entity::Update(float deltaTime) {
-	PTIMER_S;
 	Translate(); Rotate();
 }
 
@@ -123,7 +158,7 @@ PhysEntity::PhysEntity(int id, EntityParams, PhysEntityParams) : Entity(EntityAr
 };
 
 void PhysEntity::Update(float deltaTime) {
-	PTIMER_S;
+	//PTIMER_S;
 	if (!bStatic) {
 		//Vector3 velLast = velocity;
 		//if (acceleration.mag() < .01f) { acceleration = V3ZERO; }
@@ -248,7 +283,8 @@ std::string Sphere::str() {
 
 Box::Box(Vector3 dimensions, int id, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
 	this->dimensions = dimensions;
-	mesh = new BoxMesh(dimensions, position);
+	mesh = new BoxMesh(dimensions, position, this);
+	sprite = new olc::Sprite("sprites/UV_Grid_Sm.jpg");
 }
 
 //not sure if this still works or not, when I was trying to select boxes
@@ -334,7 +370,7 @@ bool Complex::LoadFromObjectFile(std::string file_name) {
 			int f[3];
 			s >> junk >> f[0] >> f[1] >> f[2];
 
-			mesh->triangles.push_back(Triangle(vertices[f[0] - 1], vertices[f[1] - 1], vertices[f[2] - 1]));
+			mesh->triangles.push_back(Triangle(vertices[f[0] - 1], vertices[f[1] - 1], vertices[f[2] - 1], this));
 		}
 	}
 
@@ -422,18 +458,18 @@ Line3::Line3(Vector3 endPosition, int id, EntityParams) : Entity(EntityArgs) {
 void Line3::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
 	Vector2 screenDimensions = Vector2(p->ScreenWidth(), p->ScreenHeight());
 	//convert vertexes from world to camera/view space
-	Vector3 startVertex = Render::WorldSpaceToCameraSpace(position, view);
-	Vector3 endVertex = Render::WorldSpaceToCameraSpace(endPosition, view);
+	Vector3 startVertex = Math::WorldToCamera(position, view);
+	Vector3 endVertex = Math::WorldToCamera(endPosition, view);
 	
 	//clip vertexes to the near and far z planes in camera/view space
-	if (!Render::ClipLineToZPlanes(startVertex, endVertex, .1f, 1000.1f)) { return; } //TODO(r,delle) change the third parameter to the camera variable
+	if (!Math::ClipLineToZPlanes(startVertex, endVertex, .1f, 1000.1f)) { return; } //TODO(r,delle) change the third parameter to the camera variable
 	
 	//convert vertexes from camera/view space to clip space
-	startVertex = Render::CameraSpaceToScreenSpace(startVertex, ProjMat, screenDimensions);
-	endVertex = Render::CameraSpaceToScreenSpace(endVertex, ProjMat, screenDimensions);
+	startVertex = Math::CameraToScreen(startVertex, ProjMat, screenDimensions);
+	endVertex = Math::CameraToScreen(endVertex, ProjMat, screenDimensions);
 
 	//clip vertexes to border planes in clip space
-	if (!Render::ClipLineToBorderPlanes(startVertex, endVertex, screenDimensions)) { return; }
+	if (!Math::ClipLineToBorderPlanes(startVertex, endVertex, screenDimensions)) { return; }
 
 	//draw the lines after all clipping and space conversion
 	p->DrawLine(startVertex.toVector2(), endVertex.toVector2(), color);
@@ -490,7 +526,7 @@ mat<float, 4, 4> Camera::MakeViewMatrix(float yaw) {
 
 	lookDir = target * Math::GetRotateV3_Y(yaw);
 	target = position + lookDir;
-	
+
 	mat<float, 4, 4> view = inverse(Math::PointAt(position, target, up));
 	
 	return view;
@@ -502,10 +538,10 @@ mat<float, 4, 4> Camera::ProjectionMatrix(olc::PixelGameEngine* p) {
 	float fovRad = 1.f / tanf(fieldOfView * .5f / 180.f * M_PI);
 
 	mat<float, 4, 4> proj{
-		aspectRatio * fovRad, 0, 0,	0,
-		0, fovRad, 0, 0,
-		0, 0, farZ / renderToView, 1,
-		0, 0, (-farZ * nearZ) / renderToView, 0
+		aspectRatio * fovRad, 0,	  0,								0,
+		0,					  fovRad, 0,								0,
+		0,					  0,	  farZ / renderToView,				1,
+		0,					  0,	  (-farZ * nearZ) / renderToView,	0
 	};
 
 	return proj;
