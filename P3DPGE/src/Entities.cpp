@@ -2,6 +2,8 @@
 #include "Mesh.h"
 #include "Collider.h"
 
+
+
 //// Entity	////
 
 Entity::Entity(int id, EntityParams) {
@@ -50,15 +52,18 @@ void Entity::DrawPosition(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat
 }
 
 void Entity::DrawVertices(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
-	
+
+	LOG("Entity shows: ");
+	LOG(EntityDat::campos);
+
 	for (Triangle t : mesh->triangles) {
-		//if (t.get_normal().dot(t.midpoint() - Render::GetCamera()->position) < 0) {
+		if (t.get_normal().dot(t.midpoint() - EntityDat::campos) < 0) {
 			for (Vector3 v : t.points) {
 				Vector3 nuv = Math::ProjMult(v.ConvertToM1x4(), view);
 						nuv.ProjToScreen(ProjMat, p);
 				p->DrawString(nuv.toVector2(), v.str2f());
 			}
-		//}
+		}
 	}
 
 	
@@ -99,11 +104,8 @@ void Entity::Rotate(Vector3 offset) {
 					Math::GetRotateV3_Y(rotation.y - prev_rotation.y) *
 					Math::GetRotateV3_Z(rotation.z - prev_rotation.z);
 				Vector3 n_local = Math::ProjMult(n.ConvertToM1x4(), Math::GetWorldToLocal(position));
-				LOG(n_local);
 				n_local = Math::ProjMult(n_local.ConvertToM1x4(), rot_mat);
-				LOG(n_local);
 				n = Math::ProjMult(n_local.ConvertToM1x4(), Math::GetLocalToWorld(position));
-				LOG(n);
 			}
 		}
 	}
@@ -353,7 +355,9 @@ bool Complex::LoadFromObjectFile(std::string file_name) {
 		char line[128];
 		f.getline(line, 128);
 
-		std::strstream s;
+		//this is deprecated and should be changed
+
+		std::stringstream s;
 
 		s << line;
 

@@ -63,7 +63,14 @@ namespace Render {
 		//b->sprite = new olc::Sprite("sprites/UV_Grid_Sm.jpg");
 		//entities.push_back(b);
 
+		//Box box(Vector3(1, 1, 1), -1, Vector3(0, 0, 0));
+		//SUCCESS(Vector3(1, 1, 1), 1);
+		//LOG("Log! ", 23.90);
+		//ERROR("box \n ", "nevermind");
+
 		timer = new Timer;
+
+		int a = 1;
 	}
 
 	using namespace boost::qvm;
@@ -414,6 +421,8 @@ namespace Render {
 	static void Update(olc::PixelGameEngine* p) {
 		//Debug::StartTimer();
 		view = camera.MakeViewMatrix(yaw);
+		
+		DEBUG EntityDat::campos = camera.position;
 
 		//get triangles from all entities
 		for (auto& e : entities) {

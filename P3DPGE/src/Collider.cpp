@@ -37,7 +37,7 @@ Vector3 AABBCollider::ClosestPointOnSurface(Vector3 target) {
 
 //TODO(p,delle) implement aabb-aabb collision and resolution
 bool AABBAABBCollision(AABBCollider* first, AABBCollider* second, bool resolveCollision) {
-	Debug::Error("AABB-AABB collision not implemented in Collider.cpp");
+	ERROR("AABB-AABB collision not implemented in Collider.cpp");
 	return false;
 }
 
@@ -45,7 +45,7 @@ bool AABBAABBCollision(AABBCollider* first, AABBCollider* second, bool resolveCo
 //TODO(p,delle) maybe abstract out closest point calculations for each collider
 //Returns true if the closest point to the sphere on the AABB is within the sphere
 bool AABBSphereCollision(AABBCollider* aabb, Sphere* sphere, bool resolveCollision) {
-	Debug::Error("AABB-Sphere collision resolution not implemented in Collider.cpp");
+	ERROR("AABB-Sphere collision resolution not implemented in Collider.cpp");
 	Vector3 closestAABBPoint = aabb->ClosestPointOnSurface(sphere->position);
 	Vector3 vectorBetween = closestAABBPoint - sphere->position; //sphere towards aabb
 	float distanceBetween = vectorBetween.mag();
@@ -93,13 +93,13 @@ bool AABBSphereCollision(AABBCollider* aabb, Sphere* sphere, bool resolveCollisi
 
 //TODO(p,delle) implement aabb-box collision and resolution
 bool AABBBoxCollision(AABBCollider* aabbCollider, Box* box, bool resolveCollision) {
-	Debug::Error("AABB-Box collision not implemented in Collider.cpp");
+	ERROR("AABB-Box collision not implemented in Collider.cpp");
 	return false;
 }
 
 //TODO(p,delle) implement aabb-complex collision and resolution
 bool AABBComplexCollision(AABBCollider* aabbCollider, Complex* complex, bool resolveCollision) {
-	Debug::Error("AABB-Complex collision not implemented in Collider.cpp");
+	ERROR("AABB-Complex collision not implemented in Collider.cpp");
 	return false;
 }
 
@@ -126,7 +126,7 @@ bool AABBCollider::CheckCollision(Collider* other, bool resolveCollision) {
 		} else {
 			std::stringstream thisAddress; thisAddress << (void const*)this;
 			std::stringstream otherAddress; thisAddress << (void const*)other;
-			Debug::Error("AABB collider (" + thisAddress.str() + ") tried to collide with an unhandled collider (" + otherAddress.str() + ")");
+			ERROR("AABB collider (" + thisAddress.str() + ") tried to collide with an unhandled collider (" + otherAddress.str() + ")");
 		}
 	}
 	return false;
@@ -175,13 +175,13 @@ bool SphereSphereCollision(Sphere* first, Sphere* second, bool resolveCollision)
 
 //TODO(p,delle) implement sphere-box collision and resolution
 bool SphereBoxCollision(Sphere* sphere, Box* box, bool resolveCollision) {
-	Debug::Error("Sphere-Box collision not implemented in Collider.cpp");
+	ERROR("Sphere-Box collision not implemented in Collider.cpp");
 	return false;
 }
 
 //TODO(p,delle) implement sphere-complex collision and resolution
 bool SphereComplexCollision(Sphere* sphere, Complex* box, bool resolveCollision) {
-	Debug::Error("Sphere-Complex collision not implemented in Collider.cpp");
+	ERROR("Sphere-Complex collision not implemented in Collider.cpp");
 	return false;
 }
 
@@ -208,7 +208,7 @@ bool SphereCollider::CheckCollision(Collider* other, bool resolveCollision) {
 		} else {
 			std::stringstream thisAddress; thisAddress << (void const*)this;
 			std::stringstream otherAddress; thisAddress << (void const*)other;
-			Debug::Error("Sphere collider (" + thisAddress.str() + ") tried to collide with an unhandled collider (" + otherAddress.str() + ")");
+			ERROR("Sphere collider (" + thisAddress.str() + ") tried to collide with an unhandled collider (" + otherAddress.str() + ")");
 		}
 	}
 	return false;
@@ -222,19 +222,19 @@ BoxCollider::BoxCollider(Box* box) {
 
 //TODO(p,delle) implement 
 bool BoxCollider::ContainsPoint(Vector3 point) {
-	Debug::Error("BoxCollider-ContainsPoint not implemented in Collider.cpp");
+	ERROR("BoxCollider-ContainsPoint not implemented in Collider.cpp");
 	return false;
 }
 
 //TODO(p,delle) implement box-box collision and resolution
 bool BoxBoxCollision(Box* first, Box* second, bool resolveCollision) {
-	Debug::Error("Box-Box collision not implemented in Collider.cpp");
+	ERROR("Box-Box collision not implemented in Collider.cpp");
 	return false;
 }
 
 //TODO(p,delle) implement box-complex collision and resolution
 bool BoxComplexCollision(Box* box, Complex* complex, bool resolveCollision) {
-	Debug::Error("Box-Complex collision not implemented in Collider.cpp");
+	ERROR("Box-Complex collision not implemented in Collider.cpp");
 	return false;
 }
 
@@ -271,7 +271,7 @@ bool BoxCollider::CheckCollision(Collider* other, bool resolveCollision) {
 			} else {
 				std::stringstream thisAddress; thisAddress << (void const*)this;
 				std::stringstream otherAddress; thisAddress << (void const*)other;
-				Debug::Error("Box collider (" + thisAddress.str() + ") tried to collide with an unhandled collider (" + otherAddress.str() + ")");
+				ERROR("Box collider (" + thisAddress.str() + ") tried to collide with an unhandled collider (" + otherAddress.str() + ")");
 			}
 		} else { //has rotation, dont treat as AABB
 			if (SphereCollider* otherSphere = dynamic_cast<SphereCollider*>(other)) {
@@ -292,7 +292,7 @@ bool BoxCollider::CheckCollision(Collider* other, bool resolveCollision) {
 			} else {
 				std::stringstream thisAddress; thisAddress << (void const*)this;
 				std::stringstream otherAddress; thisAddress << (void const*)other;
-				Debug::Error("Box collider (" + thisAddress.str() + ") tried to collide with an unhandled collider (" + otherAddress.str() + ")");
+				ERROR("Box collider (" + thisAddress.str() + ") tried to collide with an unhandled collider (" + otherAddress.str() + ")");
 			}
 		}
 	}
@@ -318,7 +318,7 @@ bool ComplexCollider::ContainsPoint(Vector3 point) {
 
 //TODO(p,delle) implement complex-complex collision and resolution
 bool ComplexComplexCollision(Complex* box, Complex* complex, bool resolveCollision) {
-	Debug::Error("Complex-Complex collision not implemented in Collider.cpp");
+	ERROR("Complex-Complex collision not implemented in Collider.cpp");
 	return false;
 }
 
@@ -345,7 +345,7 @@ bool ComplexCollider::CheckCollision(Collider* other, bool resolveCollision) {
 		} else {
 			std::stringstream thisAddress; thisAddress << (void const*)this;
 			std::stringstream otherAddress; thisAddress << (void const*)other;
-			Debug::Error("Complex collider (" + thisAddress.str() + ") tried to collide with an unhandled collider (" + otherAddress.str() + ")");
+			ERROR("Complex collider (" + thisAddress.str() + ") tried to collide with an unhandled collider (" + otherAddress.str() + ")");
 		}
 	}
 	return false;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "internal/olcPixelGameEngine.h"
+#include <any>
 #include <stack>
 #include <chrono>
 #include <string>
@@ -12,21 +13,18 @@
 #define local_persist static 
 #define global_variable static
 
+#define ENDLOGC nullptr
+
 //global debug macros
 #define DEBUG if(Debug::GLOBAL_DEBUG)
 //debug message
-#define SUCCESS DEBUG Debug::Success
-#define LOG     DEBUG Debug::Message
-#define ERROR   DEBUG Debug::Error
-#define LOGC	DEBUG Debug::LogCustom
+#define SUCCESS(...) DEBUG Debug::ToChar(2, __VA_ARGS__)
+#define LOG(...)     DEBUG Debug::ToChar(1, __VA_ARGS__)
+#define ERROR(...)   DEBUG Debug::ToChar(0, __VA_ARGS__)
 //force debug message
-#define SUCCESSF Debug::Success
-#define LOGF     Debug::Message
-#define ERRORF   Debug::Error
-#define LOGCF	 Debug::LogCustom
-
-//call tracing
-#define _TRACE  
+#define SUCCESSF(...) Debug::ToChar(2, __VA_ARGS__)
+#define LOGF(...)     Debug::ToChar(1, __VA_ARGS__)
+#define ERRORF(...)   Debug::ToChar(0, __VA_ARGS__)
 
 //stringize certain macros
 //this is all probably REALLY slow but will be as is unless I find a more elegent solution
@@ -35,6 +33,11 @@
 #define LINE_NUM  STRINGIZE(__LINE__)
 
 #define __FILENAME__ (std::strrchr(__FILE__, '\\') ? std::strrchr(__FILE__, '\\') + 1 : __FILE__)
+
+//call tracing
+#define _TRACE TRACE.push_stack()
+
+
 
 #ifndef NDEBUG
 #   define ASSERT(condition, message) \
@@ -49,10 +52,6 @@
 #   define ASSERT(condition, message) do { } while (false)
 #endif
 
-
-
-//std::cerr << "Assertion `" #condition "` failed in " << __FILE__ \
-//<< " line " << __LINE__ << ": " << message << std::endl; \
 
 typedef signed char		int8;
 typedef signed short	int16;
@@ -69,6 +68,8 @@ namespace Math { //forward declare average
 	template<class T>
 	static double average(const T& container, int size);
 }
+
+
 
 //template magic thanks to fux#2562
 template<class T>
@@ -96,92 +97,73 @@ enum ConsoleColor {
 	BRTWHITE = 15
 };
 
-namespace Debug {
-	
+struct Camera;
 
-	static bool GLOBAL_DEBUG = 1;
+namespace Debug{
 
-//// Call Tracing ////
-
-	namespace Tracer {
-		static std::stack<std::string> call_stack;
-	}
-
-	class call_tracer {
-		std::stack<std::string> call_stack;
-
-		call_tracer(std::string function_name) { Tracer::call_stack.push(function_name); }
-
-		~call_tracer() { Tracer::call_stack.pop(); }
-		void stack_place(std::string func_name) {
-			call_stack.push(func_name);
-		}
-	};
-
-	
+	global_variable bool GLOBAL_DEBUG = true;
 
 //// Console Output////
 
-internal HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);;
+	internal HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	internal int color = 7;
 	internal void ResetCmd() { //resets cmd font color to white
 		color = 7;
 		SetConsoleTextAttribute(hConsole, color);
 	}
 
-	static void Print(ConsoleColor color, const char* str, int frame_skip = 0) {
+	static void Print(ConsoleColor color, const char* str, bool newline = true) {
 		SetConsoleTextAttribute(hConsole, color);
-		std::cout << str << std::endl;
+		if(newline){ std::cout << str << std::endl; }
+		else { std::cout << str; }
 		ResetCmd();
 	}
 
-	//template magic thanks to fux#2562
+	static void ToChar(int mtype, const char* str, bool newline = true) {
+		switch (mtype) {
+		case 0: Print(ConsoleColor::RED, str, newline);    break;
+		case 1: Print(ConsoleColor::YELLOW, str, newline); break;
+		case 2: Print(ConsoleColor::GREEN, str, newline);  break;
+		}
+	}
 
-	//sends a green message to the console
-	static void Success(const char* str) { Print(ConsoleColor::GREEN, str); }
-
-	static void Success(const std::string& str) { Success(str.c_str()); }
-
-	template<class T, typename std::enable_if<!has_str_method<T>::value, bool>::type = true>
-	static void Success(T t) { Success(std::to_string(t)); }
-
-	template<class T, typename std::enable_if<has_str_method<T>::value, bool>::type = true>
-	static void Success(T t) { Success(t.str()); }
-
-	//sends a yellow message to the console
-	static void Message(const char* str) { Print(ConsoleColor::YELLOW, str); }
-
-	static void Message(const std::string& str) { Message(str.c_str()); }
+	static void ToChar(int mtype, const std::string& str, bool newline = true) { ToChar(mtype, str.c_str(), newline); }
 
 	template<class T, typename std::enable_if<!has_str_method<T>::value, bool>::type = true>
-	static void Message(T t) { Message(std::to_string(t)); }
+	static void ToChar(int mtype, T t, bool newline = true) { ToChar(mtype, std::to_string(t), newline); }
 
 	template<class T, typename std::enable_if<has_str_method<T>::value, bool>::type = true>
-	static void Message(T t) { Message(t.str()); }
+	static void ToChar(int mtype, T t, bool newline = true) { ToChar(mtype, t.str(), newline); }
 
-	//sends a red message to the console
+	template<class... T>
+	static void ToChar(int mtype, T... args) { (ToChar(mtype, args, false), ...); ToChar(0, "", true); }
 
-	static void Error(const char* str) { Print(ConsoleColor::RED, str); }
+//// Call Tracing ////
 
-	static void Error(const std::string& str) { Error(str.c_str()); }
-	
-	template<class T, typename std::enable_if<!has_str_method<T>::value, bool>::type = true>
-	static void Error(T t) { Error(std::to_string(t)); }
+	//figure this out later i guess
+	class CallTrace {
+	public:
+		CallTrace(){}
 
-	template<class T, typename std::enable_if<has_str_method<T>::value, bool>::type = true>
-	static void Error(T t) { Error(t.str()); }
+		std::stack<std::pair<std::string, std::string>> call_stack;
 
-	//sends a message with a custom color to the console
-	static void LogCustom(const char* str, ConsoleColor color) { Print(color, str); }
+		void push_stack(std::pair<std::string, std::string> c) { call_stack.push(c); }
+		void pop_stack() { call_stack.pop(); }
 
-	static void LogCustom(const std::string& str, ConsoleColor color) { LogCustom(str.c_str(), color); }
-
-	template<class T, typename std::enable_if<!has_str_method<T>::value, bool>::type = true>
-	static void LogCustom(T t, ConsoleColor color) { LogCustom(std::to_string(t), color); }
-
-	template<class T, typename std::enable_if<has_str_method<T>::value, bool>::type = true>
-	static void LogCustom(T t, ConsoleColor color) { LogCustom(t.str(), color); }
+		std::string str() {
+			std::stack<std::pair<std::string, std::string>> cs_cpy = call_stack;
+			std::string call_stack_str = "";
+			while (cs_cpy.size() != 0) {
+				call_stack_str.insert(0, cs_cpy.top().first + " in " + cs_cpy.top().second);
+				cs_cpy.pop();
+			}
+			return call_stack_str;
+		}
+	};
 
 	
 
 };
+
+//global tracing variable
+extern Debug::CallTrace TRACE;

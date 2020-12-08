@@ -69,7 +69,7 @@ namespace Time {
 		//std::cout << "Fixed Update :)" << std::endl;
 	}
 
-	static void Update(float& fElapsedTime) {
+	static void Update(float& fElapsedTime) { 
 		deltaTime = fElapsedTime;
 		totalTime += deltaTime;
 		updateCount += 1;
@@ -121,8 +121,8 @@ namespace Time {
 	static void EndTimer(float goodTime, std::string message = "") {
 		end = Time::totalTime;
 		float t = end - start;
-		if (t > goodTime) { ERROR(message + std::to_string(t)); }
-		else if (t < goodTime) { SUCCESS(message + std::to_string(t)); }
+		if (t > goodTime) { /*ERROR(message + std::to_string(t))*/; }
+		else if (t < goodTime) { /*SUCCESS(message + std::to_string(t));*/ }
 		else { LOG(message + std::to_string(t)); }
 		timer_running = false;
 	}
@@ -212,7 +212,6 @@ namespace Time {
 		return time_span.count();
 	}
 
-
 };
 
 class Timer {
@@ -282,8 +281,8 @@ public:
 		end_precise = steady_clock::now();
 		duration<double> time_span = duration_cast<duration<double>>(end_precise - start_precise);
 		double t = time_span.count();
-		if (t > goodTime) { ERROR(message + std::to_string(t)); }
-		else if (t < goodTime) { SUCCESS(message + std::to_string(t)); }
+		if (t > goodTime) { /*ERROR(message + std::to_string(t));*/ }
+		else if (t < goodTime) { /*SUCCESS(message + std::to_string(t));*/ }
 		else { LOG(message + std::to_string(t)); }
 		precise_timer_running = false;
 	}

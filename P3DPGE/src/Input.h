@@ -300,7 +300,7 @@ namespace Input {
 			}
 
 
-			if (selectedEntity == nullptr) { Debug::Error("No object selected"); }
+			if (selectedEntity == nullptr) { ERROR("No object selected"); }
 
 			}, "select_entity", olc::NONE, 0, 0, 0, 0,
 		"Selects an entity"));
@@ -437,7 +437,7 @@ namespace Input {
 			for (InputAction& action2 : inputActions) {
 				if (&action != &action2 && action.key != olc::NONE) {
 					if (action.key == action2.key && action.bCtrlHeld == action2.bCtrlHeld && action.bShiftHeld == action2.bShiftHeld) {
-						Debug::Error("Actions " + action.name + " and " + action2.name + " were both bound to " + std::to_string(action.key) + "\n\tBoth have been unbound because of this");
+						ERROR("Actions " + action.name + " and " + action2.name + " were both bound to " + std::to_string(action.key) + "\n\tBoth have been unbound because of this");
 						action.key = olc::NONE; action2.key = olc::NONE;
 					}
 				}

@@ -1,6 +1,6 @@
 #pragma once
 #include <fstream>
-#include <strstream>
+#include <sstream>
 #include "Math.h"
 #include "internal/olcPixelGameEngine.h"
 
@@ -8,8 +8,6 @@ struct Mesh;
 struct BoxMesh;
 struct Triangle;
 struct Collider;
-
-
 
 #define EntityArgs id, position, rotation, scale
 #define EntityParams Vector3 position, Vector3 rotation, Vector3 scale
@@ -31,6 +29,8 @@ public:
 	olc::Decal* decal = 0;
 
 	Timer* timer;
+
+	
 
 	bool ENTITY_DEBUG = 1;
 
@@ -212,6 +212,11 @@ struct Camera : public Entity {
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
 
+	void copy(Camera c) {
+		this->lookDir = c.lookDir;
+		this->position = c.position;
+	}
+
 	virtual std::string str() override;
 };
 
@@ -219,3 +224,6 @@ struct Camera : public Entity {
 struct Light : public Entity {
 }; 
 
+namespace EntityDat {
+	static Vector3 campos;
+}
