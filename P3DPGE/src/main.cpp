@@ -26,9 +26,7 @@ TODO(g, sushi) create a WorldMatrix that takes in several matrix operations and
 
 TODO(p,delle) add physics based collision resolution for all entities
 
-TODO(i,delle) convert inputs to new format, method to add and remove inputs
-
-TODO(g,delle) create a debug header for easy printing and such
+TODO(i,delle) convert mouse inputs to new format, method to add and remove inputs
 
 NOTE sushi: it may be benefitial to have an objects triangles always be defined in
 	  local space so we don't have to keep translating between world and local
@@ -53,7 +51,7 @@ public:
 		Input::Init();
 		Physics::Init();
 		Render::Init();
-		
+
 		return true;
 	}
 
