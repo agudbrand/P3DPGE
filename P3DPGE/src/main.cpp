@@ -50,9 +50,26 @@ public:
 		Physics::Init();
 		Render::Init();
 
-		//Matrix test1(1, 4, { 2,1,2,3 });
-		//Matrix test2(1, 4, { 1,2,3,4 });
+		Matrix test1(1, 4, {1.1231f, 1.1234f, 
+							-2.111f, -2});
+		Matrix test2(3, 3, {1, 0, 5,
+							0, 1, 0,
+							0, 0, 1});
+		Matrix test3(4, 4, {1, 2, 3, 4,
+							0, 1, 2, 3,
+							0, 0, 1, 2,
+							0, 0, 0, 1});
+		Debug::Message(test1.str2F());
+		Matrix test4 = test1.Transpose();
+		Debug::Message(test4.str2F());
 
+		Debug::Message(test2.str2F());
+		Matrix test5 = test2.Transpose();
+		Debug::Message(test5.str2F());
+
+		Debug::Message(test3.str2F());
+		Matrix test6 = test3.Transpose();
+		Debug::Message(test6.str2F());
 		return true;
 	}
 
