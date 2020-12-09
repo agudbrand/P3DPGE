@@ -73,6 +73,8 @@ namespace Render {
 		timer = new Timer;
 
 		int a = 1;
+
+
 	}
 
 	using namespace boost::qvm;
@@ -292,6 +294,11 @@ namespace Render {
 			out_tri2.proj_points[2] = Math::VectorPlaneIntersect(plane_p, plane_n, *inside_points[1], *outside_points[0], t);
 			return 2;
 		}
+
+		
+
+		
+
 	}//ClipTriangles
 
 	//TODO(r, sushi) this still needs abstracted
@@ -417,8 +424,62 @@ namespace Render {
 				}
 			}
 		};
+
 		
 	}//Draw
+
+	static void ConsoleHandler(olc::PixelGameEngine* p){
+
+		ContainerManager<std::string> last = g_cBuffer_last;
+
+		RUN_ONCE g_cBuffer_last.copy(g_cBuffer);
+
+		std::vector<std::pair<std::string, int>> inv_indexes;
+		ContainerManager<std::string> new_cBuffer;
+
+		//debug please remove if i dont
+		ContainerManager<std::string> now  = g_cBuffer;
+		last = g_cBuffer_last;
+
+		//THIS ALMOST WORKS, there's just some data syncing i still need to do
+		//please don't use this yet except for what I already have placed
+		
+		//Print last buffer at index if it doesn't match new else print new
+		//then print all additions to buffer
+		//TODO(g, sushi) fix this so it works with additions 
+		for (int i = 0; i < g_cBuffer_last.size(); i++) {
+			if (g_cBuffer.container[i].first) {
+				if (i < g_cBuffer_last.size()) {
+					if (g_cBuffer.container[i].second != g_cBuffer_last.container[i].second) {
+						//new_cBuffer.add_to(g_cBuffer_last[i]);
+						//LOG(g_cBuffer_last[i].first.value(), " ", g_cBuffer_last[i].second);
+						p->DrawString(Vector2(p->ScreenWidth() / 2, 0 + 11 * i), g_cBuffer_last[i].first.value());
+						//inv_indexes.push_back(std::pair<std::string, int>(g_cBuffer[i].first.value(), g_cBuffer[i].second));
+					}
+					else {
+						//new_cBuffer.add_to(g_cBuffer[i]);
+						//LOG(g_cBuffer[i].first.value(), " ", g_cBuffer[i].second);
+						p->DrawString(Vector2(p->ScreenWidth() / 2, 0 + 9 * i), g_cBuffer[i].first.value());
+					}
+				}
+				else {
+					//LOG(g_cBuffer[i].first.value(), " ", g_cBuffer[i].second);
+					p->DrawString(Vector2(p->ScreenWidth() / 2, 0 + 9 * i), g_cBuffer[i].first.value());
+				}
+			}
+		}
+
+		g_cBuffer_last.copy(g_cBuffer);
+
+		/*if index is less than last buffer's size then it is a previously defined
+		//object in the buffer else it is new
+		for (int i = 0; i < inv_indexes.size(); i++) {
+			if (inv_indexes[i].second < g_cBuffer_last.size()) {
+				if(inv_indexes)
+			}
+		}*/
+		g_cBuffer.empty();
+	}
 
 	//draw all entities to screen
 	static void Update(olc::PixelGameEngine* p) {
@@ -456,6 +517,8 @@ namespace Render {
 		Draw(p);
 
 		triangles.clear();
+
+		ConsoleHandler(p);
 
 		//debug
 		DEBUGR p->DrawStringDecal(olc::vf2d(p->ScreenWidth() - 300, p->ScreenHeight() - 20), "Mouse: " + Vector3(p->GetMousePos()).str2f());

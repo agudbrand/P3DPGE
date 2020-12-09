@@ -1,8 +1,15 @@
 #pragma once
 
 #include "internal/olcPixelGameEngine.h"
-#include "GLOBALS.h"
+#include <any>
+#include <stack>
+#include <chrono>
+#include <string>
+#include <vector>
+#include <cstdarg>
 #include <optional>
+#include <iostream>
+#include <windows.h>
 
 #define internal static
 #define local_persist static 
@@ -10,14 +17,17 @@
 
 //global debug macros
 #define DEBUG if(GLOBAL_DEBUG)
+
 //debug message
-#define SUCCESS(...) DEBUG Debug::ToChar(2, __VA_ARGS__)
-#define LOG(...)     DEBUG Debug::ToChar(1, __VA_ARGS__)
-#define ERROR(...)   DEBUG Debug::ToChar(0, __VA_ARGS__)
+#define SUCCESS(...)   DEBUG Debug::ToString(2, __VA_ARGS__)
+#define LOG(...)       DEBUG Debug::ToString(1, __VA_ARGS__)
+#define ERROR(...)     DEBUG Debug::ToString(0, __VA_ARGS__)
 //force debug message
-#define SUCCESSF(...) Debug::ToChar(2, __VA_ARGS__)
-#define LOGF(...)     Debug::ToChar(1, __VA_ARGS__)
-#define ERRORF(...)   Debug::ToChar(0, __VA_ARGS__)
+#define SUCCESSF(...) Debug::ToString(2, __VA_ARGS__)
+#define LOGF(...)     Debug::ToString(1, __VA_ARGS__)
+#define ERRORF(...)   Debug::ToString(0, __VA_ARGS__)
+
+#define TOSTRING(...) Debug::ToStringReturn(__VA_ARGS__)
 
 //stringize certain macros
 //this is all probably REALLY slow but will be as is unless I find a more elegent solution
@@ -30,10 +40,25 @@
 #define LOGFUNC LOG(__FUNCTION__, " called")
 #define LOGFUNCM(...) LOG(__FUNCTION__, " called ", __VA_ARGS__)
 
-//call tracing
-#define _TRACE TRACE.push_stack()
+//from John McFarlane on stack exchange
+//returns false if wherever this is called has been called before
+//eg. use this in an if statement in a loop for it to only run once ever
+#define FIRST_TIME_HERE ([] { \
+    static bool is_first_time = true; \
+    auto was_first_time = is_first_time; \
+    is_first_time = false; \
+    return was_first_time; } ())
 
-#define BUFFERLOG 
+//wrap code in this for it to only run once the entire program
+//TODO(g, sushi) write a macro for running once in a loop
+#define RUN_ONCE if(FIRST_TIME_HERE)
+
+//makes a random number only once and then always returns that same number
+#define PERM_RAND_INT ([]{ static int rint = rand() % 100000; return rint;}())
+
+#define BUFFER_IDENTIFIER ([]{ static int id_ini = buffer_size++ + 1; return id_ini;}())
+
+#define BUFFERLOG(...) unique_id = BUFFER_IDENTIFIER; g_cBuffer.add_to(std::pair<std::string, int>(TOSTRING(__VA_ARGS__), unique_id), unique_id);
  
 #ifndef NDEBUG
 #   define ASSERT(condition, message) \
@@ -58,6 +83,8 @@ typedef unsigned int	uint32;
 typedef unsigned long	uint64;
 
 using namespace std::chrono;
+
+extern bool GLOBAL_DEBUG;
 
 namespace Math { //forward declare average
 	template<class T>
@@ -97,6 +124,8 @@ struct Camera;
 
 namespace Debug{
 
+	static bool has_run = false;
+
 //// Console Output ////
 
 	internal HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -106,10 +135,6 @@ namespace Debug{
 		SetConsoleTextAttribute(hConsole, color);
 	}
 
-	static void ToBuffer(const char* str) {
-
-	}
-
 	static void Print(ConsoleColor color, const char* str, bool newline = true) {
 		SetConsoleTextAttribute(hConsole, color);
 		if(newline){ std::cout << str << std::endl; }
@@ -117,26 +142,39 @@ namespace Debug{
 		ResetCmd();
 	}
 
-	static void ToChar(int mtype, const char* str, bool newline = true) {
+	static void ToString(int mtype, const char* str, bool newline = true) {
 		switch (mtype) {
 		case 0: Print(ConsoleColor::RED, str, newline);    break;
 		case 1: Print(ConsoleColor::YELLOW, str, newline); break;
 		case 2: Print(ConsoleColor::GREEN, str, newline);  break;
 		//TODO(g, sushi) implement buffer colors
-		case 3: ToBuffer(str);
 		}
 	}
 
-	static void ToChar(int mtype, const std::string& str, bool newline = true) { ToChar(mtype, str.c_str(), newline); }
+	static void ToString(int mtype, const std::string& str, bool newline = true) { ToString(mtype, str.c_str(), newline); }
 
 	template<class T, typename std::enable_if<!has_str_method<T>::value, bool>::type = true>
-	static void ToChar(int mtype, T t, bool newline = true) { ToChar(mtype, std::to_string(t), newline); }
+	static void ToString(int mtype, T t, bool newline = true) { ToString(mtype, std::to_string(t), newline); }
 
 	template<class T, typename std::enable_if<has_str_method<T>::value, bool>::type = true>
-	static void ToChar(int mtype, T t, bool newline = true) { ToChar(mtype, t.str(), newline); }
+	static void ToString(int mtype, T t, bool newline = true) { ToString(mtype, t.str(), newline); }
 
 	template<class... T>
-	static void ToChar(int mtype, T... args) { (ToChar(mtype, args, false), ...); ToChar(0, "", true); }
+	static void ToString(int mtype, T... args) { (ToString(mtype, args, false), ...); ToString(0, "", true); }
+
+	//returns the string for in engine printing
+	static std::string ToStringReturn(const char* str) { return std::string(str); }
+
+	static std::string ToStringReturn(const std::string& str) { return str; }
+
+	template<class T, typename std::enable_if<!has_str_method<T>::value, bool>::type = true>
+	static std::string ToStringReturn(T t) { return ToStringReturn(std::to_string(t)); }
+
+	template<class T, typename std::enable_if<has_str_method<T>::value, bool>::type = true>
+	static std::string ToStringReturn(T t) { return ToStringReturn(t.str()); }
+
+	template<class... T>
+	static std::string ToStringReturn(T... args) { return (ToStringReturn(args) + ...); }
 
 //// Call Tracing ////
 
@@ -167,36 +205,111 @@ namespace Debug{
 
 template<class T>
 class ContainerManager {
-
-	std::vector<std::optional<T>> container;
+public:
+	std::vector<std::pair<std::optional<T>, int>> container;
 
 	std::vector<int> empties;
 
 	ContainerManager() {}
 
-	void add_to(T t) {
+	std::pair<std::optional<T>, int>& operator [](int i) { return container[i]; }
+	void operator = (ContainerManager<T> c) { this->copy(c); }
+
+	int add_to(std::pair<T, int> t) {
 		if (empties.size() == 0) {
 			container.push_back(t);
+			return container.size() - 1;
 		}
 		else {
-
+			container[empties[0]] = t;
+			int index = empties[0];
+			empties.erase(empties.begin());
+			return index;
 		}
 	}
 
+	int add_to(std::pair<std::optional<T>, int> t) {
+		if (empties.size() == 0) {
+			container.push_back(t);
+			return container.size() - 1;
+		}
+		else {
+			container[empties[0]] = t;
+			int index = empties[0];
+			empties.erase(empties.begin());
+			return index;
+		}
+	}
+
+	int add_to(std::pair<std::optional<T>, int> t, int index) {
+		ASSERT(allocate_space(index), "Container was unable to allocate space at specified index");
+		container[index] = t;
+	}
+
 	void remove_from(int id) {
-		ASSERT(container[id], "Container does not contain a value at " + std::to_string(id));
-		ASSERT(id < container.size(), "Container does not contain a value at " + std::to_string(id));
+		ASSERT(container[id], "Container at index " + std::to_string(id) + " is already empty.");
+		ASSERT(id <= container.size() - 1, "Trying to access container at an index that doesn't exist.");
 
 		if (id == container.size() - 1) {
 			container.pop_back();
 		}
 		else {
-			container[id].reset();
-
+			container[id].first.reset();
+			empties.push_back(id);
 		}
+	}
 
+	bool allocate_space(int index) {
+		ASSERT(index >= 0, "Attempted to pass negative index.");
+		if (index < container.size()) {
+			ASSERT(!container[index].first, "Attempted to allocate space at an index that already holds an object.");
+			return true;
+		}
+		else {
+			std::optional<T> o;
+			ASSERT(index >= container.size(), "Attempted to allocate space at an index larger than container size.");
+			container.push_back(std::pair<std::optional<T>, int>(o, index));
+			return true;
+		}
+		return false;
+		
+	}
+
+	int size() {
+		return container.size();
+	}
+
+	void copy(ContainerManager<T> cm) {
+		container = cm.container;
+		empties = cm.empties;
+	}
+
+	void empty() {
+		//this probably isn't what I should do so fix this if it isn't
+		empties.clear();
+		for (int i = 0; i < container.size(); i++) {
+			container[i].first.reset();
+			empties.push_back(i);
+		}
+	}
+
+	void clear() {
+		container.clear();
+	}
+
+	void str() {
+		std::string s = "";
+		int index = 1;
+		for (auto t : container) {
+			if (t.first) {
+				LOG(t.first.value(), " ", t.second, " ", index);
+			}
+			index++;
+		}
 	}
 };
+
+inline static std::vector<int> id_buffer;
 
 //global tracing variable
 extern Debug::CallTrace TRACE;

@@ -33,6 +33,7 @@ public:
 	P3DPGE() { sAppName = "P3DPGE"; timer = new Timer; }
 
 	bool OnUserCreate() override {
+
 		Time::Init();
 		Input::Init();
 		Physics::Init();
@@ -43,6 +44,8 @@ public:
 
 	bool OnUserUpdate(float deltaTime) {
 		Clear(olc::BLACK);
+
+		BUFFERLOG(__FUNCTION__);
 
 		//time
 		Time::Update(deltaTime);

@@ -15,6 +15,7 @@ namespace Physics {
 	static Timer* timer;
 
 	static void Init() {
+
 		physEntities = std::vector<PhysEntity*>();
 		timer = new Timer;
 		TIMER_S;
@@ -24,6 +25,7 @@ namespace Physics {
 		if (!paused || frame) {
 			if (TIMER_GET > g_fixedDeltaTime) {
 				TIMER_E;
+				BUFFERLOG(TIMER_GET);
 				for (PhysEntity* ptr : physEntities) {
 					if (ptr) {
 						if (discreteCollision) {

@@ -1,5 +1,5 @@
 #pragma once
-#include "Debug.h"
+#include "GLOBALS.h"
 #include <time.h>
 //#include <exception>
 
@@ -236,7 +236,9 @@ public:
 	}
 
 	float TimeElapsed() {
-		end = Time::totalTime;
+		if (timer_running) {
+			end = Time::totalTime;
+		}
 		return end - start;
 	}
 

@@ -1,16 +1,13 @@
 #pragma once
 
-#include <any>
-#include <stack>
-#include <chrono>
-#include <string>
-#include <vector>
-#include <cstdarg>
-#include <iostream>
-#include <windows.h>
+#include "Debug.h"
 
-extern bool GLOBAL_DEBUG;
+//should probably reorganize some of these eventually so they're not global
+
+static int unique_id;
 
 extern float g_fixedDeltaTime;
 
-//extern ContainerManager<std::string> g_cBuffer;
+extern int buffer_size;
+extern ContainerManager<std::string> g_cBuffer;
+extern ContainerManager<std::string> g_cBuffer_last;

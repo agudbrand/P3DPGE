@@ -40,7 +40,10 @@ bool Entity::LineIntersect(Edge3* e) {
 void Entity::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
 	//do nothing if not SpecialDraw unless debug is enabled
 	DEBUGE DrawPosition(p, ProjMat, view);
-	//DEBUGE DrawVertices(p, ProjMat, view);
+	DEBUGE DrawVertices(p, ProjMat, view);
+
+	BUFFERLOG("test");
+	BUFFERLOG("test2");
 
 }
 bool Entity::SpecialDraw() { return false; }
@@ -53,9 +56,6 @@ void Entity::DrawPosition(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat
 }
 
 void Entity::DrawVertices(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
-
-	LOG(g_campos);
-
 	for (Triangle t : mesh->triangles) {
 		if (t.get_normal().dot(t.midpoint() - g_campos) < 0) {
 			for (Vector3 v : t.points) {
@@ -65,8 +65,6 @@ void Entity::DrawVertices(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat
 			}
 		}
 	}
-
-	
 }
 
 void Entity::RotateX(Vector3 offset) {
@@ -289,6 +287,7 @@ std::string Sphere::str() {
 
 Box::Box(Vector3 dimensions, int id, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
 	this->dimensions = dimensions;
+	tag = "box";
 	mesh = new BoxMesh(dimensions, position, this);
 	sprite = new olc::Sprite("sprites/UV_Grid_Sm.jpg");
 	pos_lerp_from = position;
