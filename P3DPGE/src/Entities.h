@@ -33,8 +33,6 @@ public:
 
 	Timer* timer;
 
-	
-
 	bool ENTITY_DEBUG = 1;
 
 #define DEBUGE DEBUG if(ENTITY_DEBUG)
@@ -85,10 +83,19 @@ public:
 	bool bStatic;
 	Collider* collider;
 	std::vector<Vector3> forces;
+
+	//there may be a more elegent way to perform this
+	Vector3 pos_lerp_from;
+	Vector3 pos_lerp_to;
+
+	//use these when rotation is done in physics
+	Vector3 rot_lerp_from;
+	Vector3 rot_lerp_to;
 	
 	PhysEntity() : Entity() {}
 	PhysEntity(int id, EntityDefaultParams, PhysEntityDefaultParams);
 	void Update(float deltaTime) override;
+	void Interpolate(float t);
 	void AddForce(PhysEntity* creator, Vector3 force, bool bIgnoreMass = false);
 	void AddFrictionForce(PhysEntity* creator, float frictionCoef, float deltaTime, bool bIngoreMass = false);
 	void AddImpulse(PhysEntity* creator, Vector3 impulse, bool bIgnoreMass = false);

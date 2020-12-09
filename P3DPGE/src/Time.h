@@ -21,6 +21,13 @@
 //#define TIMER_EG	Time::GetEndTimer()
 //#define TIMER_GE	Time::GetElapsedTimer()
 
+
+
+
+#define TIMER_S   timer->StartTimer()
+#define TIMER_GET timer->TimeElapsed()
+#define TIMER_E   timer->EndTimer()
+
 //qol
 //this is most definitely evil!!
 //#define PTIMER_COND(a, b) if(PTIMER_GE > a) {b; PTIMER_E();}
@@ -40,11 +47,6 @@ namespace Time {
 	global_variable float fixedTimeStep;
 	global_variable float fixedDeltaTime;
 
-	//this is probably NOT good as this become a global variable to be modified
-	//by multiple sources.
-	//however with the ids it probably won't be an issue
-	global_variable std::vector<Timer*> timers;
-
 	internal float fixedCounter;
 
 	static float GetTotalTime() { return totalTime; }
@@ -56,17 +58,13 @@ namespace Time {
 
 		fixedTimeStep = 50.f;
 		fixedDeltaTime = 1.f / fixedTimeStep;
+		g_fixedDeltaTime = fixedDeltaTime;
 		fixedCounter = 0;
 	}
 
 	static void FixedUpdate() {
 		fixedCounter = 0;
-		//if (deltaTime > fixedDeltaTime) throw deltaTimeException;
-
-		//physics
-		//Physics::Update(Time::fixedDeltaTime);
-
-		//std::cout << "Fixed Update :)" << std::endl;
+		
 	}
 
 	static void Update(float& fElapsedTime) { 
@@ -77,15 +75,14 @@ namespace Time {
 		fixedCounter += deltaTime;
 		if (fixedCounter > fixedDeltaTime) {
 			FixedUpdate();
+			
 		}
-		//std::cout << deltaTime << std::endl;
+
+		
 
 		srand(time(NULL));
 	}
-
-	//resets timer's ids everytime a timer is finished
 	
-
 	static void Cleanup() {}
 
 //// Timer ////
@@ -211,13 +208,10 @@ namespace Time {
 		duration<double> time_span = duration_cast<duration<double>>(end_precise - start_precise);
 		return time_span.count();
 	}
-
 };
 
 class Timer {
 public:
-
-//// Timer ////
 
 	int elapsedFrames = 0;
 
@@ -241,10 +235,14 @@ public:
 		}
 	}
 
-	float EndTimer() {
+	float TimeElapsed() {
+		end = Time::totalTime;
+		return end - start;
+	}
+
+	void EndTimer() {
 		end = Time::totalTime;
 		timer_running = false;
-		return end - start;
 	}
 
 	float EndTimerAverage(int num, std::string message = "", int nFrames = 1) {

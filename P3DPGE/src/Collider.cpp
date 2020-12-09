@@ -1,5 +1,4 @@
 #include "Collider.h"
-
 #include "Entities.h"
 
 mat<float, 4, 4> LocalToWorldInertiaTensor(PhysEntity* entity, mat<float, 3, 3> inertiaTensor) {

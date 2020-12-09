@@ -22,6 +22,7 @@
     <ClInclude Include="src\Collider.h" />
     <ClInclude Include="src\Debug.h" />
     <ClInclude Include="src\Entities.h" />
+    <ClInclude Include="src\GLOBALS.h" />
     <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\internal\olcPixelGameEngine.h" />
     <ClInclude Include="src\math\Math.h" />
@@ -35,6 +36,7 @@
   <ItemGroup>
     <ClCompile Include="src\Collider.cpp" />
     <ClCompile Include="src\Entities.cpp" />
+    <ClCompile Include="src\GLOBALS.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

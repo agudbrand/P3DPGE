@@ -17,29 +17,40 @@ namespace Physics {
 	static void Init() {
 		physEntities = std::vector<PhysEntity*>();
 		timer = new Timer;
+		TIMER_S;
 	}
 
 	static void Update(float deltaTime) {
 		if (!paused || frame) {
-			for (PhysEntity* ptr : physEntities) {
-				if (ptr) {
-					if (discreteCollision) {
-						ptr->AddFrictionForce(nullptr, airFriction, deltaTime);
-						ptr->Update(deltaTime);
-						for (PhysEntity* target : physEntities) {
-							if (target && target->id != ptr->id) {
-								if (ptr->CheckCollision(target)) {
-									ptr->ResolveCollision(target);
+			if (TIMER_GET > g_fixedDeltaTime) {
+				TIMER_E;
+				for (PhysEntity* ptr : physEntities) {
+					if (ptr) {
+						if (discreteCollision) {
+							ptr->AddFrictionForce(nullptr, airFriction, deltaTime);
+							ptr->Update(deltaTime);
+							for (PhysEntity* target : physEntities) {
+								if (target && target->id != ptr->id) {
+									if (ptr->CheckCollision(target)) {
+										ptr->ResolveCollision(target);
+									}
 								}
+								else { break; }
 							}
-							else { break; }
 						}
 					}
+					else { break; }
 				}
-				else { break; }
+				if (frame) { frame = !frame; }
+				TIMER_S;
 			}
-			if (frame) { frame = !frame; }
+			else {
+				for (PhysEntity* ptr : physEntities) {
+					ptr->Interpolate(TIMER_GET / g_fixedDeltaTime);
+				}
+			}
 		}
+
 	}
 
 	static void Cleanup() {

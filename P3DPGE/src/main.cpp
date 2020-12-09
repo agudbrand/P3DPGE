@@ -4,7 +4,6 @@
 #include "internal/olcPixelGameEngine.h"
 #include "Input.h"
 
-
 using namespace olc;
 
 //// Requires boost library 1.74.0 ////
@@ -50,9 +49,9 @@ public:
 
 		//input
 		Input::Update(this, Time::deltaTime);
-
+		
 		//physics
-		//Physics::Update(Time::fixedDeltaTime);
+		Physics::Update(Time::fixedDeltaTime);
 
 		//rendering
 		Render::Update(this);
