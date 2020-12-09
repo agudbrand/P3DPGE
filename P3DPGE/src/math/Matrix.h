@@ -1,13 +1,76 @@
 #pragma once
-#include "Debug.h"
+#include "../Debug.h"
 
 struct Vector3;
 
 /*
-	!!!! Row-Major Matrices !!!!
+//// Notes ////
+	Matrices can only hold floats
+	Matrices are in row-major format and all the functionality follows that format
+	Non-Matrix vs Matrix interactions should be in Math.h (or a header file dedicated to those interactions)
+	
+//// Creating Matrices ////
+	Dimensions-Only Constructor:			Matrix(rows, columns)
+	You can create a zero-filled matrix by using the constructor and only providing the dimensions.
+		eg: Matrix(1,4); This will create a 1x4 matrix filled with zeros
 
-	Non-Matrix vs Matrix interactions should be in Math.h
+	Dimensions and Elements Constructor:	Matrix(rows, columns, {...})
+	You can create a matrix of given dimensions with any number of provided elements.
+	Non-provided elements will be defaulted to zero.						|1.6, -2.0|
+		eg: Matrix(2,2, {1.6f, -2, 1.5});  This will create a 2x2 matrix:	|1.5,  0.0|
+
+	Copy Constructor:						Matrix(otherMatrix)
+	You can create a copy of a matrix using this constructor.
+	The previous matrix will note recieve updates to this matrix.
+		eg: Matrix(otherMatrix);
+
+	Vector Constructors:					Matrix(vector) or Matrix(vector, w)
+	You can create a matrix from a Vector3 object with an optional fourth element.
+		eg: Matrix(Vector3(1,2,3)); This will create a 1x3 matrixs: |1.0, 2.0, 3.0|
+		eg: Matrix(Vector3(1,2,3), 1); This will create a 1x4 matrix: |1.0, 2.0, 3.0, 1.0|
+
+//// Accessing Matrix Values ////
+	You can access the values of a matrix using the () operator.
 	Acessing matrix values starts at zero for both the row and column: 0...n-1 not 1...n
+		eg: matrix(0,3); This will return the float on the first row and fourth column
+		eg: matrix(1,1); This will return the float on the second row and second column
+
+	Alternatively, you can access the elements directly by their index in a one-dimensional array.
+	This avoids doing one multiplication and one addition but might be confusing to readers of your code.
+		eg: matrix.data[3]; This will return the float on the first row and fourth column
+		eg: Matrix(4,4).data[10]; This will return the 0 on the third row and third column
+
+//// Visualizing Matrices ////																2x2 Matrix:
+	You can turn matrices into formatted strings using the str() method.					|+1.000000, -2.000000|
+		eg: Matrix(2, 2, {1, -2}).str(); This will return a string formatted like this:		|-0.000000, +0.000000|
+
+	Alternatively, you can round the decimals to two places using the str2F() method.		1x1 Matrix:
+	Note, zeros can have a + or - in front of them for same size formatting.				|-0.00|
+		eg: Matrix(2, 1).str2F(); This will return a string formatted like this:			|+0.00|
+		eg: Matrix(3, 4, {1,2,3,4,5,6,7,8,9,10,11,12}).str2F(); This will return a string formatted like the below
+			3x4 Matrix:
+			|+1.00, +2.00, +3.00, +4.00|
+			|+5.00, +6.00, +7.00, +8.00|
+			|+9.00, +10.00, +11.00, +12.00|
+
+//// Matrix Math ////
+	You can do matrix-scalar multiplication with the * or / operators.
+		eg: Matrix(1, 2, {-5, .5f}) * 10; This will return a 1x2 matrix: |-50.0, 5.0|
+
+	You can do matrix-matrix addition with the + or - operators.
+	Note, the matrices must have the same dimensions.
+		eg: Matrix(1, 2, {-5, .5f}) - Matrix(1, 2, {1,1}); This will return a 1x2 matrix: |-6.0, -0.5|
+
+	You can do matrix-matrix multiplication with the * operator.
+	Note, the number of first matrix columns must equal the number of second matrix rows
+		eg: Matrix(1, 2, {-5, .5f}) * Matrix(2, 1, {1,1}); This will return a 1x1 matrix: |-4.5|
+
+	You can do matrix-matrix element-wise multiplication with the ^ or % operators.
+	Element-wise multiplication means multiplying each element with the element in the same location in the other matrix.
+	Note, the matrices must have the same dimensions. Element-wise division is done with the % operator.
+		eg: Matrix(1, 2, {-5, .5f}) ^ Matrix(1, 2, {2, .5f}); This will return a 1x2 matrix: |-10.0, 0.25|
+		eg: Matrix(1, 2, {-5, .5f}) % Matrix(1, 2, {2, .5f}); This will return a 1x2 matrix: |-2.5, 1.0|
+
 */
 
 //TODO(o,delle) test that there is no memory leak on destruction of Matrix objects
@@ -20,8 +83,6 @@ struct Matrix {
 	Matrix(uint32 inRows, uint32 inCols);
 	Matrix(uint32 inRows, uint32 inCols, std::vector<float> list);
 	Matrix(const Matrix& m);
-	Matrix(Vector3 v); //TODO(delle) define this in Math.h
-	Matrix(Vector3 v, float w); //TODO(delle) define this in Math.h
 	~Matrix();
 
 	float&	operator () (uint32 row, uint32 col);
@@ -42,7 +103,7 @@ struct Matrix {
 	void	operator %= (const Matrix& rhs);
 	bool	operator == (const Matrix& rhs) const;
 	bool	operator != (const Matrix& rhs) const;
-	friend Matrix operator* (const float& lhs, const Matrix& rhs) { return rhs * lhs; }
+	friend Matrix operator * (const float& lhs, const Matrix& rhs) { return rhs * lhs; }
 
 	const std::string str() const;
 	const std::string str2F() const;
@@ -56,6 +117,10 @@ struct Matrix {
 	Matrix Inverse() const;
 
 	static Matrix Identity(uint32 rows, uint32 cols);
+
+	//Non-Matrix vs Matrix interactions //TODO(delle) define these in Math.h
+	Matrix(Vector3 v); //TODO(delle) define this in Math.h
+	Matrix(Vector3 v, float w); //TODO(delle) define this in Math.h
 };
 
 
@@ -95,7 +160,7 @@ inline Matrix::~Matrix() {
 
 //// Operators ////
 
-//element accessor: matrix(row,col)
+//element accessor: matrix(row,col) //TODO(delle) test that you can use this to assign values to the matrix
 inline float& Matrix::operator () (uint32 row, uint32 col) {
 	ASSERT(row <= rows && col <= cols, "Matrix subscript out of bounds");
 	return data[cols*row + col];
@@ -269,7 +334,7 @@ inline bool    Matrix::operator	!= (const Matrix& rhs) const {
 //// Functions ////
 
 //TODO(c,delle) clean up Matrix.str() and Matrix.str2F()
-const std::string Matrix::str() const {
+inline const std::string Matrix::str() const {
 	if (rows == 0 || cols == 0) {
 		return "|Zero dimension matrix|";
 	}
@@ -303,7 +368,7 @@ const std::string Matrix::str() const {
 	return str;
 };
 
-const std::string Matrix::str2F() const {
+inline const std::string Matrix::str2F() const {
 	if (rows == 0 || cols == 0) {
 		return "|Zero dimension matrix|";
 	}

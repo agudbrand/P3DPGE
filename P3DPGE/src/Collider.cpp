@@ -65,14 +65,14 @@ bool AABBSphereCollision(AABBCollider* aabb, Sphere* sphere, bool resolveCollisi
 			mat<float, 4, 4> sphereInertiaTensorInverse = boost::qvm::inverse(LocalToWorldInertiaTensor(sphere, InertiaTensors::SolidSphere(sphere->radius, sphere->mass)));
 			Vector3 normal = vectorBetween.normalized();
 			Vector3 ra = sphere->position + SphereCollider::ClosestPointOnSurface(sphere, closestAABBPoint);
-			boost::qvm::vec<float,3> sphereAngularVelocityChange = normal.cross(ra).ConvertToVec3();
+			vec<float,3> sphereAngularVelocityChange = normal.cross(ra).ConvertToVec3();
 			sphereAngularVelocityChange = boost::qvm::transform_vector(sphereInertiaTensorInverse, sphereAngularVelocityChange);
 			float inverseMassA = 1.f / sphere->mass;
 			float scalar = inverseMassA + Vector3(sphereAngularVelocityChange).cross(ra).dot(normal);
 
 			mat<float, 4, 4> aabbInertiaTensorInverse = boost::qvm::inverse(LocalToWorldInertiaTensor(sphere, InertiaTensors::SolidSphere(sphere->radius, sphere->mass)));
 			Vector3 rb = aabb->entity->position + closestAABBPoint;
-			boost::qvm::vec<float, 3> aabbAngularVelocityChange = normal.cross(rb).ConvertToVec3();
+			vec<float, 3> aabbAngularVelocityChange = normal.cross(rb).ConvertToVec3();
 			aabbAngularVelocityChange = boost::qvm::transform_vector(aabbInertiaTensorInverse, aabbAngularVelocityChange);
 			float inverseMassB = 1.f / aabb->entity->mass;
 			scalar += inverseMassB + Vector3(aabbAngularVelocityChange).cross(rb).dot(normal);

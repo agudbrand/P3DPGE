@@ -25,8 +25,9 @@
     <ClInclude Include="src\GLOBALS.h" />
     <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\internal\olcPixelGameEngine.h" />
-    <ClInclude Include="src\Math.h" />
-    <ClInclude Include="src\Matrix.h" />
+    <ClInclude Include="src\math\Math.h" />
+    <ClInclude Include="src\math\Matrix.h" />
+    <ClInclude Include="src\math\Vector.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Physics.h" />
     <ClInclude Include="src\Render.h" />

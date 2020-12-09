@@ -21,9 +21,6 @@
     <ClInclude Include="src\Input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Math.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Physics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -42,10 +39,16 @@
     <ClInclude Include="src\Collider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Matrix.h">
+    <ClInclude Include="src\internal\olcPixelGameEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\internal\olcPixelGameEngine.h">
+    <ClInclude Include="src\math\Math.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\math\Matrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\math\Vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\GLOBALS.h">

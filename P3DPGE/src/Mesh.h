@@ -1,5 +1,5 @@
 #pragma once
-#include "Math.h"
+#include "math/Math.h"
 #include "internal/olcPixelGameEngine.h"
 
 //this will currently only be set up to facilitate 2D
