@@ -1,7 +1,7 @@
 #pragma once
 #include <fstream>
 #include <sstream>
-#include "Math.h"
+#include "math/Math.h"
 #include "internal/olcPixelGameEngine.h"
 
 struct Mesh;

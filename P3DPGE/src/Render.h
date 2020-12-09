@@ -305,14 +305,14 @@ namespace Render {
 		//temp lighting set up
 		
 		//light_direction *= sinf(Time::totalTime);
-		light_direction = V3FORWARD * Math::GetRotateV3_Y(200 * Time::totalTime);
+		//light_direction = V3FORWARD * Math::GetRotateV3_Y(200 * Time::totalTime);
 		light_direction = light_direction.normalized();
 
 		//store triangles we want to draw for sorting and copy world points to projected points
 		for (auto& t : triangles) {
 			t.copy_points();
+			float dp = light_direction.dot(t.get_normal());
 			if (t.get_normal().dot(t.midpoint() - camera.position) < 0) {
-				float dp = light_direction.dot(t.get_normal());
 				t.set_color(olc::Pixel(
 					std::clamp(50 * dp,  0.f, 50.f), 
 					std::clamp(75 * dp,  0.f, 75.f),

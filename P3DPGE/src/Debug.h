@@ -101,7 +101,7 @@ struct Camera;
 
 namespace Debug{
 
-	global_variable bool GLOBAL_DEBUG = false;
+	global_variable bool GLOBAL_DEBUG = true;
 
 //// Console Output////
 
