@@ -1,7 +1,6 @@
 #pragma once
 #include "Math.h"
 #include <stdint.h>
-#include <vector>
 
 class PhysEntity;
 struct Sphere;

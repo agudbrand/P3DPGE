@@ -160,24 +160,28 @@ PhysEntity::PhysEntity(int id, EntityParams, PhysEntityParams) : Entity(EntityAr
 };
 
 void PhysEntity::Update(float deltaTime) {
-	//PTIMER_S;
 	if (!bStatic) {
-		//Vector3 velLast = velocity;
-		//if (acceleration.mag() < .01f) { acceleration = V3ZERO; }
 		acceleration = V3ZERO;
 		for (auto& f : forces) {
 			acceleration += f / mass;
+
 		}
 		forces.clear();
-		velocity += acceleration * deltaTime;
+		velocity += acceleration * g_fixedDeltaTime;
 		//if (velLast.normalized() == -velocity.normalized()) { velocity = V3ZERO; acceleration = V3ZERO; }
 		if (velocity.mag() < .01f) { velocity = V3ZERO; acceleration = V3ZERO; }
-		position += velocity * deltaTime * 10;
-		
-		rotVelocity += rotAcceleration * deltaTime;
-		rotation += rotVelocity * deltaTime;
+		//position += velocity * g_fixedDeltaTime * 10;
+		//rotVelocity += rotAcceleration * g_fixedDeltaTime;
+		//rotation += rotVelocity * g_fixedDeltaTime;
+		pos_lerp_from = position;
+		pos_lerp_to = position + velocity * g_fixedDeltaTime * 10;
+
 	}
 	Translate(); Rotate();
+}
+
+void PhysEntity::Interpolate(float t) {
+	position = Math::lerpv3(pos_lerp_from, pos_lerp_to, t);
 }
 
 //adds a force to this entity, and this entity applies that force back on the sending object
@@ -287,6 +291,8 @@ Box::Box(Vector3 dimensions, int id, EntityParams, PhysEntityParams) : PhysEntit
 	this->dimensions = dimensions;
 	mesh = new BoxMesh(dimensions, position, this);
 	sprite = new olc::Sprite("sprites/UV_Grid_Sm.jpg");
+	pos_lerp_from = position;
+	pos_lerp_to = position;
 }
 
 //not sure if this still works or not, when I was trying to select boxes

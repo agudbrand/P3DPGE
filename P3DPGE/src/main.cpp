@@ -3,9 +3,6 @@
 
 #include "internal/olcPixelGameEngine.h"
 #include "Input.h"
-#include "Matrix.h"
-
-
 
 using namespace olc;
 
@@ -52,9 +49,9 @@ public:
 
 		//input
 		Input::Update(this, Time::deltaTime);
-
+		
 		//physics
-		//Physics::Update(Time::fixedDeltaTime);
+		Physics::Update(Time::fixedDeltaTime);
 
 		//rendering
 		Render::Update(this);

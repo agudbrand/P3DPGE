@@ -149,9 +149,9 @@ namespace Render {
 
 				//fill over x
 				for (int scanx = ax; scanx < bx; scanx++) {
-					tex_u = Math::lerp(tex_su, tex_eu, t);
-					tex_v = Math::lerp(tex_sv, tex_ev, t);
-					tex_w = Math::lerp(tex_sw, tex_ew, t);
+					tex_u = Math::lerpf(tex_su, tex_eu, t);
+					tex_v = Math::lerpf(tex_sv, tex_ev, t);
+					tex_w = Math::lerpf(tex_sw, tex_ew, t);
 					p->Draw(scanx, scany, tex->Sample(tex_u / tex_w, tex_v / tex_w));
 
 					t += tstep;
@@ -197,9 +197,9 @@ namespace Render {
 
 				//fill over x
 				for (int scanx = ax; scanx < bx; scanx++) {
-					tex_u = Math::lerp(tex_su, tex_eu, t);
-					tex_v = Math::lerp(tex_sv, tex_ev, t);
-					tex_w = Math::lerp(tex_sw, tex_ew, t);
+					tex_u = Math::lerpf(tex_su, tex_eu, t);
+					tex_v = Math::lerpf(tex_sv, tex_ev, t);
+					tex_w = Math::lerpf(tex_sw, tex_ew, t);
 					p->Draw(scanx, scany, tex->Sample(tex_u / tex_w, tex_v / tex_w));
 
 					t += tstep;
@@ -299,13 +299,8 @@ namespace Render {
 		std::vector<Triangle> visibleTriangles;
 		std::vector<Triangle> drawnTriangles;
 
-		
-		//olc::Sprite* sprite = new olc::Sprite("sprites/test.png");
-
-		//temp lighting set up
-		
-		//light_direction *= sinf(Time::totalTime);
-		light_direction = V3FORWARD * Math::GetRotateV3_Y(200 * Time::totalTime);
+		//cool light rotation effect 
+		//light_direction = V3FORWARD * Math::GetRotateV3_Y(200 * Time::totalTime);
 		light_direction = light_direction.normalized();
 
 		//store triangles we want to draw for sorting and copy world points to projected points
@@ -314,7 +309,7 @@ namespace Render {
 			if (t.get_normal().dot(t.midpoint() - camera.position) < 0) {
 				float dp = light_direction.dot(t.get_normal());
 				t.set_color(olc::Pixel(
-					std::clamp(50 * dp,  0.f, 50.f), 
+					std::clamp(50 * dp,  0.f, 50.f),
 					std::clamp(75 * dp,  0.f, 75.f),
 					std::clamp(200 * dp, 0.f, 200.f)
 				));

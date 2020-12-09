@@ -1,22 +1,15 @@
 #pragma once
 
 #include "internal/olcPixelGameEngine.h"
-#include <any>
-#include <stack>
-#include <chrono>
-#include <string>
-#include <cstdarg>
-#include <iostream>
-#include <windows.h>
+#include "GLOBALS.h"
+#include <optional>
 
 #define internal static
 #define local_persist static 
 #define global_variable static
 
-#define ENDLOGC nullptr
-
 //global debug macros
-#define DEBUG if(Debug::GLOBAL_DEBUG)
+#define DEBUG if(GLOBAL_DEBUG)
 //debug message
 #define SUCCESS(...) DEBUG Debug::ToChar(2, __VA_ARGS__)
 #define LOG(...)     DEBUG Debug::ToChar(1, __VA_ARGS__)
@@ -34,11 +27,14 @@
 
 #define __FILENAME__ (std::strrchr(__FILE__, '\\') ? std::strrchr(__FILE__, '\\') + 1 : __FILE__)
 
+#define LOGFUNC LOG(__FUNCTION__, " called")
+#define LOGFUNCM(...) LOG(__FUNCTION__, " called ", __VA_ARGS__)
+
 //call tracing
 #define _TRACE TRACE.push_stack()
 
-
-
+#define BUFFERLOG 
+ 
 #ifndef NDEBUG
 #   define ASSERT(condition, message) \
     do { \
@@ -51,7 +47,6 @@
 #else
 #   define ASSERT(condition, message) condition;
 #endif
-
 
 typedef signed char		int8;
 typedef signed short	int16;
@@ -68,8 +63,6 @@ namespace Math { //forward declare average
 	template<class T>
 	static double average(const T& container, int size);
 }
-
-
 
 //template magic thanks to fux#2562
 template<class T>
@@ -99,17 +92,22 @@ enum ConsoleColor {
 
 struct Camera;
 
+
+
+
 namespace Debug{
 
-	global_variable bool GLOBAL_DEBUG = false;
-
-//// Console Output////
+//// Console Output ////
 
 	internal HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	internal int color = 7;
 	internal void ResetCmd() { //resets cmd font color to white
 		color = 7;
 		SetConsoleTextAttribute(hConsole, color);
+	}
+
+	static void ToBuffer(const char* str) {
+
 	}
 
 	static void Print(ConsoleColor color, const char* str, bool newline = true) {
@@ -124,6 +122,8 @@ namespace Debug{
 		case 0: Print(ConsoleColor::RED, str, newline);    break;
 		case 1: Print(ConsoleColor::YELLOW, str, newline); break;
 		case 2: Print(ConsoleColor::GREEN, str, newline);  break;
+		//TODO(g, sushi) implement buffer colors
+		case 3: ToBuffer(str);
 		}
 	}
 
@@ -163,6 +163,39 @@ namespace Debug{
 
 	
 
+};
+
+template<class T>
+class ContainerManager {
+
+	std::vector<std::optional<T>> container;
+
+	std::vector<int> empties;
+
+	ContainerManager() {}
+
+	void add_to(T t) {
+		if (empties.size() == 0) {
+			container.push_back(t);
+		}
+		else {
+
+		}
+	}
+
+	void remove_from(int id) {
+		ASSERT(container[id], "Container does not contain a value at " + std::to_string(id));
+		ASSERT(id < container.size(), "Container does not contain a value at " + std::to_string(id));
+
+		if (id == container.size() - 1) {
+			container.pop_back();
+		}
+		else {
+			container[id].reset();
+
+		}
+
+	}
 };
 
 //global tracing variable

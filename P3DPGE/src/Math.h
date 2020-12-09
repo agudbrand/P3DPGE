@@ -83,7 +83,7 @@ namespace Math {
 	static float roundf_two(float f) { return (float)((int)(f * 100 + .5)) / 100; }
 
 	//TODO(m, sushi) make lerp for Vector3
-	static float lerp(float p1, float p2, float t) { return (1.f - t) * p1 + t * p2; }
+
 
 	//average any std container probably
 	template<class FWIt>
@@ -337,6 +337,12 @@ namespace Math {
 
 	static Vector3 M1x4ToVector3(mat<float, 1, 4> m) { return Vector3(m.a[0][0], m.a[0][1], m.a[0][2]); }
 
+	//interpolating
+	static float lerpf(float p1, float p2, float t) { return (1.f - t) * p1 + t * p2; }
+
+	static Vector3 lerpv3(Vector3 v1, Vector3 v2, float t) { return  v1 * (1.f - t) + v2 * t; }
+
+	//matrix stuff
 	static mat<float, 1, 4> Vector3ToM1x4(Vector3 v) {
 		mat<float, 1, 4> m;
 		m.a[0][0] = v.x; m.a[0][1] = v.y; m.a[0][2] = v.z; m.a[0][3] = 1;
