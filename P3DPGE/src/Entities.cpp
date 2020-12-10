@@ -627,7 +627,7 @@ std::string DebugTriangle::str() {
 mat<float, 4, 4> Camera::MakeViewMatrix(float yaw, bool force_target) {
 	target = V3FORWARD;
 
-	lookDir = target * Math::GetRotateV3_X(yaw);
+	lookDir = target * Math::GetRotateV3_Y(yaw);
 	target = position + lookDir;
 	
 	BUFFERLOG(16, lookDir);

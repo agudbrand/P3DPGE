@@ -304,7 +304,6 @@ namespace Input {
 
 		//// camera movement ////
 
-			//TODO(i,,) change camera movement to W-forward, S-backward, Q-down, E-up
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			c->position.y -= 8 * Time::deltaTime;
 			DEBUGI std::cout << "Translating the camera in the positive y" << std::endl;
