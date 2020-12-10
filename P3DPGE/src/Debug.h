@@ -54,12 +54,24 @@
 #define RUN_ONCE if(FIRST_TIME_HERE)
 
 //makes a random number only once and then always returns that same number
+//if called by the same object
 #define PERM_RAND_INT ([]{ static int rint = rand() % 100000; return rint;}())
 
-#define BUFFER_IDENTIFIER ([]{ static int id_ini = buffer_size++ + 1; return id_ini;}())
+//#define BUFFER_IDENTIFIER ([]{ static int id_ini = buffer_size++; return id_ini; }())
+//#define BUFFERLOG(...) g_cBuffer.add_to(new StringedBuffer(TOSTRING(__VA_ARGS__), BUFFER_IDENTIFIER))
 
-#define BUFFERLOG(...) unique_id = BUFFER_IDENTIFIER; g_cBuffer.add_to(std::pair<std::string, int>(TOSTRING(__VA_ARGS__), unique_id), unique_id);
- 
+#define BUFFERLOG(i, ...) DEBUG g_cBuffer.add_to_index(TOSTRING(__VA_ARGS__), i)
+
+#define BUFFERLOGI(i, o, ...) DEBUG ([&]{static int iter = 0; if(iter == o){g_cBuffer.add_to_index(TOSTRING(__VA_ARGS__), i); iter = 0;} else iter++;}())
+
+//this stores and input vector and returns the previously stored vector
+//you must store a vector to get the previous one
+#define V_STORE(v, t) ([&]()->Vector3{static Vector3 vect[1];\
+Vector3 vr = vect[0];\
+if(t){ vect[0] = v; return vr; } \
+else return vr; }\
+())
+
 #ifndef NDEBUG
 #   define ASSERT(condition, message) \
     do { \
@@ -67,6 +79,18 @@
             std::string file = __FILENAME__; \
             ERROR("Assertion '" #condition "' failed in " + file + " line " + std::to_string(__LINE__) + ": \n" #message); \
             std::terminate(); \
+        } \
+    } while (false)
+#else
+#   define ASSERT(condition, message) condition;
+#endif
+
+#ifndef NDEBUG
+#   define ASSERTWARN(condition, message) \
+    do { \
+        if (! (condition)) { \
+            std::string file = __FILENAME__; \
+            LOG("Warning '" #condition "' failed in " + file + " line " + std::to_string(__LINE__) + ": \n" #message); \
         } \
     } while (false)
 #else
@@ -124,7 +148,7 @@ struct Camera;
 
 namespace Debug{
 
-	static bool has_run = false;
+	static std::vector<float> nums;
 
 //// Console Output ////
 
@@ -206,16 +230,17 @@ namespace Debug{
 template<class T>
 class ContainerManager {
 public:
-	std::vector<std::pair<std::optional<T>, int>> container;
+	//std::vector<std::pair<std::optional<T>, int>> container;
 
+	std::vector<std::optional<T>> container;
 	std::vector<int> empties;
 
 	ContainerManager() {}
 
-	std::pair<std::optional<T>, int>& operator [](int i) { return container[i]; }
-	void operator = (ContainerManager<T> c) { this->copy(c); }
+	//T t& operator [](int i) { return container[i]; }
+	//void operator = (ContainerManager<T> c) { this->copy(c); }
 
-	int add_to(std::pair<T, int> t) {
+	void add_to(T t) {
 		if (empties.size() == 0) {
 			container.push_back(t);
 			return container.size() - 1;
@@ -228,47 +253,43 @@ public:
 		}
 	}
 
-	int add_to(std::pair<std::optional<T>, int> t) {
-		if (empties.size() == 0) {
-			container.push_back(t);
-			return container.size() - 1;
-		}
-		else {
-			container[empties[0]] = t;
-			int index = empties[0];
-			empties.erase(empties.begin());
-			return index;
-		}
-	}
-
-	int add_to(std::pair<std::optional<T>, int> t, int index) {
+	void add_to_index(T t, int index) {
 		ASSERT(allocate_space(index), "Container was unable to allocate space at specified index");
 		container[index] = t;
 	}
 
-	void remove_from(int id) {
-		ASSERT(container[id], "Container at index " + std::to_string(id) + " is already empty.");
-		ASSERT(id <= container.size() - 1, "Trying to access container at an index that doesn't exist.");
+	void set_index(T t, int index) {
+		container[index] = t;
+	}
 
-		if (id == container.size() - 1) {
-			container.pop_back();
-		}
-		else {
-			container[id].first.reset();
-			empties.push_back(id);
-		}
+	void remove_from(int index) {
+		//ASSERT(container[index], "Container at index " + std::to_string(index) + " is already empty.");
+		ASSERT(index <= container.size() - 1, "Trying to access container at an index that doesn't exist.");
+
+		//if (index == container.size() - 1) {
+		//	container.pop_back();
+		//}
+		//else {
+			container[index].first.reset();
+			//empties.push_back(index);
+		//}
 	}
 
 	bool allocate_space(int index) {
 		ASSERT(index >= 0, "Attempted to pass negative index.");
+		//ASSERT(index >= container.size(), "Attempted to allocate space at an index larger than container size.");
 		if (index < container.size()) {
-			ASSERT(!container[index].first, "Attempted to allocate space at an index that already holds an object.");
+			//space already exists, there is no check to actually see if
+			//it's already used by something else yet though
 			return true;
 		}
 		else {
+
 			std::optional<T> o;
-			ASSERT(index >= container.size(), "Attempted to allocate space at an index larger than container size.");
-			container.push_back(std::pair<std::optional<T>, int>(o, index));
+			for (int i = container.size(); i < index; i++) {
+				container.push_back(o);
+			}
+			
 			return true;
 		}
 		return false;
@@ -301,12 +322,26 @@ public:
 		std::string s = "";
 		int index = 1;
 		for (auto t : container) {
-			if (t.first) {
-				LOG(t.first.value(), " ", t.second, " ", index);
-			}
+			s += t.value()->str + " " + std::to_string(t.value()->index) + " " + std::to_string(index) + "\n";
 			index++;
 		}
+		LOG(s);
 	}
+};
+
+class StringedBuffer {
+public:
+
+	int index;
+	std::string str;
+
+	StringedBuffer(std::string s, int index) {
+		this->index = index;
+		str = s;
+	}
+
+
+
 };
 
 inline static std::vector<int> id_buffer;

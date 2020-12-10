@@ -39,13 +39,13 @@ public:
 		Physics::Init();
 		Render::Init();
 
+		g_cBuffer.allocate_space(100);
+
 		return true;
 	}
 
 	bool OnUserUpdate(float deltaTime) {
 		Clear(olc::BLACK);
-
-		BUFFERLOG(__FUNCTION__);
 
 		//time
 		Time::Update(deltaTime);

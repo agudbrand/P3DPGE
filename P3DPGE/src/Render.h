@@ -235,7 +235,6 @@ namespace Render {
 		float d1 = dist(in_tri.proj_points[1]);
 		float d2 = dist(in_tri.proj_points[2]);
 
-
 		if (d0 >= 0) { inside_points[nInsidePointCount++] = &in_tri.proj_points[0]; inside_tex[nInsideTexCount++] = &in_tri.tex_points[0]; }
 		else { outside_points[nOutsidePointCount++] = &in_tri.proj_points[0]; outside_tex[nOutsideTexCount++] = &in_tri.tex_points[0]; }
 		if (d1 >= 0) { inside_points[nInsidePointCount++] = &in_tri.proj_points[1]; inside_tex[nInsideTexCount++] = &in_tri.tex_points[1]; }
@@ -341,7 +340,7 @@ namespace Render {
 					n.ProjToScreen(Render::camera.ProjectionMatrix(p), p, w);
 				}
 				clipped[i].e = t.e;
-				
+
 				//projecting texture
 				for (Vector3& v : clipped[i].tex_points) {
 					v.x /= w; v.y /= w;
@@ -430,7 +429,7 @@ namespace Render {
 
 	static void ConsoleHandler(olc::PixelGameEngine* p){
 
-		ContainerManager<std::string> last = g_cBuffer_last;
+		/*ContainerManager<std::string> last = g_cBuffer_last;
 
 		RUN_ONCE g_cBuffer_last.copy(g_cBuffer);
 
@@ -446,27 +445,28 @@ namespace Render {
 		
 		//Print last buffer at index if it doesn't match new else print new
 		//then print all additions to buffer
-		//TODO(g, sushi) fix this so it works with additions 
-		for (int i = 0; i < g_cBuffer_last.size(); i++) {
-			if (g_cBuffer.container[i].first) {
-				if (i < g_cBuffer_last.size()) {
-					if (g_cBuffer.container[i].second != g_cBuffer_last.container[i].second) {
-						//new_cBuffer.add_to(g_cBuffer_last[i]);
-						//LOG(g_cBuffer_last[i].first.value(), " ", g_cBuffer_last[i].second);
-						p->DrawString(Vector2(p->ScreenWidth() / 2, 0 + 11 * i), g_cBuffer_last[i].first.value());
-						//inv_indexes.push_back(std::pair<std::string, int>(g_cBuffer[i].first.value(), g_cBuffer[i].second));
-					}
-					else {
-						//new_cBuffer.add_to(g_cBuffer[i]);
-						//LOG(g_cBuffer[i].first.value(), " ", g_cBuffer[i].second);
-						p->DrawString(Vector2(p->ScreenWidth() / 2, 0 + 9 * i), g_cBuffer[i].first.value());
-					}
-				}
-				else {
-					//LOG(g_cBuffer[i].first.value(), " ", g_cBuffer[i].second);
-					p->DrawString(Vector2(p->ScreenWidth() / 2, 0 + 9 * i), g_cBuffer[i].first.value());
+		//TODO(g, sushi) fix this so it works with additions
+		for (int i = 0; i < buffer_size; i++) {
+			//if the new buffer reaches a size greater than
+			//the old one, allocate space in the old one to avoid overflow
+			if (i > g_cBuffer_last.size() - 1) {
+				g_cBuffer_last.allocate_space(i);
+			}
+
+			//if the data in the new buffer is empty and their
+			//indexes match (which they always should for now)
+			//copy the data from old to new and print old
+			if (!g_cBuffer[i].first) {
+				ASSERT(g_cBuffer.container[i].second = g_cBuffer_last[i].second, "Index mismatch in console buffer.");
+				if (g_cBuffer_last.container[i].first) {
+					g_cBuffer[i].first = g_cBuffer_last[i].first.value();
+					p->DrawString(Vector2(p->ScreenWidth() / 2, 11 * i), g_cBuffer[i].first.value());
 				}
 			}
+			else {
+				p->DrawString(Vector2(p->ScreenWidth() / 2, 11 * i), g_cBuffer[i].first.value());
+			}
+
 		}
 
 		g_cBuffer_last.copy(g_cBuffer);
@@ -477,21 +477,34 @@ namespace Render {
 			if (inv_indexes[i].second < g_cBuffer_last.size()) {
 				if(inv_indexes)
 			}
-		}*/
-		g_cBuffer.empty();
+		}
+		g_cBuffer.empty();*/
+
+		ContainerManager<std::string> copy;
+		copy.container = g_cBuffer.container;
+
+		int index = 0;
+		for (auto e : g_cBuffer.container) {
+			if (e.has_value()) {
+				p->DrawString(Vector2(p->ScreenWidth() / 2, 0 + index * 9), e.value());
+				index++;
+			}
+		}
 	}
 
 	//draw all entities to screen
 	static void Update(olc::PixelGameEngine* p) {
 		//Debug::StartTimer();
 		view = camera.MakeViewMatrix(yaw);
-		
+
 		DEBUG g_campos = camera.position;
 
 		//get triangles from all entities
 		for (auto& e : entities) {
 
 			e->Update(Time::deltaTime);
+
+
 
 			//SpecialDraw is used for determining if its just an object
 			//drawn with triangles or if its special eg. a 2D object or Line3

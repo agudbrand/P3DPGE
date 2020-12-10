@@ -149,9 +149,9 @@ struct Triangle {
 		float a2 = Triangle(i, points[2], points[1]).get_area();
 		float a3 = Triangle(i, points[1], points[0]).get_area();
 
-		float ta = Math::roundf_two((a1 + a2 + a3));
+		float ta = Math::round2f((a1 + a2 + a3));
 
-		if (ta > Math::roundf_two(get_area())) { return false; }
+		if (ta > Math::round2f(get_area())) { return false; }
 		else { return true; }
 	
 	}

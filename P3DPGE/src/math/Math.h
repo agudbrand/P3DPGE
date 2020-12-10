@@ -41,7 +41,68 @@
 //physics constants
 #define GRAVITY 9.81f
 
+//useful math things
+//averages vectors over a interval i and returns that average
+//pass in vector v and interval i
+#define V_AVG(i, v) ([&] { \
+		static std::vector<Vector3> vectors; \
+		static Vector3 nv; \
+		static int iter = 0; \
+		if(i == vectors.size()){ \
+			vectors.erase(vectors.begin()); \
+			vectors.push_back(v); \
+			iter++; \
+		} \
+		else{ \
+			vectors.push_back(v); \
+			iter++; \
+		}\
+		if(iter == i){ \
+			nv = Math::averageVector3(vectors); \
+			iter = 0; \
+		} \
+		return nv; \
+		}())
+
+//averages vectors but consistently returns the value
+#define V_AVGCON(i, v) ([&] { \
+		static std::vector<Vector3> vectors; \
+		static Vector3 nv; \
+		if(i == vectors.size()){ \
+			vectors.erase(vectors.begin()); \
+			vectors.push_back(v); \
+		} \
+		else{ \
+			vectors.push_back(v); \
+		} \
+		nv = Math::averageVector3(vectors); \
+		return nv; \
+		}())
+
+#define F_AVG(i, f) ([&] { \
+		static std::vector<float> floats; \
+		static float nf; \
+		static int iter = 0; \
+		if(i == floats.size()){ \
+			floats.erase(floats.begin()); \
+			floats.push_back(f); \
+			iter++; \
+		} \
+		else{ \
+			floats.push_back(f); \
+			iter++; \
+		}\
+		if(iter == i){ \
+			nf = Math::average(floats, floats.size()); \
+			iter = 0; \
+		} \
+		return nf; \
+		}())
+
 namespace Math {
+
+	static Vector3 proj_points_persistant[3];
+
 	static float to_radians(float angle) { return angle * (M_PI / 180); }
 	static float to_degrees(float angle) { return angle * (180 / M_PI); }
 
@@ -81,10 +142,14 @@ namespace Math {
 	}
 
 	//round a float to two decimal places
-	static float roundf_two(float f) { return (float)((int)(f * 100 + .5)) / 100; }
+	static float round2f(float f) { return (float)((int)(f * 100 + .5)) / 100; }
 
-	//TODO(m, sushi) make lerp for Vector3
-
+	static Vector3 round2v(Vector3 v) { 
+		return Vector3(
+			(float)((int)(v.x * 100 + .5)) / 100,
+			(float)((int)(v.y * 100 + .5)) / 100,
+			(float)((int)(v.z * 100 + .5)) / 100);
+	}
 
 	//average any std container probably
 	template<class FWIt>
@@ -93,7 +158,12 @@ namespace Math {
 	template<class T>
 	static double average(const T& container, int size) { return average(std::begin(container), std::end(container), size); }
 	
-	//TODO(g, sushi) write a function for indexing vectors/any container for some consistent data type we define like id.
+	static Vector3 averageVector3(std::vector<Vector3> v) {
+		Vector3 n;
+		 for (Vector3 e : v) { n += e; }
+		 if (v.size() != 0) return n / v.size();
+		 else return V3ZERO;
+	}
 
 	//conversions
 	static Vector3 vi2dToVector3(olc::vi2d vector, float z = 0) { return Vector3((float)vector.x, (float)vector.y, z); }
@@ -415,6 +485,7 @@ namespace Math {
 			}
 		}
 	}
+
 };
 
 //// Non-Vector vs Vector Interactions ////
@@ -590,7 +661,6 @@ inline void Vector3::ScreenToWorld(mat<float, 4, 4> ProjMat, mat<float, 4, 4> vi
 
 
 //attached to entities to allow different forms of checking sides of more complex objects
-//TODO(m, sushi) implement Edge in 3D
 struct Edge {
 	Vector3 p[2];
 	//if lead is true then p[1] is the right most point.

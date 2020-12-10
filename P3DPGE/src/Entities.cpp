@@ -42,8 +42,7 @@ void Entity::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 
 	DEBUGE DrawPosition(p, ProjMat, view);
 	DEBUGE DrawVertices(p, ProjMat, view);
 
-	BUFFERLOG("test");
-	BUFFERLOG("test2");
+	
 
 }
 bool Entity::SpecialDraw() { return false; }
@@ -52,7 +51,45 @@ void Entity::DrawPosition(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat
 	
 	Vector3 nuposition = Math::ProjMult(position.ConvertToM1x4(), view);
 			nuposition.ProjToScreen(ProjMat, p);
-	p->DrawString(nuposition.toVector2(), position.str2f());
+	
+	std::vector<Vector3> points;
+	for (Triangle t : mesh->triangles) {
+		for (Vector3 po : t.points) {
+			Vector3 newp = Math::ProjMult(po.ConvertToM1x4(), view);
+			newp.ProjToScreen(ProjMat, p);
+			points.push_back(newp);
+		}
+	}
+
+	Vector3 rightmost;
+	Vector3 leftmost;
+	Vector3 highest;
+	Vector3 lowest;
+
+	std::sort(points.begin(), points.end(), ([](Vector3& v1, Vector3& v2) {return v1.x > v2.x; }));
+	leftmost = points[points.size() - 1];
+	rightmost  = points[0];
+
+	std::sort(points.begin(), points.end(), ([](Vector3& v1, Vector3& v2) {return v1.y > v2.y; }));
+	highest  = points[points.size() - 1];
+	lowest = points[0];
+
+	Vector3 tr(rightmost.x, highest.y);
+	Vector3 tl(leftmost.x, highest.y);
+	Vector3 br(rightmost.x, lowest.y);
+	Vector3 bl(leftmost.x, lowest.y);
+
+	Line2 top = Line2(tr, -1, tl);
+	Line2 left = Line2(bl, -1, tl);
+	Line2 right = Line2(tr, -1, br);
+	Line2 bottom = Line2(br, -1, bl);
+	
+	top.Draw(p, ProjMat, view);
+	left.Draw(p, ProjMat, view);
+	right.Draw(p, ProjMat, view);
+	bottom.Draw(p, ProjMat, view);
+	p->DrawString(tr.toVector2(), position.str2f());
+
 }
 
 void Entity::DrawVertices(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
@@ -157,29 +194,83 @@ PhysEntity::PhysEntity(int id, EntityParams, PhysEntityParams) : Entity(EntityAr
 	this->bStatic = bStatic;
 };
 
+void PhysEntity::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
+	//do nothing if not SpecialDraw unless debug is enabled
+
+	Line3 v_vector = Line3((position + velocity * 100).clampMag(100), -1, position);
+	Line3 a_vector = Line3((position + acceleration * 100).clampMag(100), -1, position);
+
+	v_vector.Draw(p, ProjMat, view);
+	a_vector.Draw(p, ProjMat, view);
+
+	DrawPosition(p, ProjMat, view);
+
+
+}
+
 void PhysEntity::Update(float deltaTime) {
-	if (!bStatic) {
-		acceleration = V3ZERO;
-		for (auto& f : forces) {
-			acceleration += f / mass;
+	Entity::Update(deltaTime);
+}
 
+void PhysEntity::PhysUpdate(float deltaTime) {
+
+	BUFFERLOG(12, inputs);
+
+	//for debug
+	Vector3 tf = V3ZERO;
+	BUFFERLOGI(8, 20, deltaTime, " ", g_fixedDeltaTime);
+	if (deltaTime > g_fixedDeltaTime) {
+		//psuedo input
+		AddForce(nullptr, inputs);
+		AddFrictionForce(nullptr, 0.01f, deltaTime);
+		if (!bStatic) {
+			Vector3 netForce;
+			acceleration = V3ZERO;
+			for (auto& f : forces) {
+				netForce += f;
+				tf += f;
+			}
+			BUFFERLOG(3, "Forces:       ", netForce);
+			acceleration = netForce / mass * 100;
+
+			
+			forces.clear();
+			velocity += acceleration * g_fixedDeltaTime;
+			rotVelocity += rotAcceleration * g_fixedDeltaTime;
+			rotation += rotVelocity * g_fixedDeltaTime * 10;
+			Vector3 last_vel = V_STORE(velocity, 1);
+			if (velocity.mag() < .1f) { velocity = V3ZERO; acceleration = V3ZERO; }
+
+			//NOTE: this may hinder some collision checking so be aware of that
+			if (Math::round2v(velocity.normalized()) == Math::round2v(-last_vel.normalized())) {
+				velocity = V3ZERO; acceleration = V3ZERO;
+			}
+			pos_lerp_from = position;
+			pos_lerp_to = position + velocity * g_fixedDeltaTime;
+			rotAcceleration = V3ZERO;
 		}
-		forces.clear();
-		velocity += acceleration * g_fixedDeltaTime;
-		//if (velLast.normalized() == -velocity.normalized()) { velocity = V3ZERO; acceleration = V3ZERO; }
-		if (velocity.mag() < .01f) { velocity = V3ZERO; acceleration = V3ZERO; }
-		//position += velocity * g_fixedDeltaTime * 10;
-		//rotVelocity += rotAcceleration * g_fixedDeltaTime;
-		//rotation += rotVelocity * g_fixedDeltaTime;
-		pos_lerp_from = position;
-		pos_lerp_to = position + velocity * g_fixedDeltaTime * 10;
-
 	}
-	Translate(); Rotate();
+	else {
+		Interpolate(deltaTime / g_fixedDeltaTime);
+	}
+
+	BUFFERLOG(0,  "lerp_from:       ", pos_lerp_from);
+	BUFFERLOG(1,  "lerp_to:         ", pos_lerp_to);
+	BUFFERLOG(5,  "Velocity:        ", velocity);
+	BUFFERLOG(6,  "Acceleration:    ", acceleration);
+	BUFFERLOG(17, "rotAcceleration: ", rotAcceleration);
+	BUFFERLOG(18, "rotVelocity:     ", rotVelocity);
+
+	inputs = V3ZERO;
+	
 }
 
 void PhysEntity::Interpolate(float t) {
-	position = Math::lerpv3(pos_lerp_from, pos_lerp_to, t);
+	
+	position.x = Math::lerpf(pos_lerp_from.x, pos_lerp_to.x, t);
+	position.y = Math::lerpf(pos_lerp_from.y, pos_lerp_to.y, t);
+	position.z = Math::lerpf(pos_lerp_from.z, pos_lerp_to.z, t);
+
 }
 
 //adds a force to this entity, and this entity applies that force back on the sending object
@@ -190,15 +281,21 @@ void PhysEntity::AddForce(PhysEntity* creator, Vector3 force, bool bIgnoreMass) 
 	forces.push_back(force);
 }
 
+void PhysEntity::AddInput(Vector3 input) {
+	inputs += input;
+	inputs.normalize();
+}
+
 //if no creator, assume air friction and temporarily treat object as sphere with C=.5
 //if creator, assume sliding friction
 //TODO(up,delle,11/13/20) change air friction to calculate for shape of object
 void PhysEntity::AddFrictionForce(PhysEntity* creator, float frictionCoef, float deltaTime, bool bIngoreMass) {
-	if (creator) {
-	}
-	else {
-		forces.push_back(-velocity.normalized() * frictionCoef * mass * GRAVITY);
-	}
+	//if (creator) {
+	//}
+	//else {
+	forces.push_back(-velocity.normalized() * frictionCoef * mass * GRAVITY);
+	BUFFERLOG(13, -velocity.normalized() * frictionCoef * mass * GRAVITY);
+	//}
 }
 
 //adds an impulse to this entity, and this entity applies that impulse back on the sending object
@@ -527,12 +624,13 @@ std::string DebugTriangle::str() {
 
 //// Camera ////
 
-mat<float, 4, 4> Camera::MakeViewMatrix(float yaw) {
-	Vector3 target(0, 0, 1);
+mat<float, 4, 4> Camera::MakeViewMatrix(float yaw, bool force_target) {
+	target = V3FORWARD;
 
-	lookDir = target * Math::GetRotateV3_Y(yaw);
+	lookDir = target * Math::GetRotateV3_X(yaw);
 	target = position + lookDir;
-
+	
+	BUFFERLOG(16, lookDir);
 	mat<float, 4, 4> view = inverse(Math::PointAt(position, target, up));
 	
 	return view;

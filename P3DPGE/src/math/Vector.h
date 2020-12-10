@@ -57,7 +57,7 @@ struct Vector3 {
 	float	mag() const;
 	void	normalize();
 	Vector3	normalized() const;
-	Vector3 clampMag(float& rhs) const;
+	Vector3 clampMag(const float& rhs) const;
 	float	distanceTo(Vector3& rhs) const;
 	float	projectOn(Vector3& rhs) const;
 	Vector3 componentOn(Vector3& rhs) const;
@@ -245,7 +245,7 @@ inline Vector3 Vector3::normalized() const {
 	return *this; //TODO(delle) test this
 }
 
-inline Vector3 Vector3::clampMag(float& rhs) const {
+inline Vector3 Vector3::clampMag(const float& rhs) const {
 	return this->normalized() * rhs;
 }
 

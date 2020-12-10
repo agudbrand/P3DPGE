@@ -83,6 +83,7 @@ public:
 	bool bStatic;
 	Collider* collider;
 	std::vector<Vector3> forces;
+	Vector3 inputs;
 
 	//there may be a more elegent way to perform this
 	Vector3 pos_lerp_from;
@@ -95,11 +96,16 @@ public:
 	PhysEntity() : Entity() {}
 	PhysEntity(int id, EntityDefaultParams, PhysEntityDefaultParams);
 	void Update(float deltaTime) override;
+	virtual void PhysUpdate(float deltaTime);
 	void Interpolate(float t);
 	void AddForce(PhysEntity* creator, Vector3 force, bool bIgnoreMass = false);
 	void AddFrictionForce(PhysEntity* creator, float frictionCoef, float deltaTime, bool bIngoreMass = false);
 	void AddImpulse(PhysEntity* creator, Vector3 impulse, bool bIgnoreMass = false);
 	void GenerateRadialForce(Vector3 position, float radius, float strength, float falloff, bool bIgnoreMass);
+
+	void AddInput(Vector3 input);
+
+	void Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) override;
 
 	virtual bool CheckCollision(Entity* entity) = 0;
 	virtual void ResolveCollision(PhysEntity* entity) = 0;
@@ -206,6 +212,7 @@ struct DebugTriangle : public Entity {
 
 struct Camera : public Entity {
 	Vector3 lookDir;
+	Vector3 target = V3FORWARD;
 	Vector3 up = V3UP;
 	float nearZ = .1f; //the distance from the camera's position to screen plane
 	float farZ = 1000.1f; //the maximum render distance
@@ -215,7 +222,7 @@ struct Camera : public Entity {
 		position = V3ZERO;
 	}
 	
-	mat<float, 4, 4> MakeViewMatrix(float yaw);
+	mat<float, 4, 4> MakeViewMatrix(float yaw, bool force_target = false);
 	mat<float, 4, 4> ProjectionMatrix(olc::PixelGameEngine* p);
 	
 	void Update(float deltaTime) override;

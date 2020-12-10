@@ -106,7 +106,7 @@ namespace Input {
 	internal Entity* selectedEntity;
 	internal Triangle* selectedTriangle;
 	internal Vector3 leftClickPos = V3NULL;
-	internal bool DEBUG_INPUT = true;
+	internal bool DEBUG_INPUT = false;
 
 	Timer* timer;
 
@@ -181,7 +181,7 @@ namespace Input {
 			"Spawns a large sphere of radius/mass 100 at the mouse."));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-			Complex* complex = new Complex("objects/24k_Triangles.obj", 0, Vector3(0, 0, 3));
+			Complex* complex = new Complex("objects/bmonkey.obj", 0, Vector3(0, 0, 3));
 			selectedEntity = complex;
 			Physics::AddEntity(complex);
 			Render::AddEntity(complex);
@@ -201,57 +201,9 @@ namespace Input {
 
 		//// object movement ////
 
-		//inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-		//	for (auto& e : Render::entities) {
-		//		e->rotation.x += 30 * Time::deltaTime;
-		//	}
-		//	DEBUGI std::cout << "Rotating everything in the positive x" << std::endl;
-		//	}, "rotate_+x", olc::J, -1, 1, 0, 0,
-		//	"Rotates all objects around the global x-axis in the positive direction"));
-		//
-		//inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-		//	for (auto& e : Render::entities) {
-		//		e->rotation.y += 30 * Time::deltaTime;
-		//	}
-		//	DEBUGI std::cout << "Rotating everything in the positive y" << std::endl;
-		//	}, "rotate_+y", olc::K, -1, 1, 0, 0,
-		//	"Rotates all objects around the global y-axis in the positive direction"));
-		//
-		//inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-		//	for (auto& e : Render::entities) {
-		//		e->rotation.z += 30 * Time::deltaTime;
-		//	}
-		//	DEBUGI std::cout << "Rotating everything in the positive z" << std::endl;
-		//	}, "rotate_+z", olc::L, -1, 1, 0, 0,
-		//	"Rotates all objects around the global z-axis in the positive direction"));
-		//
-		//inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-		//	for (auto& e : Render::entities) {
-		//		e->rotation.x -= 30 * Time::deltaTime;
-		//	}
-		//	DEBUGI std::cout << "Rotating everything in the negative x" << std::endl;
-		//	}, "rotate_-x", olc::M, -1, 1, 0, 0,
-		//	"Rotates all objects around the global x-axis in the negative direction"));
-		//
-		//inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-		//	for (auto& e : Render::entities) {
-		//		e->rotation.y -= 30 * Time::deltaTime;
-		//	}
-		//	DEBUGI std::cout << "Rotating everything in the negative y" << std::endl;
-		//	}, "rotate_-y", olc::COMMA, -1, 1, 0, 0,
-		//	"Rotates all objects around the global y-axis in the negative direction"));
-		//
-		//inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-		//	for (auto& e : Render::entities) {
-		//		e->rotation.z -= 30 * Time::deltaTime;
-		//	}
-		//	DEBUGI std::cout << "Rotating everything in the negative z" << std::endl;
-		//	}, "rotate_-z", olc::PERIOD, -1, 1, 0, 0,
-		//	"Rotates all objects around the global z-axis in the negative direction"));
-
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			if (PhysEntity* ptr = dynamic_cast<PhysEntity*>(selectedEntity)) {
-				ptr->AddForce(nullptr, V3FORWARD);
+				ptr->AddInput(V3FORWARD);
 				DEBUGI LOG("Adding force ", V3FORWARD, " to selected object.");
 			}
 			}, "phys_force_add_+z", olc::I, -1, 1, 0, 0,
@@ -259,7 +211,7 @@ namespace Input {
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			if (PhysEntity* ptr = dynamic_cast<PhysEntity*>(selectedEntity)) {
-				ptr->AddForce(nullptr, V3BACKWARD);
+				ptr->AddInput(V3BACKWARD);
 				DEBUGI LOG("Adding force ", V3BACKWARD, " to selected object.");
 			}
 			}, "phys_force_add_-z", olc::K, -1, 1, 0, 0,
@@ -267,7 +219,7 @@ namespace Input {
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			if (PhysEntity* ptr = dynamic_cast<PhysEntity*>(selectedEntity)) {
-				ptr->AddForce(nullptr, V3RIGHT);
+				ptr->AddInput(V3RIGHT);
 				DEBUGI LOG("Adding force ", V3RIGHT, " to selected object.");
 			}
 			}, "phys_force_add_+x", olc::L, -1, 1, 0, 0,
@@ -275,7 +227,7 @@ namespace Input {
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			if (PhysEntity* ptr = dynamic_cast<PhysEntity*>(selectedEntity)) {
-				ptr->AddForce(nullptr, V3LEFT);
+				ptr->AddInput(V3LEFT);
 				DEBUGI LOG("Adding force ", V3LEFT, " to selected object.");
 			}
 			}, "phys_force_add_-x", olc::J, -1, 1, 0, 0,
@@ -283,7 +235,7 @@ namespace Input {
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			if (PhysEntity* ptr = dynamic_cast<PhysEntity*>(selectedEntity)) {
-				ptr->AddForce(nullptr, V3UP);
+				ptr->AddInput(V3UP);
 				DEBUGI LOG("Adding force ", V3UP, " to selected object.");
 			}
 			}, "phys_force_add_+y", olc::O, -1, 1, 0, 0,
@@ -291,10 +243,26 @@ namespace Input {
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			if (PhysEntity* ptr = dynamic_cast<PhysEntity*>(selectedEntity)) {
-				ptr->AddForce(nullptr, V3DOWN);
+				ptr->AddInput(V3DOWN);
 				DEBUGI LOG("Adding force ", V3DOWN, " to selected object.");
 			}
 			}, "phys_force_add_-y", olc::U, -1, 1, 0, 0,
+			"Add force on selected object in negative y direction"));
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			if (PhysEntity* ptr = dynamic_cast<PhysEntity*>(selectedEntity)) {
+				ptr->rotAcceleration.x += 10 * g_fixedDeltaTime;
+				DEBUGI LOG("Adding rotational acceleration over +x to selected object.");
+			}
+			}, "rot_add_+x", olc::K, -1, 1, 1, 0,
+			"Add force on selected object in negative y direction"));
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			if (PhysEntity* ptr = dynamic_cast<PhysEntity*>(selectedEntity)) {
+				ptr->rotAcceleration.x -= 10 * g_fixedDeltaTime;
+				DEBUGI LOG("Adding rotational acceleration over -x to selected object.");
+			}
+			}, "rot_add-+x", olc::H, -1, 1, 1, 0,
 			"Add force on selected object in negative y direction"));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
@@ -442,7 +410,13 @@ namespace Input {
 		//LMB release = add  drawn force to selected entity
 		if (p->GetMouse(0).bReleased) {
 			if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
-				entity->AddForce(nullptr, (GetMousePos(p) - leftClickPos) * 100, true);
+				Vector3 pos = GetMousePos(p);
+
+				pos.ScreenToWorld(c->ProjectionMatrix(p), c->MakeViewMatrix(Render::yaw), p);
+				leftClickPos.ScreenToWorld(c->ProjectionMatrix(p), c->MakeViewMatrix(Render::yaw), p);
+
+
+				entity->AddForce(nullptr, (pos - leftClickPos).normalized() * 5, true);
 			}
 
 			leftClickPos = V3NULL;

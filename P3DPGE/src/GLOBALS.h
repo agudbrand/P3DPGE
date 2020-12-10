@@ -7,7 +7,11 @@
 static int unique_id;
 
 extern float g_fixedDeltaTime;
+extern float g_totalTime;
 
+//master buffer size indicator
+//this is VERY prone to errors so probably implement a better way to handle it 
+//maybe let console manager handle it 
 extern int buffer_size;
 extern ContainerManager<std::string> g_cBuffer;
 extern ContainerManager<std::string> g_cBuffer_last;

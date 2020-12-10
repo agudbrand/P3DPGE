@@ -6,7 +6,7 @@ namespace Physics {
 	//TODO(ou,delle,11/9/20) optimize by using arrays rather than vectors,
 	static std::vector<PhysEntity*> physEntities;
 
-	static float airFriction = .8f; //completely arbitrary number
+	static float airFriction = .2f; //completely arbitrary number
 
 	static bool discreteCollision = true;
 	static bool paused = false;
@@ -22,37 +22,33 @@ namespace Physics {
 	}
 
 	static void Update(float deltaTime) {
-		if (!paused || frame) {
-			if (TIMER_GET > g_fixedDeltaTime) {
-				TIMER_E;
-				BUFFERLOG(TIMER_GET);
-				for (PhysEntity* ptr : physEntities) {
-					if (ptr) {
-						if (discreteCollision) {
-							ptr->AddFrictionForce(nullptr, airFriction, deltaTime);
-							ptr->Update(deltaTime);
-							for (PhysEntity* target : physEntities) {
-								if (target && target->id != ptr->id) {
-									if (ptr->CheckCollision(target)) {
-										ptr->ResolveCollision(target);
-									}
-								}
-								else { break; }
-							}
-						}
+		
+		if (!paused || frame){
+			float dTime = TIMER_GET;
+			if (dTime > g_fixedDeltaTime) { TIMER_E; }
+			for (PhysEntity* ptr : physEntities) {
+				if (ptr) {
+					if (discreteCollision) {
+						//TODO(p, sushi) figure out why friction does what its doing in 3D
+						
+						ptr->PhysUpdate(dTime);
+						BUFFERLOG(7, F_AVG(10, dTime));
+						//
+						//for (PhysEntity* target : physEntities) {
+						//	if (target && target->id != ptr->id) {
+						//		if (ptr->CheckCollision(target)) {
+						//			ptr->ResolveCollision(target);
+						//		}
+						//	}
+						//	else { break; }
+						//}
 					}
-					else { break; }
 				}
-				if (frame) { frame = !frame; }
-				TIMER_S;
+				else { break; }
 			}
-			else {
-				for (PhysEntity* ptr : physEntities) {
-					ptr->Interpolate(TIMER_GET / g_fixedDeltaTime);
-				}
-			}
+			if (frame) { frame = !frame; }
+			if (dTime > g_fixedDeltaTime) { TIMER_S; }
 		}
-
 	}
 
 	static void Cleanup() {

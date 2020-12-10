@@ -49,14 +49,12 @@ namespace Time {
 
 	internal float fixedCounter;
 
-	static float GetTotalTime() { return totalTime; }
-
 	static void Init() {
 		deltaTime = 0;
 		totalTime = 0;
 		updateCount = 0;
 
-		fixedTimeStep = 50.f;
+		fixedTimeStep = 60.f;
 		fixedDeltaTime = 1.f / fixedTimeStep;
 		g_fixedDeltaTime = fixedDeltaTime;
 		fixedCounter = 0;
@@ -70,7 +68,9 @@ namespace Time {
 	static void Update(float& fElapsedTime) { 
 		deltaTime = fElapsedTime;
 		totalTime += deltaTime;
+		g_totalTime = totalTime;
 		updateCount += 1;
+
 
 		fixedCounter += deltaTime;
 		if (fixedCounter > fixedDeltaTime) {
@@ -230,25 +230,26 @@ public:
 
 	void StartTimer() {
 		if (!timer_running) {
-			start = Time::totalTime;
+			start = g_totalTime;
 			timer_running = true;
 		}
 	}
 
 	float TimeElapsed() {
 		if (timer_running) {
-			end = Time::totalTime;
+			end = g_totalTime;
 		}
+		BUFFERLOG(9, end - start);
 		return end - start;
 	}
 
 	void EndTimer() {
-		end = Time::totalTime;
+		end = g_totalTime;
 		timer_running = false;
 	}
 
 	float EndTimerAverage(int num, std::string message = "", int nFrames = 1) {
-		end = Time::totalTime;
+		end = g_totalTime;
 		float t = end - start;
 
 		if (times.size() < num) { times_precise.push_back(t); }
