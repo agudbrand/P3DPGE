@@ -1,7 +1,6 @@
 #pragma once
 #include "../Debug.h"
 
-
 struct Matrix;
 namespace olc {
 	template<typename V>
@@ -63,10 +62,10 @@ struct Vector3 {
 	Vector3 componentOn(Vector3& rhs) const;
 	Vector3	xComp() const;
 	Vector3 yComp() const;
-	Vector3 zComp() const;
-	Vector3 xInvert() const; //TODO(delle) rename this to negatedX
-	Vector3 yInvert() const; //TODO(delle) rename this to negatedY
-	Vector3 zInvert() const; //TODO(delle) rename this to negatedZ
+	Vector3 zComp() const; //no its good as is
+	Vector3 xInvert() const; //TODO(, delle) rename this to negatedX
+	Vector3 yInvert() const; //TODO(, delle) rename this to negatedY
+	Vector3 zInvert() const; //TODO(, delle) rename this to negatedZ
 
 	//Non-Vector vs Vector interactions //TODO(delle) define these in Math.h
 	Vector3(const Vector2& vector2);
@@ -78,12 +77,9 @@ struct Vector3 {
 	bool    operator == (const Matrix& rhs) const;
 	bool    operator != (const Matrix& rhs) const;
 
-	Vector2 toVector2() const; 
+	Vector2 toVector2() const;
 	Matrix ToM1x3() const;
 	Matrix ToM1x4(float w) const;
-
-
-
 
 	//qvm stuff to convert
 	Vector3(mat<float, 1, 4> m);
@@ -115,8 +111,6 @@ struct Vector3 {
 struct Vector4 : public Vector3 {
 	float w;
 };
-
-
 
 //// Constructors ////
 
@@ -191,7 +185,7 @@ inline void    Vector3::operator /= (const Vector3& rhs) {
 }
 
 inline Vector3 Vector3::operator -  () const {
-	return { -x, -y, -z }; //TODO(delle) test this
+	return { -x, -y, -z }; //TODO(, delle) test this
 }
 
 inline bool    Vector3::operator == (const Vector3& rhs) const {
@@ -201,8 +195,6 @@ inline bool    Vector3::operator == (const Vector3& rhs) const {
 inline bool    Vector3::operator != (const Vector3& rhs) const {
 	return this->x != rhs.x || this->y != rhs.y || this->z != rhs.z;
 }
-
-
 
 //// Functions ////
 
@@ -233,7 +225,7 @@ inline float Vector3::mag() const {
 }
 
 inline void Vector3::normalize() {
-	if (*this != Vector3(0,0,0)) {
+	if (*this != Vector3(0, 0, 0)) {
 		*this /= this->mag();
 	}
 }
@@ -242,10 +234,11 @@ inline Vector3 Vector3::normalized() const {
 	if (*this != Vector3(0, 0, 0)) {
 		return *this / this->mag();
 	}
-	return *this; //TODO(delle) test this
+	return *this; //TODO(, delle) test this
 }
 
 inline Vector3 Vector3::clampMag(const float& rhs) const {
+	if (this->mag() < rhs) { return *this; }
 	return this->normalized() * rhs;
 }
 

@@ -118,9 +118,9 @@ struct Matrix {
 
 	static Matrix Identity(uint32 rows, uint32 cols);
 
-	//Non-Matrix vs Matrix interactions //TODO(delle) define these in Math.h
-	Matrix(Vector3 v); //TODO(delle) define this in Math.h
-	Matrix(Vector3 v, float w); //TODO(delle) define this in Math.h
+	//Non-Matrix vs Matrix interactions //TODO(, delle) define these in Math.h
+	Matrix(Vector3 v); //TODO(, delle) define this in Math.h
+	Matrix(Vector3 v, float w); //TODO(, delle) define this in Math.h
 };
 
 

@@ -414,7 +414,6 @@ namespace Input {
 				pos.ScreenToWorld(c->ProjectionMatrix(p), c->MakeViewMatrix(Render::yaw), p);
 				leftClickPos.ScreenToWorld(c->ProjectionMatrix(p), c->MakeViewMatrix(Render::yaw), p);
 
-
 				entity->AddForce(nullptr, (pos - leftClickPos).normalized() * 5, true);
 			}
 

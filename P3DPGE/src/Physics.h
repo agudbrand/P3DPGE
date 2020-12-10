@@ -15,22 +15,20 @@ namespace Physics {
 	static Timer* timer;
 
 	static void Init() {
-
 		physEntities = std::vector<PhysEntity*>();
 		timer = new Timer;
 		TIMER_S;
 	}
 
 	static void Update(float deltaTime) {
-		
-		if (!paused || frame){
+		if (!paused || frame) {
 			float dTime = TIMER_GET;
 			if (dTime > g_fixedDeltaTime) { TIMER_E; }
 			for (PhysEntity* ptr : physEntities) {
 				if (ptr) {
 					if (discreteCollision) {
 						//TODO(p, sushi) figure out why friction does what its doing in 3D
-						
+
 						ptr->PhysUpdate(dTime);
 						BUFFERLOG(7, F_AVG(10, dTime));
 						//

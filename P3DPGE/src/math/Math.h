@@ -100,7 +100,6 @@
 		}())
 
 namespace Math {
-
 	static Vector3 proj_points_persistant[3];
 
 	static float to_radians(float angle) { return angle * (M_PI / 180); }
@@ -126,7 +125,7 @@ namespace Math {
 
 	//append to two decimal places
 	static std::string append_two_decimal(std::string s) {
-		if(s.length() >= 2){
+		if (s.length() >= 2) {
 			while (s.at(s.length() - 4) != '.') {
 				s.pop_back();
 			}
@@ -144,7 +143,7 @@ namespace Math {
 	//round a float to two decimal places
 	static float round2f(float f) { return (float)((int)(f * 100 + .5)) / 100; }
 
-	static Vector3 round2v(Vector3 v) { 
+	static Vector3 round2v(Vector3 v) {
 		return Vector3(
 			(float)((int)(v.x * 100 + .5)) / 100,
 			(float)((int)(v.y * 100 + .5)) / 100,
@@ -157,12 +156,12 @@ namespace Math {
 
 	template<class T>
 	static double average(const T& container, int size) { return average(std::begin(container), std::end(container), size); }
-	
+
 	static Vector3 averageVector3(std::vector<Vector3> v) {
 		Vector3 n;
-		 for (Vector3 e : v) { n += e; }
-		 if (v.size() != 0) return n / v.size();
-		 else return V3ZERO;
+		for (Vector3 e : v) { n += e; }
+		if (v.size() != 0) return n / v.size();
+		else return V3ZERO;
 	}
 
 	//conversions
@@ -181,7 +180,7 @@ namespace Math {
 		m.a[0][0] = v.x; m.a[0][1] = v.y; m.a[0][2] = v.z; m.a[0][3] = 1;
 		return m;
 	}
-	
+
 	static mat<float, 4, 4> GetTranslate(Vector3 translation) {
 		mat<float, 4, 4> tv{
 			1,			   0,			  0,			 0,
@@ -191,7 +190,7 @@ namespace Math {
 		};
 		return tv;
 	}
-	
+
 	static mat<float, 4, 4> GetScaleMat(Vector3 scale) {
 		mat<float, 4, 4> sv{
 			scale.x, 0,		  0,	   0,
@@ -202,12 +201,12 @@ namespace Math {
 		return sv;
 	}
 
-	static mat<float, 4, 4> M3x3ToM4x4(mat<float,3,3> inMat) {
+	static mat<float, 4, 4> M3x3ToM4x4(mat<float, 3, 3> inMat) {
 		return mat<float, 4, 4>{
-			inMat.a[0][0],	inMat.a[0][1],	inMat.a[0][2],	0,
-			inMat.a[1][0],	inMat.a[1][1],	inMat.a[1][2],	0,
-			inMat.a[2][0],	inMat.a[2][1],	inMat.a[2][2],	0,
-			0,				0,				0,				1
+			inMat.a[0][0], inMat.a[0][1], inMat.a[0][2], 0,
+				inMat.a[1][0], inMat.a[1][1], inMat.a[1][2], 0,
+				inMat.a[2][0], inMat.a[2][1], inMat.a[2][2], 0,
+				0, 0, 0, 1
 		};
 	}
 
@@ -221,19 +220,19 @@ namespace Math {
 	//this function returns a matrix that tells a vector how to look at a specific point in space.
 	static mat<float, 4, 4> PointAt(Vector3& pos, Vector3& target, Vector3& up) {
 		up.normalize();
-		
+
 		//get new forward direction
 		Vector3 newFor = target - pos;
 		newFor.normalize();
-		
+
 		//get right direction
 		Vector3 newRight = up.cross(newFor);
 		newRight.normalize();
-		
+
 		//get up direction
 		Vector3 newUp = newRight.cross(newFor);
 		newUp.normalize();
-		
+
 		//make point at matrix
 		mat<float, 4, 4> m{
 			newRight.x, newRight.y, newRight.z, 0,
@@ -241,10 +240,10 @@ namespace Math {
 			newFor.x,	newFor.y,	newFor.z,	0,
 			pos.x,		pos.y,		pos.z,		1
 		};
-		
+
 		return m;
 	}
-	
+
 	static float DistTwoPoints(Vector3 a, Vector3 b) {
 		return sqrtf(
 			(a.x - b.x) * (a.x - b.x) +
@@ -253,10 +252,10 @@ namespace Math {
 		);
 	}
 
-	static float DistPointToPlane(Vector3 point, Vector3 plane_n, Vector3 plane_p) { 
-		return (plane_n.x * point.x + plane_n.y * point.y + plane_n.z * point.z - plane_n.dot(plane_p)); 
+	static float DistPointToPlane(Vector3 point, Vector3 plane_n, Vector3 plane_p) {
+		return (plane_n.x * point.x + plane_n.y * point.y + plane_n.z * point.z - plane_n.dot(plane_p));
 	}
-	
+
 	//where a line intersects with a plane
 	static Vector3 VectorPlaneIntersect(Vector3 plane_p, Vector3 plane_n, Vector3 line_start, Vector3 line_end, float& t) {
 		plane_n.normalize();
@@ -268,7 +267,7 @@ namespace Math {
 		Vector3 line_to_intersect = line_start_to_end * t;
 		return line_start + line_to_intersect;
 	}
-	
+
 	//TODO(, sushi) rename these functions to something not retarded
 	static mat<float, 4, 4> GetRotateV3_X(float theta) {
 		theta = Math::to_radians(theta);
@@ -280,7 +279,7 @@ namespace Math {
 		};
 		return rvx;
 	}
-	
+
 	static mat<float, 4, 4> GetRotateV3_Y(float theta) {
 		theta = Math::to_radians(theta);
 		mat<float, 4, 4> rvy{
@@ -291,7 +290,7 @@ namespace Math {
 		};
 		return rvy;
 	}
-	
+
 	static mat<float, 4, 4> GetRotateV3_Z(float theta) {
 		theta = Math::to_radians(theta);
 		mat<float, 4, 4> rvz{
@@ -354,17 +353,15 @@ namespace Math {
 
 	//returns where two lines intersect in 3D space
 	static Vector3 LineIntersect3(Vector3 adir, Vector3 ap, Vector3 bdir, Vector3 bp) {
-
 	}
 
 	//returns area of a triangle of sides a and b
 	static float TriangleArea(Vector3 a, Vector3 b) { return a.cross(b).mag() / 2; }
 
-//};
+	//};
 
-//namespace Render {
-
-	//the input vector should be in world space
+	//namespace Render {
+		//the input vector should be in world space
 	static Vector3 WorldToCamera(Vector3 vertex, mat<float, 4, 4> viewMatrix) {
 		mat<float, 1, 4> vm = vertex.ConvertToM1x4() * viewMatrix;
 		if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; }
@@ -383,9 +380,11 @@ namespace Math {
 		float t;
 		if (startBeyondPlane && !endBeyondPlane) {
 			lineStart = Math::VectorPlaneIntersect(planePoint, planeNormal, lineStart, lineEnd, t);
-		} else if (!startBeyondPlane && endBeyondPlane) {
+		}
+		else if (!startBeyondPlane && endBeyondPlane) {
 			lineEnd = Math::VectorPlaneIntersect(planePoint, planeNormal, lineStart, lineEnd, t);
-		} else if (startBeyondPlane && endBeyondPlane) {
+		}
+		else if (startBeyondPlane && endBeyondPlane) {
 			return false;
 		}
 
@@ -397,15 +396,17 @@ namespace Math {
 		endBeyondPlane = planeNormal.dot(lineEnd) - d < 0;
 		if (startBeyondPlane && !endBeyondPlane) {
 			lineStart = Math::VectorPlaneIntersect(planePoint, planeNormal, lineStart, lineEnd, t);
-		} else if (!startBeyondPlane && endBeyondPlane) {
+		}
+		else if (!startBeyondPlane && endBeyondPlane) {
 			lineEnd = Math::VectorPlaneIntersect(planePoint, planeNormal, lineStart, lineEnd, t);
-		} else if (startBeyondPlane && endBeyondPlane) {
+		}
+		else if (startBeyondPlane && endBeyondPlane) {
 			return false;
 		}
 		return true;
 	}
 
-	//the input matrixes should be in view/camera space 
+	//the input matrixes should be in view/camera space
 	static Vector3 CameraToScreen(Vector3 csVertex, mat<float, 4, 4> projectionMatrix, Vector2 dimensions) {
 		mat<float, 1, 4> vm = csVertex.ConvertToM1x4() * projectionMatrix;
 		if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; }
@@ -430,12 +431,14 @@ namespace Math {
 			int code = CLIP_INSIDE;
 			if (vertex.x < 0) {
 				code |= CLIP_LEFT;
-			} else if (vertex.x > screenDimensions.x) {
+			}
+			else if (vertex.x > screenDimensions.x) {
 				code |= CLIP_RIGHT;
 			}
 			if (vertex.y < 0) { //these are inverted because we are in screen space
 				code |= CLIP_TOP;
-			} else if (vertex.y > screenDimensions.y) {
+			}
+			else if (vertex.y > screenDimensions.y) {
 				code |= CLIP_BOTTOM;
 			}
 			return code;
@@ -449,10 +452,12 @@ namespace Math {
 			if (!(lineStartCode | lineEndCode)) {
 				//both points are inside the screen zone
 				return true;
-			} else if (lineStartCode & lineEndCode) {
+			}
+			else if (lineStartCode & lineEndCode) {
 				//both points are in the same outside zone
 				return false;
-			} else {
+			}
+			else {
 				float x, y;
 				//select one of the points outside
 				int code = lineEndCode > lineStartCode ? lineEndCode : lineStartCode;
@@ -461,13 +466,16 @@ namespace Math {
 				if (code & CLIP_TOP) { //point is above screen
 					x = ssLineStart.x + (ssLineEnd.x - ssLineStart.x) * (-ssLineStart.y) / (ssLineEnd.y - ssLineStart.y);
 					y = 0;
-				} else if (code & CLIP_BOTTOM) { //point is below screen
+				}
+				else if (code & CLIP_BOTTOM) { //point is below screen
 					x = ssLineStart.x + (ssLineEnd.x - ssLineStart.x) * (screenDimensions.y - ssLineStart.y) / (ssLineEnd.y - ssLineStart.y);
 					y = screenDimensions.y;
-				} else if (code & CLIP_RIGHT) { //point is right of screen
+				}
+				else if (code & CLIP_RIGHT) { //point is right of screen
 					y = ssLineStart.y + (ssLineEnd.y - ssLineStart.y) * (screenDimensions.x - ssLineStart.x) / (ssLineEnd.x - ssLineStart.x);
 					x = screenDimensions.x;
-				} else if (code & CLIP_LEFT) { //point is left of screen
+				}
+				else if (code & CLIP_LEFT) { //point is left of screen
 					y = ssLineStart.y + (ssLineEnd.y - ssLineStart.y) * (-ssLineStart.x) / (ssLineEnd.x - ssLineStart.x);
 					x = 0;
 				}
@@ -477,7 +485,8 @@ namespace Math {
 					ssLineStart.x = x;
 					ssLineStart.y = y;
 					lineStartCode = ComputeOutCode(ssLineStart);
-				} else {
+				}
+				else {
 					ssLineEnd.x = x;
 					ssLineEnd.y = y;
 					lineEndCode = ComputeOutCode(ssLineEnd);
@@ -485,7 +494,6 @@ namespace Math {
 			}
 		}
 	}
-
 };
 
 //// Non-Vector vs Vector Interactions ////
@@ -659,14 +667,13 @@ inline void Vector3::ScreenToWorld(mat<float, 4, 4> ProjMat, mat<float, 4, 4> vi
 	M1x4ToVector3(unproj_mult(ConvertToM1x4(), inverse(view)));
 }
 
-
 //attached to entities to allow different forms of checking sides of more complex objects
 struct Edge {
 	Vector3 p[2];
 	//if lead is true then p[1] is the right most point.
 	//ditto for high but on y
 	bool lead, high;
-	
+
 	Edge() { }
 	Edge(Vector3 point1, Vector3 point2) {
 		p[0] = point1;
@@ -676,7 +683,7 @@ struct Edge {
 		if (point1.y > point2.y) { high = false; }
 		else { high = true; }
 	}
-	
+
 	//TODO(?, sushi) find a good place to update edge, probably in Triangle?
 	void update(Vector3 point1, Vector3 point2) {
 		p[0] = point1;
@@ -686,19 +693,19 @@ struct Edge {
 		if (point1.y > point2.y) { high = false; }
 		else { high = true; }
 	}
-	
+
 	float slope() {
 		if (p[1].x == p[0].x || p[1].y == p[0].y) { return 0; }
 		else { return (p[1].y - p[0].y) / (p[1].x - p[0].x); }
 	}
-	
+
 	//y intercept and range/domain checks
 	float ycross() { return p[!lead].y - slope() * p[!lead].x; }
-	bool within_range(Vector3 point)  { return (point.y < p[high].y&& point.y > p[!high].y); }
-	bool within_range(float y_point)  { return (y_point < p[high].y&& y_point > p[!high].y); }
+	bool within_range(Vector3 point) { return (point.y < p[high].y&& point.y > p[!high].y); }
+	bool within_range(float y_point) { return (y_point < p[high].y&& y_point > p[!high].y); }
 	bool within_domain(Vector3 point) { return (point.x < p[lead].x&& point.x > p[!lead].x); }
 	bool within_domain(float x_point) { return (x_point < p[lead].x&& x_point > p[!lead].x); }
-	
+
 	//returns edge's normal
 	//returns a normal rotated -90
 	Vector3 edge_normal() {
@@ -715,29 +722,29 @@ struct Edge {
 		if ((point.y == slope() * point.x + ycross()) && within_domain(point)) { return true; }
 		else { return false; }
 	}
-	
+
 	//these signs may look wrong but its to accomidate for the top left coord (maybe)
 	bool above_edge(Vector3 point) {
 		int bp = 0;
 		if (point.y < slope() * point.x + ycross()) { return true; }
 		else { return false; }
 	}
-	
+
 	bool below_edge(Vector3 point) {
 		if (point.y > slope() * point.x + ycross()) { return true; }
 		else { return false; }
 	}
-	
+
 	bool right_of_edge(Vector3 point) {
 		if ((point.x > (point.y - ycross()) / slope())) { return true; }
 		else { return false; }
 	}
-	
+
 	bool left_of_edge(Vector3 point) {
 		if ((point.x < (point.y - ycross()) / slope())) { return true; }
 		else { return false; }
 	}
-	
+
 	//checks if two edges intersect by finding their line representation's
 	//intersection and then seeing if that point lies on either of them
 	bool edge_intersect(Edge e) {
@@ -782,10 +789,6 @@ struct Edge3 {
 	}
 
 	Vector3 direction() { return p[1] - p[0]; }
-
-
-
-
 };
 
 namespace Debug {

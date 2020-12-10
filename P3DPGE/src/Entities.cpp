@@ -197,8 +197,8 @@ PhysEntity::PhysEntity(int id, EntityParams, PhysEntityParams) : Entity(EntityAr
 void PhysEntity::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
 	//do nothing if not SpecialDraw unless debug is enabled
 
-	Line3 v_vector = Line3((position + velocity * 100).clampMag(100), -1, position);
-	Line3 a_vector = Line3((position + acceleration * 100).clampMag(100), -1, position);
+	Line3 v_vector = Line3((position + velocity).clampMag(0.3), -1, position);
+	Line3 a_vector = Line3((position + acceleration).clampMag(0.3), -1, position);
 
 	v_vector.Draw(p, ProjMat, view);
 	a_vector.Draw(p, ProjMat, view);
@@ -222,7 +222,7 @@ void PhysEntity::PhysUpdate(float deltaTime) {
 	if (deltaTime > g_fixedDeltaTime) {
 		//psuedo input
 		AddForce(nullptr, inputs);
-		AddFrictionForce(nullptr, 0.01f, deltaTime);
+		AddFrictionForce(nullptr, 0.05f, deltaTime);
 		if (!bStatic) {
 			Vector3 netForce;
 			acceleration = V3ZERO;
@@ -256,20 +256,17 @@ void PhysEntity::PhysUpdate(float deltaTime) {
 
 	BUFFERLOG(0,  "lerp_from:       ", pos_lerp_from);
 	BUFFERLOG(1,  "lerp_to:         ", pos_lerp_to);
-	BUFFERLOG(5,  "Velocity:        ", velocity);
-	BUFFERLOG(6,  "Acceleration:    ", acceleration);
-	BUFFERLOG(17, "rotAcceleration: ", rotAcceleration);
-	BUFFERLOG(18, "rotVelocity:     ", rotVelocity);
+	BUFFERLOG(5,  "Velocity:        ", V_AVG(300, velocity));
+	BUFFERLOG(6,  "Acceleration:    ", V_AVG(300, acceleration));
+	BUFFERLOG(17, "rotAcceleration: ", V_AVG(300, rotAcceleration));
+	BUFFERLOG(18, "rotVelocity:     ", V_AVG(300, rotVelocity));
 
 	inputs = V3ZERO;
 	
 }
 
 void PhysEntity::Interpolate(float t) {
-	
-	position.x = Math::lerpf(pos_lerp_from.x, pos_lerp_to.x, t);
-	position.y = Math::lerpf(pos_lerp_from.y, pos_lerp_to.y, t);
-	position.z = Math::lerpf(pos_lerp_from.z, pos_lerp_to.z, t);
+	position = Math::lerpv3(pos_lerp_from, pos_lerp_to, t);
 
 }
 
