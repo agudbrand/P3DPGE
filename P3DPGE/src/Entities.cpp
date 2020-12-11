@@ -370,7 +370,7 @@ std::string Sphere::str() {
 
 //// Box ////
 
-Box::Box(Vector3 halfDims, int id, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
+Box::Box(Vector3 halfDims, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
 	this->halfDims = halfDims;
 	tag = "box";
 	mesh = new BoxMesh(halfDims, position, this);

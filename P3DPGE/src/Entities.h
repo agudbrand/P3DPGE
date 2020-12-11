@@ -93,6 +93,7 @@ public:
 	Vector3 rot_lerp_to;
 
 	PhysEntity (EntityDefaultParams, PhysEntityDefaultParams);
+	virtual ~PhysEntity();
 	void Update(float deltaTime) override;
 	virtual void PhysUpdate(float deltaTime);
 	void Interpolate(float t);
@@ -125,7 +126,7 @@ struct Box : public PhysEntity {
 	Vector3 halfDims; //half dimensions
 	
 	Box() : PhysEntity() {}
-	Box(Vector3 halfDims, int id, EntityDefaultParams, PhysEntityDefaultParams);
+	Box(Vector3 halfDims, EntityDefaultParams, PhysEntityDefaultParams);
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
 

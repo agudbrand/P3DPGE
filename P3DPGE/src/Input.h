@@ -106,7 +106,7 @@ namespace Input {
 	internal Entity* selectedEntity;
 	internal Triangle* selectedTriangle;
 	internal Vector3 leftClickPos = V3NULL;
-	internal bool DEBUG_INPUT = true;
+	internal bool DEBUG_INPUT = false;
 
 	Timer* timer;
 
@@ -378,10 +378,10 @@ namespace Input {
 		//// temp debugging ////
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-			Box* box = new Box(Vector3(5, 5, 5), -1, Vector3(0,0,20));
+			Box* box = new Box(Vector3(5, 5, 5), Vector3(0,0,20));
 			box->mass = 100;
 			AABBCollider* aabb = new AABBCollider(box, box->halfDims);
-			Box* sphere = new Box(Vector3(.3f, .3f, .3f), -1, Vector3(20, 0, 20), V3ZERO, V3ONE, Vector3(-25, -3, 0), V3ZERO, V3ONE);
+			Box* sphere = new Box(Vector3(.3f, .3f, .3f), Vector3(20, 0, 20), V3ZERO, V3ONE, Vector3(-25, -3, 0), V3ZERO, V3ONE);
 			SphereCollider* sphereCol = new SphereCollider(sphere, 1);
 			Physics::AddEntity(box);
 			Render::AddEntity(box);
