@@ -1,12 +1,10 @@
 #pragma once
 
 #include "internal/olcPixelGameEngine.h"
-#include "SceneManager.h"
-
+#include "Render.h"
 #include "Collider.h" //TODO(i,delle) remove this
 
-//TODO(io,delle,11/17/20) look into heap vs stack memory allocation for the func pointer
-typedef void (*Action)(olc::PixelGameEngine* p);
+
 
 //NOTE update InputAction to support ALT when olcPGE does
 struct InputAction {
@@ -19,6 +17,8 @@ struct InputAction {
 	std::string name;
 	std::string description;
 	Action action;
+
+	
 
 	//function, name, key, mouseButton, inputState, shift, ctrl, desc
 	InputAction(Action action, std::string name, olc::Key key = olc::Key::NONE, int mouseButton = -1, int inputState = 0,
@@ -51,9 +51,10 @@ struct InputAction {
 			action(p);
 		}
 		else if (inputState == 2 && p->GetMouse(mouseButton).bReleased) {
+
 			action(p);
 		}
-		else if (p->GetMouse(mouseButton).bPressed) {
+		else if (inputState == 0 && p->GetMouse(mouseButton).bPressed) {
 			action(p);
 		}
 	}
@@ -104,9 +105,12 @@ namespace Input {
 	global_variable std::vector<InputAction> inputActions;
 
 	internal Entity* selectedEntity;
+	internal UI* selectedUI;
 	internal Triangle* selectedTriangle;
 	internal Vector3 leftClickPos = V3NULL;
 	internal bool DEBUG_INPUT = false;
+
+	static bool drag_latch = false; //for dragging windows
 
 	Timer* timer;
 
@@ -123,7 +127,7 @@ namespace Input {
 	internal Camera* c;
 
 	static void Init() {
-		c = &Render::camera;
+		c = &Scene::camera;
 
 		timer = new Timer;
 
@@ -140,17 +144,17 @@ namespace Input {
 			"Pauses the game while button is held."));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-			Render::paused = !Render::paused;
+			Scene::paused = !Scene::paused;
 			Physics::paused = !Physics::paused;
 			DEBUGI{
-				std::string output = (Render::paused) ? "true" : "false";
+				std::string output = (Scene::paused) ? "true" : "false";
 				std::cout << "Toggling paused to " + output << std::endl;
 			}
 			}, "pause_game", olc::SPACE, -1, 0, 0, 0,
 			"Pauses the game on press."));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-			Render::frame = !Render::frame;
+			Scene::frame = !Scene::frame;
 			Physics::frame = !Physics::frame;
 			DEBUGI std::cout << "Advancing one frame forward" << std::endl;
 			}, "next_frame", olc::F, -1, 0, 0, 0,
@@ -164,7 +168,7 @@ namespace Input {
 			sphere->mass = 10;
 			sphere->mesh = new CircleMesh(10);
 			Physics::AddEntity(sphere);
-			Render::AddEntity(sphere);
+			Scene::AddEntity(sphere);
 			DEBUGI std::cout << "Creating Sphere at: " + pos.str() << std::endl;
 			}, "spawn_sphere", olc::N, -1, 0, 0, 0,
 			"Spawns a sphere of radius/mass 10 at the mouse."));
@@ -175,7 +179,7 @@ namespace Input {
 			sphere->mass = 100;
 			sphere->mesh = new CircleMesh(100);
 			Physics::AddEntity(sphere);
-			Render::AddEntity(sphere);
+			Scene::AddEntity(sphere);
 			DEBUGI std::cout << "Creating Large Sphere at: " + pos.str() << std::endl;
 			}, "spawn_sphere_large", olc::N, -1, 0, 1, 0,
 			"Spawns a large sphere of radius/mass 100 at the mouse."));
@@ -184,7 +188,7 @@ namespace Input {
 			Complex* complex = new Complex("objects/bmonkey.obj", Vector3(0, 0, 3));
 			selectedEntity = complex;
 			Physics::AddEntity(complex);
-			Render::AddEntity(complex);
+			Scene::AddEntity(complex);
 			DEBUGI std::cout << "Creating " + complex->model_name + " at: " + V3ZERO.str() << std::endl;
 			}, "spawn_complex", olc::T, -1, 0, 0, 0,
 			"Spawns a complex object at (0,0,3)"));
@@ -194,7 +198,7 @@ namespace Input {
 			Box* box = new Box(Vector3(1, 1, 1), pos);
 			selectedEntity = box;
 			Physics::AddEntity(box);
-			Render::AddEntity(box);
+			Scene::AddEntity(box);
 			DEBUGI std::cout << "Creating Box at: " + pos.str() << std::endl;
 			}, "spawn_box", olc::B, -1, 0, 0, 0,
 			"Spawns a box at (0,0,3)"));
@@ -266,41 +270,107 @@ namespace Input {
 			"Add force on selected object in negative y direction"));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-			Render::entities.clear();
-			Render::sentities.clear();
+			Scene::entities.clear();
 			}, "clear_entities", olc::C, -1, 1, 1, 0,
 			"Delete all entities"));
 
-		//// object selection ////
+	//// object selection ////
 
-			//TODO(o, sushi) write this to skip objects who aren't close to the line
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Vector3 pos = GetMousePos(p);
-			if (selectedEntity) { selectedEntity->ENTITY_DEBUG = false; selectedEntity = nullptr; }
-
-			pos.ScreenToWorld(c->ProjectionMatrix(p), c->MakeViewMatrix(Render::yaw), p);
-			pos.WorldToLocal(c->position);
-			pos.normalize();
-			pos *= 1000;
-			pos.LocalToWorld(c->position);
-
-			//make function somehere that returns a ray cast for ease of use later maybe
-			Line3* ray = new Line3(pos, c->position);
-
-			//draw ray if debugging
-			DEBUGI Render::entities.push_back(ray);
-
-			for (Entity* e : Render::entities) {
-				if (e->LineIntersect(&ray->edge)) {
-					selectedEntity = e;
-					selectedEntity->ENTITY_DEBUG = true;
-					break;
+			leftClickPos = GetMousePos(p);
+			
+			//check ui over entities
+			
+			bool ui_clicked = false;
+			for (UI* ui : Scene::ui_layer) {
+				int index = 0;
+				if (Menu* m = dynamic_cast<Menu*>(ui)) {
+					if (m->Clicked(pos.toVector2(), p)) {
+						if (m->ClickedInTitle(pos.toVector2())) {
+							selectedUI = m;
+							break;
+						}
+						ui_clicked = true;
+					}
+					index++;
+				}
+				if (Button* b = dynamic_cast<Button*>(ui)) {
+					if (b->Clicked(pos.toVector2(), p)) {
+						ui_clicked = true;
+						break;
+					}
 				}
 			}
 
-			if (selectedEntity == nullptr) { ERROR("No object selected"); }
+			if (!ui_clicked) {
+				if (selectedEntity) { selectedEntity->ENTITY_DEBUG = false; selectedEntity = nullptr; }
+				pos.ScreenToWorld(c->ProjectionMatrix(p), c->MakeViewMatrix(Scene::yaw), p);
+				pos.WorldToLocal(c->position);
+				pos.normalize();
+				pos *= 1000;
+				pos.LocalToWorld(c->position);
+
+				//make function somehere that returns a ray cast for ease of use later maybe
+				Line3* ray = new Line3(pos, c->position);
+
+				//draw ray if debugging
+				DEBUGI Scene::entities.push_back(ray);
+
+				for (Entity* e : Scene::entities) {
+					if (e->LineIntersect(&ray->edge)) {
+						selectedEntity = e;
+						selectedEntity->ENTITY_DEBUG = true;
+						break;
+					}
+				}
+
+				if (selectedEntity == nullptr) { ERROR("No object selected"); }
+			}
+			
 			}, "select_entity", olc::NONE, 0, 0, 0, 0,
-			"Selects an entity"));
+			"Selects an entity or ui"));
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			Vector3 pos = GetMousePos(p);
+			
+			static Vector2 offset;
+
+
+			if (selectedUI) {
+				if (!drag_latch) {
+					offset = selectedUI->pos - pos.toVector2();
+					drag_latch = true;
+				}
+				selectedUI->pos = pos.toVector2() + offset;
+			}
+			else {
+				p->DrawLine(leftClickPos.x, leftClickPos.y, p->GetMouseX(), p->GetMouseY(), olc::WHITE);
+
+			}
+			//implement entity stuff later
+
+			}, "drag_entity", olc::NONE, 0, 1, 0, 0,
+			"Drags an entity or ui"));
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			if (selectedUI) {
+				selectedUI = nullptr;
+				drag_latch = false;
+			}
+			else if(selectedEntity){
+				if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
+					Vector3 pos = GetMousePos(p);
+
+					pos.ScreenToWorld(c->ProjectionMatrix(p), c->MakeViewMatrix(Scene::yaw), p);
+					leftClickPos.ScreenToWorld(c->ProjectionMatrix(p), c->MakeViewMatrix(Scene::yaw), p);
+
+					entity->AddForce(nullptr, (pos - leftClickPos).normalized() * 5, true);
+				}
+				leftClickPos = V3NULL;
+			}
+			}, "stop_drag_entity", olc::NONE, 0, 2, 0, 0,
+			""));
 
 		//// camera movement ////
 
@@ -341,20 +411,20 @@ namespace Input {
 			"Translates the camera backwards"));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-			Render::yaw -= 50 * Time::deltaTime;
+			Scene::yaw -= 50 * Time::deltaTime;
 			DEBUGI std::cout << "Turning the camera right" << std::endl;
 			}, "camera_turn_right", olc::RIGHT, -1, 1, 0, 0,
 			"Rotates the camera along its local y-axis (yaw) in the positive direction"));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-			Render::yaw += 50 * Time::deltaTime;
+			Scene::yaw += 50 * Time::deltaTime;
 			DEBUGI std::cout << "Turning the camera left" << std::endl;
 			}, "camera_turn_left", olc::LEFT, -1, 1, 0, 0,
 			"Rotates the camera along its local y-axis (yaw) in the negative direction"));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			c->position = V3ZERO;
-			Render::yaw = 0;
+			Scene::yaw = 0;
 			DEBUGI std::cout << "Resetting camera to pos: (0,0,0) and yaw: 0" << std::endl;
 			}, "camera_reset", olc::Z, -1, 0, 0, 0,
 			"Resets the camera to position: (0,0,0) and yaw: 0"));
@@ -384,9 +454,9 @@ namespace Input {
 			Box* sphere = new Box(Vector3(.3f, .3f, .3f), Vector3(20, 0, 20), V3ZERO, V3ONE, Vector3(-25, -3, 0), V3ZERO, V3ONE);
 			SphereCollider* sphereCol = new SphereCollider(sphere, 1);
 			Physics::AddEntity(box);
-			Render::AddEntity(box);
+			Scene::AddEntity(box);
 			Physics::AddEntity(sphere);
-			Render::AddEntity(sphere);
+			Scene::AddEntity(sphere);
 		}, "test_colliders", olc::F1, -1, 0, 1, 0,
 		"n/a"));
 
@@ -410,38 +480,13 @@ namespace Input {
 			action.Update(p);
 		}
 
-		////    Mouse Input    /////
-
-		//LMB press = set click position
-		if (p->GetMouse(0).bPressed) {
-			leftClickPos = GetMousePos(p);
-		}
-
-		//LMB hold = draw line between click and mouse position
-		if (p->GetMouse(0).bHeld) {
-			p->DrawLine(leftClickPos.x, leftClickPos.y, p->GetMouseX(), p->GetMouseY(), olc::WHITE);
-		}
-
-		//LMB release = add  drawn force to selected entity
-		if (p->GetMouse(0).bReleased) {
-			if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
-				Vector3 pos = GetMousePos(p);
-
-				pos.ScreenToWorld(c->ProjectionMatrix(p), c->MakeViewMatrix(Render::yaw), p);
-				leftClickPos.ScreenToWorld(c->ProjectionMatrix(p), c->MakeViewMatrix(Render::yaw), p);
-
-				entity->AddForce(nullptr, (pos - leftClickPos).normalized() * 5, true);
-			}
-
-			leftClickPos = V3NULL;
-		}
 
 		//RMB hold = set the position of selected entity to mouse
 		if (selectedEntity && p->GetMouse(1).bHeld) {
 			//do nothing for now
 
 			//Vector3 pos = GetMousePos(p);
-			//pos.ScreenToWorld(c->ProjectionMatrix(p), c->MakeViewMatrix(Render::yaw), p);
+			//pos.ScreenToWorld(c->ProjectionMatrix(p), c->MakeViewMatrix(Scene::yaw), p);
 			//pos.WorldToLocal(c->position);
 			//pos.normalize();
 			//pos *= 1000;
@@ -449,10 +494,6 @@ namespace Input {
 			//
 			//selectedEntity->position.x = pos.x;
 			//selectedEntity->position.y = pos.y;
-		}
-
-		if (selectedEntity) {
-			DEBUGI p->DrawStringDecal(Vector2(0, 0), selectedEntity->str());
 		}
 	}
 

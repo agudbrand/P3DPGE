@@ -32,7 +32,7 @@
     <ClInclude Include="src\Physics.h" />
     <ClInclude Include="src\physics\InertiaTensors.h" />
     <ClInclude Include="src\Render.h" />
-    <ClInclude Include="src\SceneManager.h" />
+    <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Time.h" />
   </ItemGroup>
   <ItemGroup>

@@ -38,8 +38,55 @@ public:
 		Input::Init();
 		Physics::Init();
 		Render::Init();
+		Scene::Init();
 
 		g_cBuffer.allocate_space(100);
+
+
+		std::vector<Button*> debug_b;
+
+		debug_b.push_back(new Button(([](olc::PixelGameEngine* p) {
+			GLOBAL_DEBUG = !GLOBAL_DEBUG;
+			}), "global_debug", ""));
+
+		debug_b.push_back(new Button(([](olc::PixelGameEngine* p) {
+			Box* box = new Box(Vector3(1, 1, 1), Vector3(0, 0, 3));
+			Input::selectedEntity = box;
+			Physics::AddEntity(box);
+			Scene::AddEntity(box);
+			}), "spawn_box", ""));
+
+		debug_b.push_back(new Button(([](olc::PixelGameEngine* p) {
+			//sub menu
+			}), "spawn_complex", "", true, 0));
+
+		
+
+		std::vector<Button*> cspawn_b;
+
+		cspawn_b.push_back(new Button(([](olc::PixelGameEngine* p) {
+			Complex* complex = new Complex("objects/bmonkey.obj", Vector3(0, 0, 3));
+			Input::selectedEntity = complex;
+			Physics::AddEntity(complex);
+			Scene::AddEntity(complex);
+			}), "bmonkey", ""));
+
+		cspawn_b.push_back(new Button(([](olc::PixelGameEngine* p) {
+			Complex* complex = new Complex("objects/whale_ship.obj", Vector3(0, 0, 3));
+			Input::selectedEntity = complex;
+			Physics::AddEntity(complex);
+			Scene::AddEntity(complex);
+			}), "whale_ship", ""));
+
+		cspawn_b.push_back(new Button(([](olc::PixelGameEngine* p) {
+			Complex* complex = new Complex("objects/24k_Triangles.obj", Vector3(0, 0, 3));
+			Input::selectedEntity = complex;
+			Physics::AddEntity(complex);
+			Scene::AddEntity(complex);
+			}), "24k_Triangles", ""));
+
+		Scene::ui_layer.push_back(new Menu(Vector2(50, 50), "debug_menu", "dm", debug_b,
+			std::vector<Menu*>{new Menu(V2ZERO, "complex_spawn", "", cspawn_b)}));
 
 		return true;
 	}
@@ -47,18 +94,11 @@ public:
 	bool OnUserUpdate(float deltaTime) {
 		Clear(olc::BLACK);
 
-		//time
 		Time::Update(deltaTime);
-
-		//input
 		Input::Update(this, Time::deltaTime);
-		
-		//physics
 		Physics::Update(Time::fixedDeltaTime);
-
-		//rendering
+		Scene::Update(this, Time::deltaTime);
 		Render::Update(this);
-
 		//Debug::Print("string: %s, decimal: %d, integer: %i", V3ZERO.str(), 1, 2);
 		//Debug::Print("float: %f, .2 float: %.2f, double: %f", 5.1234f, 5.1234f, 2.0);
 
@@ -70,6 +110,7 @@ public:
 		Input::Cleanup();
 		Physics::Cleanup();
 		Render::Cleanup();
+		Scene::CleanUp();
 		return true;
 	}
 };

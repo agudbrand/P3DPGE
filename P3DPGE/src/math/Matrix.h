@@ -120,7 +120,7 @@ struct Matrix {
 	friend Matrix operator * (const float& lhs, const Matrix& rhs) { return rhs * lhs; }
 
 	const std::string str() const;
-	const std::string str2F() const;
+	const std::string str2f() const;
 	Matrix Transpose() const;
 	Matrix Submatrix(std::vector<uint32> inRows, std::vector<uint32> inCols) const;
 	float Minor(int row, int col) const;
@@ -386,7 +386,7 @@ inline const std::string Matrix::str() const {
 	return str;
 };
 
-inline const std::string Matrix::str2F() const {
+inline const std::string Matrix::str2f() const {
 	if (rows == 0 || cols == 0) {
 		return "|Zero dimension matrix|";
 	}

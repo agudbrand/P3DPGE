@@ -231,7 +231,7 @@ public:
 		if (timer_running) {
 			end = g_totalTime;
 		}
-		BUFFERLOG(9, end - start);
+		
 		return end - start;
 	}
 

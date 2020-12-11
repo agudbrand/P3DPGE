@@ -53,13 +53,9 @@ public:
 	void SetTag(std::string newTag);
 	virtual void SetColor(olc::Pixel newColor);
 
-	// User must override these functions as required. I have not made
-	// them abstract because I do need a default behaviour to occur if
-	// they are not overwritten
-	//TODO: this ^
 	virtual void Update(float deltaTime);
-	virtual bool ContainsPoint(Vector3 point) = 0;
-	virtual bool ContainsScreenPoint(Vector3 point) = 0;
+	virtual bool ContainsPoint(Vector3 point);
+	virtual bool ContainsScreenPoint(Vector3 point);
 
 	virtual void DrawPosition(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view);
 	virtual void DrawVertices(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view);
@@ -83,6 +79,10 @@ public:
 	Collider* collider = nullptr;
 	std::vector<Vector3> forces;
 	Vector3 inputs;
+
+	int oscilliflag = 0;
+	int oscilliflag_life = 0;
+	bool checkoscilli = false;
 
 	//there may be a more elegent way to perform this
 	Vector3 pos_lerp_from;
@@ -231,7 +231,10 @@ struct Light : public Entity {
 	
 	Vector3 direction;
 
-	Light(){}
+	Light(Vector3 direction, EntityDefaultParams);
+	void ChangeLightDirection(Matrix rotation);
+	bool ContainsPoint(Vector3 point) override;
+	bool ContainsScreenPoint(Vector3 point) override;
 
 
 };

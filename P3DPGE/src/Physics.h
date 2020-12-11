@@ -14,6 +14,8 @@ namespace Physics {
 
 	static Timer* timer;
 
+	
+
 	static void Init() {
 		physEntities = std::vector<PhysEntity*>();
 		timer = new Timer;
@@ -30,7 +32,6 @@ namespace Physics {
 						//TODO(p, sushi) figure out why friction does what its doing in 3D
 
 						ptr->PhysUpdate(dTime);
-						BUFFERLOG(7, F_AVG(10, dTime));
 						
 						for (PhysEntity* target : physEntities) {
 							if (target) {

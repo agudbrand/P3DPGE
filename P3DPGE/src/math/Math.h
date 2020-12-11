@@ -36,6 +36,8 @@
 #define V3FORWARD	Vector3(0, 0, 1)
 #define V3BACKWARD	Vector3(0, 0, -1)
 
+#define V2ZERO Vector2()
+
 //qol defines
 #define RANDCOLOR olc::Pixel(rand() % 255 + 1, rand() % 255 + 1, rand() % 255 + 1)
 #define RANDVEC(a) Vector3(rand() % a + 1, rand() % a + 1, rand() % a + 1)
@@ -136,7 +138,7 @@ namespace Math {
 		return s;
 	}
 
-	static std::string str2F(float s) {
+	static std::string str2f(float s) {
 		char buffer[50];
 		std::snprintf(buffer, 50, "%-.2f", s);
 		return std::string(buffer);
@@ -174,7 +176,8 @@ namespace Math {
 	//interpolating
 	static float lerpf(float p1, float p2, float t) { return (1.f - t) * p1 + t * p2; }
 
-	static Vector3 lerpv3(Vector3 v1, Vector3 v2, float t) { return  v1 * (1.f - t) + v2 * t; }
+	static Vector3 lerpv(Vector3 v1, Vector3 v2, float t) { return  v1 * (1.f - t) + v2 * t; }
+	static Vector2 lerpv(Vector2 v1, Vector2 v2, float t) { return  v1 * (1.f - t) + v2 * t; }
 
 	//matrix stuff
 	static mat<float, 1, 4> Vector3ToM1x4(Vector3 v) {
@@ -244,6 +247,12 @@ namespace Math {
 		};
 
 		return m;
+	}
+
+	//this assumes a rectangle whose position is the top right corner
+	static bool PointInRect(Vector2 size, Vector2 pos, Vector2 point) {
+		return pos.x < point.x&& point.x < pos.x + size.x &&
+			   pos.y < point.y&& point.y < pos.y + size.y;
 	}
 
 	static float DistTwoPoints(Vector3 a, Vector3 b) {
@@ -816,7 +825,7 @@ struct Edge {
 	}
 
 	std::string str() { return "{(" + p[0].str() + "), (" + p[1].str() + ")}"; }
-	std::string str2F() { return "{(" + p[0].str2F() + "), (" + p[1].str2F() + ")}"; }
+	std::string str2f() { return "{(" + p[0].str2f() + "), (" + p[1].str2f() + ")}"; }
 };
 
 struct Edge3 {
@@ -838,7 +847,7 @@ struct Edge3 {
 	}
 
 	std::string str() { return "{(" + p[0].str() + "), (" + p[1].str() + ")}"; }
-	std::string str2F() { return "{(" + p[0].str2F() + "), (" + p[1].str2F() + ")}"; }
+	std::string str2f() { return "{(" + p[0].str2f() + "), (" + p[1].str2f() + ")}"; }
 
 	Vector3 edge_midpoint() {
 		return Vector3((p[0].x + p[1].x) / 2, (p[0].y + p[1].y) / 2, (p[0].z + p[1].z) / 2);

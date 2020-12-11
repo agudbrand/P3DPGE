@@ -177,7 +177,7 @@ struct Triangle {
 	}
 
 	std::string str() { return "{(" + points[0].str() + "), (" + points[1].str() + "), (" + points[2].str() + ")}"; }
-	std::string str2F() { return "{(" + points[0].str2F() + "), (" + points[1].str2F() + "), (" + points[2].str2F() + ")}"; }
+	std::string str2f() { return "{(" + points[0].str2f() + "), (" + points[1].str2f() + "), (" + points[2].str2f() + ")}"; }
 };
 
 

@@ -1,6 +1,5 @@
 #pragma once
-#include "Entities.h"
-#include "Mesh.h"
+#include "Scene.h"
 #include "internal/olcPixelGameEngine.h"
 
 namespace Render {
@@ -12,69 +11,24 @@ namespace Render {
 
 #define DEBUGR DEBUG if(DEBUG_RENDER)
 
-	static std::vector<Entity*> entities;
-
-	//special entities that should not be interacted with like
-	//normal entities. this is probably temporary
-	static std::vector<Entity*> sentities;
-
 	//this list can most likely be optimized by keeping triangles in it
 	//that we know havent been deleted but do that later
 	//implement pointers here at some point 
 	static std::vector<Triangle> triangles;
 
-	static Timer* timer;
-
-	static mat<float, 4, 4> view;
-	static Camera camera;
-	static float yaw;
-	static float pitch;
-
-	Vector3 light_direction(0, 0, -1);
-
-	//TODO(r, sushi) set up a way that debug can be applied to certain objects. this is important in the case of edge numbers
 	//debug booleans go here
 	bool WIRE_FRAME = false;
 	bool DISP_EDGES = false;
 
-	//booleans for pausing and advancing by frame
-	//pausing is sort of archaic right now but should be fleshed out later
-	//there are some in Physics as well
-	static bool paused = false;
-	static bool frame = false;
+	static mat<float, 4, 4> view;
 
-	//just shove all entities into here, then draw them
-	static void AddEntity(Entity* e) { entities.push_back(e); }
+	static Camera* GetCamera() { return &Scene::camera; }
 
-	static Camera* GetCamera() { return &camera; }
+	static Timer* timer;
 
 	static void Init() {
-		
-		//test lines
-		//Line2* l1 = new Line2(Vector3(100, 100, 0), 1);
-		//Line3* l2 = new Line3(Vector3(10, 10, 4), 1, Vector3(0, 2, 1));
-		//entities.push_back(l1);
-		//entities.push_back(l2);
-
-		//test triangle
-		//DebugTriangle* test = new DebugTriangle(Triangle(Vector3(0, 0, 0), Vector3(2, 0, 1), Vector3(3, 3, 1)), 1);
-		//temporary permanent Sprite because with the way we are drawing triangles 
-		//currently theres no way to know what the Entity's sprite is and I have a couple
-		//of ideas on how to solve this but later.
-		//Box* b = new Box(V3NULL, -1, V3NULL);
-		//b->sprite = new olc::Sprite("sprites/UV_Grid_Sm.jpg");
-		//entities.push_back(b);
-
-		//Box box(Vector3(1, 1, 1), -1, Vector3(0, 0, 0));
-		//SUCCESS(Vector3(1, 1, 1), 1);
-		//LOG("Log! ", 23.90);
-		//ERROR("box \n ", "nevermind");
-
 		timer = new Timer;
-
-		int a = 1;
-
-
+		Scene::ui_layer.push_back(new Menu(Vector2(80, 50), "BUFFERLOG", "buflog", std::vector<Button*>{}));
 	}
 
 	using namespace boost::qvm;
@@ -305,15 +259,13 @@ namespace Render {
 		std::vector<Triangle> visibleTriangles;
 		std::vector<Triangle> drawnTriangles;
 
-		//cool light rotation effect 
-		//light_direction = V3FORWARD * Math::GetRotateV3_Y(200 * Time::totalTime);
-		light_direction = light_direction.normalized();
+		Vector3 light_direction(0, 0, -1);
 
 		//store triangles we want to draw for sorting and copy world points to projected points
 		for (auto& t : triangles) {
 			t.copy_points();
 			float dp = light_direction.dot(t.get_normal());
-			if (t.get_normal().dot(t.midpoint() - camera.position) < 0) {
+			if (t.get_normal().dot(t.midpoint() - Scene::camera.position) < 0) {
 				t.set_color(olc::Pixel(
 					std::clamp(50 * dp,  0.f, 50.f),
 					std::clamp(75 * dp,  0.f, 75.f),
@@ -337,7 +289,7 @@ namespace Render {
 			for (int i = 0; i < clippedTriangles; i++) {
 				float w;
 				for (Vector3& n : clipped[i].proj_points) {
-					n.ProjToScreen(Render::camera.ProjectionMatrix(p), p, w);
+					n.ProjToScreen(Scene::camera.ProjectionMatrix(p), p, w);
 				}
 				clipped[i].e = t.e;
 
@@ -351,8 +303,8 @@ namespace Render {
 		}
 
 		std::sort(drawnTriangles.begin(), drawnTriangles.end(), [](Triangle& t1, Triangle& t2) {
-			float mp1 = Math::DistTwoPoints(t1.midpoint(), camera.position);
-			float mp2 = Math::DistTwoPoints(t2.midpoint(), camera.position);
+			float mp1 = Math::DistTwoPoints(t1.midpoint(), Scene::camera.position);
+			float mp2 = Math::DistTwoPoints(t2.midpoint(), Scene::camera.position);
 			return mp1 > mp2;
 			});
 
@@ -428,120 +380,66 @@ namespace Render {
 	}//Draw
 
 	static void ConsoleHandler(olc::PixelGameEngine* p){
-
-		/*ContainerManager<std::string> last = g_cBuffer_last;
-
-		RUN_ONCE g_cBuffer_last.copy(g_cBuffer);
-
-		std::vector<std::pair<std::string, int>> inv_indexes;
-		ContainerManager<std::string> new_cBuffer;
-
-		//debug please remove if i dont
-		ContainerManager<std::string> now  = g_cBuffer;
-		last = g_cBuffer_last;
-
-		//THIS ALMOST WORKS, there's just some data syncing i still need to do
-		//please don't use this yet except for what I already have placed
-		
-		//Print last buffer at index if it doesn't match new else print new
-		//then print all additions to buffer
-		//TODO(g, sushi) fix this so it works with additions
-		for (int i = 0; i < buffer_size; i++) {
-			//if the new buffer reaches a size greater than
-			//the old one, allocate space in the old one to avoid overflow
-			if (i > g_cBuffer_last.size() - 1) {
-				g_cBuffer_last.allocate_space(i);
-			}
-
-			//if the data in the new buffer is empty and their
-			//indexes match (which they always should for now)
-			//copy the data from old to new and print old
-			if (!g_cBuffer[i].first) {
-				ASSERT(g_cBuffer.container[i].second = g_cBuffer_last[i].second, "Index mismatch in console buffer.");
-				if (g_cBuffer_last.container[i].first) {
-					g_cBuffer[i].first = g_cBuffer_last[i].first.value();
-					p->DrawString(Vector2(p->ScreenWidth() / 2, 11 * i), g_cBuffer[i].first.value());
-				}
-			}
-			else {
-				p->DrawString(Vector2(p->ScreenWidth() / 2, 11 * i), g_cBuffer[i].first.value());
-			}
-
-		}
-
-		g_cBuffer_last.copy(g_cBuffer);
-
-		/*if index is less than last buffer's size then it is a previously defined
-		//object in the buffer else it is new
-		for (int i = 0; i < inv_indexes.size(); i++) {
-			if (inv_indexes[i].second < g_cBuffer_last.size()) {
-				if(inv_indexes)
-			}
-		}
-		g_cBuffer.empty();*/
-
-		ContainerManager<std::string> copy;
-		copy.container = g_cBuffer.container;
-
 		int index = 0;
-		for (auto e : g_cBuffer.container) {
-			if (e.has_value()) {
-				p->DrawString(Vector2(p->ScreenWidth() / 2, 0 + index * 9), e.value());
-				index++;
-			}
-		}
+		//BUFFERLOG_UI->update_dyn_strings(g_cBuffer);
+		//for (auto e : g_cBuffer.container) {
+		//	if (e.has_value()) {
+		//		p->DrawString(Vector2(100, 0 + index * 9), e.value());
+		//		index++;
+		//	}
+		//}
 	}
 
 	//draw all entities to screen
 	static void Update(olc::PixelGameEngine* p) {
 
-		view = camera.MakeViewMatrix(yaw);
+		view = Scene::camera.MakeViewMatrix(Scene::yaw);
 
-		DEBUG g_campos = camera.position;
+		DEBUG g_campos = Scene::camera.position;
+
+		BUFFERLOG(0, Scene::camera.position.str2f());
 
 		//get triangles from all entities
-		for (auto& e : entities) {
+		for (Entity* e : Scene::entities) {
 
 			e->Update(Time::deltaTime);
-
-			
 
 			//SpecialDraw is used for determining if its just an object
 			//drawn with triangles or if its special eg. a 2D object or Line3
 			if (e->SpecialDraw()) {
-				e->Draw(p, Render::camera.ProjectionMatrix(p), view);
+				e->Draw(p, Scene::camera.ProjectionMatrix(p), view);
 			}
 			else {
-				DEBUG e->Draw(p, Render::camera.ProjectionMatrix(p), view); //for accessing entity debug drawing
+				DEBUG e->Draw(p, Scene::camera.ProjectionMatrix(p), view); //for accessing entity debug drawing
 				for (auto& t : e->mesh->triangles) { triangles.push_back(t); }
 			}
 		}
 
-		//draw special entities
-		for (auto& se : sentities) {
-			if (se->SpecialDraw()) {
-				se->Draw(p, Render::camera.ProjectionMatrix(p), view);
-			}
-			else {
-				for (auto& t : se->mesh->triangles) { triangles.push_back(t); }
-			}
-		}
+		
 
 		Draw(p);
 
-		triangles.clear();
+		for (UI* u : Scene::ui_layer) {
+			if (Menu* m = dynamic_cast<Menu*>(u)) {
+				if (m->title == "BUFFERLOG") {
+					m->update_dyn_strings(g_cBuffer);
+				}
+			}
+			u->Draw(p);
+		}
 
+		triangles.clear();
 		ConsoleHandler(p);
 
 		//debug
-		DEBUGR p->DrawStringDecal(olc::vf2d(p->ScreenWidth() - 300, p->ScreenHeight() - 20), "Mouse: " + Vector3(p->GetMousePos()).str2F());
-		DEBUGR p->DrawStringDecal(olc::vf2d(p->ScreenWidth()-300, p->ScreenHeight() - 10), "Camera: " + Render::camera.position.str2F());
+		DEBUGR p->DrawStringDecal(olc::vf2d(p->ScreenWidth() - 300, p->ScreenHeight() - 20), "Mouse: " + Vector3(p->GetMousePos()).str2f());
+		DEBUGR p->DrawStringDecal(olc::vf2d(p->ScreenWidth()-300, p->ScreenHeight() - 10), "Camera: " + Scene::camera.position.str2f());
 
 		//Debug::EndTimerAverage(p, 10, "", 10);
 	}
 
 	static void Cleanup() {
-		//TODO(r, sushi, 11/18/2020) writing this is probably important
+		if(timer) delete timer;
 	}
 
 	

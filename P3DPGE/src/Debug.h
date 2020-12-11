@@ -227,6 +227,8 @@ public:
 	std::vector<std::optional<T>> container;
 	std::vector<int> empties;
 
+	int real_size = 0;
+
 	ContainerManager() {}
 
 	//T t& operator [](int i) { return container[i]; }
@@ -235,23 +237,30 @@ public:
 	void add_to(T t) {
 		if (empties.size() == 0) {
 			container.push_back(t);
+			real_size++;
 			return container.size() - 1;
 		}
 		else {
 			container[empties[0]] = t;
 			int index = empties[0];
 			empties.erase(empties.begin());
+			real_size++;
 			return index;
 		}
 	}
 
 	void add_to_index(T t, int index) {
 		ASSERT(allocate_space(index), "Container was unable to allocate space at specified index");
+		if(!container[index]){ real_size++; }
 		container[index] = t;
+		
 	}
 
+	//idk why i have this?
 	void set_index(T t, int index) {
+		if (!container[index]) { real_size++; }
 		container[index] = t;
+
 	}
 
 	void remove_from(int index) {
@@ -262,6 +271,7 @@ public:
 		//	container.pop_back();
 		//}
 		//else {
+		real_size--;
 		container[index].first.reset();
 		//empties.push_back(index);
 	//}
@@ -302,10 +312,12 @@ public:
 			container[i].first.reset();
 			empties.push_back(i);
 		}
+		real_size = 0;
 	}
 
 	void clear() {
 		container.clear();
+		real_size = 0;
 	}
 
 	void str() {

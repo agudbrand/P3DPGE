@@ -88,7 +88,7 @@ void Entity::DrawPosition(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat
 	left.Draw(p, ProjMat, view);
 	right.Draw(p, ProjMat, view);
 	bottom.Draw(p, ProjMat, view);
-	p->DrawString(tr.toVector2(), position.str2F());
+	p->DrawString(tr.toVector2(), position.str2f());
 
 	//float iter = 0.01;
 	//for (Triangle& t : mesh->triangles) {
@@ -107,7 +107,7 @@ void Entity::DrawVertices(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat
 			for (Vector3 v : t.points) {
 				Vector3 nuv = Math::ProjMult(v.ConvertToM1x4(), view);
 						nuv.ProjToScreen(ProjMat, p);
-				p->DrawString(nuv.toVector2(), v.str2F());
+				p->DrawString(nuv.toVector2(), v.str2f());
 			}
 		}
 	}
@@ -172,13 +172,16 @@ void Entity::Translate() {
 	prev_position = position;
 }
 
+bool Entity::ContainsPoint(Vector3 point) { return false; }
+bool Entity::ContainsScreenPoint(Vector3 point) { return false; }
+
 std::string Entity::str() {
 	std::string s =
 		"tag         " + tag					+ "\n" +
 		"id          " + std::to_string(id)		+ "\n" +
-		"position    " + position.str2F()		+ "\n" +
-		"rotation    " + rotation.str2F()		+ "\n" +
-		"scale       " + scale.str2F()			+ "\n" +
+		"position    " + position.str2f()		+ "\n" +
+		"rotation    " + rotation.str2f()		+ "\n" +
+		"scale       " + scale.str2f()			+ "\n" +
 		"entity_type: base_entity";
 		return s;
  
@@ -227,8 +230,6 @@ void PhysEntity::Update(float deltaTime) {
 
 void PhysEntity::PhysUpdate(float deltaTime) {
 
-	BUFFERLOG(12, inputs);
-
 	//for debug
 	Vector3 tf = V3ZERO;
 	BUFFERLOGI(8, 20, deltaTime, " ", g_fixedDeltaTime);
@@ -243,7 +244,7 @@ void PhysEntity::PhysUpdate(float deltaTime) {
 				netForce += f;
 				tf += f;
 			}
-			BUFFERLOG(3, "Forces:       ", netForce);
+			
 			acceleration = netForce / mass * 100;
 
 			
@@ -254,10 +255,19 @@ void PhysEntity::PhysUpdate(float deltaTime) {
 			Vector3 last_vel = V_STORE(velocity, 1);
 			if (velocity.mag() < .1f) { velocity = V3ZERO; acceleration = V3ZERO; }
 
-			//NOTE: this may hinder some collision checking so be aware of that
-			/*if (Math::round2v(velocity.normalized()) == Math::round2v(-last_vel.normalized())) {
-				velocity = V3ZERO; acceleration = V3ZERO;
-			}*/
+			if (Math::round2v(velocity.normalized()) == Math::round2v(-last_vel.normalized())) {
+				oscilliflag++;
+				checkoscilli = true;
+				if (oscilliflag >= 10) {
+					velocity = V3ZERO; acceleration = V3ZERO;
+					checkoscilli = 0; oscilliflag = 0; oscilliflag_life = 0;
+				}
+			}
+			
+			if (checkoscilli && oscilliflag_life > 20) {
+				checkoscilli = 0; oscilliflag = 0; oscilliflag_life = 0;
+			}
+
 			pos_lerp_from = position;
 			pos_lerp_to = position + velocity * g_fixedDeltaTime;
 			rotAcceleration = V3ZERO;
@@ -267,19 +277,13 @@ void PhysEntity::PhysUpdate(float deltaTime) {
 		Interpolate(deltaTime / g_fixedDeltaTime);
 	}
 
-	BUFFERLOG(0,  "lerp_from:       ", pos_lerp_from);
-	BUFFERLOG(1,  "lerp_to:         ", pos_lerp_to);
-	BUFFERLOG(5,  "Velocity:        ", V_AVG(300, velocity));
-	BUFFERLOG(6,  "Acceleration:    ", V_AVG(300, acceleration));
-	BUFFERLOG(17, "rotAcceleration: ", V_AVG(300, rotAcceleration));
-	BUFFERLOG(18, "rotVelocity:     ", V_AVG(300, rotVelocity));
 
 	inputs = V3ZERO;
 	
 }
 
 void PhysEntity::Interpolate(float t) {
-	position = Math::lerpv3(pos_lerp_from, pos_lerp_to, t);
+	position = Math::lerpv(pos_lerp_from, pos_lerp_to, t);
 
 }
 
@@ -318,7 +322,7 @@ void PhysEntity::AddFrictionForce(PhysEntity* creator, float frictionCoef, float
 	//}
 	//else {
 	forces.push_back(-velocity.normalized() * frictionCoef * mass * GRAVITY);
-	BUFFERLOG(13, -velocity.normalized() * frictionCoef * mass * GRAVITY);
+	
 	//}
 }
 
@@ -355,14 +359,14 @@ std::string Sphere::str() {
 	std::string s =
 		"tag             " + tag						+ "\n" +
 		"id              " + std::to_string(id)			+ "\n" +
-		"position        " + position.str2F()			+ "\n" +
-		"rotation        " + rotation.str2F()			+ "\n" +
-		"scale           " + scale.str2F()				+ "\n" +
+		"position        " + position.str2f()			+ "\n" +
+		"rotation        " + rotation.str2f()			+ "\n" +
+		"scale           " + scale.str2f()				+ "\n" +
 		"mass            " + std::to_string(mass)		+ "\n" +
-		"velocity        " + velocity.str2F()			+ "\n" +
-		"acceleration    " + acceleration.str2F()		+ "\n" +
-		"rotVelocity     " + rotVelocity.str2F()		+ "\n" +
-		"rotAcceleration " + rotAcceleration.str2F()	+ "\n" +
+		"velocity        " + velocity.str2f()			+ "\n" +
+		"acceleration    " + acceleration.str2f()		+ "\n" +
+		"rotVelocity     " + rotVelocity.str2f()		+ "\n" +
+		"rotAcceleration " + rotAcceleration.str2f()	+ "\n" +
 		"entity_type: sphere";
 	return s;
 
@@ -399,14 +403,14 @@ std::string Box::str() {
 	std::string s =
 		"tag             " + tag						+ "\n" +
 		"id              " + std::to_string(id)			+ "\n" +
-		"position        " + position.str2F()			+ "\n" +
-		"rotation        " + rotation.str2F()			+ "\n" +
-		"scale           " + scale.str2F()				+ "\n" +
+		"position        " + position.str2f()			+ "\n" +
+		"rotation        " + rotation.str2f()			+ "\n" +
+		"scale           " + scale.str2f()				+ "\n" +
 		"mass            " + std::to_string(mass)		+ "\n" +
-		"velocity        " + velocity.str2F()			+ "\n" +
-		"acceleration    " + acceleration.str2F()		+ "\n" +
-		"rotVelocity     " + rotVelocity.str2F()		+ "\n" +
-		"rotAcceleration " + rotAcceleration.str2F()	+ "\n" +
+		"velocity        " + velocity.str2f()			+ "\n" +
+		"acceleration    " + acceleration.str2f()		+ "\n" +
+		"rotVelocity     " + rotVelocity.str2f()		+ "\n" +
+		"rotAcceleration " + rotAcceleration.str2f()	+ "\n" +
 		"entity_type: box";
 	return s;
 
@@ -475,14 +479,14 @@ std::string Complex::str() {
 		"tag             " + tag						+ "\n" +
 		"id              " + std::to_string(id)			+ "\n" +
 		"model_name      " + model_name                 + "\n" +
-		"position        " + position.str2F()			+ "\n" +
-		"rotation        " + rotation.str2F()			+ "\n" +
-		"scale           " + scale.str2F()				+ "\n" +
+		"position        " + position.str2f()			+ "\n" +
+		"rotation        " + rotation.str2f()			+ "\n" +
+		"scale           " + scale.str2f()				+ "\n" +
 		"mass            " + std::to_string(mass)		+ "\n" +
-		"velocity        " + velocity.str2F()			+ "\n" +
-		"acceleration    " + acceleration.str2F()		+ "\n" +
-		"rotVelocity     " + rotVelocity.str2F()		+ "\n" +
-		"rotAcceleration " + rotAcceleration.str2F()	+ "\n" +
+		"velocity        " + velocity.str2f()			+ "\n" +
+		"acceleration    " + acceleration.str2f()		+ "\n" +
+		"rotVelocity     " + rotVelocity.str2f()		+ "\n" +
+		"rotAcceleration " + rotAcceleration.str2f()	+ "\n" +
 		"entity_type: complex";
 	return s;
 
@@ -514,9 +518,9 @@ std::string Line2::str() {
 	std::string s =
 		"tag         " + tag + "\n" +
 		"id          " + std::to_string(id) + "\n" +
-		"position    " + position.str2F() + "\n" +
-		"rotation    " + rotation.str2F() + "\n" +
-		"scale       " + scale.str2F() + "\n" +
+		"position    " + position.str2f() + "\n" +
+		"rotation    " + rotation.str2f() + "\n" +
+		"scale       " + scale.str2f() + "\n" +
 		"entity_type: line_2";
 	return s;
 
@@ -560,9 +564,9 @@ std::string Line3::str() {
 	std::string s =
 		"tag         " + tag + "\n" +
 		"id          " + std::to_string(id) + "\n" +
-		"position    " + position.str2F() + "\n" +
-		"rotation    " + rotation.str2F() + "\n" +
-		"scale       " + scale.str2F() + "\n" +
+		"position    " + position.str2f() + "\n" +
+		"rotation    " + rotation.str2f() + "\n" +
+		"scale       " + scale.str2f() + "\n" +
 		"entity_type: line_3";
 	return s;
 
@@ -586,9 +590,9 @@ std::string DebugTriangle::str() {
 	std::string s =
 		"tag         " + tag + "\n" +
 		"id          " + std::to_string(id) + "\n" +
-		"position    " + position.str2F() + "\n" +
-		"rotation    " + rotation.str2F() + "\n" +
-		"scale       " + scale.str2F() + "\n" +
+		"position    " + position.str2f() + "\n" +
+		"rotation    " + rotation.str2f() + "\n" +
+		"scale       " + scale.str2f() + "\n" +
 		"entity_type: debug_triangle";
 	return s;
 
@@ -601,7 +605,6 @@ mat<float, 4, 4> Camera::MakeViewMatrix(float yaw, bool force_target) {
 	lookDir = target * Math::GetRotateV3_Y(yaw);
 	target = position + lookDir;
 	
-	BUFFERLOG(16, lookDir);
 	mat<float, 4, 4> view = inverse(Math::PointAt(position, target, up));
 	
 	return view;
@@ -622,9 +625,7 @@ mat<float, 4, 4> Camera::ProjectionMatrix(olc::PixelGameEngine* p) {
 	return proj;
 }
 
-bool Camera::ContainsPoint(Vector3 point) {
-	return false;
-}
+bool Camera::ContainsPoint(Vector3 point) { return false; }
 bool Camera::ContainsScreenPoint(Vector3 point) { return false; }
 
 void Camera::Update(float deltaTime) {
@@ -634,9 +635,9 @@ std::string Camera::str() {
 	std::string s =
 		"tag         " + tag + "\n" +
 		"id          " + std::to_string(id) + "\n" +
-		"position    " + position.str2F() + "\n" +
-		"rotation    " + rotation.str2F() + "\n" +
-		"scale       " + scale.str2F() + "\n" +
+		"position    " + position.str2f() + "\n" +
+		"rotation    " + rotation.str2f() + "\n" +
+		"scale       " + scale.str2f() + "\n" +
 		"entity_type: camera";
 	return s;
 
@@ -644,6 +645,13 @@ std::string Camera::str() {
 
 //// Light ////
 
-//Light::Light(Vector3 direction) {
-//
-//}
+Light::Light(Vector3 direction, EntityParams) : Entity(EntityArgs) {
+	this->direction = direction;
+}
+
+void Light::ChangeLightDirection(Matrix rotation) {
+	direction *= rotation; direction.normalize();
+}
+
+bool Light::ContainsScreenPoint(Vector3 point) { return false; }
+bool Light::ContainsPoint(Vector3 point) { return false; }
