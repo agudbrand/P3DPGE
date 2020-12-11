@@ -37,7 +37,7 @@ public:
 
 #define DEBUGE DEBUG if(ENTITY_DEBUG)
 	
-	Entity();
+	Entity() {}
 	Entity(int id, EntityDefaultParams);
 	virtual ~Entity();
 	virtual bool LineIntersect(Edge3* e);
@@ -81,7 +81,7 @@ public:
 	float mass;
 	float elasticity;
 	bool bStatic;
-	Collider* collider;
+	Collider* collider = nullptr;
 	std::vector<Vector3> forces;
 	Vector3 inputs;
 
@@ -95,20 +95,22 @@ public:
 	
 	PhysEntity() : Entity() {}
 	PhysEntity(int id, EntityDefaultParams, PhysEntityDefaultParams);
+	virtual ~PhysEntity();
+
 	void Update(float deltaTime) override;
 	virtual void PhysUpdate(float deltaTime);
 	void Interpolate(float t);
+
 	void AddForce(PhysEntity* creator, Vector3 force, bool bIgnoreMass = false);
 	void AddFrictionForce(PhysEntity* creator, float frictionCoef, float deltaTime, bool bIngoreMass = false);
 	void AddImpulse(PhysEntity* creator, Vector3 impulse, bool bIgnoreMass = false);
 	void GenerateRadialForce(Vector3 position, float radius, float strength, float falloff, bool bIgnoreMass);
 
 	void AddInput(Vector3 input);
+	void SetCollider(Collider* collider);
+	bool CheckCollision(PhysEntity* other, bool resolveCollision = true);
 
 	void Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) override;
-
-	virtual bool CheckCollision(Entity* entity) = 0;
-	virtual void ResolveCollision(PhysEntity* entity) = 0;
 };
 
 struct Sphere : public PhysEntity {
@@ -118,22 +120,18 @@ struct Sphere : public PhysEntity {
 	Sphere(float r, int id, EntityDefaultParams, PhysEntityDefaultParams);
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
-	bool CheckCollision(Entity* entity) override;
-	void ResolveCollision(PhysEntity* entity) override;
 
 	virtual std::string str() override;
 };
 
 //formed by a single dimension vector
 struct Box : public PhysEntity {
-	Vector3 dimensions; //full dimensions
+	Vector3 halfDims; //half dimensions
 	
 	Box() : PhysEntity() {}
-	Box(Vector3 dimensions, int id, EntityDefaultParams, PhysEntityDefaultParams);
+	Box(Vector3 halfDims, int id, EntityDefaultParams, PhysEntityDefaultParams);
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
-	bool CheckCollision(Entity* entity) override;
-	void ResolveCollision(PhysEntity* entity) override;
 
 	virtual std::string str() override;
 };
@@ -154,8 +152,6 @@ struct Complex : public PhysEntity {
 	bool LoadFromObjectFile(std::string file_name);
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
-	bool CheckCollision(Entity* entity) override;
-	void ResolveCollision(PhysEntity* entity) override;
 
 	virtual std::string str() override;
 };

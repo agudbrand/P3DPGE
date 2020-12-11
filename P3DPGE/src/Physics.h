@@ -33,15 +33,14 @@ namespace Physics {
 						
 						ptr->PhysUpdate(dTime);
 						BUFFERLOG(7, F_AVG(10, dTime));
-						//
-						//for (PhysEntity* target : physEntities) {
-						//	if (target && target->id != ptr->id) {
-						//		if (ptr->CheckCollision(target)) {
-						//			ptr->ResolveCollision(target);
-						//		}
-						//	}
-						//	else { break; }
-						//}
+						
+						for (PhysEntity* target : physEntities) {
+							if (target) {
+								if (target->id != ptr->id) {
+									ptr->CheckCollision(target, true);
+								}
+							} else { break; }
+						}
 					}
 				}
 				else { break; }

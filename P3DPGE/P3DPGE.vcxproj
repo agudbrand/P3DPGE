@@ -30,6 +30,7 @@
     <ClInclude Include="src\math\Vector.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Physics.h" />
+    <ClInclude Include="src\physics\InertiaTensors.h" />
     <ClInclude Include="src\Render.h" />
     <ClInclude Include="src\Time.h" />
   </ItemGroup>

@@ -177,7 +177,7 @@ struct Triangle {
 	}
 
 	std::string str() { return "{(" + points[0].str() + "), (" + points[1].str() + "), (" + points[2].str() + ")}"; }
-	std::string str2f() { return "{(" + points[0].str2f() + "), (" + points[1].str2f() + "), (" + points[2].str2f() + ")}"; }
+	std::string str2F() { return "{(" + points[0].str2F() + "), (" + points[1].str2F() + "), (" + points[2].str2F() + ")}"; }
 };
 
 
@@ -227,16 +227,16 @@ struct CircleMesh : public Mesh {
 };
 
 struct BoxMesh : public Mesh {
-	BoxMesh(Vector3 dimensions, Vector3 position, Entity* e) {
+	BoxMesh(Vector3 halfDims, Vector3 position, Entity* e) {
 		//vertices making up the box
-		Vector3 p1 = position + dimensions.xInvert().yInvert().zInvert();
-		Vector3 p2 = position + dimensions.yInvert().zInvert();
-		Vector3 p3 = position + dimensions.xInvert().zInvert();
-		Vector3 p4 = position + dimensions.xInvert().yInvert();
-		Vector3 p5 = position + dimensions.xInvert();
-		Vector3 p6 = position + dimensions.yInvert();
-		Vector3 p7 = position + dimensions.zInvert();
-		Vector3 p8 = position + dimensions;
+		Vector3 p1 = position + halfDims.xInvert().yInvert().zInvert();
+		Vector3 p2 = position + halfDims.yInvert().zInvert();
+		Vector3 p3 = position + halfDims.xInvert().zInvert();
+		Vector3 p4 = position + halfDims.xInvert().yInvert();
+		Vector3 p5 = position + halfDims.xInvert();
+		Vector3 p6 = position + halfDims.yInvert();
+		Vector3 p7 = position + halfDims.zInvert();
+		Vector3 p8 = position + halfDims;
 		
 		//TODO(c, sushi) do this better later
 		//west
