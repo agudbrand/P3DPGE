@@ -3,6 +3,14 @@
 
 struct Vector3;
 
+namespace boost {
+	namespace qvm {
+		template<typename M, int, int>
+		class mat;
+	}
+}
+#define mat boost::qvm::mat
+
 /*
 //// Notes ////
 	Matrices can only hold floats
@@ -71,6 +79,11 @@ struct Vector3;
 		eg: Matrix(1, 2, {-5, .5f}) ^ Matrix(1, 2, {2, .5f}); This will return a 1x2 matrix: |-10.0, 0.25|
 		eg: Matrix(1, 2, {-5, .5f}) % Matrix(1, 2, {2, .5f}); This will return a 1x2 matrix: |-2.5, 1.0|
 
+//// Transformation Matrix ////														|scaleX * rot,	rot,			rot,		  translationX|
+	You can create a transformation matrix by providing the translation, rotation,	|rot,			scaleY * rot,	rot,		  translationY|
+	and scale to the TransformationMatrix() method.									|rot,			rot,			scaleZ * rot, translationZ|
+	The transformation matrix will follow the format to the right:					|0,				0,				0,			  1			  |
+
 */
 
 //TODO(o,delle) test that there is no memory leak on destruction of Matrix objects
@@ -78,14 +91,15 @@ struct Matrix {
 	uint32 rows;
 	uint32 cols;
 	uint32 elementCount;
-	float* data;
+	std::vector<float> data;
 
+	Matrix() {}
 	Matrix(uint32 inRows, uint32 inCols);
 	Matrix(uint32 inRows, uint32 inCols, std::vector<float> list);
 	Matrix(const Matrix& m);
-	~Matrix();
 
 	float&	operator () (uint32 row, uint32 col);
+	float   operator () (uint32 row, uint32 col) const;
 	void	operator =	(const Matrix& rhs);
 	Matrix  operator *  (const float& rhs) const;
 	void	operator *= (const float& rhs);
@@ -107,7 +121,6 @@ struct Matrix {
 
 	const std::string str() const;
 	const std::string str2F() const;
-	void Copy(const Matrix& m);
 	Matrix Transpose() const;
 	Matrix Submatrix(std::vector<uint32> inRows, std::vector<uint32> inCols) const;
 	float Minor(int row, int col) const;
@@ -117,10 +130,20 @@ struct Matrix {
 	Matrix Inverse() const;
 
 	static Matrix Identity(uint32 rows, uint32 cols);
+	static Matrix M3x3To4x4(const Matrix& m);
+	static Matrix RotationMatrix(Vector3 rotation, bool _4x4 = true);
+	static Matrix TranslationMatrix(Vector3 translation);
+	static Matrix ScaleMatrix(Vector3 scale, bool _4x4 = true);
+	static Matrix TransformationMatrix(Vector3 translation, Vector3 rotation, Vector3 scale);
 
-	//Non-Matrix vs Matrix interactions //TODO(, delle) define these in Math.h
-	Matrix(Vector3 v); //TODO(, delle) define this in Math.h
-	Matrix(Vector3 v, float w); //TODO(, delle) define this in Math.h
+	//Non-Matrix vs Matrix interactions //TODO(delle) define these in Math.h
+	Matrix(Vector3 v);
+	Matrix(Vector3 v, float w);
+
+	//temporary qvm interactions
+	Matrix(mat<float, 1, 4> m);
+	Matrix(mat<float, 4, 4> m);
+	Matrix(mat<float, 3, 3> m);
 };
 
 
@@ -130,7 +153,7 @@ struct Matrix {
 inline Matrix::Matrix(uint32 inRows, uint32 inCols) : rows(inRows), cols(inCols) {
 	ASSERT(inRows != 0 && inCols != 0, "Matrix constructor was given zero size");
 	this->elementCount = inRows * inCols;
-	this->data = new float[elementCount]();
+	this->data = std::vector<float>(elementCount);
 }
 
 inline Matrix::Matrix(uint32 inRows, uint32 inCols, std::vector<float> list) : rows(inRows), cols(inCols) {
@@ -138,43 +161,38 @@ inline Matrix::Matrix(uint32 inRows, uint32 inCols, std::vector<float> list) : r
 	this->elementCount = inRows * inCols;
 	uint32 inCount = list.size();
 	ASSERT(inCount <= elementCount, "Matrix constructor was given too many elements for given dimensions");
-	this->data = new float[elementCount]();
+	this->data = std::vector<float>(elementCount);
 	for (int i = 0; i < list.size(); ++i) {
 		this->data[i] = list[i];
 	}
 }
 
-inline Matrix::Matrix(const Matrix& m) {
-	this->rows = m.rows;
-	this->cols = m.cols;
-	this->elementCount = rows * cols;
-	this->data = new float[elementCount]();
-	Copy(m);
-}
-
-inline Matrix::~Matrix() {
-	delete[] data;
+inline Matrix::Matrix(const Matrix& m) : rows(m.rows), cols(m.cols), elementCount(m.elementCount) {
+	this->data = m.data;
 }
 
 
 
 //// Operators ////
 
-//element accessor: matrix(row,col) //TODO(delle) test that you can use this to assign values to the matrix
+//element accessor: matrix(row,col)
 inline float& Matrix::operator () (uint32 row, uint32 col) {
 	ASSERT(row <= rows && col <= cols, "Matrix subscript out of bounds");
 	return data[cols*row + col];
 }
 
+inline float  Matrix::operator () (uint32 row, uint32 col) const {
+	ASSERT(row <= rows && col <= cols, "Matrix subscript out of bounds");
+	return data[cols * row + col];
+}
+
 //deletes current data, copies properties from rhs, creates a new copy of the data from rhs
 inline void	   Matrix::operator =  (const Matrix& rhs) {
-	if (this->data != rhs.data) {
+	if (&this->data != &rhs.data) {
 		this->rows = rhs.rows;
 		this->cols = rhs.cols;
-		this->elementCount = rows * cols;
-		this->~Matrix();
-		this->data = new float[elementCount]();
-		Copy(rhs);
+		this->elementCount = rhs.elementCount;
+		this->data = rhs.data;
 	}
 }
 
@@ -402,17 +420,6 @@ inline const std::string Matrix::str2F() const {
 	return str;
 };
 
-//copys the data from one matrix to the other
-//REQUIRES both to have the same dimensions
-inline void Matrix::Copy(const Matrix& m) {
-	ASSERT(rows == m.rows && cols == m.cols, "Cant copy matrices of unequal dimensions");
-	float* p = data + (elementCount);
-	float* q = m.data + (elementCount);
-	while (p > data) {
-		*--p = *--q;
-	}
-}
-
 //converts the rows into columns and vice-versa
 inline Matrix Matrix::Transpose() const{
 	Matrix newMatrix(cols, rows);
@@ -542,4 +549,65 @@ inline Matrix Matrix::Identity(uint32 rows, uint32 cols) {
 		}
 	}
 	return newMatrix;
+}
+
+//returns a 4x4 matrix with the last element 1 from the provided 3x3 matrix
+inline Matrix Matrix::M3x3To4x4(const Matrix& m) {
+	ASSERT(m.rows == 3 && m.cols == 3, "Cant convert 3x3 matrix to 4x4 if the matrix isnt 3x3");
+	return Matrix(4, 4,{m(0,0), m(0,1), m(0,2), 0,
+						m(1,0), m(1,1), m(1,2), 0,
+						m(2,0), m(2,1), m(2,2), 0,
+						0,		0,		0,		1});
+}
+
+//returns a 4x4 or 3x3 rotation transformation matrix depending on boolean argument
+inline Matrix Matrix::RotationMatrix(Vector3 rotation, bool _4x4) {
+	float cosX = cosf(rotation.x);
+	float sinX = sinf(rotation.x);
+	float cosY = cosf(rotation.y);
+	float sinY = sinf(rotation.y);
+	float cosZ = cosf(rotation.z);
+	float sinZ = sinf(rotation.z);
+	Matrix newMatrix(3, 3, {cosY,		sinY*sinZ,					cosZ*sinY,
+							sinX*sinY,	cosX*cosZ - cosY*sinX*sinZ,	-cosX*sinZ - cosY*cosZ*sinX,
+							-cosX*sinY,	cosZ*sinX + cosX*cosY*sinZ, cosX*cosY*cosZ - sinX*sinZ});
+	if (_4x4) {
+		return Matrix::M3x3To4x4(newMatrix);
+	} else {
+		return newMatrix;
+	}
+}
+
+//returns a 4x4 translation transformation matrix depending on boolean argument
+inline Matrix Matrix::TranslationMatrix(Vector3 translation) {
+	Matrix newMatrix = Identity(4,4);
+	newMatrix(0,3) = translation.x;
+	newMatrix(1,3) = translation.y;
+	newMatrix(2,3) = translation.z;
+	return newMatrix;
+}
+
+inline Matrix Matrix::ScaleMatrix(Vector3 scale, bool _4x4) {
+	Matrix newMatrix = Identity(3,3);
+	newMatrix(0,0) = scale.x;
+	newMatrix(1,1) = scale.y;
+	newMatrix(2,2) = scale.z;
+	if(_4x4) {
+		return Matrix::M3x3To4x4(newMatrix);
+	} else {
+		return newMatrix;
+	}
+}
+
+inline Matrix Matrix::TransformationMatrix(Vector3 translation, Vector3 rotation, Vector3 scale) {
+	float cosX = cosf(rotation.x);
+	float sinX = sinf(rotation.x);
+	float cosY = cosf(rotation.y);
+	float sinY = sinf(rotation.y);
+	float cosZ = cosf(rotation.z);
+	float sinZ = sinf(rotation.z);
+	return Matrix(4, 4,{scale.x*(cosY),	sinY*sinZ,								cosZ*sinY,								translation.x,
+						sinX*sinY,		scale.y*(cosX*cosZ - cosY*sinX*sinZ),	-cosX*sinZ - cosY*cosZ*sinX,			translation.y,
+						-cosX*sinY,		cosZ*sinX + cosX*cosY*sinZ,				scale.z*(cosX*cosY*cosZ - sinX*sinZ),	translation.z,
+						0,				0,										0,										1});
 }

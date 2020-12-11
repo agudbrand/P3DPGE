@@ -88,7 +88,7 @@ void Entity::DrawPosition(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat
 	left.Draw(p, ProjMat, view);
 	right.Draw(p, ProjMat, view);
 	bottom.Draw(p, ProjMat, view);
-	p->DrawString(tr.toVector2(), position.str2f());
+	p->DrawString(tr.toVector2(), position.str2F());
 
 	//float iter = 0.01;
 	//for (Triangle& t : mesh->triangles) {
@@ -107,7 +107,7 @@ void Entity::DrawVertices(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat
 			for (Vector3 v : t.points) {
 				Vector3 nuv = Math::ProjMult(v.ConvertToM1x4(), view);
 						nuv.ProjToScreen(ProjMat, p);
-				p->DrawString(nuv.toVector2(), v.str2f());
+				p->DrawString(nuv.toVector2(), v.str2F());
 			}
 		}
 	}
@@ -176,9 +176,9 @@ std::string Entity::str() {
 	std::string s =
 		"tag         " + tag					+ "\n" +
 		"id          " + std::to_string(id)		+ "\n" +
-		"position    " + position.str2f()		+ "\n" +
-		"rotation    " + rotation.str2f()		+ "\n" +
-		"scale       " + scale.str2f()			+ "\n" +
+		"position    " + position.str2F()		+ "\n" +
+		"rotation    " + rotation.str2F()		+ "\n" +
+		"scale       " + scale.str2F()			+ "\n" +
 		"entity_type: base_entity";
 		return s;
  
@@ -202,6 +202,10 @@ PhysEntity::PhysEntity(EntityParams, PhysEntityParams) : Entity(EntityArgs) {
 	this->elasticity = elasticity;
 	this->bStatic = bStatic;
 };
+
+PhysEntity::~PhysEntity() {
+	delete collider;
+}
 
 void PhysEntity::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
 	//do nothing if not SpecialDraw unless debug is enabled
@@ -251,9 +255,9 @@ void PhysEntity::PhysUpdate(float deltaTime) {
 			if (velocity.mag() < .1f) { velocity = V3ZERO; acceleration = V3ZERO; }
 
 			//NOTE: this may hinder some collision checking so be aware of that
-			if (Math::round2v(velocity.normalized()) == Math::round2v(-last_vel.normalized())) {
+			/*if (Math::round2v(velocity.normalized()) == Math::round2v(-last_vel.normalized())) {
 				velocity = V3ZERO; acceleration = V3ZERO;
-			}
+			}*/
 			pos_lerp_from = position;
 			pos_lerp_to = position + velocity * g_fixedDeltaTime;
 			rotAcceleration = V3ZERO;
@@ -290,6 +294,20 @@ void PhysEntity::AddForce(PhysEntity* creator, Vector3 force, bool bIgnoreMass) 
 void PhysEntity::AddInput(Vector3 input) {
 	inputs += input;
 	inputs.normalize();
+}
+
+void PhysEntity::SetCollider(Collider* collider) {
+	ASSERT(collider != nullptr, "SetCollider cant be called with a nullptr");
+	delete this->collider;
+	this->collider = collider;
+	this->collider->entity = this;
+}
+
+bool PhysEntity::CheckCollision(PhysEntity* other, bool resolveCollision) {
+	if(collider != nullptr && other->collider != nullptr) {
+		return collider->CheckCollision(other->collider, resolveCollision);
+	}
+	return false;
 }
 
 //if no creator, assume air friction and temporarily treat object as sphere with C=.5
@@ -333,54 +351,18 @@ bool Sphere::ContainsScreenPoint(Vector3 point) {
 	return point.distanceTo(pos) <= radius;
 }
 
-//NOTE can instead return a Collision object with all info needed
-//TODO(sp,delle,11/9/20) expand this to a general entity check, but right now it just checks circles
-//TODO(oup,delle,11/9/20) if other object is sphere, can optimize the equation to not use sqrt
-bool Sphere::CheckCollision(Entity* entity) {
-	if (Sphere* sphere = dynamic_cast<Sphere*>(entity)) {
-		Vector3 vectorBetween = position - sphere->position;
-		float distanceBetween = vectorBetween.mag();
-		if (distanceBetween <= (radius + sphere->radius)) {
-			return true;
-		}
-	}
-	return false;
-}
-
-//TODO(sp,delle,11/9/20) expand this to a general entity check, but right now it just checks circles
-//TODO(oup,delle,11/17/20) can optimize this by recieving info from CheckCollision
-void Sphere::ResolveCollision(PhysEntity* other) {
-	if (Sphere* sphere = dynamic_cast<Sphere*>(other)) {
-		//static resolution
-		Vector3 vectorBetween = position - sphere->position;
-		float distanceBetween = vectorBetween.mag();
-		float overlap = .5f * (distanceBetween - radius - sphere->radius);
-		vectorBetween = vectorBetween.normalized() * overlap;
-		position -= vectorBetween;
-		sphere->position += vectorBetween;
-		
-		//dynamic resolution
-		//From wikipedia without rotation
-		//https://en.wikipedia.org/wiki/Elastic_collision#Two-dimensional_collision_with_two_moving_objects
-		Vector3 normal = (other->position - position) / distanceBetween;
-		float p = 2.f * (normal.dot(velocity - other->velocity)) / (mass + other->mass);
-		velocity -= normal * p * other->mass;
-		other->velocity += normal * p * mass;
-	}
-}
-
 std::string Sphere::str() {
 	std::string s =
 		"tag             " + tag						+ "\n" +
 		"id              " + std::to_string(id)			+ "\n" +
-		"position        " + position.str2f()			+ "\n" +
-		"rotation        " + rotation.str2f()			+ "\n" +
-		"scale           " + scale.str2f()				+ "\n" +
+		"position        " + position.str2F()			+ "\n" +
+		"rotation        " + rotation.str2F()			+ "\n" +
+		"scale           " + scale.str2F()				+ "\n" +
 		"mass            " + std::to_string(mass)		+ "\n" +
-		"velocity        " + velocity.str2f()			+ "\n" +
-		"acceleration    " + acceleration.str2f()		+ "\n" +
-		"rotVelocity     " + rotVelocity.str2f()		+ "\n" +
-		"rotAcceleration " + rotAcceleration.str2f()	+ "\n" +
+		"velocity        " + velocity.str2F()			+ "\n" +
+		"acceleration    " + acceleration.str2F()		+ "\n" +
+		"rotVelocity     " + rotVelocity.str2F()		+ "\n" +
+		"rotAcceleration " + rotAcceleration.str2F()	+ "\n" +
 		"entity_type: sphere";
 	return s;
 
@@ -388,10 +370,10 @@ std::string Sphere::str() {
 
 //// Box ////
 
-Box::Box(Vector3 dimensions, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
-	this->dimensions = dimensions;
+Box::Box(Vector3 halfDims, int id, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
+	this->halfDims = halfDims;
 	tag = "box";
-	mesh = new BoxMesh(dimensions, position, this);
+	mesh = new BoxMesh(halfDims, position, this);
 	sprite = new olc::Sprite("sprites/UV_Grid_Sm.jpg");
 	pos_lerp_from = position;
 	pos_lerp_to = position;
@@ -400,40 +382,31 @@ Box::Box(Vector3 dimensions, EntityParams, PhysEntityParams) : PhysEntity(Entity
 //not sure if this still works or not, when I was trying to select boxes
 //it wouldn't do anything but i feel it should still work
 bool Box::ContainsPoint(Vector3 point) {
-	bool checkX = point.x >= position.x - dimensions.x / 2 && point.x <= position.x + dimensions.x / 2;
-	bool checkY = point.y >= position.y - dimensions.y / 2 && point.y <= position.y + dimensions.y / 2;
-	bool checkZ = point.z >= position.z - dimensions.z / 2 && point.z <= position.z + dimensions.z / 2;
+	bool checkX = point.x >= position.x - halfDims.x / 2 && point.x <= position.x + halfDims.x / 2;
+	bool checkY = point.y >= position.y - halfDims.y / 2 && point.y <= position.y + halfDims.y / 2;
+	bool checkZ = point.z >= position.z - halfDims.z / 2 && point.z <= position.z + halfDims.z / 2;
 	return  checkX && checkY && checkZ;
 }
 
 bool Box::ContainsScreenPoint(Vector3 point) {
-	bool checkX = point.x >= position.x - dimensions.x / 2 && point.x <= position.x + dimensions.x / 2;
-	bool checkY = point.y >= position.y - dimensions.y / 2 && point.y <= position.y + dimensions.y / 2;
+	bool checkX = point.x >= position.x - halfDims.x / 2 && point.x <= position.x + halfDims.x / 2;
+	bool checkY = point.y >= position.y - halfDims.y / 2 && point.y <= position.y + halfDims.y / 2;
 	//bool checkZ = point.z >= position.z - dimensions.z / 2 && point.z <= position.z + dimensions.z / 2;
 	return  checkX && checkY;//&& checkZ;
-}
-
-//TODO(sp,delle,11/9/20) expand this to a general entity check
-bool Box::CheckCollision(Entity* entity) {
-	return false;
-}
-
-//TODO(sp,delle,11/9/20) expand this to a general entity check
-void Box::ResolveCollision(PhysEntity* entity) {
 }
 
 std::string Box::str() {
 	std::string s =
 		"tag             " + tag						+ "\n" +
 		"id              " + std::to_string(id)			+ "\n" +
-		"position        " + position.str2f()			+ "\n" +
-		"rotation        " + rotation.str2f()			+ "\n" +
-		"scale           " + scale.str2f()				+ "\n" +
+		"position        " + position.str2F()			+ "\n" +
+		"rotation        " + rotation.str2F()			+ "\n" +
+		"scale           " + scale.str2F()				+ "\n" +
 		"mass            " + std::to_string(mass)		+ "\n" +
-		"velocity        " + velocity.str2f()			+ "\n" +
-		"acceleration    " + acceleration.str2f()		+ "\n" +
-		"rotVelocity     " + rotVelocity.str2f()		+ "\n" +
-		"rotAcceleration " + rotAcceleration.str2f()	+ "\n" +
+		"velocity        " + velocity.str2F()			+ "\n" +
+		"acceleration    " + acceleration.str2F()		+ "\n" +
+		"rotVelocity     " + rotVelocity.str2F()		+ "\n" +
+		"rotAcceleration " + rotAcceleration.str2F()	+ "\n" +
 		"entity_type: box";
 	return s;
 
@@ -497,26 +470,19 @@ bool Complex::ContainsScreenPoint(Vector3 point){
 	return false;
 }
 
-bool Complex::CheckCollision(Entity* entity) {
-	return false;
-}
-
-void Complex::ResolveCollision(PhysEntity* entity) {
-}
-
 std::string Complex::str() {
 	std::string s =
 		"tag             " + tag						+ "\n" +
 		"id              " + std::to_string(id)			+ "\n" +
 		"model_name      " + model_name                 + "\n" +
-		"position        " + position.str2f()			+ "\n" +
-		"rotation        " + rotation.str2f()			+ "\n" +
-		"scale           " + scale.str2f()				+ "\n" +
+		"position        " + position.str2F()			+ "\n" +
+		"rotation        " + rotation.str2F()			+ "\n" +
+		"scale           " + scale.str2F()				+ "\n" +
 		"mass            " + std::to_string(mass)		+ "\n" +
-		"velocity        " + velocity.str2f()			+ "\n" +
-		"acceleration    " + acceleration.str2f()		+ "\n" +
-		"rotVelocity     " + rotVelocity.str2f()		+ "\n" +
-		"rotAcceleration " + rotAcceleration.str2f()	+ "\n" +
+		"velocity        " + velocity.str2F()			+ "\n" +
+		"acceleration    " + acceleration.str2F()		+ "\n" +
+		"rotVelocity     " + rotVelocity.str2F()		+ "\n" +
+		"rotAcceleration " + rotAcceleration.str2F()	+ "\n" +
 		"entity_type: complex";
 	return s;
 
@@ -548,9 +514,9 @@ std::string Line2::str() {
 	std::string s =
 		"tag         " + tag + "\n" +
 		"id          " + std::to_string(id) + "\n" +
-		"position    " + position.str2f() + "\n" +
-		"rotation    " + rotation.str2f() + "\n" +
-		"scale       " + scale.str2f() + "\n" +
+		"position    " + position.str2F() + "\n" +
+		"rotation    " + rotation.str2F() + "\n" +
+		"scale       " + scale.str2F() + "\n" +
 		"entity_type: line_2";
 	return s;
 
@@ -594,9 +560,9 @@ std::string Line3::str() {
 	std::string s =
 		"tag         " + tag + "\n" +
 		"id          " + std::to_string(id) + "\n" +
-		"position    " + position.str2f() + "\n" +
-		"rotation    " + rotation.str2f() + "\n" +
-		"scale       " + scale.str2f() + "\n" +
+		"position    " + position.str2F() + "\n" +
+		"rotation    " + rotation.str2F() + "\n" +
+		"scale       " + scale.str2F() + "\n" +
 		"entity_type: line_3";
 	return s;
 
@@ -620,9 +586,9 @@ std::string DebugTriangle::str() {
 	std::string s =
 		"tag         " + tag + "\n" +
 		"id          " + std::to_string(id) + "\n" +
-		"position    " + position.str2f() + "\n" +
-		"rotation    " + rotation.str2f() + "\n" +
-		"scale       " + scale.str2f() + "\n" +
+		"position    " + position.str2F() + "\n" +
+		"rotation    " + rotation.str2F() + "\n" +
+		"scale       " + scale.str2F() + "\n" +
 		"entity_type: debug_triangle";
 	return s;
 
@@ -668,9 +634,9 @@ std::string Camera::str() {
 	std::string s =
 		"tag         " + tag + "\n" +
 		"id          " + std::to_string(id) + "\n" +
-		"position    " + position.str2f() + "\n" +
-		"rotation    " + rotation.str2f() + "\n" +
-		"scale       " + scale.str2f() + "\n" +
+		"position    " + position.str2F() + "\n" +
+		"rotation    " + rotation.str2F() + "\n" +
+		"scale       " + scale.str2F() + "\n" +
 		"entity_type: camera";
 	return s;
 

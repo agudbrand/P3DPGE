@@ -19,6 +19,8 @@
 //math constants
 #define M_PI 3.14159265359f
 #define M_E 2.71828f
+#define M_TWOTHIRDS 0.66666666666f
+#define M_ONETWELFTH 0.08333333333f
 
 //vector constants
 #define V3NULL	Vector3(std::numeric_limits<float>::min(), std::numeric_limits<float>::min(), std::numeric_limits<float>::min())
@@ -134,7 +136,7 @@ namespace Math {
 		return s;
 	}
 
-	static std::string str2f(float s) {
+	static std::string str2F(float s) {
 		char buffer[50];
 		std::snprintf(buffer, 50, "%-.2f", s);
 		return std::string(buffer);
@@ -363,8 +365,8 @@ namespace Math {
 	//namespace Render {
 		//the input vector should be in world space
 	static Vector3 WorldToCamera(Vector3 vertex, mat<float, 4, 4> viewMatrix) {
-		mat<float, 1, 4> vm = vertex.ConvertToM1x4() * viewMatrix;
-		if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; }
+		Matrix vm = Matrix(vertex, 1) * Matrix(viewMatrix);
+		if (vm(0,3) != 0) { vm(0, 0) /= vm(0, 3); vm(0, 1) /= vm(0, 3); vm(0, 2) /= vm(0, 3); }
 		return Vector3(vm);
 	}
 
@@ -408,8 +410,8 @@ namespace Math {
 
 	//the input matrixes should be in view/camera space
 	static Vector3 CameraToScreen(Vector3 csVertex, mat<float, 4, 4> projectionMatrix, Vector2 dimensions) {
-		mat<float, 1, 4> vm = csVertex.ConvertToM1x4() * projectionMatrix;
-		if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; }
+		Matrix vm = Matrix(csVertex, 1) * Matrix(projectionMatrix);
+		if (vm(0, 3) != 0) { vm(0, 0) /= vm(0, 3); vm(0, 1) /= vm(0, 3); vm(0, 2) /= vm(0, 3); }
 		Vector3 out(vm);
 		out.x += 1.0f; out.y += 1.0f;
 		out.x *= 0.5f * dimensions.x;
@@ -498,11 +500,65 @@ namespace Math {
 
 //// Non-Vector vs Vector Interactions ////
 
+//Creates a vector from the matrices first 3 values
+inline Vector3::Vector3(Matrix matrix) {
+	this->x = matrix(0,0); this->y = matrix(0, 1); this->z = matrix(0, 2);
+}
+
 inline Vector2 Vector3::toVector2() const {
 	return Vector2(x, y);
 }
 
-//// Old Vector3-QVM interactions ... To be removed ////
+inline Matrix Vector3::ToM1x3() const {
+	return Matrix(1, 3, {x, y, z});
+}
+
+inline Matrix Vector3::ToM1x4(float w) const {
+	return Matrix(1, 4, {x, y, z, w});
+}
+
+//// Non-Matrix vs Matrix Interactions ////
+
+//Creates a 1x3 matrix
+inline Matrix::Matrix(Vector3 v) {
+	this->rows = 1; this->cols = 3; this->elementCount = 3;
+	this->data = {v.x, v.y, v.z};
+}
+
+//Creates a 1x4 matrix
+inline Matrix::Matrix(Vector3 v, float w) {
+	this->rows = 1; this->cols = 4; this->elementCount = 4;
+	this->data = {v.x, v.y, v.z, w};
+}
+
+//// Old QVM interactions ... To be removed ////
+
+inline Matrix::Matrix(mat<float, 1, 4> m) {
+	this->rows = 1; this->cols = 4; this->elementCount = 4;
+	this->data = {m.a[0][0], m.a[0][1], m.a[0][2], m.a[0][3]};
+}
+
+inline Matrix::Matrix(mat<float, 4, 4> m) {
+	this->rows = 4; this->cols = 4; this->elementCount = 16;
+	this->data = std::vector<float>(elementCount);
+	int index = 0;
+	for (int i = 0; i < rows; ++i) {
+		for (int j = 0; j < cols; ++j) {
+			this->data[index++] = m.a[i][j];
+		}
+	}
+}
+
+inline Matrix::Matrix(mat<float, 3, 3> m) {
+	this->rows = 3; this->cols = 3; this->elementCount = 9;
+	this->data = std::vector<float>(elementCount);
+	int index = 0;
+	for (int i = 0; i < rows; ++i) {
+		for (int j = 0; j < cols; ++j) {
+			this->data[index++] = m.a[i][j];
+		}
+	}
+}
 
 inline Vector3::Vector3(const Vector2& vector2) {
 	this->x = vector2.x; this->y = vector2.y; this->z = 0;
@@ -760,7 +816,7 @@ struct Edge {
 	}
 
 	std::string str() { return "{(" + p[0].str() + "), (" + p[1].str() + ")}"; }
-	std::string str2f() { return "{(" + p[0].str2f() + "), (" + p[1].str2f() + ")}"; }
+	std::string str2F() { return "{(" + p[0].str2F() + "), (" + p[1].str2F() + ")}"; }
 };
 
 struct Edge3 {
@@ -782,7 +838,7 @@ struct Edge3 {
 	}
 
 	std::string str() { return "{(" + p[0].str() + "), (" + p[1].str() + ")}"; }
-	std::string str2f() { return "{(" + p[0].str2f() + "), (" + p[1].str2f() + ")}"; }
+	std::string str2F() { return "{(" + p[0].str2F() + "), (" + p[1].str2F() + ")}"; }
 
 	Vector3 edge_midpoint() {
 		return Vector3((p[0].x + p[1].x) / 2, (p[0].y + p[1].y) / 2, (p[0].z + p[1].z) / 2);

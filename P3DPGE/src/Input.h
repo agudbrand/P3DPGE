@@ -3,7 +3,7 @@
 #include "internal/olcPixelGameEngine.h"
 #include "SceneManager.h"
 
-//#include "Collider.h" //TODO(i,delle) remove this
+#include "Collider.h" //TODO(i,delle) remove this
 
 //TODO(io,delle,11/17/20) look into heap vs stack memory allocation for the func pointer
 typedef void (*Action)(olc::PixelGameEngine* p);
@@ -374,6 +374,22 @@ namespace Input {
 			DEBUGI std::cout << "Toggling display edge numbers to: " + output << std::endl;
 			}, "TOGGLE_DISP_EDGES", olc::V, -1, 0, 0, 0,
 			"Toggles whether the edges of objects are numbered"));
+
+		//// temp debugging ////
+
+		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
+			Box* box = new Box(Vector3(5, 5, 5), -1, Vector3(0,0,20));
+			box->mass = 100;
+			AABBCollider* aabb = new AABBCollider(box, box->halfDims);
+			Box* sphere = new Box(Vector3(.3f, .3f, .3f), -1, Vector3(20, 0, 20), V3ZERO, V3ONE, Vector3(-25, -3, 0), V3ZERO, V3ONE);
+			SphereCollider* sphereCol = new SphereCollider(sphere, 1);
+			Physics::AddEntity(box);
+			Render::AddEntity(box);
+			Physics::AddEntity(sphere);
+			Render::AddEntity(sphere);
+		}, "test_colliders", olc::F1, -1, 0, 1, 0,
+		"n/a"));
+
 
 		//// input management ////
 			//loop through all the input actions and unbind duplicate binds

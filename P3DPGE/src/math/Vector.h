@@ -49,7 +49,7 @@ struct Vector3 {
 	friend Vector3 operator * (const float& lhs, const Vector3& rhs) { return   rhs * lhs; }
 
 	const std::string str() const;
-	const std::string str2f() const;
+	const std::string str2F() const;
 	Vector3 copy() const;
 	float	dot(const Vector3& rhs) const;
 	Vector3 cross(const Vector3& rhs) const;
@@ -71,13 +71,7 @@ struct Vector3 {
 	Vector3(const Vector2& vector2);
 	Vector3(Matrix matrix);
 
-	void    operator =	(const Matrix& rhs);
-	Vector3 operator *  (const Matrix& rhs) const;
-	void    operator *= (const Matrix& rhs);
-	bool    operator == (const Matrix& rhs) const;
-	bool    operator != (const Matrix& rhs) const;
-
-	Vector2 toVector2() const;
+	Vector2 toVector2() const; 
 	Matrix ToM1x3() const;
 	Matrix ToM1x4(float w) const;
 
@@ -202,7 +196,7 @@ inline const std::string Vector3::str() const {
 	return std::string("(") + std::to_string(this->x) + "," + std::to_string(this->y) + "," + std::to_string(this->z) + ")";
 }
 
-inline const std::string Vector3::str2f() const {
+inline const std::string Vector3::str2F() const {
 	char buffer[50];
 	std::snprintf(buffer, 50, "(%-.2f, %-.2f, %-.2f)", this->x, this->y, this->z);
 	return std::string(buffer);
