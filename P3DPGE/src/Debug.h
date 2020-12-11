@@ -12,7 +12,7 @@
 #include <windows.h>
 
 #define internal static
-#define local_persist static 
+#define local_persist static
 #define global_variable static
 
 //global debug macros
@@ -143,14 +143,10 @@ enum ConsoleColor {
 
 struct Camera;
 
-
-
-
-namespace Debug{
-
+namespace Debug {
 	static std::vector<float> nums;
 
-//// Console Output ////
+	//// Console Output ////
 
 	internal HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	internal int color = 7;
@@ -161,7 +157,7 @@ namespace Debug{
 
 	static void Print(ConsoleColor color, const char* str, bool newline = true) {
 		SetConsoleTextAttribute(hConsole, color);
-		if(newline){ std::cout << str << std::endl; }
+		if (newline) { std::cout << str << std::endl; }
 		else { std::cout << str; }
 		ResetCmd();
 	}
@@ -171,7 +167,7 @@ namespace Debug{
 		case 0: Print(ConsoleColor::RED, str, newline);    break;
 		case 1: Print(ConsoleColor::YELLOW, str, newline); break;
 		case 2: Print(ConsoleColor::GREEN, str, newline);  break;
-		//TODO(g, sushi) implement buffer colors
+			//TODO(g, sushi) implement buffer colors
 		}
 	}
 
@@ -200,12 +196,12 @@ namespace Debug{
 	template<class... T>
 	static std::string ToStringReturn(T... args) { return (ToStringReturn(args) + ...); }
 
-//// Call Tracing ////
+	//// Call Tracing ////
 
-	//figure this out later i guess
+		//figure this out later i guess
 	class CallTrace {
 	public:
-		CallTrace(){}
+		CallTrace() {}
 
 		std::stack<std::pair<std::string, std::string>> call_stack;
 
@@ -222,9 +218,6 @@ namespace Debug{
 			return call_stack_str;
 		}
 	};
-
-	
-
 };
 
 template<class T>
@@ -270,9 +263,9 @@ public:
 		//	container.pop_back();
 		//}
 		//else {
-			container[index].first.reset();
-			//empties.push_back(index);
-		//}
+		container[index].first.reset();
+		//empties.push_back(index);
+	//}
 	}
 
 	bool allocate_space(int index) {
@@ -284,16 +277,14 @@ public:
 			return true;
 		}
 		else {
-
 			std::optional<T> o;
 			for (int i = container.size(); i < index; i++) {
 				container.push_back(o);
 			}
-			
+
 			return true;
 		}
 		return false;
-		
 	}
 
 	int size() {
@@ -339,9 +330,6 @@ public:
 		this->index = index;
 		str = s;
 	}
-
-
-
 };
 
 inline static std::vector<int> id_buffer;

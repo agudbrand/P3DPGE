@@ -238,7 +238,6 @@ struct BoxMesh : public Mesh {
 		Vector3 p7 = position + halfDims.zInvert();
 		Vector3 p8 = position + halfDims;
 		
-		//TODO(c, sushi) do this better later
 		//west
 		triangles.push_back(Triangle(p3, p1, p4, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1), e)); 
 		triangles.push_back(Triangle(p3, p4, p5, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1), e)); 

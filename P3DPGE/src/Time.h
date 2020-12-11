@@ -21,9 +21,6 @@
 //#define TIMER_EG	Time::GetEndTimer()
 //#define TIMER_GE	Time::GetElapsedTimer()
 
-
-
-
 #define TIMER_S   timer->StartTimer()
 #define TIMER_GET timer->TimeElapsed()
 #define TIMER_E   timer->EndTimer()
@@ -62,30 +59,25 @@ namespace Time {
 
 	static void FixedUpdate() {
 		fixedCounter = 0;
-		
 	}
 
-	static void Update(float& fElapsedTime) { 
+	static void Update(float& fElapsedTime) {
 		deltaTime = fElapsedTime;
 		totalTime += deltaTime;
 		g_totalTime = totalTime;
 		updateCount += 1;
 
-
 		fixedCounter += deltaTime;
 		if (fixedCounter > fixedDeltaTime) {
 			FixedUpdate();
-			
 		}
-
-		
 
 		srand(time(NULL));
 	}
-	
+
 	static void Cleanup() {}
 
-//// Timer ////
+	//// Timer ////
 
 	static int elapsedFrames = 0;
 
@@ -100,7 +92,7 @@ namespace Time {
 	static bool timer_running = false;
 	static bool precise_timer_running = false;
 
-//// Normal Timers ////
+	//// Normal Timers ////
 
 	static void StartTimer() {
 		if (!timer_running) {
@@ -226,7 +218,7 @@ public:
 	bool timer_running = false;
 	bool precise_timer_running = false;
 
-//// Normal Timers ////
+	//// Normal Timers ////
 
 	void StartTimer() {
 		if (!timer_running) {
@@ -320,6 +312,4 @@ public:
 		duration<double> time_span = duration_cast<duration<double>>(end_precise - start_precise);
 		return time_span.count();
 	}
-
 };
-
