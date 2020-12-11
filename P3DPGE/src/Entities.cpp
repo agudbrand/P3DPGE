@@ -6,8 +6,7 @@
 
 Vector3 g_campos;
 
-Entity::Entity(int id, EntityParams) {
-	this->id = id;
+Entity::Entity(EntityParams) {
 	this->position = position;
 	this->rotation = rotation;
 	prev_position = position;
@@ -16,9 +15,10 @@ Entity::Entity(int id, EntityParams) {
 }
 
 Entity::~Entity() {
-	if (mesh) delete mesh;
+	if (mesh)   delete mesh;
 	if (sprite) delete sprite;
-	if (decal) delete decal;
+	if (decal)  delete decal;
+	if (timer)  delete timer;
 }
 
 void Entity::SetTag(std::string newTag) {
@@ -79,16 +79,25 @@ void Entity::DrawPosition(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat
 	Vector3 br(rightmost.x, lowest.y);
 	Vector3 bl(leftmost.x, lowest.y);
 
-	Line2 top = Line2(tr, -1, tl);
-	Line2 left = Line2(bl, -1, tl);
-	Line2 right = Line2(tr, -1, br);
-	Line2 bottom = Line2(br, -1, bl);
+	Line2 top = Line2(tr, tl);
+	Line2 left = Line2(bl, tl);
+	Line2 right = Line2(tr, br);
+	Line2 bottom = Line2(br, bl);
 	
 	top.Draw(p, ProjMat, view);
 	left.Draw(p, ProjMat, view);
 	right.Draw(p, ProjMat, view);
 	bottom.Draw(p, ProjMat, view);
 	p->DrawString(tr.toVector2(), position.str2f());
+
+	//float iter = 0.01;
+	//for (Triangle& t : mesh->triangles) {
+	//	for (Vector3& po : t.points) {
+	//		po.x += t.get_normal().x * sinf(2 * M_PI * g_totalTime + iter) * 0.003f;
+	//		po.y += t.get_normal().y * cosf(40 * M_PI * g_totalTime + iter) * 0.003f;
+	//	}
+	//	iter += 0.02;
+	//}
 
 }
 
@@ -184,7 +193,7 @@ void Entity::Update(float deltaTime) {
 
 //// Physics Entity ////
 
-PhysEntity::PhysEntity(int id, EntityParams, PhysEntityParams) : Entity(EntityArgs) {
+PhysEntity::PhysEntity(EntityParams, PhysEntityParams) : Entity(EntityArgs) {
 	this->velocity = velocity;
 	this->acceleration = acceleration;
 	this->rotVelocity = rotVelocity;
@@ -197,8 +206,8 @@ PhysEntity::PhysEntity(int id, EntityParams, PhysEntityParams) : Entity(EntityAr
 void PhysEntity::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
 	//do nothing if not SpecialDraw unless debug is enabled
 
-	Line3 v_vector = Line3((position + velocity).clampMag(0.3), -1, position);
-	Line3 a_vector = Line3((position + acceleration).clampMag(0.3), -1, position);
+	Line3 v_vector = Line3((position + velocity).clampMag(0.3), position);
+	Line3 a_vector = Line3((position + acceleration).clampMag(0.3), position);
 
 	v_vector.Draw(p, ProjMat, view);
 	a_vector.Draw(p, ProjMat, view);
@@ -222,7 +231,7 @@ void PhysEntity::PhysUpdate(float deltaTime) {
 	if (deltaTime > g_fixedDeltaTime) {
 		//psuedo input
 		AddForce(nullptr, inputs);
-		AddFrictionForce(nullptr, 0.05f, deltaTime);
+		AddFrictionForce(nullptr, 0.01f, deltaTime);
 		if (!bStatic) {
 			Vector3 netForce;
 			acceleration = V3ZERO;
@@ -308,7 +317,7 @@ void PhysEntity::GenerateRadialForce(Vector3 position, float radius, float stren
 
 //// Sphere	////
 
-Sphere::Sphere(float r, int id, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
+Sphere::Sphere(float r, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
 	this->radius = r;
 }
 
@@ -379,7 +388,7 @@ std::string Sphere::str() {
 
 //// Box ////
 
-Box::Box(Vector3 dimensions, int id, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
+Box::Box(Vector3 dimensions, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
 	this->dimensions = dimensions;
 	tag = "box";
 	mesh = new BoxMesh(dimensions, position, this);
@@ -432,7 +441,7 @@ std::string Box::str() {
 
 //// Complex ////
 
-Complex::Complex(std::string file_name, int id, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
+Complex::Complex(std::string file_name, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
 	mesh = new Mesh();
 	ASSERT(LoadFromObjectFile(file_name), "OBJ_LOAD_ERROR");
 	model_name = Math::append_decimal(file_name);
@@ -515,7 +524,7 @@ std::string Complex::str() {
 
 //// Line2 and Line3 ////
 
-Line2::Line2(Vector3 endPosition, int id, EntityParams) : Entity(EntityArgs) {
+Line2::Line2(Vector3 endPosition, EntityParams) : Entity(EntityArgs) {
 	//just so no RAV
 	mesh = new Mesh();
 
@@ -547,7 +556,7 @@ std::string Line2::str() {
 
 }
 
-Line3::Line3(Vector3 endPosition, int id, EntityParams) : Entity(EntityArgs) {
+Line3::Line3(Vector3 endPosition, EntityParams) : Entity(EntityArgs) {
 	mesh = new Mesh();
 	this->endPosition = endPosition;
 	this->id = id;
@@ -595,7 +604,7 @@ std::string Line3::str() {
 
 //// Debug Triangle ////
 
-DebugTriangle::DebugTriangle(Triangle triangle, int id, EntityParams) : Entity(EntityArgs) {
+DebugTriangle::DebugTriangle(Triangle triangle, EntityParams) : Entity(EntityArgs) {
 	mesh = new Mesh(triangle);
 }
 
@@ -623,7 +632,6 @@ std::string DebugTriangle::str() {
 
 mat<float, 4, 4> Camera::MakeViewMatrix(float yaw, bool force_target) {
 	target = V3FORWARD;
-
 	lookDir = target * Math::GetRotateV3_Y(yaw);
 	target = position + lookDir;
 	
@@ -667,3 +675,9 @@ std::string Camera::str() {
 	return s;
 
 }
+
+//// Light ////
+
+//Light::Light(Vector3 direction) {
+//
+//}

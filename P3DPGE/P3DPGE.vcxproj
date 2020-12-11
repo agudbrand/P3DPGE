@@ -31,6 +31,7 @@
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Physics.h" />
     <ClInclude Include="src\Render.h" />
+    <ClInclude Include="src\SceneManager.h" />
     <ClInclude Include="src\Time.h" />
   </ItemGroup>
   <ItemGroup>

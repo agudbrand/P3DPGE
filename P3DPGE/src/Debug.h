@@ -167,7 +167,6 @@ namespace Debug {
 		case 0: Print(ConsoleColor::RED, str, newline);    break;
 		case 1: Print(ConsoleColor::YELLOW, str, newline); break;
 		case 2: Print(ConsoleColor::GREEN, str, newline);  break;
-			//TODO(g, sushi) implement buffer colors
 		}
 	}
 

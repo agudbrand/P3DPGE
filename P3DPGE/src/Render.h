@@ -332,7 +332,7 @@ namespace Render {
 
 			int clippedTriangles = 0;
 			Triangle clipped[2];
-			clippedTriangles = ClipTriangles(Vector3(0, 0, 0.01), Vector3(0, 0, 1), t, clipped[0], clipped[1]);
+			clippedTriangles = ClipTriangles(Vector3(0, 0, 0.01f), Vector3(0, 0, 1), t, clipped[0], clipped[1]);
 
 			for (int i = 0; i < clippedTriangles; i++) {
 				float w;
@@ -494,7 +494,7 @@ namespace Render {
 
 	//draw all entities to screen
 	static void Update(olc::PixelGameEngine* p) {
-		//Debug::StartTimer();
+
 		view = camera.MakeViewMatrix(yaw);
 
 		DEBUG g_campos = camera.position;
@@ -504,7 +504,7 @@ namespace Render {
 
 			e->Update(Time::deltaTime);
 
-
+			
 
 			//SpecialDraw is used for determining if its just an object
 			//drawn with triangles or if its special eg. a 2D object or Line3

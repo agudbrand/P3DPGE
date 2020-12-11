@@ -1,7 +1,7 @@
 #pragma once
-#include "Render.h"
-#include "Physics.h"
+
 #include "internal/olcPixelGameEngine.h"
+#include "SceneManager.h"
 
 //#include "Collider.h" //TODO(i,delle) remove this
 
@@ -106,7 +106,7 @@ namespace Input {
 	internal Entity* selectedEntity;
 	internal Triangle* selectedTriangle;
 	internal Vector3 leftClickPos = V3NULL;
-	internal bool DEBUG_INPUT = false;
+	internal bool DEBUG_INPUT = true;
 
 	Timer* timer;
 
@@ -160,7 +160,7 @@ namespace Input {
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Vector3 pos = GetMousePos(p);
-			Sphere* sphere = new Sphere(10, 0, pos);
+			Sphere* sphere = new Sphere(10, pos);
 			sphere->mass = 10;
 			sphere->mesh = new CircleMesh(10);
 			Physics::AddEntity(sphere);
@@ -171,7 +171,7 @@ namespace Input {
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Vector3 pos = GetMousePos(p);
-			Sphere* sphere = new Sphere(100, 0, pos);
+			Sphere* sphere = new Sphere(100, pos);
 			sphere->mass = 100;
 			sphere->mesh = new CircleMesh(100);
 			Physics::AddEntity(sphere);
@@ -181,7 +181,7 @@ namespace Input {
 			"Spawns a large sphere of radius/mass 100 at the mouse."));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-			Complex* complex = new Complex("objects/bmonkey.obj", 0, Vector3(0, 0, 3));
+			Complex* complex = new Complex("objects/bmonkey.obj", Vector3(0, 0, 3));
 			selectedEntity = complex;
 			Physics::AddEntity(complex);
 			Render::AddEntity(complex);
@@ -191,7 +191,7 @@ namespace Input {
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
 			Vector3 pos = Vector3(0, 0, 3);
-			Box* box = new Box(Vector3(1, 1, 1), 0, pos);
+			Box* box = new Box(Vector3(1, 1, 1), pos);
 			selectedEntity = box;
 			Physics::AddEntity(box);
 			Render::AddEntity(box);
@@ -285,13 +285,13 @@ namespace Input {
 			pos.LocalToWorld(c->position);
 
 			//make function somehere that returns a ray cast for ease of use later maybe
-			Line3* ray = new Line3(pos, -1, c->position);
+			Line3* ray = new Line3(pos, c->position);
 
 			//draw ray if debugging
 			DEBUGI Render::entities.push_back(ray);
 
 			for (Entity* e : Render::entities) {
-				if (e->LineIntersect(&ray->edge) && e->id != -1) {
+				if (e->LineIntersect(&ray->edge)) {
 					selectedEntity = e;
 					selectedEntity->ENTITY_DEBUG = true;
 					break;

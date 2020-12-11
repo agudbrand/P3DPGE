@@ -12,14 +12,14 @@ struct Collider;
 //global campos variable until I figured out a better way to do that
 extern Vector3 g_campos;
 
-#define EntityArgs id, position, rotation, scale
+#define EntityArgs position, rotation, scale
 #define EntityParams Vector3 position, Vector3 rotation, Vector3 scale
 #define EntityDefaultParams Vector3 position = V3ZERO, Vector3 rotation = V3ZERO, Vector3 scale = V3ONE
 //the basis of all objects drawn on screen or otherwise, includes basic information such
 //as position, rotation, scale, tags, etc.
 class Entity {
 public:
-	int id;
+	int id = -1;
 	std::string tag;
 	Vector3 position;
 	Vector3 prev_position;
@@ -37,8 +37,7 @@ public:
 
 #define DEBUGE DEBUG if(ENTITY_DEBUG)
 
-	Entity();
-	Entity(int id, EntityDefaultParams);
+	Entity (EntityDefaultParams);
 	virtual ~Entity();
 	virtual bool LineIntersect(Edge3* e);
 	virtual void Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view);
@@ -93,8 +92,7 @@ public:
 	Vector3 rot_lerp_from;
 	Vector3 rot_lerp_to;
 
-	PhysEntity() : Entity() {}
-	PhysEntity(int id, EntityDefaultParams, PhysEntityDefaultParams);
+	PhysEntity (EntityDefaultParams, PhysEntityDefaultParams);
 	void Update(float deltaTime) override;
 	virtual void PhysUpdate(float deltaTime);
 	void Interpolate(float t);
@@ -115,7 +113,7 @@ struct Sphere : public PhysEntity {
 	float radius;
 
 	Sphere() : PhysEntity() {}
-	Sphere(float r, int id, EntityDefaultParams, PhysEntityDefaultParams);
+	Sphere(float r, EntityDefaultParams, PhysEntityDefaultParams);
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
 	bool CheckCollision(Entity* entity) override;
@@ -129,7 +127,7 @@ struct Box : public PhysEntity {
 	Vector3 dimensions; //full dimensions
 
 	Box() : PhysEntity() {}
-	Box(Vector3 dimensions, int id, EntityDefaultParams, PhysEntityDefaultParams);
+	Box(Vector3 dimensions, EntityDefaultParams, PhysEntityDefaultParams);
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
 	bool CheckCollision(Entity* entity) override;
@@ -145,7 +143,7 @@ struct Box : public PhysEntity {
 struct Complex : public PhysEntity {
 	std::string model_name;
 
-	Complex(std::string file_name, int id, EntityDefaultParams, PhysEntityDefaultParams);
+	Complex(std::string file_name, EntityDefaultParams, PhysEntityDefaultParams);
 	//this function is done exactly how Javid does it in
 	//his video and should probably be redone later
 	//for ex he uses a lot of weird ways to get strings
@@ -167,7 +165,7 @@ struct Line2 : public Entity {
 
 	Edge edge;
 
-	Line2(Vector3 endPosition, int id, EntityDefaultParams);
+	Line2(Vector3 endPosition, EntityDefaultParams);
 	void Update(float deltaTime) override;
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
@@ -184,7 +182,7 @@ struct Line3 : public Entity {
 	olc::Pixel color = olc::WHITE;
 	Edge3 edge;
 
-	Line3(Vector3 endPosition, int id, EntityDefaultParams);
+	Line3(Vector3 endPosition, EntityDefaultParams);
 	void Update(float deltaTime) override;
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
@@ -197,7 +195,7 @@ struct Line3 : public Entity {
 
 //for spawning single triangles
 struct DebugTriangle : public Entity {
-	DebugTriangle(Triangle triangle, int id, EntityDefaultParams);
+	DebugTriangle(Triangle triangle, EntityDefaultParams);
 
 	void Update(float deltaTime) override;
 	bool ContainsPoint(Vector3 point) override;
@@ -214,7 +212,7 @@ struct Camera : public Entity {
 	float farZ = 1000.1f; //the maximum render distance
 	float fieldOfView = 90.f;
 
-	Camera(int id = -1, EntityDefaultParams) : Entity(EntityArgs) {
+	Camera(EntityDefaultParams) : Entity(EntityArgs) {
 		position = V3ZERO;
 	}
 
@@ -235,4 +233,10 @@ struct Camera : public Entity {
 
 //archaic light class
 struct Light : public Entity {
+	
+	Vector3 direction;
+
+	Light(){}
+
+
 };
