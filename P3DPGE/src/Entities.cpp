@@ -49,6 +49,8 @@ bool Entity::SpecialDraw() { return false; }
 
 void Entity::DrawPosition(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
 	
+
+	//TODO(er, sushi) fix this to not lag the fuck out when it gets close to the camera
 	Vector3 nuposition = Math::ProjMult(position.ConvertToM1x4(), view);
 			nuposition.ProjToScreen(ProjMat, p);
 	
@@ -207,7 +209,7 @@ PhysEntity::PhysEntity(EntityParams, PhysEntityParams) : Entity(EntityArgs) {
 };
 
 PhysEntity::~PhysEntity() {
-	delete collider;
+	if (collider) delete collider;
 }
 
 void PhysEntity::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
@@ -219,7 +221,7 @@ void PhysEntity::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<flo
 	v_vector.Draw(p, ProjMat, view);
 	a_vector.Draw(p, ProjMat, view);
 
-	DrawPosition(p, ProjMat, view);
+	//DrawPosition(p, ProjMat, view);
 
 
 }
@@ -528,9 +530,10 @@ std::string Line2::str() {
 
 Line3::Line3(Vector3 endPosition, EntityParams) : Entity(EntityArgs) {
 	mesh = new Mesh();
+	timer = new Timer();
 	this->endPosition = endPosition;
 	this->id = id;
-
+	
 	edge = Edge3(position, endPosition);
 }
 
@@ -655,3 +658,15 @@ void Light::ChangeLightDirection(Matrix rotation) {
 
 bool Light::ContainsScreenPoint(Vector3 point) { return false; }
 bool Light::ContainsPoint(Vector3 point) { return false; }
+
+std::string Light::str() {
+	std::string s =
+		"tag         " + tag + "\n" +
+		"id          " + std::to_string(id) + "\n" +
+		"position    " + position.str2f() + "\n" +
+		"rotation    " + rotation.str2f() + "\n" +
+		"scale       " + scale.str2f() + "\n" +
+		"entity_type: light";
+	return s;
+
+}

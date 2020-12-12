@@ -236,5 +236,5 @@ struct Light : public Entity {
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
 
-
+	virtual std::string str() override;
 };

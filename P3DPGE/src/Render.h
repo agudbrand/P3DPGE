@@ -261,10 +261,19 @@ namespace Render {
 
 		Vector3 light_direction(0, 0, -1);
 
+		
+
 		//store triangles we want to draw for sorting and copy world points to projected points
 		for (auto& t : triangles) {
 			t.copy_points();
-			float dp = light_direction.dot(t.get_normal());
+			float light_ray1 = (Scene::light.position - t.points[0]).dot(t.get_normal());
+			//float light_ray2 = (t.points[0] - Scene::light2.position).dot(t.get_normal());
+			
+			//Line3 ray = Line3(t.points[0], Scene::light.position);
+			//ray.Draw(p, Scene::camera.ProjectionMatrix(p), view);
+
+			float dp = light_ray1;
+			//float dp = light_direction.dot(t.get_normal());
 			if (t.get_normal().dot(t.midpoint() - Scene::camera.position) < 0) {
 				t.set_color(olc::Pixel(
 					std::clamp(50 * dp,  0.f, 50.f),
@@ -428,6 +437,11 @@ namespace Render {
 			u->Draw(p);
 		}
 
+		for (Entity* d : Scene::debug_layer) {
+			d->Draw(p, Scene::camera.ProjectionMatrix(p), view);
+		}
+		
+		Scene::debug_layer.clear();
 		triangles.clear();
 		ConsoleHandler(p);
 

@@ -60,8 +60,6 @@ public:
 			//sub menu
 			}), "spawn_complex", "", true, 0));
 
-		
-
 		std::vector<Button*> cspawn_b;
 
 		cspawn_b.push_back(new Button(([](olc::PixelGameEngine* p) {
