@@ -17,6 +17,8 @@ struct Triangle {
 	Vector3 tex_points[3];
 	Entity* e;
 
+	olc::Sprite* sprite;
+
 	//maybe edges can be cleared when they're not actually needed,
 	//and only spawned when used?
 	Edge edges[3];
@@ -36,7 +38,21 @@ struct Triangle {
 		edges[0] = Edge(p1, p2);
 		edges[1] = Edge(p2, p3);
 		edges[2] = Edge(p3, p1);
-	}
+
+		tex_points[0] = Vector3(0, 0, 1);
+		tex_points[1] = Vector3(0, 1, 1);
+		tex_points[2] = Vector3(1, 0, 1);
+
+		sprite = new olc::Sprite(50, 50);
+
+		for (int i = 0; i < 50; i++) {
+			for (int o = 0; o < 50; o++) {
+				sprite->SetPixel(Vector2(i, o), olc::Pixel(floor(255 * ((float)i / 50)), floor(255 * ((float)o / 50)), 50));
+			}
+		}
+
+	};
+
 	Triangle(Vector3 p1, Vector3 p2, Vector3 p3, Entity* e) {
 		points[0] = p1;
 		points[1] = p2;
@@ -96,6 +112,17 @@ struct Triangle {
 		Vector3 l1 = proj_points[1] - proj_points[0];
 		Vector3 l2 = proj_points[2] - proj_points[0];
 		return l1.cross(l2).yInvert().normalized();
+	}
+
+	//TODO(r, sushi) figure out how to make this work better
+	Vector3 sprite_pixel_location(int x, int y) {
+		Vector3 v21 = points[1] - points[2];
+		Vector3 v20 = points[0] - points[2];
+		float xdiv = v21.mag() / (sprite->width);
+		float ydiv = v20.mag() / (sprite->height);
+		Vector3 v0x = points[2] + v21.normalized() * x * xdiv;
+		Vector3 v0y = points[2] + v20.normalized() * y * ydiv;
+		return points[2] + (v0x - points[2]) + (v0y - points[2]);
 	}
 	
 	//checks if a triangle contains a point in screen space
@@ -256,5 +283,25 @@ struct BoxMesh : public Mesh {
 		//north	
 		triangles.push_back(Triangle(p7, p2, p1, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1), e)); 
 		triangles.push_back(Triangle(p7, p1, p3, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1), e)); 
+		
+		
+		//triangles.push_back(Triangle(p3, p1, p4));
+		//triangles.push_back(Triangle(p3, p4, p5));
+		////top								   	)
+		//triangles.push_back(Triangle(p4, p1, p2));
+		//triangles.push_back(Triangle(p4, p2, p6));
+		////east								   	)
+		//triangles.push_back(Triangle(p8, p6, p2));
+		//triangles.push_back(Triangle(p8, p2, p7));
+		////bottom							   	)
+		//triangles.push_back(Triangle(p3, p5, p8));
+		//triangles.push_back(Triangle(p3, p8, p7));
+		////south								   	)
+		//triangles.push_back(Triangle(p5, p4, p6));
+		//triangles.push_back(Triangle(p5, p6, p8));
+		////north								   	)
+		//triangles.push_back(Triangle(p7, p2, p1));
+		//triangles.push_back(Triangle(p7, p1, p3));
+	
 	}
 };

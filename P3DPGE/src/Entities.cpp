@@ -49,14 +49,16 @@ bool Entity::SpecialDraw() { return false; }
 
 void Entity::DrawPosition(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
 	
+
+	//TODO(er, sushi) fix this to not lag the fuck out when it gets close to the camera
 	Vector3 nuposition = Math::ProjMult(position.ConvertToM1x4(), view);
-			nuposition.ProjToScreen(ProjMat, p);
+			nuposition.ProjToScreen(ProjMat);
 	
 	std::vector<Vector3> points;
 	for (Triangle t : mesh->triangles) {
 		for (Vector3 po : t.points) {
 			Vector3 newp = Math::ProjMult(po.ConvertToM1x4(), view);
-			newp.ProjToScreen(ProjMat, p);
+			newp.ProjToScreen(ProjMat);
 			points.push_back(newp);
 		}
 	}
@@ -106,7 +108,7 @@ void Entity::DrawVertices(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat
 		if (t.get_normal().dot(t.midpoint() - g_campos) < 0) {
 			for (Vector3 v : t.points) {
 				Vector3 nuv = Math::ProjMult(v.ConvertToM1x4(), view);
-						nuv.ProjToScreen(ProjMat, p);
+						nuv.ProjToScreen(ProjMat);
 				p->DrawString(nuv.toVector2(), v.str2f());
 			}
 		}
@@ -207,19 +209,19 @@ PhysEntity::PhysEntity(EntityParams, PhysEntityParams) : Entity(EntityArgs) {
 };
 
 PhysEntity::~PhysEntity() {
-	delete collider;
+	if (collider) delete collider;
 }
 
 void PhysEntity::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
 	//do nothing if not SpecialDraw unless debug is enabled
 
-	Line3 v_vector = Line3((position + velocity).clampMag(0.3), position);
-	Line3 a_vector = Line3((position + acceleration).clampMag(0.3), position);
+	Line3 v_vector = Line3((position + velocity), position);
+	Line3 a_vector = Line3((position + acceleration), position);
 
 	v_vector.Draw(p, ProjMat, view);
 	a_vector.Draw(p, ProjMat, view);
 
-	DrawPosition(p, ProjMat, view);
+	//DrawPosition(p, ProjMat, view);
 
 
 }
@@ -233,50 +235,54 @@ void PhysEntity::PhysUpdate(float deltaTime) {
 	//for debug
 	Vector3 tf = V3ZERO;
 	BUFFERLOGI(8, 20, deltaTime, " ", g_fixedDeltaTime);
-	if (deltaTime > g_fixedDeltaTime) {
-		//psuedo input
-		AddForce(nullptr, inputs);
-		AddFrictionForce(nullptr, 0.01f, deltaTime);
-		if (!bStatic) {
-			Vector3 netForce;
-			acceleration = V3ZERO;
-			for (auto& f : forces) {
-				netForce += f;
-				tf += f;
-			}
+	
+	//psuedo input
+	AddForce(nullptr, inputs);
+	AddFrictionForce(nullptr, 0.01f, deltaTime);
+	if (!bStatic) {
+		Vector3 netForce;
+		acceleration = V3ZERO;
+		for (auto& f : forces) {
+			netForce += f;
+			tf += f;
+		}
 			
-			acceleration = netForce / mass * 100;
+		acceleration = netForce / mass * 5;
 
 			
-			forces.clear();
-			velocity += acceleration * g_fixedDeltaTime;
-			rotVelocity += rotAcceleration * g_fixedDeltaTime;
-			rotation += rotVelocity * g_fixedDeltaTime * 10;
-			Vector3 last_vel = V_STORE(velocity, 1);
-			if (velocity.mag() < .1f) { velocity = V3ZERO; acceleration = V3ZERO; }
+		forces.clear();
+		velocity += acceleration * g_fixedDeltaTime;
+		rotVelocity += rotAcceleration * g_fixedDeltaTime;
+		rotation += rotVelocity * g_fixedDeltaTime * 10;
+		Vector3 last_vel = V_STORE(velocity, 1);
+		if (velocity.mag() < .1f) { velocity = V3ZERO; acceleration = V3ZERO; }
 
-			if (Math::round2v(velocity.normalized()) == Math::round2v(-last_vel.normalized())) {
-				oscilliflag++;
-				checkoscilli = true;
-				if (oscilliflag >= 10) {
-					velocity = V3ZERO; acceleration = V3ZERO;
-					checkoscilli = 0; oscilliflag = 0; oscilliflag_life = 0;
-				}
-			}
-			
-			if (checkoscilli && oscilliflag_life > 20) {
+		if (Math::round2v(velocity.normalized()) == Math::round2v(-last_vel.normalized())) {
+			oscilliflag++;
+			checkoscilli = true;
+			if (oscilliflag >= 10) {
+				velocity = V3ZERO; acceleration = V3ZERO;
 				checkoscilli = 0; oscilliflag = 0; oscilliflag_life = 0;
 			}
-
-			pos_lerp_from = position;
-			pos_lerp_to = position + velocity * g_fixedDeltaTime;
-			rotAcceleration = V3ZERO;
 		}
+			
+		if (checkoscilli && oscilliflag_life > 20) {
+			checkoscilli = 0; oscilliflag = 0; oscilliflag_life = 0;
+		}
+			
+			
+		pos_lerp_from = position;
+		pos_lerp_to = position + velocity * g_fixedDeltaTime;
+		rotAcceleration = V3ZERO;
+			
+			
 	}
-	else {
+	if (deltaTime < g_fixedDeltaTime) {
 		Interpolate(deltaTime / g_fixedDeltaTime);
 	}
-
+	else {
+		Interpolate(g_fixedDeltaTime);
+	}
 
 	inputs = V3ZERO;
 	
@@ -378,7 +384,8 @@ Box::Box(Vector3 halfDims, EntityParams, PhysEntityParams) : PhysEntity(EntityAr
 	this->halfDims = halfDims;
 	tag = "box";
 	mesh = new BoxMesh(halfDims, position, this);
-	sprite = new olc::Sprite("sprites/UV_Grid_Sm.jpg");
+	sprite = new olc::Sprite(50, 50);
+	
 	pos_lerp_from = position;
 	pos_lerp_to = position;
 }
@@ -420,6 +427,8 @@ std::string Box::str() {
 
 Complex::Complex(std::string file_name, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
 	mesh = new Mesh();
+	sprite = new olc::Sprite(100, 100);
+
 	ASSERT(LoadFromObjectFile(file_name), "OBJ_LOAD_ERROR");
 	model_name = Math::append_decimal(file_name);
 	//temp fix i guess
@@ -528,14 +537,14 @@ std::string Line2::str() {
 
 Line3::Line3(Vector3 endPosition, EntityParams) : Entity(EntityArgs) {
 	mesh = new Mesh();
+	timer = new Timer();
 	this->endPosition = endPosition;
 	this->id = id;
-
+	
 	edge = Edge3(position, endPosition);
 }
 
 void Line3::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
-	Vector2 screenDimensions = Vector2(p->ScreenWidth(), p->ScreenHeight());
 	//convert vertexes from world to camera/view space
 	Vector3 startVertex = Math::WorldToCamera(position, view);
 	Vector3 endVertex = Math::WorldToCamera(endPosition, view);
@@ -544,11 +553,11 @@ void Line3::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4
 	if (!Math::ClipLineToZPlanes(startVertex, endVertex, .1f, 1000.1f)) { return; } //TODO(r,delle) change the third parameter to the camera variable
 	
 	//convert vertexes from camera/view space to clip space
-	startVertex = Math::CameraToScreen(startVertex, ProjMat, screenDimensions);
-	endVertex = Math::CameraToScreen(endVertex, ProjMat, screenDimensions);
+	startVertex = Math::CameraToScreen(startVertex, ProjMat);
+	endVertex = Math::CameraToScreen(endVertex, ProjMat);
 
 	//clip vertexes to border planes in clip space
-	if (!Math::ClipLineToBorderPlanes(startVertex, endVertex, screenDimensions)) { return; }
+	if (!Math::ClipLineToBorderPlanes(startVertex, endVertex)) { return; }
 
 	//draw the lines after all clipping and space conversion
 	p->DrawLine(startVertex.toVector2(), endVertex.toVector2(), color);
@@ -600,17 +609,21 @@ std::string DebugTriangle::str() {
 
 //// Camera ////
 
-MatrixN Camera::MakeViewMatrix(float yaw, bool force_target) {
-	target = V3FORWARD;
-	lookDir = target * MatrixN::RotationMatrixY(yaw);
+mat<float, 4, 4> Camera::MakeViewMatrix(float yaw, bool force_target) {
+	Vector3 target = Vector3(0, 0, 1);
+	lookDir = target * Math::GetRotateV3_Y(yaw);
 	target = position + lookDir;
 	
-	return Math::PointAtMatrix(position, target, up).Inverse();
+	BUFFERLOG(1, lookDir);
+
+	mat<float, 4, 4> view = inverse(Math::PointAt(position, target, up));
+	
+	return view;
 }
 
-MatrixN Camera::ProjectionMatrix(olc::PixelGameEngine* p) {
+mat<float, 4, 4> Camera::ProjectionMatrix() {
 	float renderToView = farZ - nearZ;
-	float aspectRatio = (float)p->ScreenHeight() / (float)p->ScreenWidth();
+	float aspectRatio = (float)screenHeight / (float)screenWidth;
 	float fovRad = 1.f / tanf(fieldOfView * .5f / 180.f * M_PI);
 
 	return MatrixN(4, 4, {
@@ -651,3 +664,15 @@ void Light::ChangeLightDirection(MatrixN rotation) {
 
 bool Light::ContainsScreenPoint(Vector3 point) { return false; }
 bool Light::ContainsPoint(Vector3 point) { return false; }
+
+std::string Light::str() {
+	std::string s =
+		"tag         " + tag + "\n" +
+		"id          " + std::to_string(id) + "\n" +
+		"position    " + position.str2f() + "\n" +
+		"rotation    " + rotation.str2f() + "\n" +
+		"scale       " + scale.str2f() + "\n" +
+		"entity_type: light";
+	return s;
+
+}

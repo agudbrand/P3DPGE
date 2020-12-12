@@ -201,7 +201,7 @@ struct DebugTriangle : public Entity {
 
 struct Camera : public Entity {
 	Vector3 lookDir;
-	Vector3 target = V3FORWARD;
+	//Vector3 target = V3FORWARD;
 	Vector3 up = V3UP;
 	float nearZ = .1f; //the distance from the camera's position to screen plane
 	float farZ = 1000.1f; //the maximum render distance
@@ -211,8 +211,8 @@ struct Camera : public Entity {
 		position = V3ZERO;
 	}
 
-	MatrixN MakeViewMatrix(float yaw, bool force_target = false);
-	MatrixN ProjectionMatrix(olc::PixelGameEngine* p);
+	mat<float, 4, 4> MakeViewMatrix(float yaw, bool force_target = false);
+	mat<float, 4, 4> ProjectionMatrix();
 
 	void Update(float deltaTime) override;
 	bool ContainsPoint(Vector3 point) override;
@@ -236,5 +236,5 @@ struct Light : public Entity {
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
 
-
+	virtual std::string str() override;
 };

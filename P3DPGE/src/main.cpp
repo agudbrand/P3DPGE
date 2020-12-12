@@ -41,7 +41,10 @@ public:
 		Scene::Init();
 
 		g_cBuffer.allocate_space(100);
+		Render::pDepthBuffer = new float[ScreenWidth() * ScreenHeight()];
 
+		screenHeight = ScreenHeight();
+		screenWidth = ScreenWidth();
 
 		std::vector<Button*> debug_b;
 
@@ -59,8 +62,6 @@ public:
 		debug_b.push_back(new Button(([](olc::PixelGameEngine* p) {
 			//sub menu
 			}), "spawn_complex", "", true, 0));
-
-		
 
 		std::vector<Button*> cspawn_b;
 
