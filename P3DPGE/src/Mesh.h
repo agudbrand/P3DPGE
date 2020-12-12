@@ -19,6 +19,8 @@ struct Triangle {
 
 	olc::Sprite* sprite;
 
+	bool alt_tri = false;
+
 	//maybe edges can be cleared when they're not actually needed,
 	//and only spawned when used?
 	Edge edges[3];
@@ -80,6 +82,14 @@ struct Triangle {
 		edges[1] = Edge(p2, p3);
 		edges[2] = Edge(p3, p1);
 
+		sprite = new olc::Sprite(100, 100);
+
+		LOG((points[2] - points[0]).mag());
+		LOG((points[2] - points[1]).mag());
+		if ((points[2] - points[0]).mag() > (points[2] - points[1]).mag()) {
+			alt_tri = true;
+		}
+
 		this->e = e;
 	}
 	
@@ -116,13 +126,25 @@ struct Triangle {
 
 	//TODO(r, sushi) figure out how to make this work better
 	Vector3 sprite_pixel_location(int x, int y) {
-		Vector3 v21 = points[1] - points[2];
-		Vector3 v20 = points[0] - points[2];
-		float xdiv = v21.mag() / (sprite->width);
-		float ydiv = v20.mag() / (sprite->height);
-		Vector3 v0x = points[2] + v21.normalized() * x * xdiv;
-		Vector3 v0y = points[2] + v20.normalized() * y * ydiv;
-		return points[2] + (v0x - points[2]) + (v0y - points[2]);
+		if (alt_tri) {
+			Vector3 v21 = points[2] - points[1];
+			Vector3 v01 = points[0] - points[1];
+			float xdiv = v21.mag() / (sprite->width);
+			float ydiv = v01.mag() / (sprite->height);
+			Vector3 v0x = points[1] + v21.normalized() * x * xdiv;
+			Vector3 v0y = points[1] + v01.normalized() * y * ydiv;
+			return points[1] + (v0x - points[1]) + (v0y - points[1]);
+		}
+		else {
+			Vector3 v21 = points[1] - points[2];
+			Vector3 v20 = points[0] - points[2];
+			float xdiv = v21.mag() / (sprite->width);
+			float ydiv = v20.mag() / (sprite->height);
+			Vector3 v0x = points[2] + v21.normalized() * x * xdiv;
+			Vector3 v0y = points[2] + v20.normalized() * y * ydiv;
+			return points[2] + (v0x - points[2]) + (v0y - points[2]);
+		}
+		
 	}
 	
 	//checks if a triangle contains a point in screen space

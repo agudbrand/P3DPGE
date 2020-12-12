@@ -55,6 +55,7 @@ namespace Time {
 		fixedDeltaTime = 1.f / fixedTimeStep;
 		g_fixedDeltaTime = fixedDeltaTime;
 		fixedCounter = 0;
+		
 	}
 
 	static void FixedUpdate() {
@@ -72,7 +73,7 @@ namespace Time {
 			FixedUpdate();
 		}
 
-		srand(time(NULL));
+		
 	}
 
 	static void Cleanup() {}
