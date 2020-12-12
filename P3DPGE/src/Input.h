@@ -447,10 +447,10 @@ namespace Input {
 
 		/*inputActions.push_back(InputAction([](olc::PixelGameEngine* p) { //TODO(i,delle) add back projection fulcrum
 
-			Vector3 pos1 = V3ZERO; pos1.ScreenToWorld(Render::camera.ProjectionMatrix(p), Render::view, p);
-			Vector3 pos2 = Vector3(0, p->ScreenHeight()); pos2.ScreenToWorld(Render::camera.ProjectionMatrix(p), Render::view, p);
-			Vector3 pos3 = Vector3(p->ScreenWidth(), 0); pos3.ScreenToWorld(Render::camera.ProjectionMatrix(p), Render::view, p);
-			Vector3 pos4 = Vector3(p->ScreenWidth(), p->ScreenHeight()); pos4.ScreenToWorld(Render::camera.ProjectionMatrix(p), Render::view, p);
+			Vector3 pos1 = V3ZERO; pos1.ScreenToWorld(Render::camera.ProjectionMatrix(p), Render::viewMatrix, p);
+			Vector3 pos2 = Vector3(0, p->ScreenHeight()); pos2.ScreenToWorld(Render::camera.ProjectionMatrix(p), Render::viewMatrix, p);
+			Vector3 pos3 = Vector3(p->ScreenWidth(), 0); pos3.ScreenToWorld(Render::camera.ProjectionMatrix(p), Render::viewMatrix, p);
+			Vector3 pos4 = Vector3(p->ScreenWidth(), p->ScreenHeight()); pos4.ScreenToWorld(Render::camera.ProjectionMatrix(p), Render::viewMatrix, p);
 
 			Vector3 ctox1 = (pos1 - Render::camera.position).normalized();
 			Vector3 ctox2 = (pos2 - Render::camera.position).normalized();
@@ -484,7 +484,7 @@ namespace Input {
 			Box* box = new Box(Vector3(5, 5, 5), Vector3(0,0,20));
 			box->mass = 100;
 			AABBCollider* aabb = new AABBCollider(box, box->halfDims);
-			Box* sphere = new Box(Vector3(.3f, .3f, .3f), Vector3(20, 0, 20), V3ZERO, V3ONE, Vector3(-25, -3, 0), V3ZERO, V3ONE);
+			Box* sphere = new Box(Vector3(.3f, .3f, .3f), Vector3(20, 0, 20), V3ZERO, V3ONE, Vector3(-500, -3, 0), V3ZERO, V3ONE);
 			SphereCollider* sphereCol = new SphereCollider(sphere, 1);
 			Physics::AddEntity(box);
 			Scene::AddEntity(box);
