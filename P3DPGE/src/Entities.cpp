@@ -626,7 +626,7 @@ mat<float, 4, 4> Camera::ProjectionMatrix() {
 	float aspectRatio = (float)screenHeight / (float)screenWidth;
 	float fovRad = 1.f / tanf(fieldOfView * .5f / 180.f * M_PI);
 
-	return MatrixN(4, 4, {
+	return mat<float,4,4>({
 		aspectRatio * fovRad, 0,	  0,								0,
 		0,					  fovRad, 0,								0,
 		0,					  0,	  farZ / renderToView,				1,
@@ -658,7 +658,7 @@ Light::Light(Vector3 direction, EntityParams) : Entity(EntityArgs) {
 	this->direction = direction;
 }
 
-void Light::ChangeLightDirection(MatrixN rotation) {
+void Light::ChangeLightDirection(Matrix3 rotation) {
 	direction *= rotation; direction.normalize();
 }
 

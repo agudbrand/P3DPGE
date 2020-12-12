@@ -232,7 +232,7 @@ struct Light : public Entity {
 	Vector3 direction;
 
 	Light(Vector3 direction, EntityDefaultParams);
-	void ChangeLightDirection(MatrixN rotation);
+	void ChangeLightDirection(Matrix3 rotation);
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
 

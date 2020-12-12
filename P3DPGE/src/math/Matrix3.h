@@ -5,10 +5,12 @@ struct Vector3;
 struct Matrix4;
 
 struct Matrix3 {
-	float data[9];
+	float data[9]{};
 
 	Matrix3() {}
-	Matrix3(std::array<float, 9> list);
+	Matrix3(float _00, float _01, float _02,
+			float _10, float _11, float _12,
+			float _20, float _21, float _22);
 	Matrix3(const Matrix3& m);
 
 	float&	operator () (uint32 row, uint32 col);
@@ -36,6 +38,9 @@ struct Matrix3 {
 	const std::string str2f() const;
 	Matrix3 Transpose() const;
 	float Determinant() const;
+	float Minor(int row, int col) const;
+	float Cofactor(int row, int col) const;
+	Matrix3 Adjoint() const;
 	Matrix3 Inverse() const;
 
 	static Matrix3 Identity();
@@ -53,14 +58,16 @@ struct Matrix3 {
 
 //// Constructors ////
 
-inline Matrix3::Matrix3(std::array<float, 9> list) {
-	for(int i = 0; i < 9; ++i) {
-		this->data[i] = list[i];
-	}
+inline Matrix3::Matrix3(float _00, float _01, float _02,
+				float _10, float _11, float _12,
+				float _20, float _21, float _22) {
+	data[0] = _00; data[1] = _01; data[2] = _02;
+	data[3] = _10; data[4] = _11; data[5] = _12;
+	data[6] = _20; data[7] = _21; data[8] = _22;
 }
 
 inline Matrix3::Matrix3(const Matrix3& m) {
-	memcpy(&data, &m.data, 9); //TODO(,delle) test this
+	memcpy(&data, &m.data, 9*sizeof(float));
 }
 
 //// Operators ////
@@ -284,10 +291,47 @@ inline float Matrix3::Determinant() const{
 			(data[0] * data[5] * data[7]);		//afh
 }
 
+//returns the determinant of this matrix without the specified row and column
+inline float Matrix3::Minor(int row, int col) const {
+	float arr[4];
+	int index = 0;
+	for (int i = 0; i < 3; ++i) {
+		if (i == row) continue;
+		for (int j = 0; j < 3; ++j) {
+			if (j == col) continue;
+			arr[index++] = data[3 * i + j];
+		}
+	}
+
+	//2x2 determinant
+	return (data[0] * data[3]) - (data[1] * data[2]);
+}
+
+//returns the cofactor (minor with adjusted sign based on location in matrix) at given row and column
+inline float Matrix3::Cofactor(int row, int col) const{
+	if ((row + col) % 2) {
+		return -Minor(row, col);
+	} else {
+		return Minor(row, col);
+	}
+}
+
+//returns the transposed matrix of cofactors of this matrix
+inline Matrix3 Matrix3::Adjoint() const {
+	Matrix3 newMatrix = Matrix3();
+	int index = 0;
+	for (int i = 0; i < 3; ++i) {
+		for (int j = 0; j < 3; ++j) {
+			newMatrix.data[index++] = this->Cofactor(i, j);
+		}
+	}
+	return newMatrix.Transpose();
+}
+
 //returns the adjoint divided by the determinant
 inline Matrix3 Matrix3::Inverse() const {
 	ASSERT(this->Determinant(), "Matrix3 inverse does not exist if determinant is zero");
-	return *this / this->Determinant();
+	return this->Adjoint() / this->Determinant();
 }
 
 //returns an identity matrix with the given dimensions

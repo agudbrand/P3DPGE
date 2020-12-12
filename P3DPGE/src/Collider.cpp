@@ -2,9 +2,9 @@
 #include "Entities.h"
 #include "physics/InertiaTensors.h"
 
-MatrixN LocalToWorldInertiaTensor(PhysEntity* entity, MatrixN inertiaTensor) {
-	MatrixN inverseTransformation = MatrixN::TransformationMatrix(entity->position, entity->rotation, entity->scale).Inverse();
-	return inverseTransformation * MatrixN::M3x3To4x4(inertiaTensor) * inverseTransformation.Transpose();
+Matrix4 LocalToWorldInertiaTensor(PhysEntity* entity, Matrix3 inertiaTensor) {
+	Matrix4 inverseTransformation = Matrix4::TransformationMatrix(entity->position, entity->rotation, entity->scale).Inverse();
+	return inverseTransformation * inertiaTensor.To4x4() * inverseTransformation.Transpose();
 }
 
 
@@ -50,7 +50,6 @@ bool AABBAABBCollision(AABBCollider* first, AABBCollider* second, bool resolveCo
 }
 
 //TODO(p,delle) implement sphere-aabb dynamic resolution
-//TODO(p,delle) maybe abstract out closest point calculations for each collider
 //Returns true if the closest point to the sphere on the AABB is within the sphere
 //Reference: https://www.euclideanspace.com/physics/dynamics/collision/threed/index.htm
 bool AABBSphereCollision(AABBCollider* aabb, SphereCollider* sphere, bool resolveCollision) {
@@ -72,18 +71,18 @@ bool AABBSphereCollision(AABBCollider* aabb, SphereCollider* sphere, bool resolv
 			sphere->entity->position -= vectorBetween;
 			
 			//dynamic resolution
-			MatrixN sphereInertiaTensorInverse = LocalToWorldInertiaTensor(sphere->entity, sphere->inertiaTensor).Inverse();
+			Matrix4 sphereInertiaTensorInverse = LocalToWorldInertiaTensor(sphere->entity, sphere->inertiaTensor).Inverse();
 			Vector3 normal = -vectorBetween.normalized();
 			Vector3 ra = sphere->entity->position + sphere->ClosestPointOnSurfaceTo(closestAABBPoint);
 			Vector3 sphereAngularVelocityChange = normal.cross(ra);
-			sphereAngularVelocityChange = Vector3(MatrixN(sphereAngularVelocityChange, 1) * sphereInertiaTensorInverse);
+			sphereAngularVelocityChange *= sphereInertiaTensorInverse;
 			float inverseMassA = 1.f / sphere->entity->mass;
 			float scalar = inverseMassA + sphereAngularVelocityChange.cross(ra).dot(normal);
 
-			MatrixN aabbInertiaTensorInverse = LocalToWorldInertiaTensor(aabb->entity, aabb->inertiaTensor).Inverse();
+			Matrix4 aabbInertiaTensorInverse = LocalToWorldInertiaTensor(aabb->entity, aabb->inertiaTensor).Inverse();
 			Vector3 rb = aabb->entity->position + closestAABBPoint;
 			Vector3 aabbAngularVelocityChange = normal.cross(rb);
-			aabbAngularVelocityChange = Vector3(MatrixN(aabbAngularVelocityChange, 1) * aabbInertiaTensorInverse);
+			aabbAngularVelocityChange *= aabbInertiaTensorInverse;
 			float inverseMassB = 1.f / aabb->entity->mass;
 			scalar += inverseMassB + aabbAngularVelocityChange.cross(rb).dot(normal);
 				

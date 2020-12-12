@@ -9,9 +9,10 @@ struct Complex;
 
 struct Collider{
 	PhysEntity* entity = nullptr;
-	MatrixN inertiaTensor;
+	Matrix3 inertiaTensor;
 	int8 collisionLayer;
 
+	virtual Vector3 ClosestPointOnSurfaceTo(Vector3 target) = 0;
 	virtual bool ContainsPoint(Vector3 point) = 0;
 	virtual bool CheckCollision(Collider* other, bool resolveCollision = true) = 0;
 };
@@ -35,7 +36,7 @@ struct AABBCollider : public Collider {
 	AABBCollider(BoxCollider* boxCollider);
 
 	bool ContainsPoint(Vector3 point) override;
-	Vector3 ClosestPointOnSurfaceTo(Vector3 target);
+	Vector3 ClosestPointOnSurfaceTo(Vector3 target) override;
 	bool CheckCollision(Collider* other, bool resolveCollision = true) override;
 };
 
@@ -46,7 +47,7 @@ struct SphereCollider : public Collider {
 	SphereCollider(PhysEntity* entity, float radius, int8 collisionLayer = 0);
 
 	bool ContainsPoint(Vector3 point) override;
-	Vector3 ClosestPointOnSurfaceTo(Vector3 target);
+	Vector3 ClosestPointOnSurfaceTo(Vector3 target) override;
 	bool CheckCollision(Collider* other, bool resolveCollision = true) override;
 };
 

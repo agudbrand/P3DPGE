@@ -445,6 +445,39 @@ namespace Input {
 			}, "TOGGLE_DISP_EDGES", olc::V, -1, 0, 0, 0,
 			"Toggles whether the edges of objects are numbered"));
 
+		/*inputActions.push_back(InputAction([](olc::PixelGameEngine* p) { //TODO(i,delle) add back projection fulcrum
+
+			Vector3 pos1 = V3ZERO; pos1.ScreenToWorld(Render::camera.ProjectionMatrix(p), Render::view, p);
+			Vector3 pos2 = Vector3(0, p->ScreenHeight()); pos2.ScreenToWorld(Render::camera.ProjectionMatrix(p), Render::view, p);
+			Vector3 pos3 = Vector3(p->ScreenWidth(), 0); pos3.ScreenToWorld(Render::camera.ProjectionMatrix(p), Render::view, p);
+			Vector3 pos4 = Vector3(p->ScreenWidth(), p->ScreenHeight()); pos4.ScreenToWorld(Render::camera.ProjectionMatrix(p), Render::view, p);
+
+			Vector3 ctox1 = (pos1 - Render::camera.position).normalized();
+			Vector3 ctox2 = (pos2 - Render::camera.position).normalized();
+			Vector3 ctox3 = (pos3 - Render::camera.position).normalized();
+			Vector3 ctox4 = (pos4 - Render::camera.position).normalized();
+
+			Line3* r1 = new Line3(ctox1, 1, Render::camera.position);
+			Line3* r2 = new Line3(ctox2, 2, Render::camera.position);
+			Line3* r3 = new Line3(ctox3, 3, Render::camera.position);
+			Line3* r4 = new Line3(ctox4, 4, Render::camera.position);
+			Line3* r5 = new Line3(ctox1, 5, ctox3);
+			Line3* r6 = new Line3(ctox2, 6, ctox1);
+			Line3* r7 = new Line3(ctox3, 7, ctox4);
+			Line3* r8 = new Line3(ctox4, 8, ctox2);
+
+			Render::sentities.push_back(r1);
+			Render::sentities.push_back(r2);
+			Render::sentities.push_back(r3);
+			Render::sentities.push_back(r4);
+			Render::sentities.push_back(r5);
+			Render::sentities.push_back(r6);
+			Render::sentities.push_back(r7);
+			Render::sentities.push_back(r8);
+
+		}, "display_proj_fulcrum", olc::B, -1, 0, 0, 0,
+		"Display camera's perspective fulcrum"));*/
+
 		//// temp debugging ////
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {

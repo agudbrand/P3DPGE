@@ -5,10 +5,13 @@ struct Vector4;
 struct Matrix3;
 
 struct Matrix4 {
-	float data[16];
+	float data[16]{};
 
 	Matrix4() {}
-	Matrix4(std::array<float, 16> list);
+	Matrix4(float _00, float _01, float _02, float _03,
+			float _10, float _11, float _12, float _13,
+			float _20, float _21, float _22, float _23,
+			float _30, float _31, float _32, float _33);
 	Matrix4(const Matrix4& m);
 
 	float&	operator () (uint32 row, uint32 col);
@@ -36,6 +39,9 @@ struct Matrix4 {
 	const std::string str2f() const;
 	Matrix4 Transpose() const;
 	float Determinant() const;
+	float Minor(int row, int col) const;
+	float Cofactor(int row, int col) const;
+	Matrix4 Adjoint() const;
 	Matrix4 Inverse() const;
 
 	static Matrix4 Identity();
@@ -55,14 +61,18 @@ struct Matrix4 {
 
 //// Constructors ////
 
-inline Matrix4::Matrix4(std::array<float, 16> list) {
-	for(int i = 0; i < 16; ++i) {
-		this->data[i] = list[i];
-	}
+inline Matrix4::Matrix4(float _00, float _01, float _02, float _03,
+				float _10, float _11, float _12, float _13,
+				float _20, float _21, float _22, float _23,
+				float _30, float _31, float _32, float _33) {
+	data[0] = _00; data[1] = _01; data[2] = _02; data[3] = _03;
+	data[4] = _10; data[5] = _11; data[6] = _12; data[7] = _13;
+	data[8] = _20; data[9] = _21; data[10] = _22; data[11] = _23;
+	data[12] = _30; data[13] = _31; data[14] = _32; data[15] = _33;
 }
 
 inline Matrix4::Matrix4(const Matrix4& m) {
-	memcpy(&data, &m.data, 16); //TODO(,delle) test this
+	memcpy(&data, &m.data, 16*sizeof(float));
 }
 
 //// Operators ////
@@ -294,10 +304,48 @@ inline float Matrix4::Determinant() const{
 						data[ 9] * (data[ 2] * data[ 7] - data[ 3] * data[ 6]));
 }
 
+//returns the determinant of this matrix without the specified row and column
+inline float Matrix4::Minor(int row, int col) const {
+	float arr[9];
+	int index = 0;
+	for (int i = 0; i < 4; ++i) {
+		if (i == row) continue;
+		for (int j = 0; j < 4; ++j) {
+			if (j == col) continue;
+			arr[index++] = data[4 * i + j];
+		}
+	}
+
+	//3x3 determinant
+	return (arr[0] * arr[4] * arr[8]) + (arr[1] * arr[5] * arr[6]) + (arr[2] * arr[3] * arr[7]) -	
+			(arr[2] * arr[4] * arr[6]) - (arr[1] * arr[3] * arr[8]) - (arr[0] * arr[5] * arr[7]);
+}
+
+//returns the cofactor (minor with adjusted sign based on location in matrix) at given row and column
+inline float Matrix4::Cofactor(int row, int col) const{
+	if ((row + col) % 2) {
+		return -Minor(row, col);
+	} else {
+		return Minor(row, col);
+	}
+}
+
+//returns the transposed matrix of cofactors of this matrix
+inline Matrix4 Matrix4::Adjoint() const {
+	Matrix4 newMatrix = Matrix4();
+	int index = 0;
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			newMatrix.data[index++] = this->Cofactor(i, j);
+		}
+	}
+	return newMatrix.Transpose();
+}
+
 //returns the adjoint divided by the determinant
 inline Matrix4 Matrix4::Inverse() const {
 	ASSERT(this->Determinant(), "Matrix4 inverse does not exist if determinant is zero");
-	return *this / this->Determinant();
+	return this->Adjoint() / this->Determinant();
 }
 
 //returns an identity matrix with the given dimensions

@@ -3,6 +3,7 @@
 
 struct MatrixN;
 struct Matrix3;
+struct Matrix4;
 struct Vector4;
 
 namespace olc {
@@ -24,9 +25,9 @@ namespace boost {
 #define vec boost::qvm::vec
 
 struct Vector3 {
-	float x;
-	float y;
-	float z;
+	float x{};
+	float y{};
+	float z{};
 
 	Vector3();
 	Vector3(float inX, float inY, float inZ);
@@ -75,6 +76,8 @@ struct Vector3 {
 
 	Vector3 operator *  (const Matrix3& rhs) const;
 	void    operator *= (const Matrix3& rhs);
+	Vector3 operator *  (const Matrix4& rhs) const;
+	void    operator *= (const Matrix4& rhs);
 
 	Vector4 ToVector4() const;
 

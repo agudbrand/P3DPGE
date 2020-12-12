@@ -5,12 +5,12 @@ struct Vector3;
 struct Matrix4;
 
 struct Vector4 {
-	float x;
-	float y;
-	float z;
-	float w;
+	float x{};
+	float y{};
+	float z{};
+	float w{};
 
-	Vector4();
+	Vector4() {}
 	Vector4(float inX, float inY, float inZ, float inW);
 	Vector4(const Vector4& v);
 
@@ -38,7 +38,6 @@ struct Vector4 {
 	float	dot(const Vector4& rhs) const;
 	float	mag() const;
 	Vector4	normalized() const;
-	Vector4 clampMag(const float& rhs) const;
 	Vector4	xComp() const;
 	Vector4 yComp() const;
 	Vector4 zComp() const;
@@ -57,11 +56,9 @@ struct Vector4 {
 	Vector3 ToVector3() const;
 };
 
-//// Constructors ////
 
-inline Vector4::Vector4() {
-	this->x = 0; this->y = 0; this->z = 0; this->w = 0;
-}
+
+//// Constructors ////
 
 inline Vector4::Vector4(float inX, float inY, float inZ, float inW) {
 	this->x = inX; this->y = inY; this->z = inZ; this->w = inW;
@@ -70,6 +67,8 @@ inline Vector4::Vector4(float inX, float inY, float inZ, float inW) {
 inline Vector4::Vector4(const Vector4& v) {
 	this->x = v.x; this->y = v.y; this->z = v.z; this->w = v.w;
 }
+
+
 
 //// Operators ////
 
@@ -137,6 +136,8 @@ inline bool    Vector4::operator != (const Vector4& rhs) const {
 	return this->x != rhs.x || this->y != rhs.y || this->z != rhs.z || this->w != rhs.w;
 }
 
+
+
 //// Functions ////
 
 inline const std::string Vector4::str() const {
@@ -161,16 +162,12 @@ inline float Vector4::mag() const {
 	return std::sqrtf(x * x + y * y + z * z + w * w);
 }
 
+//NOTE: normalizing a Vector4 means dividing all parts by W
 inline Vector4 Vector4::normalized() const {
-	if (*this != Vector4(0, 0, 0, 0)) {
-		return *this / this->mag();
+	if (w != 0) {
+		return *this / w;
 	}
 	return Vector4(*this);
-}
-
-inline Vector4 Vector4::clampMag(const float& rhs) const {
-	if (this->mag() < rhs) { return *this; }
-	return this->normalized() * rhs;
 }
 
 inline Vector4 Vector4::xComp() const {

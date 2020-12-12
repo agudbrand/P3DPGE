@@ -396,14 +396,14 @@ namespace Math {
 	static float TriangleArea(Vector3 a, Vector3 b) { return a.cross(b).mag() / 2; }
 
 	static Vector3 WorldToCamera(Vector3 vertex, mat<float, 4, 4> viewMatrix) {
-		MatrixN vm = MatrixN(vertex, 1) * MatrixN(viewMatrix);
-		if (vm(0,3) != 0) { vm(0, 0) /= vm(0, 3); vm(0, 1) /= vm(0, 3); vm(0, 2) /= vm(0, 3); }
+		mat<float, 1, 4> vm = vertex.ConvertToM1x4() * viewMatrix;
+		if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; }
 		return Vector3(vm);
 	}
 
 	static Vector3 CameraToScreen(Vector3 csVertex, mat<float, 4, 4> projectionMatrix) {
-		Matrix vm = Matrix(csVertex, 1) * Matrix(projectionMatrix);
-		if (vm(0, 3) != 0) { vm(0, 0) /= vm(0, 3); vm(0, 1) /= vm(0, 3); vm(0, 2) /= vm(0, 3); }
+		mat<float, 1, 4> vm = csVertex.ConvertToM1x4() * projectionMatrix;
+		if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; }
 		Vector3 out(vm);
 		out.x += 1.0f; out.y += 1.0f;
 		out.x *= 0.5f * screenWidth;
@@ -537,6 +537,10 @@ namespace Math {
 
 //// Vector3 vs Vector4 Interactions ////
 
+inline Vector4::Vector4(const Vector3& v, const float& w) {
+	this->x = v.x; this->y = v.y; this->z = v.z; this->w = w;
+}
+
 inline Vector4 Vector3::ToVector4() const {
 	return Vector4(x, y, z, 1);
 }
@@ -548,56 +552,66 @@ inline Vector3 Vector4::ToVector3() const {
 //// Matrix3 vs Matrix4 Interactions ////
 
 inline Matrix4 Matrix3::To4x4() {
-	return Matrix4({
+	return Matrix4(
 		data[0],	data[1],	data[2],	0,
 		data[3],	data[4],	data[5],	0,
 		data[6],	data[7],	data[8],	0,
 		0,			0,			0,			1
-	});
+	);
 }
 
 inline Matrix3 Matrix4::To3x3() {
-	return Matrix3({
+	return Matrix3(
 		data[0], data[1], data[2],
 		data[4], data[5], data[6],
-		data[8], data[9], data[10],
-	});
+		data[8], data[9], data[10]
+	);
 }
 
 //// Vector vs Matrix Interactions ////
 
 inline Vector3 Vector3::operator *  (const Matrix3& rhs) const {
-	float newX, newY, newZ;
-	newX = x*rhs.data[0] + y*rhs.data[3] + z*rhs.data[6];
-	newY = x*rhs.data[1] + y*rhs.data[4] + z*rhs.data[7];
-	newZ = x*rhs.data[2] + y*rhs.data[5] + z*rhs.data[8];
-	return Vector3(newX, newY, newZ);
+	return Vector3(
+		x*rhs.data[0] + y*rhs.data[3] + z*rhs.data[6], 
+		x*rhs.data[1] + y*rhs.data[4] + z*rhs.data[7], 
+		x*rhs.data[2] + y*rhs.data[5] + z*rhs.data[8]);
 }
 
 inline void Vector3::operator *= (const Matrix3& rhs) {
-	float newX, newY, newZ;
-	newX = x*rhs.data[0] + y*rhs.data[3] + z*rhs.data[6];
-	newY = x*rhs.data[1] + y*rhs.data[4] + z*rhs.data[7];
-	newZ = x*rhs.data[2] + y*rhs.data[5] + z*rhs.data[8];
-	*this = Vector3(newX, newY, newZ);
+	*this = Vector3(
+		x*rhs.data[0] + y*rhs.data[3] + z*rhs.data[6], 
+		x*rhs.data[1] + y*rhs.data[4] + z*rhs.data[7], 
+		x*rhs.data[2] + y*rhs.data[5] + z*rhs.data[8]);
+}
+
+inline Vector3 Vector3::operator *  (const Matrix4& rhs) const {
+	return Vector3(
+		x*rhs.data[0] + y*rhs.data[4] + z*rhs.data[8] + rhs.data[12],
+		x*rhs.data[1] + y*rhs.data[5] + z*rhs.data[9] + rhs.data[13],
+		x*rhs.data[2] + y*rhs.data[6] + z*rhs.data[10] + rhs.data[14]);
+}
+
+inline void Vector3::operator *= (const Matrix4& rhs) {
+	*this = Vector3(
+		x*rhs.data[0] + y*rhs.data[4] + z*rhs.data[8] + rhs.data[12],
+		x*rhs.data[1] + y*rhs.data[5] + z*rhs.data[9] + rhs.data[13],
+		x*rhs.data[2] + y*rhs.data[6] + z*rhs.data[10] + rhs.data[14]);
 }
 
 inline Vector4 Vector4::operator *  (const Matrix4& rhs) const {
-	float newX, newY, newZ, newW;
-	newX = x*rhs.data[0] + y*rhs.data[4] + z*rhs.data[8] + w*rhs.data[12];
-	newY = x*rhs.data[1] + y*rhs.data[5] + z*rhs.data[9] + w*rhs.data[13];
-	newZ = x*rhs.data[2] + y*rhs.data[6] + z*rhs.data[10] + w*rhs.data[14];
-	newW = x*rhs.data[3] + y*rhs.data[7] + z*rhs.data[11] + w*rhs.data[15];
-	return Vector4(newX, newY, newZ, newW);
+	return Vector4(
+		x*rhs.data[0] + y*rhs.data[4] + z*rhs.data[8] + w*rhs.data[12],
+		x*rhs.data[1] + y*rhs.data[5] + z*rhs.data[9] + w*rhs.data[13],
+		x*rhs.data[2] + y*rhs.data[6] + z*rhs.data[10] + w*rhs.data[14],
+		x*rhs.data[3] + y*rhs.data[7] + z*rhs.data[11] + w*rhs.data[15]);
 }
 
 inline void Vector4::operator *= (const Matrix4& rhs) {
-	float newX, newY, newZ, newW;
-	newX = x*rhs.data[0] + y*rhs.data[4] + z*rhs.data[8] + w*rhs.data[12];
-	newY = x*rhs.data[1] + y*rhs.data[5] + z*rhs.data[9] + w*rhs.data[13];
-	newZ = x*rhs.data[2] + y*rhs.data[6] + z*rhs.data[10] + w*rhs.data[14];
-	newW = x*rhs.data[3] + y*rhs.data[7] + z*rhs.data[11] + w*rhs.data[15];
-	*this = Vector4(newX, newY, newZ, newW);
+	*this = Vector4(
+		x*rhs.data[0] + y*rhs.data[4] + z*rhs.data[8] + w*rhs.data[12],
+		x*rhs.data[1] + y*rhs.data[5] + z*rhs.data[9] + w*rhs.data[13],
+		x*rhs.data[2] + y*rhs.data[6] + z*rhs.data[10] + w*rhs.data[14],
+		x*rhs.data[3] + y*rhs.data[7] + z*rhs.data[11] + w*rhs.data[15]);
 }
 
 //// Non-Vector vs Vector Interactions ////
