@@ -40,7 +40,7 @@ public:
 	Entity (EntityDefaultParams);
 	virtual ~Entity();
 	virtual bool LineIntersect(Edge3* e);
-	virtual void Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view);
+	virtual void Draw(olc::PixelGameEngine* p, Matrix4 ProjMat, Matrix4 view);
 	virtual bool SpecialDraw();
 	//these functions are virtual but aren't implemented
 	//in any child yet as I see no use for differenciating
@@ -57,8 +57,8 @@ public:
 	virtual bool ContainsPoint(Vector3 point);
 	virtual bool ContainsScreenPoint(Vector3 point);
 
-	virtual void DrawPosition(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view);
-	virtual void DrawVertices(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view);
+	virtual void DrawPosition(olc::PixelGameEngine* p, Matrix4 ProjMat, Matrix4 view);
+	virtual void DrawVertices(olc::PixelGameEngine* p, Matrix4 ProjMat, Matrix4 view);
 
 	virtual std::string str();
 };
@@ -101,13 +101,12 @@ public:
 	void AddForce(PhysEntity* creator, Vector3 force, bool bIgnoreMass = false);
 	void AddFrictionForce(PhysEntity* creator, float frictionCoef, float deltaTime, bool bIngoreMass = false);
 	void AddImpulse(PhysEntity* creator, Vector3 impulse, bool bIgnoreMass = false);
-	void GenerateRadialForce(Vector3 position, float radius, float strength, float falloff, bool bIgnoreMass);
 
 	void AddInput(Vector3 input);
 	void SetCollider(Collider* collider);
 	bool CheckCollision(PhysEntity* other, bool resolveCollision = true);
 
-	void Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) override;
+	void Draw(olc::PixelGameEngine* p, Matrix4 ProjMat, Matrix4 view) override;
 };
 
 struct Sphere : public PhysEntity {
@@ -164,7 +163,7 @@ struct Line2 : public Entity {
 	void Update(float deltaTime) override;
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
-	void Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) override;
+	void Draw(olc::PixelGameEngine* p, Matrix4 ProjMat, Matrix4 view) override;
 	bool SpecialDraw() override;
 	void SetColor(olc::Pixel newColor) override;
 
@@ -181,7 +180,7 @@ struct Line3 : public Entity {
 	void Update(float deltaTime) override;
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
-	void Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) override;
+	void Draw(olc::PixelGameEngine* p, Matrix4 ProjMat, Matrix4 view) override;
 	bool SpecialDraw() override;
 	void SetColor(olc::Pixel newColor) override;
 
@@ -211,8 +210,8 @@ struct Camera : public Entity {
 		position = V3ZERO;
 	}
 
-	mat<float, 4, 4> MakeViewMatrix(float yaw, bool force_target = false);
-	mat<float, 4, 4> ProjectionMatrix();
+	Matrix4 MakeViewMatrix(float yaw, bool force_target = false);
+	Matrix4 ProjectionMatrix();
 
 	void Update(float deltaTime) override;
 	bool ContainsPoint(Vector3 point) override;
