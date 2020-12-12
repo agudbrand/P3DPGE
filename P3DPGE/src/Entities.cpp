@@ -51,8 +51,7 @@ void Entity::DrawPosition(olc::PixelGameEngine* p, Matrix4 ProjMat, Matrix4 view
 	
 
 	//TODO(er, sushi) fix this to not lag the fuck out when it gets close to the camera
-	Vector3 nuposition = Math::CameraToScreen(Math::WorldToCamera(position, view), ProjMat);
-	nuposition = Math::WorldToScreen(position, ProjMat, view);
+	Vector3 nuposition =  Math::WorldToScreen(position, ProjMat, view);
 	
 	std::vector<Vector3> points;
 	for (Triangle t : mesh->triangles) {

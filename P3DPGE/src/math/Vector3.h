@@ -75,6 +75,7 @@ struct Vector3 {
 	Vector2 toVector2() const; 
 	MatrixN ToM1x3() const;
 	MatrixN ToM1x4(float w) const;
+	Vector3 ProjectionMultiply(Matrix4 projection) const;
 };
 
 //// Constructors ////
