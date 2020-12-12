@@ -30,6 +30,7 @@ namespace Render {
 
 	static int x0 = 0;
 	static int y0 = 0;
+	static bool up = true;
 
 	static bool ui_toggle = false;
 
@@ -326,17 +327,31 @@ namespace Render {
 						clipped[i].tex_points[o].y /= w;
 						clipped[i].tex_points[o].z = 1 / w;
 					}
-					
-					
-					//projecting texture
-					//for (Vector3& v : clipped[i].tex_points) {
-					//	v.x /= w; v.y /= w;
-					//	v.z = 1.f / w;
-					//}
 
 					clipped[i].e = t.e;
 					clipped[i].sprite = t.sprite;
 					
+					float ti = g_totalTime;
+					for (int ox = 0; ox < 100; ox++) {
+						for (int oy = 0; oy < 100; oy++) {
+							ti += 0.1;
+
+							float dist = (clipped[i].sprite_pixel_location(ox, oy) - Scene::light.position).mag();
+							float dp = Scene::light.direction.dot(clipped[i].get_normal());
+							//std::clamp(50 * dp, 0.f, 50.f),
+							//std::clamp(75 * dp, 0.f, 75.f),
+							//std::clamp(200 * dp, 0.f, 200.f)
+
+							clipped[i].sprite->SetPixel(Vector2(ox, oy),
+								olc::Pixel(
+									floor(255 * 1 / dist),
+									floor(255 * 1 / dist),
+									floor(255 * 1 / dist)));
+							
+
+						}
+					}
+
 					
 					drawnTriangles.push_back(clipped[i]);
 				}
@@ -382,31 +397,16 @@ namespace Render {
 
 			for (Triangle& tr : listTriangles) {
 
-				//this breaks in release mode but looks
-				//really cool in debug mode idk why
-				//in release mode the entity pointer is a bunch
-				//of garbage
-				float ti = g_totalTime;
-				for (int ox = 0; ox < 50; ox++) {
-					for (int oy = 0; oy < 50; oy++) {
-						ti += 0.1;
-						tr.e->sprite->SetPixel(Vector2(ox, oy),
-							olc::Pixel(
-								floor(255 * sinf(M_PI * ti)), 
-								floor(255 * cosf(1.2 * M_PI * ti)),
-								155));
-
-					}
-				}
-
 				
-
+				
 
 				TexturedTriangle(p,
 					tr.proj_points[0].x, tr.proj_points[0].y, tr.tex_points[0].x, tr.tex_points[0].y, tr.tex_points[0].z,
 					tr.proj_points[1].x, tr.proj_points[1].y, tr.tex_points[1].x, tr.tex_points[1].y, tr.tex_points[1].z,
 					tr.proj_points[2].x, tr.proj_points[2].y, tr.tex_points[2].x, tr.tex_points[2].y, tr.tex_points[2].z,
-					tr.e->sprite);
+					tr.sprite);
+
+				p->DrawCircle(Math::WorldToScreen(tr.sprite_pixel_location(x0, y0), Scene::camera.ProjectionMatrix(), view), 10);
 
 
 				//This has been rendered (lol) useless by textures but
@@ -418,6 +418,9 @@ namespace Render {
 				//	t.get_color());
 			}
 		}
+
+		p->DrawCircle(Math::WorldToScreen(Scene::light.position, Scene::camera.ProjectionMatrix(), view), 10);
+
 
 		//debug drawing
 		DEBUGR{
@@ -481,25 +484,23 @@ namespace Render {
 			}
 		}
 
-		
-		//if (TIMER_GET > 0.01) {
-		//	TIMER_E;
-		//	LOG(TIMER_GET);
-			if (x0 > 50) {
-				if (y0 > 50) {
+		if (TIMER_GET > 0.01) {
+			TIMER_E;
+			if (up ? x0 >= 100 - y0 : x0 <= 0) {
+				if (y0 >= 100) {
 					y0 = 0;
 					x0 = 0;
 				}
-				y0++;
-				x0 = 0;
+				y0 += 5;
+				up = !up;
 			}
 			else {
-				x0++;
+				if (up) { x0 += 5; }
+				else { x0 -= 5; }
 			}
-		//	TIMER_S;
-		//}
+			TIMER_S;
+		}
 		
-
 		Draw(p);
 
 		if (ui_toggle) {

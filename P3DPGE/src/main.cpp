@@ -117,7 +117,7 @@ public:
 };
 
 int main() {
-		
+	srand(time(0));
 	P3DPGE game;
 	if (game.Construct(1280, 720, 1, 1, false, false)) { game.Start(); }
 }

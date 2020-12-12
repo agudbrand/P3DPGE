@@ -247,7 +247,7 @@ void PhysEntity::PhysUpdate(float deltaTime) {
 			tf += f;
 		}
 			
-		acceleration = netForce / mass * 5;
+		acceleration = netForce / mass * 15;
 
 			
 		forces.clear();
@@ -384,7 +384,7 @@ Box::Box(Vector3 halfDims, EntityParams, PhysEntityParams) : PhysEntity(EntityAr
 	this->halfDims = halfDims;
 	tag = "box";
 	mesh = new BoxMesh(halfDims, position, this);
-	sprite = new olc::Sprite(50, 50);
+	sprite = new olc::Sprite(100, 100);
 	
 	pos_lerp_from = position;
 	pos_lerp_to = position;
