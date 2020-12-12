@@ -26,8 +26,11 @@
     <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\internal\olcPixelGameEngine.h" />
     <ClInclude Include="src\math\Math.h" />
-    <ClInclude Include="src\math\Matrix.h" />
-    <ClInclude Include="src\math\Vector.h" />
+    <ClInclude Include="src\math\Matrix3.h" />
+    <ClInclude Include="src\math\Matrix4.h" />
+    <ClInclude Include="src\math\MatrixN.h" />
+    <ClInclude Include="src\math\Vector3.h" />
+    <ClInclude Include="src\math\Vector4.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Physics.h" />
     <ClInclude Include="src\physics\InertiaTensors.h" />

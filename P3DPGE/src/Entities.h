@@ -211,8 +211,8 @@ struct Camera : public Entity {
 		position = V3ZERO;
 	}
 
-	mat<float, 4, 4> MakeViewMatrix(float yaw, bool force_target = false);
-	mat<float, 4, 4> ProjectionMatrix(olc::PixelGameEngine* p);
+	MatrixN MakeViewMatrix(float yaw, bool force_target = false);
+	MatrixN ProjectionMatrix(olc::PixelGameEngine* p);
 
 	void Update(float deltaTime) override;
 	bool ContainsPoint(Vector3 point) override;
@@ -232,7 +232,7 @@ struct Light : public Entity {
 	Vector3 direction;
 
 	Light(Vector3 direction, EntityDefaultParams);
-	void ChangeLightDirection(Matrix rotation);
+	void ChangeLightDirection(MatrixN rotation);
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
 

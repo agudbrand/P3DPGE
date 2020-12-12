@@ -2,9 +2,9 @@
 #include "Entities.h"
 #include "physics/InertiaTensors.h"
 
-Matrix LocalToWorldInertiaTensor(PhysEntity* entity, Matrix inertiaTensor) {
-	Matrix inverseTransformation = Matrix::TransformationMatrix(entity->position, entity->rotation, entity->scale).Inverse();
-	return inverseTransformation * Matrix::M3x3To4x4(inertiaTensor) * inverseTransformation.Transpose();
+MatrixN LocalToWorldInertiaTensor(PhysEntity* entity, MatrixN inertiaTensor) {
+	MatrixN inverseTransformation = MatrixN::TransformationMatrix(entity->position, entity->rotation, entity->scale).Inverse();
+	return inverseTransformation * MatrixN::M3x3To4x4(inertiaTensor) * inverseTransformation.Transpose();
 }
 
 
@@ -72,18 +72,18 @@ bool AABBSphereCollision(AABBCollider* aabb, SphereCollider* sphere, bool resolv
 			sphere->entity->position -= vectorBetween;
 			
 			//dynamic resolution
-			Matrix sphereInertiaTensorInverse = LocalToWorldInertiaTensor(sphere->entity, sphere->inertiaTensor).Inverse();
+			MatrixN sphereInertiaTensorInverse = LocalToWorldInertiaTensor(sphere->entity, sphere->inertiaTensor).Inverse();
 			Vector3 normal = -vectorBetween.normalized();
 			Vector3 ra = sphere->entity->position + sphere->ClosestPointOnSurfaceTo(closestAABBPoint);
 			Vector3 sphereAngularVelocityChange = normal.cross(ra);
-			sphereAngularVelocityChange = Vector3(Matrix(sphereAngularVelocityChange, 1) * sphereInertiaTensorInverse);
+			sphereAngularVelocityChange = Vector3(MatrixN(sphereAngularVelocityChange, 1) * sphereInertiaTensorInverse);
 			float inverseMassA = 1.f / sphere->entity->mass;
 			float scalar = inverseMassA + sphereAngularVelocityChange.cross(ra).dot(normal);
 
-			Matrix aabbInertiaTensorInverse = LocalToWorldInertiaTensor(aabb->entity, aabb->inertiaTensor).Inverse();
+			MatrixN aabbInertiaTensorInverse = LocalToWorldInertiaTensor(aabb->entity, aabb->inertiaTensor).Inverse();
 			Vector3 rb = aabb->entity->position + closestAABBPoint;
 			Vector3 aabbAngularVelocityChange = normal.cross(rb);
-			aabbAngularVelocityChange = Vector3(Matrix(aabbAngularVelocityChange, 1) * aabbInertiaTensorInverse);
+			aabbAngularVelocityChange = Vector3(MatrixN(aabbAngularVelocityChange, 1) * aabbInertiaTensorInverse);
 			float inverseMassB = 1.f / aabb->entity->mass;
 			scalar += inverseMassB + aabbAngularVelocityChange.cross(rb).dot(normal);
 				

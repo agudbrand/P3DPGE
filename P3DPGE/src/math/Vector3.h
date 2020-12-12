@@ -1,7 +1,10 @@
 #pragma once
 #include "../Debug.h"
 
-struct Matrix;
+struct MatrixN;
+struct Matrix3;
+struct Vector4;
+
 namespace olc {
 	template<typename V>
 	struct v2d_generic;
@@ -62,18 +65,22 @@ struct Vector3 {
 	Vector3 componentOn(Vector3& rhs) const;
 	Vector3	xComp() const;
 	Vector3 yComp() const;
-	Vector3 zComp() const; //no its good as is
-	Vector3 xInvert() const; //TODO(, delle) rename this to negatedX
-	Vector3 yInvert() const; //TODO(, delle) rename this to negatedY
-	Vector3 zInvert() const; //TODO(, delle) rename this to negatedZ
+	Vector3 zComp() const;
+	Vector3 xInvert() const;
+	Vector3 yInvert() const;
+	Vector3 zInvert() const;
 
-	//Non-Vector vs Vector interactions //TODO(delle) define these in Math.h
+	//Non-Vector vs Vector interactions defined in Math.h
 	Vector3(const Vector2& vector2);
-	Vector3(Matrix matrix);
+
+	Vector3 operator *  (const Matrix3& rhs) const;
+	void    operator *= (const Matrix3& rhs);
+
+	Vector4 ToVector4() const;
 
 	Vector2 toVector2() const; 
-	Matrix ToM1x3() const;
-	Matrix ToM1x4(float w) const;
+	MatrixN ToM1x3() const;
+	MatrixN ToM1x4(float w) const;
 
 	//qvm stuff to convert
 	Vector3(mat<float, 1, 4> m);
@@ -100,10 +107,6 @@ struct Vector3 {
 	void ProjToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p);
 	void ProjToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p, float& w);
 	void ScreenToWorld(mat<float, 4, 4> ProjMat, mat<float, 4, 4> view, olc::PixelGameEngine* p);
-};
-
-struct Vector4 : public Vector3 {
-	float w;
 };
 
 //// Constructors ////
@@ -179,7 +182,7 @@ inline void    Vector3::operator /= (const Vector3& rhs) {
 }
 
 inline Vector3 Vector3::operator -  () const {
-	return { -x, -y, -z }; //TODO(, delle) test this
+	return Vector3( -x, -y, -z );
 }
 
 inline bool    Vector3::operator == (const Vector3& rhs) const {
@@ -198,7 +201,7 @@ inline const std::string Vector3::str() const {
 
 inline const std::string Vector3::str2f() const {
 	char buffer[50];
-	std::snprintf(buffer, 50, "(%-.2f, %-.2f, %-.2f)", this->x, this->y, this->z);
+	std::snprintf(buffer, 50, "(%+.2f, %+.2f, %+.2f)", this->x, this->y, this->z);
 	return std::string(buffer);
 }
 
@@ -228,7 +231,7 @@ inline Vector3 Vector3::normalized() const {
 	if (*this != Vector3(0, 0, 0)) {
 		return *this / this->mag();
 	}
-	return *this; //TODO(, delle) test this
+	return Vector3(*this);
 }
 
 inline Vector3 Vector3::clampMag(const float& rhs) const {

@@ -9,7 +9,7 @@ struct Complex;
 
 struct Collider{
 	PhysEntity* entity = nullptr;
-	Matrix inertiaTensor;
+	MatrixN inertiaTensor;
 	int8 collisionLayer;
 
 	virtual bool ContainsPoint(Vector3 point) = 0;

@@ -1,7 +1,10 @@
 #pragma once
 #include "Time.h"
-#include "Vector.h"
-#include "Matrix.h"
+#include "Vector3.h"
+#include "Vector4.h"
+#include "Matrix3.h"
+#include "Matrix4.h"
+#include "MatrixN.h"
 
 #include <math.h>
 #include <algorithm>
@@ -249,6 +252,30 @@ namespace Math {
 		return m;
 	}
 
+	static MatrixN PointAtMatrix(Vector3& pos, Vector3& target, Vector3& up) {
+		up.normalize();
+
+		//get new forward direction
+		Vector3 newFor = target - pos;
+		newFor.normalize();
+
+		//get right direction
+		Vector3 newRight = up.cross(newFor);
+		newRight.normalize();
+
+		//get up direction
+		Vector3 newUp = newRight.cross(newFor);
+		newUp.normalize();
+
+		//make point at matrix
+		return MatrixN(4, 4, {
+			newRight.x, newRight.y, newRight.z, 0,
+			newUp.x,	newUp.y,	newUp.z,	0,
+			newFor.x,	newFor.y,	newFor.z,	0,
+			pos.x,		pos.y,		pos.z,		1
+		});
+	}
+
 	//this assumes a rectangle whose position is the top right corner
 	static bool PointInRect(Vector2 size, Vector2 pos, Vector2 point) {
 		return pos.x < point.x&& point.x < pos.x + size.x &&
@@ -374,7 +401,7 @@ namespace Math {
 	//namespace Render {
 		//the input vector should be in world space
 	static Vector3 WorldToCamera(Vector3 vertex, mat<float, 4, 4> viewMatrix) {
-		Matrix vm = Matrix(vertex, 1) * Matrix(viewMatrix);
+		MatrixN vm = MatrixN(vertex, 1) * MatrixN(viewMatrix);
 		if (vm(0,3) != 0) { vm(0, 0) /= vm(0, 3); vm(0, 1) /= vm(0, 3); vm(0, 2) /= vm(0, 3); }
 		return Vector3(vm);
 	}
@@ -419,7 +446,7 @@ namespace Math {
 
 	//the input matrixes should be in view/camera space
 	static Vector3 CameraToScreen(Vector3 csVertex, mat<float, 4, 4> projectionMatrix, Vector2 dimensions) {
-		Matrix vm = Matrix(csVertex, 1) * Matrix(projectionMatrix);
+		MatrixN vm = MatrixN(csVertex, 1) * MatrixN(projectionMatrix);
 		if (vm(0, 3) != 0) { vm(0, 0) /= vm(0, 3); vm(0, 1) /= vm(0, 3); vm(0, 2) /= vm(0, 3); }
 		Vector3 out(vm);
 		out.x += 1.0f; out.y += 1.0f;
@@ -507,47 +534,109 @@ namespace Math {
 	}
 };
 
+//// Vector3 vs Vector4 Interactions ////
+
+inline Vector4 Vector3::ToVector4() const {
+	return Vector4(x, y, z, 1);
+}
+
+inline Vector3 Vector4::ToVector3() const {
+	return Vector3(x, y, z);
+}
+
+//// Matrix3 vs Matrix4 Interactions ////
+
+inline Matrix4 Matrix3::To4x4() {
+	return Matrix4({
+		data[0],	data[1],	data[2],	0,
+		data[3],	data[4],	data[5],	0,
+		data[6],	data[7],	data[8],	0,
+		0,			0,			0,			1
+	});
+}
+
+inline Matrix3 Matrix4::To3x3() {
+	return Matrix3({
+		data[0], data[1], data[2],
+		data[4], data[5], data[6],
+		data[8], data[9], data[10],
+	});
+}
+
+//// Vector vs Matrix Interactions ////
+
+inline Vector3 Vector3::operator *  (const Matrix3& rhs) const {
+	float newX, newY, newZ;
+	newX = x*rhs.data[0] + y*rhs.data[3] + z*rhs.data[6];
+	newY = x*rhs.data[1] + y*rhs.data[4] + z*rhs.data[7];
+	newZ = x*rhs.data[2] + y*rhs.data[5] + z*rhs.data[8];
+	return Vector3(newX, newY, newZ);
+}
+
+inline void Vector3::operator *= (const Matrix3& rhs) {
+	float newX, newY, newZ;
+	newX = x*rhs.data[0] + y*rhs.data[3] + z*rhs.data[6];
+	newY = x*rhs.data[1] + y*rhs.data[4] + z*rhs.data[7];
+	newZ = x*rhs.data[2] + y*rhs.data[5] + z*rhs.data[8];
+	*this = Vector3(newX, newY, newZ);
+}
+
+inline Vector4 Vector4::operator *  (const Matrix4& rhs) const {
+	float newX, newY, newZ, newW;
+	newX = x*rhs.data[0] + y*rhs.data[4] + z*rhs.data[8] + w*rhs.data[12];
+	newY = x*rhs.data[1] + y*rhs.data[5] + z*rhs.data[9] + w*rhs.data[13];
+	newZ = x*rhs.data[2] + y*rhs.data[6] + z*rhs.data[10] + w*rhs.data[14];
+	newW = x*rhs.data[3] + y*rhs.data[7] + z*rhs.data[11] + w*rhs.data[15];
+	return Vector4(newX, newY, newZ, newW);
+}
+
+inline void Vector4::operator *= (const Matrix4& rhs) {
+	float newX, newY, newZ, newW;
+	newX = x*rhs.data[0] + y*rhs.data[4] + z*rhs.data[8] + w*rhs.data[12];
+	newY = x*rhs.data[1] + y*rhs.data[5] + z*rhs.data[9] + w*rhs.data[13];
+	newZ = x*rhs.data[2] + y*rhs.data[6] + z*rhs.data[10] + w*rhs.data[14];
+	newW = x*rhs.data[3] + y*rhs.data[7] + z*rhs.data[11] + w*rhs.data[15];
+	*this = Vector4(newX, newY, newZ, newW);
+}
+
 //// Non-Vector vs Vector Interactions ////
 
 //Creates a vector from the matrices first 3 values
-inline Vector3::Vector3(Matrix matrix) {
-	this->x = matrix(0,0); this->y = matrix(0, 1); this->z = matrix(0, 2);
-}
 
 inline Vector2 Vector3::toVector2() const {
 	return Vector2(x, y);
 }
 
-inline Matrix Vector3::ToM1x3() const {
-	return Matrix(1, 3, {x, y, z});
+inline MatrixN Vector3::ToM1x3() const {
+	return MatrixN(1, 3, {x, y, z});
 }
 
-inline Matrix Vector3::ToM1x4(float w) const {
-	return Matrix(1, 4, {x, y, z, w});
+inline MatrixN Vector3::ToM1x4(float w) const {
+	return MatrixN(1, 4, {x, y, z, w});
 }
 
-//// Non-Matrix vs Matrix Interactions ////
+//// Non-MatrixN vs MatrixN Interactions ////
 
 //Creates a 1x3 matrix
-inline Matrix::Matrix(Vector3 v) {
+inline MatrixN::MatrixN(Vector3 v) {
 	this->rows = 1; this->cols = 3; this->elementCount = 3;
 	this->data = {v.x, v.y, v.z};
 }
 
 //Creates a 1x4 matrix
-inline Matrix::Matrix(Vector3 v, float w) {
+inline MatrixN::MatrixN(Vector3 v, float w) {
 	this->rows = 1; this->cols = 4; this->elementCount = 4;
 	this->data = {v.x, v.y, v.z, w};
 }
 
 //// Old QVM interactions ... To be removed ////
 
-inline Matrix::Matrix(mat<float, 1, 4> m) {
+inline MatrixN::MatrixN(mat<float, 1, 4> m) {
 	this->rows = 1; this->cols = 4; this->elementCount = 4;
 	this->data = {m.a[0][0], m.a[0][1], m.a[0][2], m.a[0][3]};
 }
 
-inline Matrix::Matrix(mat<float, 4, 4> m) {
+inline MatrixN::MatrixN(mat<float, 4, 4> m) {
 	this->rows = 4; this->cols = 4; this->elementCount = 16;
 	this->data = std::vector<float>(elementCount);
 	int index = 0;
@@ -558,7 +647,7 @@ inline Matrix::Matrix(mat<float, 4, 4> m) {
 	}
 }
 
-inline Matrix::Matrix(mat<float, 3, 3> m) {
+inline MatrixN::MatrixN(mat<float, 3, 3> m) {
 	this->rows = 3; this->cols = 3; this->elementCount = 9;
 	this->data = std::vector<float>(elementCount);
 	int index = 0;

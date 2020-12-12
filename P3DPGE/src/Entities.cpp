@@ -600,29 +600,25 @@ std::string DebugTriangle::str() {
 
 //// Camera ////
 
-mat<float, 4, 4> Camera::MakeViewMatrix(float yaw, bool force_target) {
+MatrixN Camera::MakeViewMatrix(float yaw, bool force_target) {
 	target = V3FORWARD;
-	lookDir = target * Math::GetRotateV3_Y(yaw);
+	lookDir = target * MatrixN::RotationMatrixY(yaw);
 	target = position + lookDir;
 	
-	mat<float, 4, 4> view = inverse(Math::PointAt(position, target, up));
-	
-	return view;
+	return Math::PointAtMatrix(position, target, up).Inverse();
 }
 
-mat<float, 4, 4> Camera::ProjectionMatrix(olc::PixelGameEngine* p) {
+MatrixN Camera::ProjectionMatrix(olc::PixelGameEngine* p) {
 	float renderToView = farZ - nearZ;
 	float aspectRatio = (float)p->ScreenHeight() / (float)p->ScreenWidth();
 	float fovRad = 1.f / tanf(fieldOfView * .5f / 180.f * M_PI);
 
-	mat<float, 4, 4> proj{
+	return MatrixN(4, 4, {
 		aspectRatio * fovRad, 0,	  0,								0,
 		0,					  fovRad, 0,								0,
 		0,					  0,	  farZ / renderToView,				1,
 		0,					  0,	  (-farZ * nearZ) / renderToView,	0
-	};
-
-	return proj;
+	});
 }
 
 bool Camera::ContainsPoint(Vector3 point) { return false; }
@@ -649,7 +645,7 @@ Light::Light(Vector3 direction, EntityParams) : Entity(EntityArgs) {
 	this->direction = direction;
 }
 
-void Light::ChangeLightDirection(Matrix rotation) {
+void Light::ChangeLightDirection(MatrixN rotation) {
 	direction *= rotation; direction.normalize();
 }
 
