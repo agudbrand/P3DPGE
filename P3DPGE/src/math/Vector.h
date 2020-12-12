@@ -57,7 +57,7 @@ struct Vector3 {
 	void	normalize();
 	Vector3	normalized() const;
 	Vector3 clampMag(const float& rhs) const;
-	float	distanceTo(Vector3& rhs) const;
+	float	distanceTo(const Vector3& rhs) const;
 	float	projectOn(Vector3& rhs) const;
 	Vector3 componentOn(Vector3& rhs) const;
 	Vector3	xComp() const;
@@ -97,8 +97,8 @@ struct Vector3 {
 	void rotateV3_X(float theta, Vector3 pos, Vector3 offset);
 	void rotateV3_Y(float theta, Vector3 pos, Vector3 offset);
 	void rotateV3_Z(float theta, Vector3 pos, Vector3 offset);
-	void ProjToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p);
-	void ProjToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p, float& w);
+	void ProjToScreen(mat<float, 4, 4> ProjMat);
+	void ProjToScreen(mat<float, 4, 4> ProjMat, float& w);
 	void ScreenToWorld(mat<float, 4, 4> ProjMat, mat<float, 4, 4> view, olc::PixelGameEngine* p);
 };
 
@@ -236,7 +236,7 @@ inline Vector3 Vector3::clampMag(const float& rhs) const {
 	return this->normalized() * rhs;
 }
 
-inline float Vector3::distanceTo(Vector3& rhs) const {
+inline float Vector3::distanceTo(const Vector3& rhs) const {
 	return (*this - rhs).mag();
 }
 

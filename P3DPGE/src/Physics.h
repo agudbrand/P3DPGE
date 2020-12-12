@@ -14,8 +14,6 @@ namespace Physics {
 
 	static Timer* timer;
 
-	
-
 	static void Init() {
 		physEntities = std::vector<PhysEntity*>();
 		timer = new Timer;

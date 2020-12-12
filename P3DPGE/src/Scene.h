@@ -338,7 +338,7 @@ namespace Scene {
 	static float yaw;
 	static float pitch;
 
-	static Light light(Vector3(0, 0, -1), Vector3(-1, 1, 2));
+	static Light light(Vector3(0, 0, 1), Vector3(-1, 1, -2));
 	static Light light2(Vector3(1, 0, 0), Vector3(0, -1, 4));
 
 	static void AddEntity(Entity* e) { Scene::entities.push_back(e); }

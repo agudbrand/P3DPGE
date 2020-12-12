@@ -104,7 +104,6 @@
 		}())
 
 namespace Math {
-	static Vector3 proj_points_persistant[3];
 
 	static float to_radians(float angle) { return angle * (M_PI / 180); }
 	static float to_degrees(float angle) { return angle * (180 / M_PI); }
@@ -313,7 +312,7 @@ namespace Math {
 		return rvz;
 	}
 
-	static mat<float, 4, 4> GetLocalToWorld(static Vector3 pos) {
+	static mat<float, 4, 4> GetLocalToWorld(Vector3 pos) {
 		mat<float, 4, 4> wtl{
 			1,	   0,	  0,	 0,
 			0,	   1,	  0,	 0,
@@ -369,15 +368,27 @@ namespace Math {
 	//returns area of a triangle of sides a and b
 	static float TriangleArea(Vector3 a, Vector3 b) { return a.cross(b).mag() / 2; }
 
-	//};
-
-	//namespace Render {
-		//the input vector should be in world space
 	static Vector3 WorldToCamera(Vector3 vertex, mat<float, 4, 4> viewMatrix) {
 		Matrix vm = Matrix(vertex, 1) * Matrix(viewMatrix);
 		if (vm(0,3) != 0) { vm(0, 0) /= vm(0, 3); vm(0, 1) /= vm(0, 3); vm(0, 2) /= vm(0, 3); }
 		return Vector3(vm);
 	}
+
+	static Vector3 CameraToScreen(Vector3 csVertex, mat<float, 4, 4> projectionMatrix) {
+		Matrix vm = Matrix(csVertex, 1) * Matrix(projectionMatrix);
+		if (vm(0, 3) != 0) { vm(0, 0) /= vm(0, 3); vm(0, 1) /= vm(0, 3); vm(0, 2) /= vm(0, 3); }
+		Vector3 out(vm);
+		out.x += 1.0f; out.y += 1.0f;
+		out.x *= 0.5f * screenWidth;
+		out.y *= 0.5f * screenHeight;
+		return out;
+	}
+
+	static Vector2 WorldToScreen(Vector3 point, mat<float, 4, 4> ProjMat, mat<float, 4, 4> ViewMat) {
+		Vector3 v = CameraToScreen(WorldToCamera(point, ViewMat), ProjMat);
+		return Vector2(v.x, v.y);
+	}
+
 
 	//the input vectors should be in view/camera space
 	//returns true if the line can be rendered after clipping, false otherwise
@@ -417,21 +428,10 @@ namespace Math {
 		return true;
 	}
 
-	//the input matrixes should be in view/camera space
-	static Vector3 CameraToScreen(Vector3 csVertex, mat<float, 4, 4> projectionMatrix, Vector2 dimensions) {
-		Matrix vm = Matrix(csVertex, 1) * Matrix(projectionMatrix);
-		if (vm(0, 3) != 0) { vm(0, 0) /= vm(0, 3); vm(0, 1) /= vm(0, 3); vm(0, 2) /= vm(0, 3); }
-		Vector3 out(vm);
-		out.x += 1.0f; out.y += 1.0f;
-		out.x *= 0.5f * dimensions.x;
-		out.y *= 0.5f * dimensions.y;
-		return out;
-	}
-
 	//cohen-sutherland algorithm https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
 	//the input vectors should be in screen space
 	//returns true if the line can be rendered after clipping, false otherwise
-	static bool ClipLineToBorderPlanes(Vector3& ssLineStart, Vector3& ssLineEnd, Vector2 screenDimensions) {
+	static bool ClipLineToBorderPlanes(Vector3& ssLineStart, Vector3& ssLineEnd) {
 		//clip to the vertical and horizontal planes
 		const int CLIP_INSIDE = 0;
 		const int CLIP_LEFT = 1;
@@ -443,13 +443,13 @@ namespace Math {
 			if (vertex.x < 0) {
 				code |= CLIP_LEFT;
 			}
-			else if (vertex.x > screenDimensions.x) {
+			else if (vertex.x > screenWidth) {
 				code |= CLIP_RIGHT;
 			}
 			if (vertex.y < 0) { //these are inverted because we are in screen space
 				code |= CLIP_TOP;
 			}
-			else if (vertex.y > screenDimensions.y) {
+			else if (vertex.y > screenHeight) {
 				code |= CLIP_BOTTOM;
 			}
 			return code;
@@ -479,12 +479,12 @@ namespace Math {
 					y = 0;
 				}
 				else if (code & CLIP_BOTTOM) { //point is below screen
-					x = ssLineStart.x + (ssLineEnd.x - ssLineStart.x) * (screenDimensions.y - ssLineStart.y) / (ssLineEnd.y - ssLineStart.y);
-					y = screenDimensions.y;
+					x = ssLineStart.x + (ssLineEnd.x - ssLineStart.x) * (screenHeight - ssLineStart.y) / (ssLineEnd.y - ssLineStart.y);
+					y = screenHeight;
 				}
 				else if (code & CLIP_RIGHT) { //point is right of screen
-					y = ssLineStart.y + (ssLineEnd.y - ssLineStart.y) * (screenDimensions.x - ssLineStart.x) / (ssLineEnd.x - ssLineStart.x);
-					x = screenDimensions.x;
+					y = ssLineStart.y + (ssLineEnd.y - ssLineStart.y) * (screenWidth - ssLineStart.x) / (ssLineEnd.x - ssLineStart.x);
+					x = screenWidth;
 				}
 				else if (code & CLIP_LEFT) { //point is left of screen
 					y = ssLineStart.y + (ssLineEnd.y - ssLineStart.y) * (-ssLineStart.x) / (ssLineEnd.x - ssLineStart.x);
@@ -505,6 +505,7 @@ namespace Math {
 			}
 		}
 	}
+
 };
 
 //// Non-Vector vs Vector Interactions ////
@@ -708,25 +709,25 @@ inline void Vector3::rotateV3_Z(float theta, Vector3 pos, Vector3 offset) {
 	LocalToWorld(pos + offset);
 }
 
-inline void Vector3::ProjToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p) {
+inline void Vector3::ProjToScreen(mat<float, 4, 4> ProjMat) {
 	M1x4ToVector3(proj_mult(ConvertToM1x4(), ProjMat));
 	x += 1.0f; y += 1.0f;
-	x *= 0.5f * (float)p->ScreenWidth();
-	y *= 0.5f * (float)p->ScreenHeight();
+	x *= 0.5f * (float)screenWidth;
+	y *= 0.5f * (float)screenHeight;
 }
 
-inline void Vector3::ProjToScreen(mat<float, 4, 4> ProjMat, olc::PixelGameEngine* p, float& w) {
+inline void Vector3::ProjToScreen(mat<float, 4, 4> ProjMat, float& w) {
 	float _w;
 	M1x4ToVector3(proj_mult(ConvertToM1x4(), ProjMat, _w));
 	x += 1.f; y += 1.f;
-	x *= 0.5f * (float)p->ScreenWidth();
-	y *= 0.5f * (float)p->ScreenHeight();
+	x *= 0.5f * (float)screenWidth;
+	y *= 0.5f * (float)screenHeight;
 	w = _w;
 }
 
 inline void Vector3::ScreenToWorld(mat<float, 4, 4> ProjMat, mat<float, 4, 4> view, olc::PixelGameEngine* p) {
-	x /= .5f * (float)p->ScreenWidth();
-	y /= .5f * (float)p->ScreenHeight();
+	x /= .5f * (float)screenWidth;
+	y /= .5f * (float)screenHeight;
 	x -= 1.f; y -= 1.f; z = -1.f;
 	M1x4ToVector3(unproj_mult(ConvertToM1x4(), inverse(ProjMat)));
 	M1x4ToVector3(unproj_mult(ConvertToM1x4(), inverse(view)));

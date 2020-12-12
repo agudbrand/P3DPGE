@@ -22,13 +22,21 @@ namespace Render {
 
 	static mat<float, 4, 4> view;
 
+	static float* pDepthBuffer;
+
 	static Camera* GetCamera() { return &Scene::camera; }
 
 	static Timer* timer;
 
+	static int x0 = 0;
+	static int y0 = 0;
+
+	static bool ui_toggle = false;
+
 	static void Init() {
 		timer = new Timer;
 		Scene::ui_layer.push_back(new Menu(Vector2(80, 50), "BUFFERLOG", "buflog", std::vector<Button*>{}));
+		TIMER_S;
 	}
 
 	using namespace boost::qvm;
@@ -36,15 +44,16 @@ namespace Render {
 	//TODO(rc, sushi) change this to take in types and not individual values
 	//in essence this algorithm scans down a triangle and fills each row it occupies
 	//with the texture. this is necessary to account for us clipping triangles.
-	static void TexturedTriangle(olc::PixelGameEngine* p,
+	void TexturedTriangle(olc::PixelGameEngine* p,
 		int x1, int y1, float u1, float v1, float w1,
 		int x2, int y2, float u2, float v2, float w2,
-		int x3, int y3, float u3, float v3, float w3, 
-		olc::Sprite* tex) {
+		int x3, int y3, float u3, float v3, float w3,
+		olc::Sprite* tex){
 
-		//manually sort y coords using swap(didn't know about swap its kinda cool)
 		if (y2 < y1) { std::swap(y1, y2); std::swap(x1, x2); std::swap(u1, u2); std::swap(v1, v2); std::swap(w1, w2); }
+
 		if (y3 < y1) { std::swap(y1, y3); std::swap(x1, x3); std::swap(u1, u3); std::swap(v1, v3); std::swap(w1, w3); }
+
 		if (y3 < y2) { std::swap(y2, y3); std::swap(x2, x3); std::swap(u2, u3); std::swap(v2, v3); std::swap(w2, w3); }
 
 		int dy1 = y2 - y1;
@@ -66,107 +75,113 @@ namespace Render {
 			  du2_step = 0, dv2_step = 0,
 			  dw1_step = 0, dw2_step = 0;
 
-		//idk why javid wrote these this way
-		//they can probably be compressed but im not gonna do that until im done
-		//following the video just in case.
-		if (dy1) { dax_step = dx1 / (float)std::abs(dy1); }
-		if (dy2) { dbx_step = dx2 / (float)std::abs(dy2); }
+		if (dy1) dax_step = dx1 / (float)abs(dy1);
+		if (dy2) dbx_step = dx2 / (float)abs(dy2);
 
-		if (dy1) { du1_step = du1 / (float)std::abs(dy1); }
-		if (dy1) { dv1_step = dv1 / (float)std::abs(dy1); }
-		if (dy1) { dw1_step = dw1 / (float)std::abs(dy1); }
+		if (dy1) du1_step = du1 / (float)abs(dy1);
+		if (dy1) dv1_step = dv1 / (float)abs(dy1);
+		if (dy1) dw1_step = dw1 / (float)abs(dy1);
 
-		if (dy2) { du2_step = du1 / (float)std::abs(dy2); }
-		if (dy2) { dv2_step = dv2 / (float)std::abs(dy2); }
-		if (dy2) { dw2_step = dw2 / (float)std::abs(dy2); }
+		if (dy2) du2_step = du2 / (float)abs(dy2);
+		if (dy2) dv2_step = dv2 / (float)abs(dy2);
+		if (dy2) dw2_step = dw2 / (float)abs(dy2);
 
-		//scanline fill triangles
-		if (dy1) {
-			//scan down y
-			for (int scany = y1; scany < y2; scany++) {
-				int ax = x1 + (float)(scany - y1) * dax_step;
-				int bx = x1 + (float)(scany - y1) * dbx_step;
+		if (dy1){
+			for (int i = y1; i <= y2; i++){
+				int ax = x1 + (float)(i - y1) * dax_step;
+				int bx = x1 + (float)(i - y1) * dbx_step;
 
-				float tex_su = u1 + (float)(scany - y1) * du1_step;
-				float tex_sv = v1 + (float)(scany - y1) * dv1_step;
-				float tex_sw = w1 + (float)(scany - y1) * dv1_step;
+				float tex_su = u1 + (float)(i - y1) * du1_step;
+				float tex_sv = v1 + (float)(i - y1) * dv1_step;
+				float tex_sw = w1 + (float)(i - y1) * dw1_step;
 
-				float tex_eu = u1 + (float)(scany - y1) * du2_step;
-				float tex_ev = v1 + (float)(scany - y1) * dv2_step;
-				float tex_ew = w1 + (float)(scany - y1) * dw2_step;
+				float tex_eu = u1 + (float)(i - y1) * du2_step;
+				float tex_ev = v1 + (float)(i - y1) * dv2_step;
+				float tex_ew = w1 + (float)(i - y1) * dw2_step;
 
-				//ensure we are actually drawing from start to end
-				if (ax > bx) { std::swap(ax, bx); std::swap(tex_su, tex_eu); std::swap(tex_sv, tex_ev); std::swap(tex_sw, tex_ew); }
+				if (ax > bx){
+					std::swap(ax, bx);
+					std::swap(tex_su, tex_eu);
+					std::swap(tex_sv, tex_ev);
+					std::swap(tex_sw, tex_ew);
+				}
 
-				tex_u = tex_su; tex_v = tex_sv; tex_w = tex_sw;
+				tex_u = tex_su;
+				tex_v = tex_sv;
+				tex_w = tex_sw;
 
-				float tstep = 1.f / ((float)(bx - ax));
-				float t = 0.f;
+				float tstep = 1.0f / ((float)(bx - ax));
+				float t = 0.0f;
 
-				//fill over x
-				for (int scanx = ax; scanx < bx; scanx++) {
-					tex_u = Math::lerpf(tex_su, tex_eu, t);
-					tex_v = Math::lerpf(tex_sv, tex_ev, t);
-					tex_w = Math::lerpf(tex_sw, tex_ew, t);
-					p->Draw(scanx, scany, tex->Sample(tex_u / tex_w, tex_v / tex_w));
+				for (int j = ax; j < bx; j++){
+					tex_u = (1.0f - t) * tex_su + t * tex_eu;
+					tex_v = (1.0f - t) * tex_sv + t * tex_ev;
+					tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 
+					if (tex_w > pDepthBuffer[i * screenWidth + j]) {
+						p->Draw(j, i, tex->Sample(tex_u / tex_w, tex_v / tex_w));
+						pDepthBuffer[i * screenWidth + j] = tex_w;
+					}
 					t += tstep;
 				}
+
 			}
-
-			//here the path along one line changes and must be accounted for
-			//also means we have to do the entire loop again which means 
-			//it will probably be abstracted out at some point
-			dy1 = y3 - y2;
-			dx1 = x3 - x2;
-			dv1 = v3 - v2;
-			du1 = u3 - u2;
-			dw1 = w3 - w2;
-
-			if (dy1) { dax_step = dx1 / (float)std::abs(dy1); }
-			if (dy2) { dbx_step = dx2 / (float)std::abs(dy2); }
-
-			du1_step = 0; dv1_step = 0;
-			if (dy1) { du1_step = du1 / (float)std::abs(dy1); }
-			if (dy1) { dv1_step = dv1 / (float)std::abs(dy1); }
-			if (dy1) { dw1_step = dw1 / (float)std::abs(dy1); }
-
-			for (int scany = y2; scany < y3; scany++) {
-				int ax = x2 + (float)(scany - y2) * dax_step;
-				int bx = x1 + (float)(scany - y1) * dbx_step;
-
-				float tex_su = u2 + (float)(scany - y2) * du1_step;
-				float tex_sv = v2 + (float)(scany - y2) * dv1_step;
-				float tex_sw = w2 + (float)(scany - y2) * dw1_step;
-
-				float tex_eu = u1 + (float)(scany - y1) * du2_step;
-				float tex_ev = v1 + (float)(scany - y1) * dv2_step;
-				float tex_ew = w1 + (float)(scany - y1) * dw2_step;
-
-				//ensure we are actually drawing from start to end
-				if (ax > bx) { std::swap(ax, bx); std::swap(tex_su, tex_eu); std::swap(tex_sv, tex_ev); std::swap(tex_sw, tex_ew); }
-
-				tex_u = tex_su; tex_v = tex_sv; tex_w = tex_ew;
-
-				float tstep = 1.f / ((float)(bx - ax));
-				float t = 0.f;
-
-				//fill over x
-				for (int scanx = ax; scanx < bx; scanx++) {
-					tex_u = Math::lerpf(tex_su, tex_eu, t);
-					tex_v = Math::lerpf(tex_sv, tex_ev, t);
-					tex_w = Math::lerpf(tex_sw, tex_ew, t);
-					p->Draw(scanx, scany, tex->Sample(tex_u / tex_w, tex_v / tex_w));
-
-					t += tstep;
-				}
-			}
-
-
 		}
 
+		dy1 = y3 - y2;
+		dx1 = x3 - x2;
+		dv1 = v3 - v2;
+		du1 = u3 - u2;
+		dw1 = w3 - w2;
 
+		if (dy1) dax_step = dx1 / (float)abs(dy1);
+		if (dy2) dbx_step = dx2 / (float)abs(dy2);
 
+		du1_step = 0, dv1_step = 0;
+		if (dy1) du1_step = du1 / (float)abs(dy1);
+		if (dy1) dv1_step = dv1 / (float)abs(dy1);
+		if (dy1) dw1_step = dw1 / (float)abs(dy1);
+
+		if (dy1){
+			for (int i = y2; i <= y3; i++){
+				int ax = x2 + (float)(i - y2) * dax_step;
+				int bx = x1 + (float)(i - y1) * dbx_step;
+
+				float tex_su = u2 + (float)(i - y2) * du1_step;
+				float tex_sv = v2 + (float)(i - y2) * dv1_step;
+				float tex_sw = w2 + (float)(i - y2) * dw1_step;
+
+				float tex_eu = u1 + (float)(i - y1) * du2_step;
+				float tex_ev = v1 + (float)(i - y1) * dv2_step;
+				float tex_ew = w1 + (float)(i - y1) * dw2_step;
+
+				if (ax > bx){
+					std::swap(ax, bx);
+					std::swap(tex_su, tex_eu);
+					std::swap(tex_sv, tex_ev);
+					std::swap(tex_sw, tex_ew);
+				}
+
+				tex_u = tex_su;
+				tex_v = tex_sv;
+				tex_w = tex_sw;
+
+				float tstep = 1.0f / ((float)(bx - ax));
+				float t = 0.0f;
+
+				for (int j = ax; j < bx; j++){
+					tex_u = (1.0f - t) * tex_su + t * tex_eu;
+					tex_v = (1.0f - t) * tex_sv + t * tex_ev;
+					tex_w = (1.0f - t) * tex_sw + t * tex_ew;
+
+					if (tex_w > pDepthBuffer[i * screenWidth + j]) {
+						p->Draw(j, i, tex->Sample(tex_u / tex_w, tex_v / tex_w));
+						pDepthBuffer[i * screenWidth + j] = tex_w;
+					}
+					t += tstep;
+				}
+			}
+		}
 	}
 
 	static int ClipTriangles(Vector3 plane_p, Vector3 plane_n, Triangle in_tri, Triangle& out_tri1, Triangle& out_tri2) {
@@ -189,12 +204,12 @@ namespace Render {
 		float d1 = dist(in_tri.proj_points[1]);
 		float d2 = dist(in_tri.proj_points[2]);
 
-		if (d0 >= 0) { inside_points[nInsidePointCount++] = &in_tri.proj_points[0]; inside_tex[nInsideTexCount++] = &in_tri.tex_points[0]; }
-		else { outside_points[nOutsidePointCount++] = &in_tri.proj_points[0]; outside_tex[nOutsideTexCount++] = &in_tri.tex_points[0]; }
-		if (d1 >= 0) { inside_points[nInsidePointCount++] = &in_tri.proj_points[1]; inside_tex[nInsideTexCount++] = &in_tri.tex_points[1]; }
-		else { outside_points[nOutsidePointCount++] = &in_tri.proj_points[1];  outside_tex[nOutsideTexCount++] = &in_tri.tex_points[1]; }
-		if (d2 >= 0) { inside_points[nInsidePointCount++] = &in_tri.proj_points[2]; inside_tex[nInsideTexCount++] = &in_tri.tex_points[2]; }
-		else { outside_points[nOutsidePointCount++] = &in_tri.proj_points[2];  outside_tex[nOutsideTexCount++] = &in_tri.tex_points[2]; }
+		if (d0 >= 0) { inside_points[nInsidePointCount++]   = &in_tri.proj_points[0]; inside_tex[nInsideTexCount++]   = &in_tri.tex_points[0]; }
+		else         { outside_points[nOutsidePointCount++] = &in_tri.proj_points[0]; outside_tex[nOutsideTexCount++] = &in_tri.tex_points[0]; }
+		if (d1 >= 0) { inside_points[nInsidePointCount++]   = &in_tri.proj_points[1]; inside_tex[nInsideTexCount++]   = &in_tri.tex_points[1]; }
+		else         { outside_points[nOutsidePointCount++] = &in_tri.proj_points[1]; outside_tex[nOutsideTexCount++] = &in_tri.tex_points[1]; }
+		if (d2 >= 0) { inside_points[nInsidePointCount++]   = &in_tri.proj_points[2]; inside_tex[nInsideTexCount++]   = &in_tri.tex_points[2]; }
+		else         { outside_points[nOutsidePointCount++] = &in_tri.proj_points[2]; outside_tex[nOutsideTexCount++] = &in_tri.tex_points[2]; }
 
 		//classify points and break input triangle into smaller trangles if
 		//required. there are four possible outcomes
@@ -205,6 +220,7 @@ namespace Render {
 		if (nInsidePointCount == 3) { out_tri1 = in_tri; return 1; }
 		if (nInsidePointCount == 1 && nOutsidePointCount == 2) {
 			out_tri1.color = in_tri.color;
+			out_tri1.e = in_tri.e;
 
 			//the inside point is valid so we keep it
 			out_tri1.proj_points[0] = *inside_points[0];
@@ -215,10 +231,12 @@ namespace Render {
 			out_tri1.proj_points[1] = Math::VectorPlaneIntersect(plane_p, plane_n, *inside_points[0], *outside_points[0], t);
 			out_tri1.tex_points[1].x = t * (outside_tex[0]->x - inside_tex[0]->x) + inside_tex[0]->x;
 			out_tri1.tex_points[1].y = t * (outside_tex[0]->y - inside_tex[0]->y) + inside_tex[0]->y;
+			out_tri1.tex_points[1].z = t * (outside_tex[0]->z - inside_tex[0]->z) + inside_tex[0]->z;
 
 			out_tri1.proj_points[2] = Math::VectorPlaneIntersect(plane_p, plane_n, *inside_points[0], *outside_points[1], t);
 			out_tri1.tex_points[2].x = t * (outside_tex[1]->x - inside_tex[0]->x) + inside_tex[0]->x;
 			out_tri1.tex_points[2].y = t * (outside_tex[1]->y - inside_tex[0]->y) + inside_tex[0]->y;
+			out_tri1.tex_points[2].z = t * (outside_tex[1]->z - inside_tex[0]->z) + inside_tex[0]->z;
 
 			return 1; //return new triangle
 		}
@@ -226,10 +244,10 @@ namespace Render {
 			//triangle will be clipped and becomes a quad which is
 			//cut into two more triagles.
 
-			
-
 			out_tri1.color = in_tri.color;
 			out_tri2.color = in_tri.color;
+			out_tri1.e = in_tri.e;
+			out_tri2.e = in_tri.e;
 
 			out_tri1.proj_points[0] = *inside_points[0];
 			out_tri1.proj_points[1] = *inside_points[1];
@@ -240,11 +258,17 @@ namespace Render {
 			out_tri1.proj_points[2] = Math::VectorPlaneIntersect(plane_p, plane_n, *inside_points[0], *outside_points[0], t);
 			out_tri1.tex_points[2].x = t * (outside_tex[0]->x - inside_tex[0]->x) + inside_tex[0]->x;
 			out_tri1.tex_points[2].y = t * (outside_tex[0]->y - inside_tex[0]->y) + inside_tex[0]->y;
+			out_tri1.tex_points[2].z = t * (outside_tex[0]->z - inside_tex[0]->z) + inside_tex[0]->z;
 
 
 			out_tri2.proj_points[0] = *inside_points[1];
+			out_tri2.tex_points[0] = *inside_tex[1];
 			out_tri2.proj_points[1] = out_tri1.proj_points[2];
+			out_tri2.tex_points[1] = out_tri1.tex_points[2];
 			out_tri2.proj_points[2] = Math::VectorPlaneIntersect(plane_p, plane_n, *inside_points[1], *outside_points[0], t);
+			out_tri2.tex_points[2].x = t * (outside_tex[0]->x - inside_tex[1]->x) + inside_tex[1]->x;
+			out_tri2.tex_points[2].y = t * (outside_tex[0]->y - inside_tex[1]->y) + inside_tex[1]->y;
+			out_tri2.tex_points[2].z = t * (outside_tex[0]->z - inside_tex[1]->z) + inside_tex[1]->z;
 			return 2;
 		}
 
@@ -256,7 +280,6 @@ namespace Render {
 
 	//TODO(r, sushi) this still needs abstracted
 	static void Draw(olc::PixelGameEngine* p) {
-		std::vector<Triangle> visibleTriangles;
 		std::vector<Triangle> drawnTriangles;
 
 		Vector3 light_direction(0, 0, -1);
@@ -265,6 +288,7 @@ namespace Render {
 
 		//store triangles we want to draw for sorting and copy world points to projected points
 		for (auto& t : triangles) {
+			
 			t.copy_points();
 			float light_ray1 = (Scene::light.position - t.points[0]).dot(t.get_normal());
 			//float light_ray2 = (t.points[0] - Scene::light2.position).dot(t.get_normal());
@@ -280,42 +304,50 @@ namespace Render {
 					std::clamp(75 * dp,  0.f, 75.f),
 					std::clamp(200 * dp, 0.f, 200.f)
 				));
-				visibleTriangles.push_back(t);
+				for (Vector3& n : t.proj_points) {
+					float w;
+					n.M1x4ToVector3(n.proj_mult(n.ConvertToM1x4(), view, w));
+
+				}
+
+				int clippedTriangles = 0;
+				Triangle clipped[2];
+				clippedTriangles = ClipTriangles(Vector3(0, 0, 0.1f), Vector3(0, 0, 1), t, clipped[0], clipped[1]);
+				
+				
+				for (int i = 0; i < clippedTriangles; i++) {
+					//for (Vector3& n : clipped[i].proj_points) {
+					//	n.ProjToScreen(Scene::camera.ProjectionMatrix(p), p, w);
+					//}
+					float w;
+					for (int o = 0; o < 3; o++) {
+						clipped[i].proj_points[o].ProjToScreen(Scene::camera.ProjectionMatrix(), w);
+						clipped[i].tex_points[o].x /= w;
+						clipped[i].tex_points[o].y /= w;
+						clipped[i].tex_points[o].z = 1 / w;
+					}
+					
+					
+					//projecting texture
+					//for (Vector3& v : clipped[i].tex_points) {
+					//	v.x /= w; v.y /= w;
+					//	v.z = 1.f / w;
+					//}
+
+					clipped[i].e = t.e;
+					clipped[i].sprite = t.sprite;
+					
+					
+					drawnTriangles.push_back(clipped[i]);
+				}
 			}
 		}
 
-		//project triangles to screen and add them to the draw vector
-		for (Triangle t : visibleTriangles) {
-			for (Vector3& n : t.proj_points) {
-				n.M1x4ToVector3(n.proj_mult(n.ConvertToM1x4(), view));
-
-			}
-
-			int clippedTriangles = 0;
-			Triangle clipped[2];
-			clippedTriangles = ClipTriangles(Vector3(0, 0, 0.01f), Vector3(0, 0, 1), t, clipped[0], clipped[1]);
-
-			for (int i = 0; i < clippedTriangles; i++) {
-				float w;
-				for (Vector3& n : clipped[i].proj_points) {
-					n.ProjToScreen(Scene::camera.ProjectionMatrix(p), p, w);
-				}
-				clipped[i].e = t.e;
-
-				//projecting texture
-				for (Vector3& v : clipped[i].tex_points) {
-					v.x /= w; v.y /= w;
-					v.z = 1.f / w;
-				}
-				drawnTriangles.push_back(clipped[i]);
-			}
-		}
-
-		std::sort(drawnTriangles.begin(), drawnTriangles.end(), [](Triangle& t1, Triangle& t2) {
-			float mp1 = Math::DistTwoPoints(t1.midpoint(), Scene::camera.position);
-			float mp2 = Math::DistTwoPoints(t2.midpoint(), Scene::camera.position);
-			return mp1 > mp2;
-			});
+		//std::sort(drawnTriangles.begin(), drawnTriangles.end(), [](Triangle& t1, Triangle& t2) {
+		//	float mp1 = Math::DistTwoPoints(t1.midpoint(), Scene::camera.position);
+		//	float mp2 = Math::DistTwoPoints(t2.midpoint(), Scene::camera.position);
+		//	return mp1 > mp2;
+		//	});
 
 		//TODO(o, sushi) optimize this for loop 
 		for (const Triangle& t : drawnTriangles) {
@@ -334,35 +366,56 @@ namespace Render {
 
 					switch (a) {
 					case 0:	trisToAdd = ClipTriangles(Vector3(0, 0, 0), Vector3(0, 1, 0), test, clipped[0], clipped[1]); break;
-					case 1:	trisToAdd = ClipTriangles(Vector3(0, (float)p->ScreenHeight() - 1, 0), Vector3(0, -1, 0), test, clipped[0], clipped[1]); break;
+					case 1:	trisToAdd = ClipTriangles(Vector3(0, (float)screenHeight - 1, 0), Vector3(0, -1, 0), test, clipped[0], clipped[1]); break;
 					case 2:	trisToAdd = ClipTriangles(Vector3(0, 0, 0), Vector3(1, 0, 0), test, clipped[0], clipped[1]); break;
-					case 3: trisToAdd = ClipTriangles(Vector3((float)p->ScreenWidth() - 1, 0, 0), Vector3(-1, 0, 0), test, clipped[0], clipped[1]); break;
+					case 3: trisToAdd = ClipTriangles(Vector3((float)screenWidth - 1, 0, 0), Vector3(-1, 0, 0), test, clipped[0], clipped[1]); break;
 					}
 
-					for (int w = 0; w < trisToAdd; w++) {
-						clipped[w].e = t.e;
-						listTriangles.push_back(clipped[w]);
+					for (int wa = 0; wa < trisToAdd; wa++) {
+						clipped[wa].e = t.e;
+						clipped[wa].sprite = t.sprite;
+						listTriangles.push_back(clipped[wa]);
 					}
 				}
 				newTriangles = listTriangles.size();
 			}
 
-			for (Triangle& t : listTriangles) {
+			for (Triangle& tr : listTriangles) {
 
-				//TexturedTriangle(p,
-				//	t.proj_points[0].x, t.proj_points[0].y, t.tex_points[0].x, t.tex_points[0].y, t.tex_points[0].z,
-				//	t.proj_points[1].x, t.proj_points[1].y, t.tex_points[1].x, t.tex_points[1].y, t.tex_points[1].z,
-				//	t.proj_points[2].x, t.proj_points[2].y, t.tex_points[2].x, t.tex_points[2].y, t.tex_points[2].z,
-				//	t.e->sprite);
+				//this breaks in release mode but looks
+				//really cool in debug mode idk why
+				//in release mode the entity pointer is a bunch
+				//of garbage
+				float ti = g_totalTime;
+				for (int ox = 0; ox < 50; ox++) {
+					for (int oy = 0; oy < 50; oy++) {
+						ti += 0.1;
+						tr.e->sprite->SetPixel(Vector2(ox, oy),
+							olc::Pixel(
+								floor(255 * sinf(M_PI * ti)), 
+								floor(255 * cosf(1.2 * M_PI * ti)),
+								155));
+
+					}
+				}
+
+				
+
+
+				TexturedTriangle(p,
+					tr.proj_points[0].x, tr.proj_points[0].y, tr.tex_points[0].x, tr.tex_points[0].y, tr.tex_points[0].z,
+					tr.proj_points[1].x, tr.proj_points[1].y, tr.tex_points[1].x, tr.tex_points[1].y, tr.tex_points[1].z,
+					tr.proj_points[2].x, tr.proj_points[2].y, tr.tex_points[2].x, tr.tex_points[2].y, tr.tex_points[2].z,
+					tr.e->sprite);
 
 
 				//This has been rendered (lol) useless by textures but
 				//could be used for debugging or something later
-				p->FillTriangle(
-					t.proj_points[0].x, t.proj_points[0].y,
-					t.proj_points[1].x, t.proj_points[1].y,
-					t.proj_points[2].x, t.proj_points[2].y,
-					t.get_color());
+				//p->FillTriangle(
+				//	t.proj_points[0].x, t.proj_points[0].y,
+				//	t.proj_points[1].x, t.proj_points[1].y,
+				//	t.proj_points[2].x, t.proj_points[2].y,
+				//	t.get_color());
 			}
 		}
 
@@ -399,10 +452,15 @@ namespace Render {
 		//}
 	}
 
+	
+
 	//draw all entities to screen
 	static void Update(olc::PixelGameEngine* p) {
 
 		view = Scene::camera.MakeViewMatrix(Scene::yaw);
+		for (int i = 0; i < screenWidth * screenHeight; i++) {
+			pDepthBuffer[i] = 0.f;
+		}
 
 		DEBUG g_campos = Scene::camera.position;
 
@@ -410,35 +468,49 @@ namespace Render {
 
 		//get triangles from all entities
 		for (Entity* e : Scene::entities) {
-
 			e->Update(Time::deltaTime);
 
 			//SpecialDraw is used for determining if its just an object
 			//drawn with triangles or if its special eg. a 2D object or Line3
 			if (e->SpecialDraw()) {
-				e->Draw(p, Scene::camera.ProjectionMatrix(p), view);
+				e->Draw(p, Scene::camera.ProjectionMatrix(), view);
 			}
 			else {
-				DEBUG e->Draw(p, Scene::camera.ProjectionMatrix(p), view); //for accessing entity debug drawing
+				DEBUG e->Draw(p, Scene::camera.ProjectionMatrix(), view); //for accessing entity debug drawing
 				for (auto& t : e->mesh->triangles) { triangles.push_back(t); }
 			}
 		}
 
 		
+		//if (TIMER_GET > 0.01) {
+		//	TIMER_E;
+		//	LOG(TIMER_GET);
+			if (x0 > 50) {
+				if (y0 > 50) {
+					y0 = 0;
+					x0 = 0;
+				}
+				y0++;
+				x0 = 0;
+			}
+			else {
+				x0++;
+			}
+		//	TIMER_S;
+		//}
+		
 
 		Draw(p);
 
-		for (UI* u : Scene::ui_layer) {
-			if (Menu* m = dynamic_cast<Menu*>(u)) {
-				if (m->title == "BUFFERLOG") {
-					m->update_dyn_strings(g_cBuffer);
+		if (ui_toggle) {
+			for (UI* u : Scene::ui_layer) {
+				if (Menu* m = dynamic_cast<Menu*>(u)) {
+					if (m->title == "BUFFERLOG") {
+						m->update_dyn_strings(g_cBuffer);
+					}
 				}
+				u->Draw(p);
 			}
-			u->Draw(p);
-		}
-
-		for (Entity* d : Scene::debug_layer) {
-			d->Draw(p, Scene::camera.ProjectionMatrix(p), view);
 		}
 		
 		Scene::debug_layer.clear();
@@ -446,8 +518,8 @@ namespace Render {
 		ConsoleHandler(p);
 
 		//debug
-		DEBUGR p->DrawStringDecal(olc::vf2d(p->ScreenWidth() - 300, p->ScreenHeight() - 20), "Mouse: " + Vector3(p->GetMousePos()).str2f());
-		DEBUGR p->DrawStringDecal(olc::vf2d(p->ScreenWidth()-300, p->ScreenHeight() - 10), "Camera: " + Scene::camera.position.str2f());
+		DEBUGR p->DrawStringDecal(olc::vf2d(screenWidth - 300, screenHeight - 20), "Mouse: " + Vector3(p->GetMousePos()).str2f());
+		DEBUGR p->DrawStringDecal(olc::vf2d(screenWidth-300, screenHeight - 10), "Camera: " + Scene::camera.position.str2f());
 
 		//Debug::EndTimerAverage(p, 10, "", 10);
 	}

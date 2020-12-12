@@ -121,7 +121,7 @@ namespace Input {
 	}
 
 	internal Vector3 GetMousePosNormalized(olc::PixelGameEngine* p) {
-		return Vector3((float)p->GetMouseX() / (float)p->ScreenWidth(), (float)p->GetMouseY() / (float)p->ScreenHeight());
+		return Vector3((float)p->GetMouseX() / (float)screenWidth, (float)p->GetMouseY() / (float)screenHeight);
 	}
 
 	internal Camera* c;
@@ -305,7 +305,7 @@ namespace Input {
 
 			if (!ui_clicked) {
 				if (selectedEntity) { selectedEntity->ENTITY_DEBUG = false; selectedEntity = nullptr; }
-				pos.ScreenToWorld(c->ProjectionMatrix(p), c->MakeViewMatrix(Scene::yaw), p);
+				pos.ScreenToWorld(c->ProjectionMatrix(), c->MakeViewMatrix(Scene::yaw), p);
 				pos.WorldToLocal(c->position);
 				pos.normalize();
 				pos *= 1000;
@@ -362,8 +362,8 @@ namespace Input {
 				if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
 					Vector3 pos = GetMousePos(p);
 
-					pos.ScreenToWorld(c->ProjectionMatrix(p), c->MakeViewMatrix(Scene::yaw), p);
-					leftClickPos.ScreenToWorld(c->ProjectionMatrix(p), c->MakeViewMatrix(Scene::yaw), p);
+					pos.ScreenToWorld(c->ProjectionMatrix(), c->MakeViewMatrix(Scene::yaw), p);
+					leftClickPos.ScreenToWorld(c->ProjectionMatrix(), c->MakeViewMatrix(Scene::yaw), p);
 
 					entity->AddForce(nullptr, (pos - leftClickPos).normalized() * 5, true);
 				}
@@ -495,6 +495,12 @@ namespace Input {
 			//selectedEntity->position.x = pos.x;
 			//selectedEntity->position.y = pos.y;
 		}
+
+		Vector3 pos = GetMousePos(p);
+		pos.ScreenToWorld(c->ProjectionMatrix(), c->MakeViewMatrix(Scene::yaw), p);
+		pos.WorldToLocal(c->position);
+
+		g_MouseWorldPos = pos;
 	}
 
 	//NOTE: selected entity should never point to a NEW object, since Input shouldnt own that object
