@@ -33,7 +33,7 @@ namespace Render {
 	static int y0 = 0;
 	static bool up = true;
 
-	static bool ui_toggle = false;
+	static bool ui_toggle = 1;
 
 	static void Init() {
 		timer = new Timer;

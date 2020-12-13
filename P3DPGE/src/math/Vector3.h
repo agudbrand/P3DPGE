@@ -13,9 +13,9 @@ namespace olc {
 #define Vector2 olc::vf2d
 
 struct Vector3 {
-	float x{};
-	float y{};
-	float z{};
+	float x;
+	float y;
+	float z;
 
 	Vector3();
 	Vector3(float inX, float inY, float inZ);
@@ -61,7 +61,7 @@ struct Vector3 {
 
 	void LocalToWorld(Vector3 pos);
 	void WorldToLocal(Vector3 pos);
-	void ScreenToWorld(Matrix4 ProjMat, Matrix4 view, olc::PixelGameEngine* p);
+	void ScreenToWorld(Matrix4 ProjMat, Matrix4 view);
 
 	//Non-Vector vs Vector interactions defined in Math.h
 	Vector3(const Vector2& v);

@@ -143,8 +143,17 @@ void Entity::Rotate(Vector3 offset) {
 	if (rotation != prev_rotation) {
 		for (auto& m : mesh->triangles) {
 			for (auto& n : m.points) {
-				Matrix4 translation = Matrix4::TranslationMatrix(position);
-				n = n * translation.Inverse() * Matrix4::RotationMatrix(rotation - prev_rotation) * translation;
+				//Matrix4 translation = Matrix4::TranslationMatrix(position);
+				//n = n * translation.Inverse() * Matrix4::RotationMatrix(rotation - prev_rotation) * translation;
+				Matrix4 rot_mat =
+					Matrix4::RotationMatrixX(rotation.x - prev_rotation.x) *
+					Matrix4::RotationMatrixY(rotation.y - prev_rotation.y) *
+					Matrix4::RotationMatrixZ(rotation.z - prev_rotation.z);
+				
+				n.WorldToLocal(position);
+				n = Math::ProjMult(n.ToVector4(), rot_mat).ToVector3();
+				n.LocalToWorld(position);
+				
 			}
 		}
 	}
@@ -155,11 +164,19 @@ void Entity::Translate() {
 	if (position != prev_position) {
 		for (auto& m : mesh->triangles) {
 			for (auto& n : m.points) {
-				Matrix4 offset = Matrix4::TranslationMatrix(position);
-				n = n * offset.Inverse() * Matrix4::TranslationMatrix(position - prev_position) * offset;
+				//Matrix4 offset = Matrix4::TranslationMatrix(position);
+				//n = n * offset.Inverse() * Matrix4::TranslationMatrix(position - prev_position) * offset;
+				Vector3 n_loc = n * Math::WorldToLocal(position);
+				n_loc = (n_loc.ToVector4() * Matrix4::TranslationMatrix(position - prev_position)).normalized().ToVector3();
+				n = n_loc * Math::LocalToWorld(position);
+			
 			}
+
+
 		}
 	}
+	BUFFERLOG(2, "prev: ", prev_position);
+	BUFFERLOG(1, "now:  ", position);
 	prev_position = position;
 }
 
@@ -181,7 +198,6 @@ std::string Entity::str() {
 
 
 void Entity::Update(float deltaTime) {
-
 	Translate(); Rotate();
 }
 
@@ -210,7 +226,7 @@ void PhysEntity::Draw(olc::PixelGameEngine* p, Matrix4 ProjMat, Matrix4 view) {
 	v_vector.Draw(p, ProjMat, view);
 	a_vector.Draw(p, ProjMat, view);
 
-	//DrawPosition(p, ProjMat, viewMatrix);
+	DrawPosition(p, ProjMat, view);
 
 
 }
@@ -222,7 +238,6 @@ void PhysEntity::Update(float deltaTime) {
 void PhysEntity::PhysUpdate(float deltaTime) {
 
 	//for debug
-	Vector3 tf = V3ZERO;
 	BUFFERLOGI(8, 20, deltaTime, " ", g_fixedDeltaTime);
 	
 	//psuedo input
@@ -233,10 +248,9 @@ void PhysEntity::PhysUpdate(float deltaTime) {
 		acceleration = V3ZERO;
 		for (auto& f : forces) {
 			netForce += f;
-			tf += f;
 		}
 			
-		acceleration = netForce / mass * 15;
+		acceleration = netForce / mass * 50;
 
 			
 		forces.clear();

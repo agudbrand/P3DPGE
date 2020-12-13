@@ -305,17 +305,21 @@ namespace Input {
 
 			if (!ui_clicked) {
 				if (selectedEntity) { selectedEntity->ENTITY_DEBUG = false; selectedEntity = nullptr; }
-				pos.ScreenToWorld(c->ProjectionMatrix(), c->MakeViewMatrix(Scene::yaw), p);
+				pos.ScreenToWorld(c->ProjectionMatrix(), c->MakeViewMatrix(Scene::yaw));
+				LOG("Screen to world ", pos);
+				
 				pos.WorldToLocal(c->position);
+				LOG("World to local  ", pos);
 				pos.normalize();
+				LOG("Normalize       ", pos);
 				pos *= 1000;
+				LOG("Times 1000      ", pos);
 				pos.LocalToWorld(c->position);
-
-				//make function somehere that returns a ray cast for ease of use later maybe
+				LOG("Local to world  ", pos);
 				Line3* ray = new Line3(pos, c->position);
-
+				LOG(c->position);
 				//draw ray if debugging
-				DEBUGI Scene::entities.push_back(ray);
+				Scene::entities.push_back(ray);
 
 				for (Entity* e : Scene::entities) {
 					if (e->LineIntersect(&ray->edge)) {
@@ -362,8 +366,8 @@ namespace Input {
 				if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
 					Vector3 pos = GetMousePos(p);
 
-					pos.ScreenToWorld(c->ProjectionMatrix(), c->MakeViewMatrix(Scene::yaw), p);
-					leftClickPos.ScreenToWorld(c->ProjectionMatrix(), c->MakeViewMatrix(Scene::yaw), p);
+					pos.ScreenToWorld(c->ProjectionMatrix(), c->MakeViewMatrix(Scene::yaw));
+					leftClickPos.ScreenToWorld(c->ProjectionMatrix(), c->MakeViewMatrix(Scene::yaw));
 
 					entity->AddForce(nullptr, (pos - leftClickPos).normalized() * 5, true);
 				}
@@ -529,11 +533,11 @@ namespace Input {
 			//selectedEntity->position.y = pos.y;
 		}
 
-		Vector3 pos = GetMousePos(p);
-		pos.ScreenToWorld(c->ProjectionMatrix(), c->MakeViewMatrix(Scene::yaw), p);
-		pos.WorldToLocal(c->position);
-
-		g_MouseWorldPos = pos;
+		//Vector3 pos = GetMousePos(p);
+		//pos.ScreenToWorld(c->ProjectionMatrix(), c->MakeViewMatrix(Scene::yaw));
+		//pos.WorldToLocal(c->position);
+		//
+		//g_MouseWorldPos = pos;
 	}
 
 	//NOTE: selected entity should never point to a NEW object, since Input shouldnt own that object

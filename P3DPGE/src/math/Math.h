@@ -98,6 +98,22 @@
 		return nf; \
 		}())
 
+namespace Math {
+	static Vector4 ProjMult(Vector4 v, Matrix4 m) {
+		Vector4 nv = v * m;
+		if (nv.w != 0) { nv.x /= nv.w; nv.y /= nv.w; nv.z /= nv.w; }
+		return nv;
+	}
+
+	static Matrix4 LocalToWorld(Vector3 offsetFromOrigin) {
+		return Matrix4::TranslationMatrix(offsetFromOrigin);
+	}
+
+	static Matrix4 WorldToLocal(Vector3 offsetFromOrigin) {
+		return Matrix4::TranslationMatrix(offsetFromOrigin).Inverse();
+	}
+
+}
 
 
 //// Vector3 vs Vector4 Interactions ////
@@ -147,10 +163,10 @@ inline Vector3 Vector3::operator *  (const Matrix3& rhs) const {
 }
 
 inline void Vector3::operator *= (const Matrix3& rhs) {
-	*this = Vector3(
-		x*rhs.data[0] + y*rhs.data[3] + z*rhs.data[6], 
-		x*rhs.data[1] + y*rhs.data[4] + z*rhs.data[7], 
-		x*rhs.data[2] + y*rhs.data[5] + z*rhs.data[8]);
+	x = x * rhs.data[0] + y * rhs.data[3] + z * rhs.data[6];
+	y = x * rhs.data[1] + y * rhs.data[4] + z * rhs.data[7];
+	z = x * rhs.data[2] + y * rhs.data[5] + z * rhs.data[8];
+
 }
 
 inline Vector3 Vector3::operator *  (const Matrix4& rhs) const {
@@ -161,26 +177,24 @@ inline Vector3 Vector3::operator *  (const Matrix4& rhs) const {
 }
 
 inline void Vector3::operator *= (const Matrix4& rhs) {
-	*this = Vector3(
-		x*rhs.data[0] + y*rhs.data[4] + z*rhs.data[8] + rhs.data[12],
-		x*rhs.data[1] + y*rhs.data[5] + z*rhs.data[9] + rhs.data[13],
-		x*rhs.data[2] + y*rhs.data[6] + z*rhs.data[10] + rhs.data[14]);
+	x = x * rhs.data[0] + y * rhs.data[4] + z * rhs.data[8]  + rhs.data[12];
+	y = x * rhs.data[1] + y * rhs.data[5] + z * rhs.data[9]  + rhs.data[13];
+	z = x * rhs.data[2] + y * rhs.data[6] + z * rhs.data[10] + rhs.data[14];
 }
 
 inline Vector4 Vector4::operator *  (const Matrix4& rhs) const {
 	return Vector4(
-		x*rhs.data[0] + y*rhs.data[4] + z*rhs.data[8] + w*rhs.data[12],
-		x*rhs.data[1] + y*rhs.data[5] + z*rhs.data[9] + w*rhs.data[13],
+		x*rhs.data[0] + y*rhs.data[4] + z*rhs.data[8]  + w*rhs.data[12],
+		x*rhs.data[1] + y*rhs.data[5] + z*rhs.data[9]  + w*rhs.data[13],
 		x*rhs.data[2] + y*rhs.data[6] + z*rhs.data[10] + w*rhs.data[14],
 		x*rhs.data[3] + y*rhs.data[7] + z*rhs.data[11] + w*rhs.data[15]);
 }
 
 inline void Vector4::operator *= (const Matrix4& rhs) {
-	*this = Vector4(
-		x*rhs.data[0] + y*rhs.data[4] + z*rhs.data[8] + w*rhs.data[12],
-		x*rhs.data[1] + y*rhs.data[5] + z*rhs.data[9] + w*rhs.data[13],
-		x*rhs.data[2] + y*rhs.data[6] + z*rhs.data[10] + w*rhs.data[14],
-		x*rhs.data[3] + y*rhs.data[7] + z*rhs.data[11] + w*rhs.data[15]);
+	x = x * rhs.data[0] + y * rhs.data[4] + z * rhs.data[8]  + w * rhs.data[12];
+	y = x * rhs.data[1] + y * rhs.data[5] + z * rhs.data[9]  + w * rhs.data[13];
+	z = x * rhs.data[2] + y * rhs.data[6] + z * rhs.data[10] + w * rhs.data[14];
+	w = x * rhs.data[3] + y * rhs.data[7] + z * rhs.data[11] + w * rhs.data[15];
 }
 
 inline void Vector3::LocalToWorld(Vector3 offsetFromOrigin) {
@@ -191,16 +205,16 @@ inline void Vector3::WorldToLocal(Vector3 offsetFromOrigin) {
 	*this *= Matrix4::TranslationMatrix(offsetFromOrigin).Inverse();
 }
 
-inline void Vector3::ScreenToWorld(Matrix4 ProjMat, Matrix4 view, olc::PixelGameEngine* p) {
+inline void Vector3::ScreenToWorld(Matrix4 ProjMat, Matrix4 view) {
 	x /= .5f * (float)screenWidth;
 	y /= .5f * (float)screenHeight;
 	x -= 1.f; y -= 1.f; z = -1.f;
-	*this *= ProjMat.Inverse();
-	*this *= view.Inverse();
+	*this = Math::ProjMult(this->ToVector4(), ProjMat.Inverse()).ToVector3();
+	*this = Math::ProjMult(this->ToVector4(), view.Inverse()).ToVector3();
 }
 
 inline Vector3 Vector3::ProjectionMultiply(Matrix4 projection) const{
-	return (this->ToVector4() * projection).normalized().ToVector3();
+	return Math::ProjMult(this->ToVector4(), projection).ToVector3();
 }
 
 
@@ -372,10 +386,6 @@ namespace Math {
 		return line_start + line_to_intersect;
 	}
 
-	static Vector4 ProjMult(Vector4 v, Matrix4 m) {
-		return (v * m).normalized();
-	}
-
 	//return where two lines intersect on the x axis with slope and the y-intercept
 	static Vector3 LineIntersect2(float slope1, float ycross1, float slope2, float ycross2) {
 		MatrixN lhs(2,2,{ slope1, ycross1, slope2, ycross2 });
@@ -394,11 +404,11 @@ namespace Math {
 	static float TriangleArea(Vector3 a, Vector3 b) { return a.cross(b).mag() / 2; }
 
 	static Vector4 WorldToCamera(Vector3 vertex, Matrix4 viewMatrix) {
-		return (vertex.ToVector4() * viewMatrix).normalized();
+		return Math::ProjMult(vertex.ToVector4(), viewMatrix);
 	}
 
 	static Vector3 CameraToScreen(Vector3 csVertex, Matrix4 projectionMatrix) {
-		Vector3 vm = csVertex.ProjectionMultiply(projectionMatrix);
+		Vector3 vm = Math::ProjMult(csVertex.ToVector4(), projectionMatrix).ToVector3();
 		vm.x += 1.0f; vm.y += 1.0f;
 		vm.x *= 0.5f * (float)screenWidth;
 		vm.y *= 0.5f * (float)screenHeight;
@@ -416,7 +426,7 @@ namespace Math {
 	}
 
 	static Vector3 CameraToScreen(Vector4 csVertex, Matrix4 projectionMatrix) {
-		Vector3 vm = (csVertex * projectionMatrix).normalized().ToVector3();
+		Vector3 vm = Math::ProjMult(csVertex, projectionMatrix).ToVector3();
 		vm.x += 1.0f; vm.y += 1.0f;
 		vm.x *= 0.5f * (float)screenWidth;
 		vm.y *= 0.5f * (float)screenHeight;
