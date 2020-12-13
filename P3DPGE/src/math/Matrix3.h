@@ -336,10 +336,11 @@ inline Matrix3 Matrix3::Inverse() const {
 
 //returns an identity matrix with the given dimensions
 inline Matrix3 Matrix3::Identity() {
-	return Matrix3({1,0,0,0,1,0,0,0,1});
+	return Matrix3(1,0,0,0,1,0,0,0,1);
 }
 
 //returns a rotation transformation matrix based on input in degrees
+//rotates over the Y, then Z then X, ref: https://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToMatrix/index.htm
 inline Matrix3 Matrix3::RotationMatrix(Vector3 rotation) {
 	float cosX = cosf(rotation.x);
 	float sinX = sinf(rotation.x);
@@ -347,11 +348,13 @@ inline Matrix3 Matrix3::RotationMatrix(Vector3 rotation) {
 	float sinY = sinf(rotation.y);
 	float cosZ = cosf(rotation.z);
 	float sinZ = sinf(rotation.z);
-	return Matrix3({
-		cosY,		sinY*sinZ,					cosZ*sinY,
-		sinX*sinY,	cosX*cosZ - cosY*sinX*sinZ,	-cosX*sinZ - cosY*cosZ*sinX,
-		-cosX*sinY,	cosZ*sinX + cosX*cosY*sinZ, cosX*cosY*cosZ - sinX*sinZ
-	});
+	float r00 = cosY*cosZ;	float r01 = -cosY*sinZ*cosX + sinY*sinX;	float r02 = cosY*sinZ*sinX + sinY*cosX;
+	float r10 = sinZ;		float r11 = cosZ*cosX;						float r12 = -cosZ*sinX;
+	float r20 = -sinY*cosZ;	float r21 = sinY*sinZ*cosX + cosY*sinX;		float r22 = -sinY*sinZ*sinX + cosY*cosX;
+	return Matrix3(
+		r00,	r01,	r02,
+		r10,	r11,	r12,
+		r20,	r21,	r22);
 }
 
 //returns a rotation transformation matrix based on input in degrees
@@ -359,11 +362,11 @@ inline Matrix3 Matrix3::RotationMatrixX(float degrees) {
 	float r = degrees * (3.14159265359f / 180.f);
 	float c = cosf(r);
 	float s = sinf(r);
-	return Matrix3({
+	return Matrix3(
 		1,	0,	0,
 		0,	c,	-s,
 		0,	s,	c
-	});
+	);
 }
 
 //returns a rotation transformation matrix based on input in degrees
@@ -371,11 +374,11 @@ inline Matrix3 Matrix3::RotationMatrixY(float degrees) {
 	float r = degrees * (3.14159265359f / 180.f);
 	float c = cosf(r);
 	float s = sinf(r);
-	return Matrix3({
+	return Matrix3(
 		c,	0,	s,
 		0,	1,	0,
 		-s,	0,	c
-	});
+	);
 }
 
 //returns a rotation transformation matrix based on input in degrees
@@ -383,11 +386,11 @@ inline Matrix3 Matrix3::RotationMatrixZ(float degrees) {
 	float r = degrees * (3.14159265359f / 180.f);
 	float c = cosf(r);
 	float s = sinf(r);
-	return Matrix3({
+	return Matrix3(
 		c,	-s,	0,
 		s,	c,	0,
 		0,	0,	1
-	});
+	);
 }
 
 //returns a scale matrix where (0,0) = scale.x, (1,1) = scale.y, (2,2) = scale.z

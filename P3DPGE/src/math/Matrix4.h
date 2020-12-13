@@ -52,6 +52,7 @@ struct Matrix4 {
 	static Matrix4 TranslationMatrix(Vector3 translation);
 	static Matrix4 ScaleMatrix(Vector3 scale);
 	static Matrix4 TransformationMatrix(Vector3 translation, Vector3 rotation, Vector3 scale);
+	static Matrix4 RotationMatrixAroundPoint(Vector3 pivot, Vector3 rotation);
 
 	//Non-Matrix4 vs Matrix4 interactions defined in Matrix.h/Math.h
 	Matrix3 To3x3();
@@ -350,10 +351,11 @@ inline Matrix4 Matrix4::Inverse() const {
 
 //returns an identity matrix with the given dimensions
 inline Matrix4 Matrix4::Identity() {
-	return Matrix4({1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1});
+	return Matrix4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
 }
 
 //returns a rotation transformation matrix based on input in degrees
+//rotates over the Y, then Z then X, ref: https://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToMatrix/index.htm
 inline Matrix4 Matrix4::RotationMatrix(Vector3 rotation) {
 	float cosX = cosf(rotation.x);
 	float sinX = sinf(rotation.x);
@@ -361,12 +363,14 @@ inline Matrix4 Matrix4::RotationMatrix(Vector3 rotation) {
 	float sinY = sinf(rotation.y);
 	float cosZ = cosf(rotation.z);
 	float sinZ = sinf(rotation.z);
-	return Matrix4({
-		cosY,		sinY*sinZ,					cosZ*sinY,						0,
-		sinX*sinY,	cosX*cosZ - cosY*sinX*sinZ,	-cosX*sinZ - cosY*cosZ*sinX,	0,
-		-cosX*sinY,	cosZ*sinX + cosX*cosY*sinZ, cosX*cosY*cosZ - sinX*sinZ,		0,
-		0,			0,							0,								1
-	});
+	float r00 = cosY*cosZ;	float r01 = -cosY*sinZ*cosX + sinY*sinX;	float r02 = cosY*sinZ*sinX + sinY*cosX;
+	float r10 = sinZ;		float r11 = cosZ*cosX;						float r12 = -cosZ*sinX;
+	float r20 = -sinY*cosZ;	float r21 = sinY*sinZ*cosX + cosY*sinX;		float r22 = -sinY*sinZ*sinX + cosY*cosX;
+	return Matrix4(
+		r00,	r01,	r02,	0,
+		r10,	r11,	r12,	0,
+		r20,	r21,	r22,	0,
+		0,		0,		0,		1);
 }
 
 //returns a rotation transformation matrix based on input in degrees
@@ -374,12 +378,12 @@ inline Matrix4 Matrix4::RotationMatrixX(float degrees) {
 	float r = degrees * (3.14159265359f / 180.f);
 	float c = cosf(r);
 	float s = sinf(r);
-	return Matrix4({
+	return Matrix4(
 		1,	0,	0,	0,
 		0,	c,	-s,	0,
 		0,	s,	c,	0,
 		0,	0,	0,	1
-	});
+	);
 }
 
 //returns a rotation transformation matrix based on input in degrees
@@ -387,12 +391,12 @@ inline Matrix4 Matrix4::RotationMatrixY(float degrees) {
 	float r = degrees * (3.14159265359f / 180.f);
 	float c = cosf(r);
 	float s = sinf(r);
-	return Matrix4({
+	return Matrix4(
 		c,	0,	s,	0,
 		0,	1,	0,	0,
 		-s,	0,	c,	0,
 		0,	0,	0,	1
-	});
+	);
 }
 
 //returns a rotation transformation matrix based on input in degrees
@@ -400,21 +404,21 @@ inline Matrix4 Matrix4::RotationMatrixZ(float degrees) {
 	float r = degrees * (3.14159265359f / 180.f);
 	float c = cosf(r);
 	float s = sinf(r);
-	return Matrix4({
+	return Matrix4(
 		c,	-s,	0,	0,
 		s,	c,	0,	0,
 		0,	0,	1,	0,
 		0,	0,	0,	1
-	});
+	);
 }
 
 //returns a translation matrix where (0,3) = translation.x, (1,3) = translation.y, (2,3) = translation.z
 inline Matrix4 Matrix4::TranslationMatrix(Vector3 translation) {
-	Matrix4 newMatrix = Identity();
-	newMatrix.data[3] = translation.x;
-	newMatrix.data[7] = translation.y;
-	newMatrix.data[11] = translation.z;
-	return newMatrix;
+	return Matrix4(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0,0, 1, 0,
+		translation.x, translation.y, translation.z, 1);
 }
 
 //returns a scale matrix where (0,0) = scale.x, (1,1) = scale.y, (2,2) = scale.z
@@ -427,6 +431,7 @@ inline Matrix4 Matrix4::ScaleMatrix(Vector3 scale) {
 }
 
 //returns a transformation matrix of the combined translation, rotation, and scale matrices from input vectors
+//rotates over the Y, then Z then X
 inline Matrix4 Matrix4::TransformationMatrix(Vector3 translation, Vector3 rotation, Vector3 scale) {
 	float cosX = cosf(rotation.x);
 	float sinX = sinf(rotation.x);
@@ -434,9 +439,32 @@ inline Matrix4 Matrix4::TransformationMatrix(Vector3 translation, Vector3 rotati
 	float sinY = sinf(rotation.y);
 	float cosZ = cosf(rotation.z);
 	float sinZ = sinf(rotation.z);
-	return Matrix4({
-		scale.x*(cosY),	sinY*sinZ,								cosZ*sinY,								translation.x,
-		sinX*sinY,		scale.y*(cosX*cosZ - cosY*sinX*sinZ),	-cosX*sinZ - cosY*cosZ*sinX,			translation.y,
-		-cosX*sinY,		cosZ*sinX + cosX*cosY*sinZ,				scale.z*(cosX*cosY*cosZ - sinX*sinZ),	translation.z,
-		0,				0,										0,										1});
+	float r00 = cosY*cosZ;	float r01 = -cosY*sinZ*cosX + sinY*sinX;	float r02 = cosY*sinZ*sinX + sinY*cosX;
+	float r10 = sinZ;		float r11 = cosZ*cosX;						float r12 = -cosZ*sinX;
+	float r20 = -sinY*cosZ;	float r21 = sinY*sinZ*cosX + cosY*sinX;		float r22 = -sinY*sinZ*sinX + cosY*cosX;
+	return Matrix4(
+		scale.x*r00,	r01,			r02,			0,
+		r10,			scale.y*r11,	r12,			0,
+		r20,			r21,			scale.z*r22,	0,
+		translation.x,	translation.y,	translation.z,	1);
+}
+
+//returns a transformation matrix of the combined translation, rotation, and scale matrices from input vectors
+//rotates over the Y, then Z then X, ref: https://www.euclideanspace.com/maths/geometry/affine/aroundPoint/index.htm
+inline Matrix4 Matrix4::RotationMatrixAroundPoint(Vector3 pivot, Vector3 rotation) {
+	pivot = -pivot; //gotta negate this for some reason :)
+	float cosX = cosf(rotation.x);
+	float sinX = sinf(rotation.x);
+	float cosY = cosf(rotation.y);
+	float sinY = sinf(rotation.y);
+	float cosZ = cosf(rotation.z);
+	float sinZ = sinf(rotation.z);
+	float r00 = cosY*cosZ;	float r01 = -cosY*sinZ*cosX + sinY*sinX;	float r02 = cosY*sinZ*sinX + sinY*cosX;
+	float r10 = sinZ;		float r11 = cosZ*cosX;						float r12 = -cosZ*sinX;
+	float r20 = -sinY*cosZ;	float r21 = sinY*sinZ*cosX + cosY*sinX;		float r22 = -sinY*sinZ*sinX + cosY*cosX;
+	return Matrix4(
+		r00, r01, r02, 0,
+		r10, r11, r12, 0,
+		r20, r21, r22, 0,
+		pivot.x - r00*pivot.x - r01*pivot.y - r02*pivot.z, pivot.y - r10*pivot.x - r11*pivot.y - r12*pivot.z, pivot.z - r20*pivot.x - r21*pivot.y - r22*pivot.z, 1);
 }

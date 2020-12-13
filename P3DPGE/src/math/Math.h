@@ -163,10 +163,10 @@ inline Vector3 Vector3::operator *  (const Matrix3& rhs) const {
 }
 
 inline void Vector3::operator *= (const Matrix3& rhs) {
-	x = x * rhs.data[0] + y * rhs.data[3] + z * rhs.data[6];
-	y = x * rhs.data[1] + y * rhs.data[4] + z * rhs.data[7];
-	z = x * rhs.data[2] + y * rhs.data[5] + z * rhs.data[8];
-
+	*this = Vector3(
+	x * rhs.data[0] + y * rhs.data[3] + z * rhs.data[6],
+	x * rhs.data[1] + y * rhs.data[4] + z * rhs.data[7],
+	x * rhs.data[2] + y * rhs.data[5] + z * rhs.data[8]);
 }
 
 inline Vector3 Vector3::operator *  (const Matrix4& rhs) const {
@@ -177,9 +177,10 @@ inline Vector3 Vector3::operator *  (const Matrix4& rhs) const {
 }
 
 inline void Vector3::operator *= (const Matrix4& rhs) {
-	x = x * rhs.data[0] + y * rhs.data[4] + z * rhs.data[8]  + rhs.data[12];
-	y = x * rhs.data[1] + y * rhs.data[5] + z * rhs.data[9]  + rhs.data[13];
-	z = x * rhs.data[2] + y * rhs.data[6] + z * rhs.data[10] + rhs.data[14];
+	*this = Vector3(
+	x * rhs.data[0] + y * rhs.data[4] + z * rhs.data[8]  + rhs.data[12],
+	x * rhs.data[1] + y * rhs.data[5] + z * rhs.data[9]  + rhs.data[13],
+	x * rhs.data[2] + y * rhs.data[6] + z * rhs.data[10] + rhs.data[14]);
 }
 
 inline Vector4 Vector4::operator *  (const Matrix4& rhs) const {
@@ -191,10 +192,11 @@ inline Vector4 Vector4::operator *  (const Matrix4& rhs) const {
 }
 
 inline void Vector4::operator *= (const Matrix4& rhs) {
-	x = x * rhs.data[0] + y * rhs.data[4] + z * rhs.data[8]  + w * rhs.data[12];
-	y = x * rhs.data[1] + y * rhs.data[5] + z * rhs.data[9]  + w * rhs.data[13];
-	z = x * rhs.data[2] + y * rhs.data[6] + z * rhs.data[10] + w * rhs.data[14];
-	w = x * rhs.data[3] + y * rhs.data[7] + z * rhs.data[11] + w * rhs.data[15];
+	*this = Vector4(
+	x * rhs.data[0] + y * rhs.data[4] + z * rhs.data[8]  + w * rhs.data[12],
+	x * rhs.data[1] + y * rhs.data[5] + z * rhs.data[9]  + w * rhs.data[13],
+	x * rhs.data[2] + y * rhs.data[6] + z * rhs.data[10] + w * rhs.data[14],
+	x * rhs.data[3] + y * rhs.data[7] + z * rhs.data[11] + w * rhs.data[15]);
 }
 
 inline void Vector3::LocalToWorld(Vector3 offsetFromOrigin) {

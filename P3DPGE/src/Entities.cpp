@@ -114,7 +114,7 @@ void Entity::DrawVertices(olc::PixelGameEngine* p, Matrix4 ProjMat, Matrix4 view
 
 void Entity::RotateX(Vector3 offset) {
 	for (auto& m : mesh->triangles) {
-		for (auto& n : m.points) {
+		for (auto& n : m.points) { //idk if these work
 			Matrix4 translation = Matrix4::TranslationMatrix(position);
 			n = n * translation.Inverse() * Matrix4::RotationMatrixX(rotation.x) * translation;
 		}
@@ -123,7 +123,7 @@ void Entity::RotateX(Vector3 offset) {
 
 void Entity::RotateY(Vector3 offset) {
 	for (auto& m : mesh->triangles) {
-		for (auto& n : m.points) {
+		for (auto& n : m.points) { //idk if these work
 			Matrix4 translation = Matrix4::TranslationMatrix(position);
 			n = n * translation.Inverse() * Matrix4::RotationMatrixY(rotation.y) * translation;
 		}
@@ -132,7 +132,7 @@ void Entity::RotateY(Vector3 offset) {
 
 void Entity::RotateZ(Vector3 offset) {
 	for (auto& m : mesh->triangles) {
-		for (auto& n : m.points) {
+		for (auto& n : m.points) { //idk if these work
 			Matrix4 translation = Matrix4::TranslationMatrix(position);
 			n = n * translation.Inverse() * Matrix4::RotationMatrixZ(rotation.z) * translation;
 		}
@@ -143,17 +143,7 @@ void Entity::Rotate(Vector3 offset) {
 	if (rotation != prev_rotation) {
 		for (auto& m : mesh->triangles) {
 			for (auto& n : m.points) {
-				//Matrix4 translation = Matrix4::TranslationMatrix(position);
-				//n = n * translation.Inverse() * Matrix4::RotationMatrix(rotation - prev_rotation) * translation;
-				Matrix4 rot_mat =
-					Matrix4::RotationMatrixX(rotation.x - prev_rotation.x) *
-					Matrix4::RotationMatrixY(rotation.y - prev_rotation.y) *
-					Matrix4::RotationMatrixZ(rotation.z - prev_rotation.z);
-				
-				n.WorldToLocal(position);
-				n = Math::ProjMult(n.ToVector4(), rot_mat).ToVector3();
-				n.LocalToWorld(position);
-				
+				n *= Matrix4::RotationMatrixAroundPoint(position, rotation - prev_rotation);
 			}
 		}
 	}
@@ -164,15 +154,9 @@ void Entity::Translate() {
 	if (position != prev_position) {
 		for (auto& m : mesh->triangles) {
 			for (auto& n : m.points) {
-				//Matrix4 offset = Matrix4::TranslationMatrix(position);
-				//n = n * offset.Inverse() * Matrix4::TranslationMatrix(position - prev_position) * offset;
-				Vector3 n_loc = n * Math::WorldToLocal(position);
-				n_loc = (n_loc.ToVector4() * Matrix4::TranslationMatrix(position - prev_position)).normalized().ToVector3();
-				n = n_loc * Math::LocalToWorld(position);
-			
+				n += position - prev_position;
+				//n *= Matrix4::TranslationMatrix(position - prev_position); //probably less efficient
 			}
-
-
 		}
 	}
 	BUFFERLOG(2, "prev: ", prev_position);
