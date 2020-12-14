@@ -33,7 +33,7 @@ namespace Render {
 	static int y0 = 0;
 	static bool up = true;
 
-	static bool ui_toggle = 1;
+	static bool ui_toggle = true;
 
 	static void Init() {
 		timer = new Timer;
@@ -325,21 +325,26 @@ namespace Render {
 					clipped[i].sprite = t.sprite;
 					
 					float ti = g_totalTime;
-					for (int ox = 0; ox < 100; ox++) {
-						for (int oy = 0; oy < 100; oy++) {
+					for (int ox = 0; ox < 25; ox++) {
+						for (int oy = 0; oy < 25; oy++) {
 							ti += 0.1;
 
 							float dist = (clipped[i].sprite_pixel_location(ox, oy) - Scene::light.position).mag();
-							float dp = Scene::light.direction.dot(clipped[i].get_normal());
-							//std::clamp(50 * dp, 0.f, 50.f),
-							//std::clamp(75 * dp, 0.f, 75.f),
-							//std::clamp(200 * dp, 0.f, 200.f)
+							float dp = (Scene::light.position - clipped[i].points[0]).dot(clipped[i].get_normal());
+
 
 							clipped[i].sprite->SetPixel(Vector2(ox, oy),
 								olc::Pixel(
-									floor(255 * 1 / dist),
-									floor(255 * 1 / dist),
-									floor(255 * 1 / dist)));
+									floor(std::clamp(255 * (1 /  (2 * dist)), 0.f, 255.f)),
+									floor(std::clamp(255 * (1 /  (2 * dist)), 0.f, 255.f)),
+									floor(std::clamp(255 * (1 /  (2 * dist)), 0.f, 255.f))));
+							
+
+							//Vector3 dir_to = clipped[i].sprite_pixel_location(ox, oy) - Scene::light.position;
+
+							
+							
+
 						}
 					}
 					drawnTriangles.push_back(clipped[i]);

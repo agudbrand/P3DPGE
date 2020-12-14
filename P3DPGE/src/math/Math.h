@@ -678,6 +678,13 @@ struct Edge3 {
 		else { deep = true; }
 	}
 
+	bool within_range(Vector3 point)  { return (point.y < p[high].y && point.y > p[!high].y); }
+	bool within_range(float y_point)  { return (y_point < p[high].y && y_point > p[!high].y); }
+	bool within_domain(Vector3 point) { return (point.x < p[lead].x && point.x > p[!lead].x); }
+	bool within_domain(float x_point) { return (x_point < p[lead].x && x_point > p[!lead].x); }
+	bool within_depth(Vector3 point)  { return (point.z < p[deep].z && point.z > p[!deep].z); }
+	bool within_depth(float z_point)  { return (z_point < p[deep].z && z_point > p[!deep].z); }
+
 	std::string str() { return "{(" + p[0].str() + "), (" + p[1].str() + ")}"; }
 	std::string str2f() { return "{(" + p[0].str2f() + "), (" + p[1].str2f() + ")}"; }
 
@@ -686,4 +693,19 @@ struct Edge3 {
 	}
 
 	Vector3 direction() { return p[1] - p[0]; }
+
+	bool point_on_edge(Vector3 p) {
+		if (within_range(p) && within_domain(p) && within_depth(p) &&
+			Math::round2v(direction().normalized()) == Math::round2v(p.normalized())) {
+			return true;
+		}
+		return false;
+	}
+
+};
+
+namespace Debug {
+	static std::string M1x4ToString(mat<float, 1, 4> matrix) {
+		return "(" + std::to_string(matrix.a[0][0]) + ", " + std::to_string(matrix.a[0][1]) + ", " + std::to_string(matrix.a[0][2]) + ", " + std::to_string(matrix.a[0][3]) + ")";
+	}
 };

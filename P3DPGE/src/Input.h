@@ -185,7 +185,7 @@ namespace Input {
 			"Spawns a large sphere of radius/mass 100 at the mouse."));
 
 		inputActions.push_back(InputAction([](olc::PixelGameEngine* p) {
-			Complex* complex = new Complex("objects/bmonkey.obj", Vector3(0, 0, 3));
+			Complex* complex = new Complex("objects/sphere.obj", Vector3(0, 0, 3));
 			selectedEntity = complex;
 			Physics::AddEntity(complex);
 			Scene::AddEntity(complex);
