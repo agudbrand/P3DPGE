@@ -1,8 +1,6 @@
 #pragma once
 #include "GLOBALS.h"
 #include <time.h>
-//#include <exception>
-
 //more debug macros
 //this may not be necessary but is qol so
 
@@ -44,6 +42,8 @@ namespace Time {
 	global_variable float fixedTimeStep;
 	global_variable float fixedDeltaTime;
 
+	static float temp = 0;
+
 	internal float fixedCounter;
 
 	static void Init() {
@@ -51,7 +51,7 @@ namespace Time {
 		totalTime = 0;
 		updateCount = 0;
 
-		fixedTimeStep = 60.f;
+		fixedTimeStep = 300.f;
 		fixedDeltaTime = 1.f / fixedTimeStep;
 		g_fixedDeltaTime = fixedDeltaTime;
 		fixedCounter = 0;
@@ -68,10 +68,10 @@ namespace Time {
 		g_totalTime = totalTime;
 		updateCount += 1;
 
-		fixedCounter += deltaTime;
-		if (fixedCounter > fixedDeltaTime) {
+		//fixedCounter += deltaTime;
+		/*if (fixedCounter > fixedDeltaTime) {
 			FixedUpdate();
-		}
+		}*/
 
 		
 	}

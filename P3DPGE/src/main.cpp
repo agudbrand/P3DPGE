@@ -97,11 +97,17 @@ public:
 
 		Time::Update(deltaTime);
 		Input::Update(this, Time::deltaTime);
-		Physics::Update(Time::fixedDeltaTime);
+
+		//attempt to separate physics from render
+		if(deltaTime > .25f) deltaTime = .25f;
+		Time::temp += deltaTime;
+		while(Time::temp >= Time::fixedDeltaTime) {
+			Physics::Update(Time::fixedDeltaTime);
+			Time::temp -= Time::fixedDeltaTime;
+		}
+
 		Scene::Update(this, Time::deltaTime);
 		Render::Update(this);
-		//Debug::Print("string: %s, decimal: %d, integer: %i", V3ZERO.str(), 1, 2);
-		//Debug::Print("float: %f, .2 float: %.2f, double: %f", 5.1234f, 5.1234f, 2.0);
 
 		return true;
 	}
