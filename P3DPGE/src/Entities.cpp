@@ -37,7 +37,7 @@ bool Entity::LineIntersect(Edge3* e) {
 	return false;
 }
 
-void Entity::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
+void Entity::Draw(olc::PixelGameEngine* p, Matrix4 ProjMat, Matrix4 view) {
 	//do nothing if not SpecialDraw unless debug is enabled
 	DEBUGE DrawPosition(p, ProjMat, view);
 	DEBUGE DrawVertices(p, ProjMat, view);
@@ -47,18 +47,16 @@ void Entity::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 
 }
 bool Entity::SpecialDraw() { return false; }
 
-void Entity::DrawPosition(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
+void Entity::DrawPosition(olc::PixelGameEngine* p, Matrix4 ProjMat, Matrix4 view) {
 	
 
 	//TODO(er, sushi) fix this to not lag the fuck out when it gets close to the camera
-	Vector3 nuposition = Math::ProjMult(position.ConvertToM1x4(), view);
-			nuposition.ProjToScreen(ProjMat);
+	Vector3 nuposition =  Math::WorldToScreen(position, ProjMat, view);
 	
 	std::vector<Vector3> points;
 	for (Triangle t : mesh->triangles) {
 		for (Vector3 po : t.points) {
-			Vector3 newp = Math::ProjMult(po.ConvertToM1x4(), view);
-			newp.ProjToScreen(ProjMat);
+			Vector3 newp = Math::WorldToScreen(po, ProjMat, view);
 			points.push_back(newp);
 		}
 	}
@@ -103,12 +101,11 @@ void Entity::DrawPosition(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat
 
 }
 
-void Entity::DrawVertices(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
+void Entity::DrawVertices(olc::PixelGameEngine* p, Matrix4 ProjMat, Matrix4 view) {
 	for (Triangle t : mesh->triangles) {
 		if (t.get_normal().dot(t.midpoint() - g_campos) < 0) {
 			for (Vector3 v : t.points) {
-				Vector3 nuv = Math::ProjMult(v.ConvertToM1x4(), view);
-						nuv.ProjToScreen(ProjMat);
+				Vector3 nuv = Math::WorldToScreen(v, ProjMat, view);
 				p->DrawString(nuv.toVector2(), v.str2f());
 			}
 		}
@@ -117,24 +114,27 @@ void Entity::DrawVertices(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat
 
 void Entity::RotateX(Vector3 offset) {
 	for (auto& m : mesh->triangles) {
-		for (auto& n : m.points) {
-			n.rotateV3_X(rotation.x, position, offset);
+		for (auto& n : m.points) { //idk if these work
+			Matrix4 translation = Matrix4::TranslationMatrix(position);
+			n = n * translation.Inverse() * Matrix4::RotationMatrixX(rotation.x) * translation;
 		}
 	}
 }
 
 void Entity::RotateY(Vector3 offset) {
 	for (auto& m : mesh->triangles) {
-		for (auto& n : m.points) {
-			n.rotateV3_Y(rotation.y, position, offset);
+		for (auto& n : m.points) { //idk if these work
+			Matrix4 translation = Matrix4::TranslationMatrix(position);
+			n = n * translation.Inverse() * Matrix4::RotationMatrixY(rotation.y) * translation;
 		}
 	}
 }
 
 void Entity::RotateZ(Vector3 offset) {
 	for (auto& m : mesh->triangles) {
-		for (auto& n : m.points) {
-			n.rotateV3_Z(rotation.z, position, offset);
+		for (auto& n : m.points) { //idk if these work
+			Matrix4 translation = Matrix4::TranslationMatrix(position);
+			n = n * translation.Inverse() * Matrix4::RotationMatrixZ(rotation.z) * translation;
 		}
 	}
 }
@@ -143,16 +143,7 @@ void Entity::Rotate(Vector3 offset) {
 	if (rotation != prev_rotation) {
 		for (auto& m : mesh->triangles) {
 			for (auto& n : m.points) {
-				
-
-				mat<float, 4, 4> rot_mat =
-					Math::GetRotateV3_X(rotation.x - prev_rotation.x) *
-					Math::GetRotateV3_Y(rotation.y - prev_rotation.y) *
-					Math::GetRotateV3_Z(rotation.z - prev_rotation.z);
-
-				Vector3 n_local = Math::ProjMult(n.ConvertToM1x4(), Math::GetWorldToLocal(position));
-				n_local = Math::ProjMult(n_local.ConvertToM1x4(), rot_mat);
-				n = Math::ProjMult(n_local.ConvertToM1x4(), Math::GetLocalToWorld(position));
+				n *= Matrix4::RotationMatrixAroundPoint(position, rotation - prev_rotation);
 			}
 		}
 	}
@@ -163,14 +154,13 @@ void Entity::Translate() {
 	if (position != prev_position) {
 		for (auto& m : mesh->triangles) {
 			for (auto& n : m.points) {
-				//n = n * Math::GetTranslate(position - prev_position);
-
-				Vector3 n_local = Math::ProjMult(n.ConvertToM1x4(), Math::GetWorldToLocal(position));
-				n_local = Math::ProjMult(n_local.ConvertToM1x4(), Math::GetTranslate(position - prev_position));
-				n = Math::ProjMult(n_local.ConvertToM1x4(), Math::GetLocalToWorld(position));
+				n += position - prev_position;
+				//n *= Matrix4::TranslationMatrix(position - prev_position); //probably less efficient
 			}
 		}
 	}
+	BUFFERLOG(2, "prev: ", prev_position);
+	BUFFERLOG(1, "now:  ", position);
 	prev_position = position;
 }
 
@@ -192,7 +182,6 @@ std::string Entity::str() {
 
 
 void Entity::Update(float deltaTime) {
-
 	Translate(); Rotate();
 }
 
@@ -212,7 +201,7 @@ PhysEntity::~PhysEntity() {
 	if (collider) delete collider;
 }
 
-void PhysEntity::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
+void PhysEntity::Draw(olc::PixelGameEngine* p, Matrix4 ProjMat, Matrix4 view) {
 	//do nothing if not SpecialDraw unless debug is enabled
 
 	Line3 v_vector = Line3((position + velocity), position);
@@ -221,7 +210,7 @@ void PhysEntity::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<flo
 	v_vector.Draw(p, ProjMat, view);
 	a_vector.Draw(p, ProjMat, view);
 
-	//DrawPosition(p, ProjMat, view);
+	DrawPosition(p, ProjMat, view);
 
 
 }
@@ -233,7 +222,6 @@ void PhysEntity::Update(float deltaTime) {
 void PhysEntity::PhysUpdate(float deltaTime) {
 
 	//for debug
-	Vector3 tf = V3ZERO;
 	BUFFERLOGI(8, 20, deltaTime, " ", g_fixedDeltaTime);
 	
 	//psuedo input
@@ -244,10 +232,9 @@ void PhysEntity::PhysUpdate(float deltaTime) {
 		acceleration = V3ZERO;
 		for (auto& f : forces) {
 			netForce += f;
-			tf += f;
 		}
 			
-		acceleration = netForce / mass * 15;
+		acceleration = netForce / mass * 50;
 
 			
 		forces.clear();
@@ -340,10 +327,6 @@ void PhysEntity::AddFrictionForce(PhysEntity* creator, float frictionCoef, float
 void PhysEntity::AddImpulse(PhysEntity* creator, Vector3 impulse, bool bIgnoreMass) {
 	this->velocity += bIgnoreMass ? impulse : impulse / mass;
 	if (creator) { creator->acceleration -= bIgnoreMass ? impulse : impulse / creator->mass; }
-}
-
-//TODO(up,delle,11/13/20) create the GenerateRadialForce function
-void PhysEntity::GenerateRadialForce(Vector3 position, float radius, float strength, float falloff, bool bIgnoreMass) {
 }
 
 //// Sphere	////
@@ -548,7 +531,7 @@ Line2::Line2(Vector3 endPosition, EntityParams) : Entity(EntityArgs) {
 
 }
 
-void Line2::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
+void Line2::Draw(olc::PixelGameEngine* p, Matrix4 ProjMat, Matrix4 view) {
 	p->DrawLine(position.toVector2(), endPosition.toVector2(), color);
 }
 bool Line2::SpecialDraw() { return true; }
@@ -580,15 +563,15 @@ Line3::Line3(Vector3 endPosition, EntityParams) : Entity(EntityArgs) {
 	edge = Edge3(position, endPosition);
 }
 
-void Line3::Draw(olc::PixelGameEngine* p, mat<float, 4, 4> ProjMat, mat<float, 4, 4> view) {
-	//convert vertexes from world to camera/view space
-	Vector3 startVertex = Math::WorldToCamera(position, view);
-	Vector3 endVertex = Math::WorldToCamera(endPosition, view);
+void Line3::Draw(olc::PixelGameEngine* p, Matrix4 ProjMat, Matrix4 view) {
+	//convert vertexes from world to camera/viewMatrix space
+	Vector3 startVertex = Math::WorldToCamera(position, view).ToVector3();
+	Vector3 endVertex = Math::WorldToCamera(endPosition, view).ToVector3();
 	
-	//clip vertexes to the near and far z planes in camera/view space
+	//clip vertexes to the near and far z planes in camera/viewMatrix space
 	if (!Math::ClipLineToZPlanes(startVertex, endVertex, .1f, 1000.1f)) { return; } //TODO(r,delle) change the third parameter to the camera variable
 	
-	//convert vertexes from camera/view space to clip space
+	//convert vertexes from camera/viewMatrix space to clip space
 	startVertex = Math::CameraToScreen(startVertex, ProjMat);
 	endVertex = Math::CameraToScreen(endVertex, ProjMat);
 
@@ -645,29 +628,29 @@ std::string DebugTriangle::str() {
 
 //// Camera ////
 
-mat<float, 4, 4> Camera::MakeViewMatrix(float yaw, bool force_target) {
+Matrix4 Camera::MakeViewMatrix(float yaw, bool force_target) {
 	Vector3 target = Vector3(0, 0, 1);
-	lookDir = target * Math::GetRotateV3_Y(yaw);
+	lookDir = target * Matrix4::RotationMatrixY(yaw);
 	target = position + lookDir;
 	
 	BUFFERLOG(1, lookDir);
 
-	mat<float, 4, 4> view = inverse(Math::PointAt(position, target, up));
+	Matrix4 view = Math::PointAtMatrix(position, target, up).Inverse();
 	
 	return view;
 }
 
-mat<float, 4, 4> Camera::ProjectionMatrix() {
+Matrix4 Camera::ProjectionMatrix() {
 	float renderToView = farZ - nearZ;
 	float aspectRatio = (float)screenHeight / (float)screenWidth;
 	float fovRad = 1.f / tanf(fieldOfView * .5f / 180.f * M_PI);
 
-	return mat<float,4,4>({
+	return Matrix4(
 		aspectRatio * fovRad, 0,	  0,								0,
 		0,					  fovRad, 0,								0,
 		0,					  0,	  farZ / renderToView,				1,
 		0,					  0,	  (-farZ * nearZ) / renderToView,	0
-	});
+	);
 }
 
 bool Camera::ContainsPoint(Vector3 point) { return false; }

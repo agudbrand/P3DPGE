@@ -12,22 +12,10 @@ namespace olc {
 }
 #define Vector2 olc::vf2d
 
-namespace boost {
-	namespace qvm {
-		template<typename M, int, int>
-		class mat;
-
-		template<typename V, int>
-		class vec;
-	}
-}
-#define mat boost::qvm::mat
-#define vec boost::qvm::vec
-
 struct Vector3 {
-	float x{};
-	float y{};
-	float z{};
+	float x;
+	float y;
+	float z;
 
 	Vector3();
 	Vector3(float inX, float inY, float inZ);
@@ -71,8 +59,12 @@ struct Vector3 {
 	Vector3 yInvert() const;
 	Vector3 zInvert() const;
 
+	void LocalToWorld(Vector3 pos);
+	void WorldToLocal(Vector3 pos);
+	void ScreenToWorld(Matrix4 ProjMat, Matrix4 view);
+
 	//Non-Vector vs Vector interactions defined in Math.h
-	Vector3(const Vector2& vector2);
+	Vector3(const Vector2& v);
 
 	Vector3 operator *  (const Matrix3& rhs) const;
 	void    operator *= (const Matrix3& rhs);
@@ -80,36 +72,10 @@ struct Vector3 {
 	void    operator *= (const Matrix4& rhs);
 
 	Vector4 ToVector4() const;
-
 	Vector2 toVector2() const; 
 	MatrixN ToM1x3() const;
 	MatrixN ToM1x4(float w) const;
-
-	//qvm stuff to convert
-	Vector3(mat<float, 1, 4> m);
-	Vector3(vec<float, 3> vector);
-
-	void    operator =	(const mat<float, 1, 4>& rhs);
-	Vector3 operator *  (const mat<float, 4, 4> rhs);
-	Vector3 operator *= (const mat<float, 4, 4> rhs);
-
-	mat<float, 1, 4> ConvertToM1x4();
-	vec<float, 3> ConvertToVec3();
-	void M1x4ToVector3(mat<float, 1, 4> m);
-	Vector3 GetM1x4ToVector3(mat<float, 1, 4> m);
-	mat<float, 1, 4> proj_mult(mat<float, 1, 4> v, mat<float, 4, 4> m);
-	mat<float, 1, 4> proj_mult(mat<float, 1, 4> v, mat<float, 4, 4> m, float& w);
-	mat<float, 1, 4> unproj_mult(mat<float, 1, 4> v, mat<float, 4, 4> m);
-	void translateV3(Vector3 translation);
-	void scaleV3(Vector3 scale);
-	void LocalToWorld(Vector3 pos);
-	void WorldToLocal(Vector3 pos);
-	void rotateV3_X(float theta, Vector3 pos, Vector3 offset);
-	void rotateV3_Y(float theta, Vector3 pos, Vector3 offset);
-	void rotateV3_Z(float theta, Vector3 pos, Vector3 offset);
-	void ProjToScreen(mat<float, 4, 4> ProjMat);
-	void ProjToScreen(mat<float, 4, 4> ProjMat, float& w);
-	void ScreenToWorld(mat<float, 4, 4> ProjMat, mat<float, 4, 4> view, olc::PixelGameEngine* p);
+	Vector3 ProjectionMultiply(Matrix4 projection) const;
 };
 
 //// Constructors ////
@@ -221,8 +187,20 @@ inline Vector3 Vector3::cross(const Vector3& rhs) const {
 }
 
 inline float Vector3::mag() const {
-	return std::sqrtf(x * x + y * y + z * z);
+	return std::sqrt(x * x + y * y + z * z);
 }
+
+////ref: https://betterexplained.com/articles/understanding-quakes-fast-inverse-square-root/
+//inline float Vector3::mag() const {
+//	ASSERT(CHAR_BIT*sizeof(float) == 32 && CHAR_BIT*sizeof(int32) == 32, "This mag method only works if float and int are 32bit");
+//	float k = x * x + y * y + z * z;
+//	float kHalf = .5f * k;
+//	int32 i = *(int32*)&k;
+//	i = 0x5f3759df - (i >> 1);
+//	k = *(float*)&i;
+//	k = k*(1.5f - kHalf*k*k);
+//	return 1.f / k;
+//}
 
 inline void Vector3::normalize() {
 	if (*this != Vector3(0, 0, 0)) {

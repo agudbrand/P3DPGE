@@ -20,7 +20,8 @@ namespace Render {
 	bool WIRE_FRAME = false;
 	bool DISP_EDGES = false;
 
-	static mat<float, 4, 4> view;
+	static Matrix4 viewMatrix;
+	static Matrix4 projectionMatrix;
 
 	static float* pDepthBuffer;
 
@@ -40,8 +41,6 @@ namespace Render {
 		TIMER_S;
 	}
 
-	using namespace boost::qvm;
-
 	//TODO(rc, sushi) change this to take in types and not individual values
 	//in essence this algorithm scans down a triangle and fills each row it occupies
 	//with the texture. this is necessary to account for us clipping triangles.
@@ -49,7 +48,7 @@ namespace Render {
 		int x1, int y1, float u1, float v1, float w1,
 		int x2, int y2, float u2, float v2, float w2,
 		int x3, int y3, float u3, float v3, float w3,
-		olc::Sprite* tex){
+		olc::Sprite* tex){ //TODO(or,delle) this took about 50% CPU time (in release), look into optimizing this
 
 		if (y2 < y1) { std::swap(y1, y2); std::swap(x1, x2); std::swap(u1, u2); std::swap(v1, v2); std::swap(w1, w2); }
 
@@ -116,8 +115,8 @@ namespace Render {
 
 				for (int j = ax; j < bx; j++){
 					tex_u = (1.0f - t) * tex_su + t * tex_eu;
-					tex_v = (1.0f - t) * tex_sv + t * tex_ev;
-					tex_w = (1.0f - t) * tex_sw + t * tex_ew;
+					tex_v = (1.0f - t) * tex_sv + t * tex_ev; //TODO(or,delle) maybe optimize this by moving the u and v 
+					tex_w = (1.0f - t) * tex_sw + t * tex_ew; //calulcutions into the if statement
 
 					if (tex_w > pDepthBuffer[i * screenWidth + j]) {
 						p->Draw(j, i, tex->Sample(tex_u / tex_w, tex_v / tex_w));
@@ -282,20 +281,16 @@ namespace Render {
 	//TODO(r, sushi) this still needs abstracted
 	static void Draw(olc::PixelGameEngine* p) {
 		std::vector<Triangle> drawnTriangles;
-
 		Vector3 light_direction(0, 0, -1);
-
-		
 
 		//store triangles we want to draw for sorting and copy world points to projected points
 		for (auto& t : triangles) {
-			
 			t.copy_points();
 			float light_ray1 = (Scene::light.position - t.points[0]).dot(t.get_normal());
 			//float light_ray2 = (t.points[0] - Scene::light2.position).dot(t.get_normal());
 			
 			//Line3 ray = Line3(t.points[0], Scene::light.position);
-			//ray.Draw(p, Scene::camera.ProjectionMatrix(p), view);
+			//ray.Draw(p, Scene::camera.ProjectionMatrix(p), viewMatrix);
 
 			float dp = light_ray1;
 			//float dp = light_direction.dot(t.get_normal());
@@ -306,9 +301,7 @@ namespace Render {
 					std::clamp(200 * dp, 0.f, 200.f)
 				));
 				for (Vector3& n : t.proj_points) {
-					float w;
-					n.M1x4ToVector3(n.proj_mult(n.ConvertToM1x4(), view, w));
-
+					n = Math::WorldToCamera(n, viewMatrix).ToVector3();
 				}
 
 				int clippedTriangles = 0;
@@ -322,7 +315,7 @@ namespace Render {
 					//}
 					float w;
 					for (int o = 0; o < 3; o++) {
-						clipped[i].proj_points[o].ProjToScreen(Scene::camera.ProjectionMatrix(), w);
+						clipped[i].proj_points[o] = Math::CameraToScreen(clipped[i].proj_points[o], projectionMatrix, w);
 						clipped[i].tex_points[o].x /= w;
 						clipped[i].tex_points[o].y /= w;
 						clipped[i].tex_points[o].z = 1 / w;
@@ -354,8 +347,6 @@ namespace Render {
 
 						}
 					}
-
-					
 					drawnTriangles.push_back(clipped[i]);
 				}
 			}
@@ -399,17 +390,13 @@ namespace Render {
 			}
 
 			for (Triangle& tr : listTriangles) {
-
-				
-				
-
 				TexturedTriangle(p,
 					tr.proj_points[0].x, tr.proj_points[0].y, tr.tex_points[0].x, tr.tex_points[0].y, tr.tex_points[0].z,
 					tr.proj_points[1].x, tr.proj_points[1].y, tr.tex_points[1].x, tr.tex_points[1].y, tr.tex_points[1].z,
 					tr.proj_points[2].x, tr.proj_points[2].y, tr.tex_points[2].x, tr.tex_points[2].y, tr.tex_points[2].z,
 					tr.sprite);
 
-				//p->DrawCircle(Math::WorldToScreen(tr.sprite_pixel_location(x0, y0), Scene::camera.ProjectionMatrix(), view), 10);
+				p->DrawCircle(Math::WorldToScreen2D(tr.sprite_pixel_location(x0, y0), Scene::camera.ProjectionMatrix(), viewMatrix), 10);
 
 
 				//This has been rendered (lol) useless by textures but
@@ -422,7 +409,7 @@ namespace Render {
 			}
 		}
 
-		p->DrawCircle(Math::WorldToScreen(Scene::light.position, Scene::camera.ProjectionMatrix(), view), 10);
+		p->DrawCircle(Math::WorldToScreen2D(Scene::light.position, Scene::camera.ProjectionMatrix(), viewMatrix), 10);
 
 
 		//debug drawing
@@ -458,12 +445,12 @@ namespace Render {
 		//}
 	}
 
-	
-
 	//draw all entities to screen
 	static void Update(olc::PixelGameEngine* p) {
 
-		view = Scene::camera.MakeViewMatrix(Scene::yaw);
+		viewMatrix = Scene::camera.MakeViewMatrix(Scene::yaw);
+		projectionMatrix = Scene::camera.ProjectionMatrix();
+
 		for (int i = 0; i < screenWidth * screenHeight; i++) {
 			pDepthBuffer[i] = 0.f;
 		}
@@ -479,10 +466,10 @@ namespace Render {
 			//SpecialDraw is used for determining if its just an object
 			//drawn with triangles or if its special eg. a 2D object or Line3
 			if (e->SpecialDraw()) {
-				e->Draw(p, Scene::camera.ProjectionMatrix(), view);
+				e->Draw(p, projectionMatrix, viewMatrix);
 			}
 			else {
-				DEBUG e->Draw(p, Scene::camera.ProjectionMatrix(), view); //for accessing entity debug drawing
+				DEBUG e->Draw(p, projectionMatrix, viewMatrix); //for accessing entity debug drawing
 				for (auto& t : e->mesh->triangles) { triangles.push_back(t); }
 			}
 		}

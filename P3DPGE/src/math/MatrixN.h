@@ -3,14 +3,6 @@
 
 struct Vector3;
 
-namespace boost {
-	namespace qvm {
-		template<typename M, int, int>
-		class mat;
-	}
-}
-#define mat boost::qvm::mat
-
 /*
 //// Notes ////
 Matrices can only hold floats
@@ -142,10 +134,6 @@ struct MatrixN {
 	MatrixN(Vector3 v);
 	MatrixN(Vector3 v, float w);
 
-	//temporary qvm interactions
-	MatrixN(mat<float, 1, 4> m);
-	MatrixN(mat<float, 4, 4> m);
-	MatrixN(mat<float, 3, 3> m);
 };
 
 

@@ -289,9 +289,9 @@ namespace Input {
 					if (m->Clicked(pos.toVector2(), p)) {
 						if (m->ClickedInTitle(pos.toVector2())) {
 							selectedUI = m;
-							break;
 						}
 						ui_clicked = true;
+						break;
 					}
 					index++;
 				}
@@ -305,17 +305,21 @@ namespace Input {
 
 			if (!ui_clicked) {
 				if (selectedEntity) { selectedEntity->ENTITY_DEBUG = false; selectedEntity = nullptr; }
-				pos.ScreenToWorld(c->ProjectionMatrix(), c->MakeViewMatrix(Scene::yaw), p);
+				pos.ScreenToWorld(c->ProjectionMatrix(), c->MakeViewMatrix(Scene::yaw));
+				LOG("Screen to world ", pos);
+				
 				pos.WorldToLocal(c->position);
+				LOG("World to local  ", pos);
 				pos.normalize();
+				LOG("Normalize       ", pos);
 				pos *= 1000;
+				LOG("Times 1000      ", pos);
 				pos.LocalToWorld(c->position);
-
-				//make function somehere that returns a ray cast for ease of use later maybe
+				LOG("Local to world  ", pos);
 				Line3* ray = new Line3(pos, c->position);
-
+				LOG(c->position);
 				//draw ray if debugging
-				DEBUGI Scene::entities.push_back(ray);
+				Scene::entities.push_back(ray);
 
 				for (Entity* e : Scene::entities) {
 					if (e->LineIntersect(&ray->edge)) {
@@ -362,8 +366,8 @@ namespace Input {
 				if (PhysEntity* entity = dynamic_cast<PhysEntity*>(selectedEntity)) {
 					Vector3 pos = GetMousePos(p);
 
-					pos.ScreenToWorld(c->ProjectionMatrix(), c->MakeViewMatrix(Scene::yaw), p);
-					leftClickPos.ScreenToWorld(c->ProjectionMatrix(), c->MakeViewMatrix(Scene::yaw), p);
+					pos.ScreenToWorld(c->ProjectionMatrix(), c->MakeViewMatrix(Scene::yaw));
+					leftClickPos.ScreenToWorld(c->ProjectionMatrix(), c->MakeViewMatrix(Scene::yaw));
 
 					entity->AddForce(nullptr, (pos - leftClickPos).normalized() * 5, true);
 				}
@@ -447,10 +451,10 @@ namespace Input {
 
 		/*inputActions.push_back(InputAction([](olc::PixelGameEngine* p) { //TODO(i,delle) add back projection fulcrum
 
-			Vector3 pos1 = V3ZERO; pos1.ScreenToWorld(Render::camera.ProjectionMatrix(p), Render::view, p);
-			Vector3 pos2 = Vector3(0, p->ScreenHeight()); pos2.ScreenToWorld(Render::camera.ProjectionMatrix(p), Render::view, p);
-			Vector3 pos3 = Vector3(p->ScreenWidth(), 0); pos3.ScreenToWorld(Render::camera.ProjectionMatrix(p), Render::view, p);
-			Vector3 pos4 = Vector3(p->ScreenWidth(), p->ScreenHeight()); pos4.ScreenToWorld(Render::camera.ProjectionMatrix(p), Render::view, p);
+			Vector3 pos1 = V3ZERO; pos1.ScreenToWorld(Render::camera.ProjectionMatrix(p), Render::viewMatrix, p);
+			Vector3 pos2 = Vector3(0, p->ScreenHeight()); pos2.ScreenToWorld(Render::camera.ProjectionMatrix(p), Render::viewMatrix, p);
+			Vector3 pos3 = Vector3(p->ScreenWidth(), 0); pos3.ScreenToWorld(Render::camera.ProjectionMatrix(p), Render::viewMatrix, p);
+			Vector3 pos4 = Vector3(p->ScreenWidth(), p->ScreenHeight()); pos4.ScreenToWorld(Render::camera.ProjectionMatrix(p), Render::viewMatrix, p);
 
 			Vector3 ctox1 = (pos1 - Render::camera.position).normalized();
 			Vector3 ctox2 = (pos2 - Render::camera.position).normalized();
@@ -484,7 +488,7 @@ namespace Input {
 			Box* box = new Box(Vector3(5, 5, 5), Vector3(0,0,20));
 			box->mass = 100;
 			AABBCollider* aabb = new AABBCollider(box, box->halfDims);
-			Box* sphere = new Box(Vector3(.3f, .3f, .3f), Vector3(20, 0, 20), V3ZERO, V3ONE, Vector3(-25, -3, 0), V3ZERO, V3ONE);
+			Box* sphere = new Box(Vector3(.3f, .3f, .3f), Vector3(20, 0, 20), V3ZERO, V3ONE, Vector3(-500, -3, 0), V3ZERO, V3ONE);
 			SphereCollider* sphereCol = new SphereCollider(sphere, 1);
 			Physics::AddEntity(box);
 			Scene::AddEntity(box);
@@ -529,11 +533,11 @@ namespace Input {
 			//selectedEntity->position.y = pos.y;
 		}
 
-		Vector3 pos = GetMousePos(p);
-		pos.ScreenToWorld(c->ProjectionMatrix(), c->MakeViewMatrix(Scene::yaw), p);
-		pos.WorldToLocal(c->position);
-
-		g_MouseWorldPos = pos;
+		//Vector3 pos = GetMousePos(p);
+		//pos.ScreenToWorld(c->ProjectionMatrix(), c->MakeViewMatrix(Scene::yaw));
+		//pos.WorldToLocal(c->position);
+		//
+		//g_MouseWorldPos = pos;
 	}
 
 	//NOTE: selected entity should never point to a NEW object, since Input shouldnt own that object

@@ -1,4 +1,5 @@
 #pragma once
+#include "../internal/olcPixelGameEngine.h"
 #include "Time.h"
 #include "Vector3.h"
 #include "Vector4.h"
@@ -9,15 +10,6 @@
 #include <math.h>
 #include <algorithm>
 #include <numeric>
-
-#include "boost/qvm/mat_access.hpp"
-#include "boost/qvm/mat.hpp"
-#include "boost/qvm/vec.hpp"
-#include "boost/qvm/map_vec_mat.hpp"
-#include "boost/qvm/map_mat_mat.hpp"
-#include "boost/qvm/mat_operations.hpp"
-#include "boost/qvm/vec_mat_operations.hpp"
-#include "../internal/olcPixelGameEngine.h"
 
 //math constants
 #define M_PI 3.14159265359f
@@ -107,9 +99,171 @@
 		}())
 
 namespace Math {
+	static Vector4 ProjMult(Vector4 v, Matrix4 m) {
+		Vector4 nv = v * m;
+		if (nv.w != 0) { nv.x /= nv.w; nv.y /= nv.w; nv.z /= nv.w; }
+		return nv;
+	}
 
-	static float to_radians(float angle) { return angle * (M_PI / 180); }
-	static float to_degrees(float angle) { return angle * (180 / M_PI); }
+	static Matrix4 LocalToWorld(Vector3 offsetFromOrigin) {
+		return Matrix4::TranslationMatrix(offsetFromOrigin);
+	}
+
+	static Matrix4 WorldToLocal(Vector3 offsetFromOrigin) {
+		return Matrix4::TranslationMatrix(offsetFromOrigin).Inverse();
+	}
+
+}
+
+
+//// Vector3 vs Vector4 Interactions ////
+
+inline Vector4::Vector4(const Vector3& v, const float& w) {
+	this->x = v.x; this->y = v.y; this->z = v.z; this->w = w;
+}
+
+inline Vector4 Vector3::ToVector4() const {
+	return Vector4(x, y, z, 1);
+}
+
+inline Vector3 Vector4::ToVector3() const {
+	return Vector3(x, y, z);
+}
+
+
+
+//// Matrix3 vs Matrix4 Interactions ////
+
+inline Matrix4 Matrix3::To4x4() {
+	return Matrix4(
+		data[0],	data[1],	data[2],	0,
+		data[3],	data[4],	data[5],	0,
+		data[6],	data[7],	data[8],	0,
+		0,			0,			0,			1
+	);
+}
+
+inline Matrix3 Matrix4::To3x3() {
+	return Matrix3(
+		data[0], data[1], data[2],
+		data[4], data[5], data[6],
+		data[8], data[9], data[10]
+	);
+}
+
+
+
+//// Vector vs Matrix Interactions ////
+
+inline Vector3 Vector3::operator *  (const Matrix3& rhs) const {
+	return Vector3(
+		x*rhs.data[0] + y*rhs.data[3] + z*rhs.data[6], 
+		x*rhs.data[1] + y*rhs.data[4] + z*rhs.data[7], 
+		x*rhs.data[2] + y*rhs.data[5] + z*rhs.data[8]);
+}
+
+inline void Vector3::operator *= (const Matrix3& rhs) {
+	*this = Vector3(
+	x * rhs.data[0] + y * rhs.data[3] + z * rhs.data[6],
+	x * rhs.data[1] + y * rhs.data[4] + z * rhs.data[7],
+	x * rhs.data[2] + y * rhs.data[5] + z * rhs.data[8]);
+}
+
+inline Vector3 Vector3::operator *  (const Matrix4& rhs) const {
+	return Vector3(
+		x*rhs.data[0] + y*rhs.data[4] + z*rhs.data[8] + rhs.data[12],
+		x*rhs.data[1] + y*rhs.data[5] + z*rhs.data[9] + rhs.data[13],
+		x*rhs.data[2] + y*rhs.data[6] + z*rhs.data[10] + rhs.data[14]);
+}
+
+inline void Vector3::operator *= (const Matrix4& rhs) {
+	*this = Vector3(
+	x * rhs.data[0] + y * rhs.data[4] + z * rhs.data[8]  + rhs.data[12],
+	x * rhs.data[1] + y * rhs.data[5] + z * rhs.data[9]  + rhs.data[13],
+	x * rhs.data[2] + y * rhs.data[6] + z * rhs.data[10] + rhs.data[14]);
+}
+
+inline Vector4 Vector4::operator *  (const Matrix4& rhs) const {
+	return Vector4(
+		x*rhs.data[0] + y*rhs.data[4] + z*rhs.data[8]  + w*rhs.data[12],
+		x*rhs.data[1] + y*rhs.data[5] + z*rhs.data[9]  + w*rhs.data[13],
+		x*rhs.data[2] + y*rhs.data[6] + z*rhs.data[10] + w*rhs.data[14],
+		x*rhs.data[3] + y*rhs.data[7] + z*rhs.data[11] + w*rhs.data[15]);
+}
+
+inline void Vector4::operator *= (const Matrix4& rhs) {
+	*this = Vector4(
+	x * rhs.data[0] + y * rhs.data[4] + z * rhs.data[8]  + w * rhs.data[12],
+	x * rhs.data[1] + y * rhs.data[5] + z * rhs.data[9]  + w * rhs.data[13],
+	x * rhs.data[2] + y * rhs.data[6] + z * rhs.data[10] + w * rhs.data[14],
+	x * rhs.data[3] + y * rhs.data[7] + z * rhs.data[11] + w * rhs.data[15]);
+}
+
+inline void Vector3::LocalToWorld(Vector3 offsetFromOrigin) {
+	*this *= Matrix4::TranslationMatrix(offsetFromOrigin);
+}
+
+inline void Vector3::WorldToLocal(Vector3 offsetFromOrigin) {
+	*this *= Matrix4::TranslationMatrix(offsetFromOrigin).Inverse();
+}
+
+inline void Vector3::ScreenToWorld(Matrix4 ProjMat, Matrix4 view) {
+	x /= .5f * (float)screenWidth;
+	y /= .5f * (float)screenHeight;
+	x -= 1.f; y -= 1.f; z = -1.f;
+	*this = Math::ProjMult(this->ToVector4(), ProjMat.Inverse()).ToVector3();
+	*this = Math::ProjMult(this->ToVector4(), view.Inverse()).ToVector3();
+}
+
+inline Vector3 Vector3::ProjectionMultiply(Matrix4 projection) const{
+	return Math::ProjMult(this->ToVector4(), projection).ToVector3();
+}
+
+
+
+//// Non-Vector vs Vector Interactions ////
+
+inline Vector3::Vector3(const Vector2& v) {
+	this->x = v.x; this->y = v.y; this->z = 0;
+}
+
+inline Vector2 Vector3::toVector2() const {
+	return Vector2(x, y);
+}
+
+inline MatrixN Vector3::ToM1x3() const {
+	return MatrixN(1, 3, {x, y, z});
+}
+
+inline MatrixN Vector3::ToM1x4(float w) const {
+	return MatrixN(1, 4, {x, y, z, w});
+}
+
+
+
+//// Non-MatrixN vs MatrixN Interactions ////
+
+//Creates a 1x3 matrix
+inline MatrixN::MatrixN(Vector3 v) {
+	this->rows = 1; this->cols = 3; this->elementCount = 3;
+	this->data = {v.x, v.y, v.z};
+}
+
+//Creates a 1x4 matrix
+inline MatrixN::MatrixN(Vector3 v, float w) {
+	this->rows = 1; this->cols = 4; this->elementCount = 4;
+	this->data = {v.x, v.y, v.z, w};
+}
+
+
+
+namespace Math {
+
+	inline static float to_radians(float angle) { return angle * (M_PI / 180); }
+	inline static float to_degrees(float angle) { return angle * (180 / M_PI); }
+
+	inline static Vector3 to_radians(Vector3& vector) { return vector * (M_PI / 180); }
+	inline static Vector3 to_degrees(Vector3& vector) { return vector * (180 / M_PI); }
 
 	//for debugging with floats or doubles
 	static std::string append_decimal(std::string s) {
@@ -173,59 +327,14 @@ namespace Math {
 	//conversions
 	static Vector3 vi2dToVector3(olc::vi2d vector, float z = 0) { return Vector3((float)vector.x, (float)vector.y, z); }
 
-	static Vector3 M1x4ToVector3(mat<float, 1, 4> m) { return Vector3(m.a[0][0], m.a[0][1], m.a[0][2]); }
-
 	//interpolating
 	static float lerpf(float p1, float p2, float t) { return (1.f - t) * p1 + t * p2; }
 
 	static Vector3 lerpv(Vector3 v1, Vector3 v2, float t) { return  v1 * (1.f - t) + v2 * t; }
 	static Vector2 lerpv(Vector2 v1, Vector2 v2, float t) { return  v1 * (1.f - t) + v2 * t; }
 
-	//matrix stuff
-	static mat<float, 1, 4> Vector3ToM1x4(Vector3 v) {
-		mat<float, 1, 4> m;
-		m.a[0][0] = v.x; m.a[0][1] = v.y; m.a[0][2] = v.z; m.a[0][3] = 1;
-		return m;
-	}
-
-	static mat<float, 4, 4> GetTranslate(Vector3 translation) {
-		mat<float, 4, 4> tv{
-			1,			   0,			  0,			 0,
-			0,			   1,			  0,			 0,
-			0,			   0,			  1,			 0,
-			translation.x, translation.y, translation.z, 1
-		};
-		return tv;
-	}
-
-	static mat<float, 4, 4> GetScaleMat(Vector3 scale) {
-		mat<float, 4, 4> sv{
-			scale.x, 0,		  0,	   0,
-			0,		 scale.y, 0,	   0,
-			0,		 0,		  scale.z, 0,
-			0,		 0,		  0,	   1
-		};
-		return sv;
-	}
-
-	static mat<float, 4, 4> M3x3ToM4x4(mat<float, 3, 3> inMat) {
-		return mat<float, 4, 4>{
-			inMat.a[0][0], inMat.a[0][1], inMat.a[0][2], 0,
-				inMat.a[1][0], inMat.a[1][1], inMat.a[1][2], 0,
-				inMat.a[2][0], inMat.a[2][1], inMat.a[2][2], 0,
-				0, 0, 0, 1
-		};
-	}
-
-	static mat<float, 4, 4> WorldMatrix4x4(Vector3 translation, Vector3 rotation, Vector3 scale) {
-		mat<float, 4, 4> matrix = boost::qvm::rot_mat_xyx<4, float>(rotation.x, rotation.y, rotation.z);
-		matrix.a[0][3] = translation.x; matrix.a[1][3] = translation.y; matrix.a[2][3] = translation.z;
-		matrix.a[0][0] *= scale.x; matrix.a[1][1] *= scale.y; matrix.a[2][2] *= scale.z;
-		return matrix;
-	}
-
 	//this function returns a matrix that tells a vector how to look at a specific point in space.
-	static mat<float, 4, 4> PointAt(Vector3& pos, Vector3& target, Vector3& up) {
+	static Matrix4 PointAtMatrix(Vector3& pos, Vector3& target, Vector3& up) {
 		up.normalize();
 
 		//get new forward direction
@@ -241,44 +350,18 @@ namespace Math {
 		newUp.normalize();
 
 		//make point at matrix
-		mat<float, 4, 4> m{
+		return Matrix4(
 			newRight.x, newRight.y, newRight.z, 0,
 			newUp.x,	newUp.y,	newUp.z,	0,
 			newFor.x,	newFor.y,	newFor.z,	0,
 			pos.x,		pos.y,		pos.z,		1
-		};
-
-		return m;
+		);
 	}
 
-	static MatrixN PointAtMatrix(Vector3& pos, Vector3& target, Vector3& up) {
-		up.normalize();
-
-		//get new forward direction
-		Vector3 newFor = target - pos;
-		newFor.normalize();
-
-		//get right direction
-		Vector3 newRight = up.cross(newFor);
-		newRight.normalize();
-
-		//get up direction
-		Vector3 newUp = newRight.cross(newFor);
-		newUp.normalize();
-
-		//make point at matrix
-		return MatrixN(4, 4, {
-			newRight.x, newRight.y, newRight.z, 0,
-			newUp.x,	newUp.y,	newUp.z,	0,
-			newFor.x,	newFor.y,	newFor.z,	0,
-			pos.x,		pos.y,		pos.z,		1
-		});
-	}
-
-	//this assumes a rectangle whose position is the top right corner
+	//this assumes a rectangle whose pivot is the top right corner
 	static bool PointInRect(Vector2 size, Vector2 pos, Vector2 point) {
 		return pos.x < point.x&& point.x < pos.x + size.x &&
-			   pos.y < point.y&& point.y < pos.y + size.y;
+			pos.y < point.y&& point.y < pos.y + size.y;
 	}
 
 	static float DistTwoPoints(Vector3 a, Vector3 b) {
@@ -305,119 +388,63 @@ namespace Math {
 		return line_start + line_to_intersect;
 	}
 
-	//TODO(, sushi) rename these functions to something not retarded
-	static mat<float, 4, 4> GetRotateV3_X(float theta) {
-		theta = Math::to_radians(theta);
-		mat<float, 4, 4> rvx{
-			1,		0,			0,           0,
-			0,		cos(theta),	-sin(theta), 0,
-			0,		sin(theta),	cos(theta),  0,
-			0,		0,			0,			 1
-		};
-		return rvx;
-	}
-
-	static mat<float, 4, 4> GetRotateV3_Y(float theta) {
-		theta = Math::to_radians(theta);
-		mat<float, 4, 4> rvy{
-			cos(theta),	0,	sin(theta),  0,
-			0,			1,	0,			 0,
-			-sin(theta),0,	cos(theta),  0,
-			0,			0,	0,			 1
-		};
-		return rvy;
-	}
-
-	static mat<float, 4, 4> GetRotateV3_Z(float theta) {
-		theta = Math::to_radians(theta);
-		mat<float, 4, 4> rvz{
-			cos(theta), -sin(theta),	0, 0,
-			sin(theta), cos(theta),		0, 0,
-			0,			0,				1, 0,
-			0,			0,				0, 1
-		};
-		return rvz;
-	}
-
-	static mat<float, 4, 4> GetLocalToWorld(Vector3 pos) {
-		mat<float, 4, 4> wtl{
-			1,	   0,	  0,	 0,
-			0,	   1,	  0,	 0,
-			0,	   0,	  1,	 0,
-			pos.x, pos.y, pos.z, 1
-		};
-		return wtl;
-	}
-
-	static mat<float, 4, 4> GetWorldToLocal(Vector3 pos) {
-		mat<float, 4, 4> ltw{
-			1,	   0,	  0,	 0,
-			0,	   1,	  0,	 0,
-			0,	   0,	  1,	 0,
-			pos.x, pos.y, pos.z, 1
-		};
-		return inverse(ltw);
-	}
-
-	static mat<float, 1, 4> ProjMult(mat<float, 1, 4> v, mat<float, 4, 4> m) {
-		mat<float, 1, 4> vm = v * m;
-		if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; }
-		return vm;
-	}
-
-	//optional overload that 'returns' the w value
-	static mat<float, 1, 4> ProjMult(mat<float, 1, 4> v, mat<float, 4, 4> m, float& w) {
-		mat<float, 1, 4> vm = v * m;
-		if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; w = vm.a[0][3]; }
-		return vm;
-	}
-
-	static mat<float, 1, 4> unProjMult(mat<float, 1, 4> v, mat<float, 4, 4> m) {
-		mat<float, 1, 4> vm = v * m;
-		if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; }
-		return vm;
-	}
-
 	//return where two lines intersect on the x axis with slope and the y-intercept
 	static Vector3 LineIntersect2(float slope1, float ycross1, float slope2, float ycross2) {
-		mat<float, 2, 2> lhs{ slope1, ycross1, slope2, ycross2 };
-		mat<float, 2, 1> rhs{ 1, 1 };
-		mat<float, 2, 1> det = inverse(lhs) * rhs;
-		float x = 1 / (det.a[0][1]) * det.a[0][0];
+		MatrixN lhs(2,2,{ slope1, ycross1, slope2, ycross2 });
+		MatrixN rhs(2,1,{ 1, 1 });
+		MatrixN det = lhs.Inverse() * rhs;
+		float x = 1 / det(0,1) * det(0,0);
 		float y = slope1 * x + ycross1;
 		return Vector3(x, y);
 	}
 
-	//returns where two lines intersect in 3D space
+	//returns where two lines intersect in 3D space //TODO(,sushi) implement this
 	static Vector3 LineIntersect3(Vector3 adir, Vector3 ap, Vector3 bdir, Vector3 bp) {
 	}
 
 	//returns area of a triangle of sides a and b
 	static float TriangleArea(Vector3 a, Vector3 b) { return a.cross(b).mag() / 2; }
 
-	static Vector3 WorldToCamera(Vector3 vertex, mat<float, 4, 4> viewMatrix) {
-		mat<float, 1, 4> vm = vertex.ConvertToM1x4() * viewMatrix;
-		if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; }
-		return Vector3(vm);
+	static Vector4 WorldToCamera(Vector3 vertex, Matrix4 viewMatrix) {
+		return Math::ProjMult(vertex.ToVector4(), viewMatrix);
 	}
 
-	static Vector3 CameraToScreen(Vector3 csVertex, mat<float, 4, 4> projectionMatrix) {
-		mat<float, 1, 4> vm = csVertex.ConvertToM1x4() * projectionMatrix;
-		if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; }
-		Vector3 out(vm);
-		out.x += 1.0f; out.y += 1.0f;
-		out.x *= 0.5f * screenWidth;
-		out.y *= 0.5f * screenHeight;
-		return out;
+	static Vector3 CameraToScreen(Vector3 csVertex, Matrix4 projectionMatrix) {
+		Vector3 vm = Math::ProjMult(csVertex.ToVector4(), projectionMatrix).ToVector3();
+		vm.x += 1.0f; vm.y += 1.0f;
+		vm.x *= 0.5f * (float)screenWidth;
+		vm.y *= 0.5f * (float)screenHeight;
+		return vm;
 	}
 
-	static Vector2 WorldToScreen(Vector3 point, mat<float, 4, 4> ProjMat, mat<float, 4, 4> ViewMat) {
+	static Vector3 CameraToScreen(Vector3 csVertex, Matrix4 projectionMatrix, float& w) {
+		Vector4 bleh = csVertex.ToVector4() * projectionMatrix;
+		w = bleh.w;
+		Vector3 vm = bleh.normalized().ToVector3();
+		vm.x += 1.0f; vm.y += 1.0f;
+		vm.x *= 0.5f * (float)screenWidth;
+		vm.y *= 0.5f * (float)screenHeight;
+		return vm;
+	}
+
+	static Vector3 CameraToScreen(Vector4 csVertex, Matrix4 projectionMatrix) {
+		Vector3 vm = Math::ProjMult(csVertex, projectionMatrix).ToVector3();
+		vm.x += 1.0f; vm.y += 1.0f;
+		vm.x *= 0.5f * (float)screenWidth;
+		vm.y *= 0.5f * (float)screenHeight;
+		return vm;
+	}
+
+	static Vector3 WorldToScreen(Vector3 point, Matrix4 ProjMat, Matrix4 ViewMat) {
+		return CameraToScreen(WorldToCamera(point, ViewMat), ProjMat);
+	}
+
+	static Vector2 WorldToScreen2D(Vector3 point, Matrix4 ProjMat, Matrix4 ViewMat) {
 		Vector3 v = CameraToScreen(WorldToCamera(point, ViewMat), ProjMat);
 		return Vector2(v.x, v.y);
 	}
 
-
-	//the input vectors should be in view/camera space
+	//the input vectors should be in viewMatrix/camera space
 	//returns true if the line can be rendered after clipping, false otherwise
 	static bool ClipLineToZPlanes(Vector3& lineStart, Vector3& lineEnd, float nearZ, float farZ) {
 		//clip to the near plane
@@ -535,306 +562,7 @@ namespace Math {
 
 };
 
-//// Vector3 vs Vector4 Interactions ////
 
-inline Vector4::Vector4(const Vector3& v, const float& w) {
-	this->x = v.x; this->y = v.y; this->z = v.z; this->w = w;
-}
-
-inline Vector4 Vector3::ToVector4() const {
-	return Vector4(x, y, z, 1);
-}
-
-inline Vector3 Vector4::ToVector3() const {
-	return Vector3(x, y, z);
-}
-
-//// Matrix3 vs Matrix4 Interactions ////
-
-inline Matrix4 Matrix3::To4x4() {
-	return Matrix4(
-		data[0],	data[1],	data[2],	0,
-		data[3],	data[4],	data[5],	0,
-		data[6],	data[7],	data[8],	0,
-		0,			0,			0,			1
-	);
-}
-
-inline Matrix3 Matrix4::To3x3() {
-	return Matrix3(
-		data[0], data[1], data[2],
-		data[4], data[5], data[6],
-		data[8], data[9], data[10]
-	);
-}
-
-//// Vector vs Matrix Interactions ////
-
-inline Vector3 Vector3::operator *  (const Matrix3& rhs) const {
-	return Vector3(
-		x*rhs.data[0] + y*rhs.data[3] + z*rhs.data[6], 
-		x*rhs.data[1] + y*rhs.data[4] + z*rhs.data[7], 
-		x*rhs.data[2] + y*rhs.data[5] + z*rhs.data[8]);
-}
-
-inline void Vector3::operator *= (const Matrix3& rhs) {
-	*this = Vector3(
-		x*rhs.data[0] + y*rhs.data[3] + z*rhs.data[6], 
-		x*rhs.data[1] + y*rhs.data[4] + z*rhs.data[7], 
-		x*rhs.data[2] + y*rhs.data[5] + z*rhs.data[8]);
-}
-
-inline Vector3 Vector3::operator *  (const Matrix4& rhs) const {
-	return Vector3(
-		x*rhs.data[0] + y*rhs.data[4] + z*rhs.data[8] + rhs.data[12],
-		x*rhs.data[1] + y*rhs.data[5] + z*rhs.data[9] + rhs.data[13],
-		x*rhs.data[2] + y*rhs.data[6] + z*rhs.data[10] + rhs.data[14]);
-}
-
-inline void Vector3::operator *= (const Matrix4& rhs) {
-	*this = Vector3(
-		x*rhs.data[0] + y*rhs.data[4] + z*rhs.data[8] + rhs.data[12],
-		x*rhs.data[1] + y*rhs.data[5] + z*rhs.data[9] + rhs.data[13],
-		x*rhs.data[2] + y*rhs.data[6] + z*rhs.data[10] + rhs.data[14]);
-}
-
-inline Vector4 Vector4::operator *  (const Matrix4& rhs) const {
-	return Vector4(
-		x*rhs.data[0] + y*rhs.data[4] + z*rhs.data[8] + w*rhs.data[12],
-		x*rhs.data[1] + y*rhs.data[5] + z*rhs.data[9] + w*rhs.data[13],
-		x*rhs.data[2] + y*rhs.data[6] + z*rhs.data[10] + w*rhs.data[14],
-		x*rhs.data[3] + y*rhs.data[7] + z*rhs.data[11] + w*rhs.data[15]);
-}
-
-inline void Vector4::operator *= (const Matrix4& rhs) {
-	*this = Vector4(
-		x*rhs.data[0] + y*rhs.data[4] + z*rhs.data[8] + w*rhs.data[12],
-		x*rhs.data[1] + y*rhs.data[5] + z*rhs.data[9] + w*rhs.data[13],
-		x*rhs.data[2] + y*rhs.data[6] + z*rhs.data[10] + w*rhs.data[14],
-		x*rhs.data[3] + y*rhs.data[7] + z*rhs.data[11] + w*rhs.data[15]);
-}
-
-//// Non-Vector vs Vector Interactions ////
-
-//Creates a vector from the matrices first 3 values
-
-inline Vector2 Vector3::toVector2() const {
-	return Vector2(x, y);
-}
-
-inline MatrixN Vector3::ToM1x3() const {
-	return MatrixN(1, 3, {x, y, z});
-}
-
-inline MatrixN Vector3::ToM1x4(float w) const {
-	return MatrixN(1, 4, {x, y, z, w});
-}
-
-//// Non-MatrixN vs MatrixN Interactions ////
-
-//Creates a 1x3 matrix
-inline MatrixN::MatrixN(Vector3 v) {
-	this->rows = 1; this->cols = 3; this->elementCount = 3;
-	this->data = {v.x, v.y, v.z};
-}
-
-//Creates a 1x4 matrix
-inline MatrixN::MatrixN(Vector3 v, float w) {
-	this->rows = 1; this->cols = 4; this->elementCount = 4;
-	this->data = {v.x, v.y, v.z, w};
-}
-
-//// Old QVM interactions ... To be removed ////
-
-inline MatrixN::MatrixN(mat<float, 1, 4> m) {
-	this->rows = 1; this->cols = 4; this->elementCount = 4;
-	this->data = {m.a[0][0], m.a[0][1], m.a[0][2], m.a[0][3]};
-}
-
-inline MatrixN::MatrixN(mat<float, 4, 4> m) {
-	this->rows = 4; this->cols = 4; this->elementCount = 16;
-	this->data = std::vector<float>(elementCount);
-	int index = 0;
-	for (int i = 0; i < rows; ++i) {
-		for (int j = 0; j < cols; ++j) {
-			this->data[index++] = m.a[i][j];
-		}
-	}
-}
-
-inline MatrixN::MatrixN(mat<float, 3, 3> m) {
-	this->rows = 3; this->cols = 3; this->elementCount = 9;
-	this->data = std::vector<float>(elementCount);
-	int index = 0;
-	for (int i = 0; i < rows; ++i) {
-		for (int j = 0; j < cols; ++j) {
-			this->data[index++] = m.a[i][j];
-		}
-	}
-}
-
-inline Vector3::Vector3(const Vector2& vector2) {
-	this->x = vector2.x; this->y = vector2.y; this->z = 0;
-}
-
-inline Vector3::Vector3(mat<float, 1, 4> m) {
-	this->x = m.a[0][0]; this->y = m.a[0][1]; this->z = m.a[0][2];
-}
-
-inline Vector3::Vector3(vec<float, 3> vector) {
-	this->x = vector.a[0]; this->y = vector.a[1]; this->z = vector.a[2];
-}
-
-inline void    Vector3::operator =	(const mat<float, 1, 4>& rhs) {
-	this->x = rhs.a[0][0]; this->y = rhs.a[0][1]; this->z = rhs.a[0][2];
-}
-
-inline Vector3 Vector3::operator *  (const mat<float, 4, 4> rhs) {
-	mat<float, 1, 4> v{ x,y,z,1 }; return GetM1x4ToVector3(v * rhs);
-}
-
-inline Vector3 Vector3::operator *= (const mat<float, 4, 4> rhs) {
-	mat<float, 1, 4> v{ x,y,z,1 }; return GetM1x4ToVector3(v * rhs);
-}
-
-inline mat<float, 1, 4> Vector3::ConvertToM1x4() {
-	mat<float, 1, 4> m;
-	m.a[0][0] = x; m.a[0][1] = y; m.a[0][2] = z; m.a[0][3] = 1;
-	return m;
-}
-
-inline vec<float, 3> Vector3::ConvertToVec3() {
-	return vec<float, 3>{x, y, z};
-}
-
-inline void Vector3::M1x4ToVector3(mat<float, 1, 4> m) {
-	x = m.a[0][0]; y = m.a[0][1]; z = m.a[0][2];
-}
-
-inline Vector3 Vector3::GetM1x4ToVector3(mat<float, 1, 4> m) {
-	return Vector3(m.a[0][0], m.a[0][1], m.a[0][2]);
-}
-
-inline mat<float, 1, 4> Vector3::proj_mult(mat<float, 1, 4> v, mat<float, 4, 4> m) {
-	mat<float, 1, 4> vm = v * m;
-	if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; }
-	return vm;
-}
-
-inline mat<float, 1, 4> Vector3::proj_mult(mat<float, 1, 4> v, mat<float, 4, 4> m, float& w) {
-	mat<float, 1, 4> vm = v * m;
-	if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; w = vm.a[0][3]; }
-	return vm;
-}
-
-inline mat<float, 1, 4> Vector3::unproj_mult(mat<float, 1, 4> v, mat<float, 4, 4> m) {
-	mat<float, 1, 4> vm = v * m;
-	if (vm.a[0][3] != 0) { vm.a[0][0] /= vm.a[0][3]; vm.a[0][1] /= vm.a[0][3]; vm.a[0][2] /= vm.a[0][3]; }
-	return vm;
-}
-
-inline void Vector3::translateV3(Vector3 translation) {
-	mat<float, 4, 4> tv{
-			1,			   0,			  0,			 0,
-			0,			   1,			  0,			 0,
-			0,			   0,			  1,			 0,
-			translation.x, translation.y, translation.z, 1
-	};
-	M1x4ToVector3(ConvertToM1x4() * tv);
-}
-
-inline void Vector3::scaleV3(Vector3 scale) {
-	mat<float, 4, 4> sv{
-			scale.x, 0,		  0,	   0,
-			0,		 scale.y, 0,	   0,
-			0,		 0,		  scale.z, 0,
-			0,		 0,		  0,	   1
-	};
-	M1x4ToVector3(proj_mult(ConvertToM1x4(), sv));
-}
-
-inline void Vector3::LocalToWorld(Vector3 pos) {
-	mat<float, 4, 4> wtl{
-			1,	   0,	  0,	 0,
-			0,	   1,	  0,	 0,
-			0,	   0,	  1,	 0,
-			pos.x, pos.y, pos.z, 1
-	};
-	M1x4ToVector3(proj_mult(ConvertToM1x4(), wtl));
-}
-
-inline void Vector3::WorldToLocal(Vector3 pos) {
-	mat<float, 4, 4> ltw{
-			1,	   0,	  0,	 0,
-			0,	   1,	  0,	 0,
-			0,	   0,	  1,	 0,
-			pos.x, pos.y, pos.z, 1
-	};
-	M1x4ToVector3(proj_mult(ConvertToM1x4(), inverse(ltw)));
-}
-
-inline void Vector3::rotateV3_X(float theta, Vector3 pos, Vector3 offset) {
-	theta = Math::to_radians(theta);
-	WorldToLocal(pos + offset);
-	mat<float, 4, 4> rvx{
-		1,		0,			0,           0,
-		0,		cos(theta),	-sin(theta), 0,
-		0,		sin(theta),	cos(theta),  0,
-		0,		0,			0,			 1
-	};
-	M1x4ToVector3(ConvertToM1x4() * rvx);
-	LocalToWorld(pos + offset);
-}
-
-inline void Vector3::rotateV3_Y(float theta, Vector3 pos, Vector3 offset) {
-	theta = Math::to_radians(theta);
-	WorldToLocal(pos + offset);
-	mat<float, 4, 4> rvy{
-		cos(theta),	0,	sin(theta),  0,
-		0,			1,	0,			 0,
-		-sin(theta),0,	cos(theta),  0,
-		0,			0,	0,			 1
-	};
-	M1x4ToVector3(ConvertToM1x4() * rvy);
-	LocalToWorld(pos + offset);
-}
-
-inline void Vector3::rotateV3_Z(float theta, Vector3 pos, Vector3 offset) {
-	theta = Math::to_radians(theta);
-	WorldToLocal(pos + offset);
-	mat<float, 4, 4> rvz{
-		cos(theta), -sin(theta),	0, 0,
-		sin(theta), cos(theta),		0, 0,
-		0,			0,				1, 0,
-		0,			0,				0, 1
-	};
-	M1x4ToVector3(ConvertToM1x4() * rvz);
-	LocalToWorld(pos + offset);
-}
-
-inline void Vector3::ProjToScreen(mat<float, 4, 4> ProjMat) {
-	M1x4ToVector3(proj_mult(ConvertToM1x4(), ProjMat));
-	x += 1.0f; y += 1.0f;
-	x *= 0.5f * (float)screenWidth;
-	y *= 0.5f * (float)screenHeight;
-}
-
-inline void Vector3::ProjToScreen(mat<float, 4, 4> ProjMat, float& w) {
-	float _w;
-	M1x4ToVector3(proj_mult(ConvertToM1x4(), ProjMat, _w));
-	x += 1.f; y += 1.f;
-	x *= 0.5f * (float)screenWidth;
-	y *= 0.5f * (float)screenHeight;
-	w = _w;
-}
-
-inline void Vector3::ScreenToWorld(mat<float, 4, 4> ProjMat, mat<float, 4, 4> view, olc::PixelGameEngine* p) {
-	x /= .5f * (float)screenWidth;
-	y /= .5f * (float)screenHeight;
-	x -= 1.f; y -= 1.f; z = -1.f;
-	M1x4ToVector3(unproj_mult(ConvertToM1x4(), inverse(ProjMat)));
-	M1x4ToVector3(unproj_mult(ConvertToM1x4(), inverse(view)));
-}
 
 //attached to entities to allow different forms of checking sides of more complex objects
 struct Edge {
