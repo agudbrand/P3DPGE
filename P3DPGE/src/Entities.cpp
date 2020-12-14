@@ -252,6 +252,9 @@ void PhysEntity::PhysUpdate(float deltaTime) {
 			
 		forces.clear();
 		velocity += acceleration * g_fixedDeltaTime;
+		LOG(velocity.mag());
+		if (velocity.mag() > 8) { velocity.clampMag(8); }
+	
 		rotVelocity += rotAcceleration * g_fixedDeltaTime;
 		rotation += rotVelocity * g_fixedDeltaTime * 10;
 		Vector3 last_vel = V_STORE(velocity, 1);
@@ -427,9 +430,9 @@ std::string Box::str() {
 
 Complex::Complex(std::string file_name, EntityParams, PhysEntityParams) : PhysEntity(EntityArgs, PhysEntityArgs) {
 	mesh = new Mesh();
-	sprite = new olc::Sprite(100, 100);
+	sprite = new olc::Sprite(25, 25);
 
-	ASSERT(LoadFromObjectFile(file_name), "OBJ_LOAD_ERROR");
+	ASSERT(LoadFromObjectFile(file_name, true), "OBJ_LOAD_ERROR");
 	model_name = Math::append_decimal(file_name);
 	//temp fix i guess
 	prev_position = V3ZERO;
@@ -437,11 +440,12 @@ Complex::Complex(std::string file_name, EntityParams, PhysEntityParams) : PhysEn
 
 }
 
-bool Complex::LoadFromObjectFile(std::string file_name) {
+bool Complex::LoadFromObjectFile(std::string file_name, bool hasTexture) {
 	std::ifstream f(file_name);
 	if (!f.is_open()) { return false; }
 
 	std::vector<Vector3> vertices;
+	std::vector<Vector3> textices;
 
 	while (!f.eof()) {
 		char line[128];
@@ -454,17 +458,49 @@ bool Complex::LoadFromObjectFile(std::string file_name) {
 		char junk;
 
 		if (line[0] == 'v') {
-			Vector3 v;
+			if (line[1] == 't') {
+				Vector3 t;
+				s >> junk >> junk >> t.x >> t.y;
+				textices.push_back(t);
 
-			s >> junk >> v.x >> v.y >> v.z;
-			vertices.push_back(v);
+			}
+			else {
+				Vector3 v;
+
+				s >> junk >> v.x >> v.y >> v.z;
+				vertices.push_back(v);
+			}
+			
 		}
+		if (!hasTexture) {
+			if (line[0] == 'f') {
+				int f[3];
+				s >> junk >> f[0] >> f[1] >> f[2];
 
-		if (line[0] == 'f') {
-			int f[3];
-			s >> junk >> f[0] >> f[1] >> f[2];
+				mesh->triangles.push_back(Triangle(vertices[f[0] - 1], vertices[f[1] - 1], vertices[f[2] - 1], this));
+			}
+		}
+		else {
+			if (line[0] == 'f') {
+				s >> junk;
 
-			mesh->triangles.push_back(Triangle(vertices[f[0] - 1], vertices[f[1] - 1], vertices[f[2] - 1], this));
+				std::string tokens[6];
+				int tokenCount = -1;
+
+				while (!s.eof()) {
+					char c = s.get();
+					if (c == ' ' || c == '/') {
+						tokenCount++;
+					}
+					else {
+						tokens[tokenCount].append(1, c);
+					}
+				}
+				tokens[tokenCount].pop_back();
+
+				mesh->triangles.push_back(Triangle( vertices[stoi(tokens[0]) - 1], vertices[stoi(tokens[2]) - 1], vertices[stoi(tokens[4]) - 1],
+						textices[stoi(tokens[1]) - 1], textices[stoi(tokens[3]) - 1], textices[stoi(tokens[5]) - 1], this));
+			}
 		}
 	}
 

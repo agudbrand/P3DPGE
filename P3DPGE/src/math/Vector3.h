@@ -60,7 +60,7 @@ struct Vector3 {
 	float	mag() const;
 	void	normalize();
 	Vector3	normalized() const;
-	Vector3 clampMag(const float& rhs) const;
+	void    clampMag(const float& rhs);
 	float	distanceTo(const Vector3& rhs) const;
 	float	projectOn(Vector3& rhs) const;
 	Vector3 componentOn(Vector3& rhs) const;
@@ -237,9 +237,9 @@ inline Vector3 Vector3::normalized() const {
 	return Vector3(*this);
 }
 
-inline Vector3 Vector3::clampMag(const float& rhs) const {
-	if (this->mag() < rhs) { return *this; }
-	return this->normalized() * rhs;
+inline void Vector3::clampMag(const float& rhs) {
+	if (this->mag() < rhs) {  }
+	else { *this = normalized() * rhs; }
 }
 
 inline float Vector3::distanceTo(const Vector3& rhs) const {

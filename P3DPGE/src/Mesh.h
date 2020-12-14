@@ -74,20 +74,30 @@ struct Triangle {
 		points[2] = p3;
 		copy_points();
 
-		tex_points[0] = t1;
-		tex_points[1] = t2;
-		tex_points[2] = t3;
+		
+
 
 		edges[0] = Edge(p1, p2);
 		edges[1] = Edge(p2, p3);
 		edges[2] = Edge(p3, p1);
 
-		sprite = new olc::Sprite(100, 100);
+		sprite = new olc::Sprite(25, 25);
 
-		LOG((points[2] - points[0]).mag());
-		LOG((points[2] - points[1]).mag());
 		if ((points[2] - points[0]).mag() > (points[2] - points[1]).mag()) {
 			alt_tri = true;
+		
+
+			tex_points[0] = Vector3(0, 1, 1);
+			tex_points[1] = Vector3(0, 0, 1);
+			tex_points[2] = Vector3(1, 0, 1);
+			
+		}
+		else {
+
+
+			tex_points[0] = Vector3(0, 1, 1);
+			tex_points[1] = Vector3(1, 0, 1);
+			tex_points[2] = Vector3(0, 0, 1);
 		}
 
 		this->e = e;

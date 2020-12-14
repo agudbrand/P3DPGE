@@ -146,7 +146,7 @@ struct Complex : public PhysEntity {
 	//for ex he uses a lot of weird ways to get strings
 	//from the obj file that may not be necessary
 	//TODO(e, sushi) generate complex object relative to input position
-	bool LoadFromObjectFile(std::string file_name);
+	bool LoadFromObjectFile(std::string file_name, bool hasTexture = false);
 	bool ContainsPoint(Vector3 point) override;
 	bool ContainsScreenPoint(Vector3 point) override;
 
