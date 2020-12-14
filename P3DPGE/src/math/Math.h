@@ -703,9 +703,3 @@ struct Edge3 {
 	}
 
 };
-
-namespace Debug {
-	static std::string M1x4ToString(mat<float, 1, 4> matrix) {
-		return "(" + std::to_string(matrix.a[0][0]) + ", " + std::to_string(matrix.a[0][1]) + ", " + std::to_string(matrix.a[0][2]) + ", " + std::to_string(matrix.a[0][3]) + ")";
-	}
-};

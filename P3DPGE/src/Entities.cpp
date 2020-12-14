@@ -240,7 +240,7 @@ void PhysEntity::PhysUpdate(float deltaTime) {
 		forces.clear();
 		velocity += acceleration * g_fixedDeltaTime;
 		LOG(velocity.mag());
-		if (velocity.mag() > 8) { velocity.clampMag(8); }
+		if (velocity.mag() > 50) { velocity.clampMag(50); }
 	
 		rotVelocity += rotAcceleration * g_fixedDeltaTime;
 		rotation += rotVelocity * g_fixedDeltaTime * 10;

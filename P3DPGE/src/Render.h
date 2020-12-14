@@ -396,7 +396,7 @@ namespace Render {
 					tr.proj_points[2].x, tr.proj_points[2].y, tr.tex_points[2].x, tr.tex_points[2].y, tr.tex_points[2].z,
 					tr.sprite);
 
-				p->DrawCircle(Math::WorldToScreen2D(tr.sprite_pixel_location(x0, y0), Scene::camera.ProjectionMatrix(), viewMatrix), 10);
+				//p->DrawCircle(Math::WorldToScreen2D(tr.sprite_pixel_location(x0, y0), Scene::camera.ProjectionMatrix(), viewMatrix), 10);
 
 
 				//This has been rendered (lol) useless by textures but
