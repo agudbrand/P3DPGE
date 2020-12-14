@@ -99,12 +99,13 @@ public:
 		Input::Update(this, Time::deltaTime);
 
 		//attempt to separate physics from render
-		if(deltaTime > .25f) deltaTime = .25f;
+		/*if(deltaTime > .25f) deltaTime = .25f;
 		Time::temp += deltaTime;
 		while(Time::temp >= Time::fixedDeltaTime) {
 			Physics::Update(Time::fixedDeltaTime);
 			Time::temp -= Time::fixedDeltaTime;
-		}
+		}*/
+		Physics::Update(Time::fixedDeltaTime);
 
 		Scene::Update(this, Time::deltaTime);
 		Render::Update(this);

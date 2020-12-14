@@ -68,10 +68,10 @@ namespace Time {
 		g_totalTime = totalTime;
 		updateCount += 1;
 
-		//fixedCounter += deltaTime;
-		/*if (fixedCounter > fixedDeltaTime) {
+		fixedCounter += deltaTime;
+		if (fixedCounter > fixedDeltaTime) {
 			FixedUpdate();
-		}*/
+		}
 
 		
 	}
