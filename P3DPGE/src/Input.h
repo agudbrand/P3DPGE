@@ -289,9 +289,9 @@ namespace Input {
 					if (m->Clicked(pos.toVector2(), p)) {
 						if (m->ClickedInTitle(pos.toVector2())) {
 							selectedUI = m;
-							break;
 						}
 						ui_clicked = true;
+						break;
 					}
 					index++;
 				}

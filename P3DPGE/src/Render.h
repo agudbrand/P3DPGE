@@ -48,7 +48,7 @@ namespace Render {
 		int x1, int y1, float u1, float v1, float w1,
 		int x2, int y2, float u2, float v2, float w2,
 		int x3, int y3, float u3, float v3, float w3,
-		olc::Sprite* tex){
+		olc::Sprite* tex){ //TODO(or,delle) this took about 50% CPU time (in release), look into optimizing this
 
 		if (y2 < y1) { std::swap(y1, y2); std::swap(x1, x2); std::swap(u1, u2); std::swap(v1, v2); std::swap(w1, w2); }
 
@@ -115,8 +115,8 @@ namespace Render {
 
 				for (int j = ax; j < bx; j++){
 					tex_u = (1.0f - t) * tex_su + t * tex_eu;
-					tex_v = (1.0f - t) * tex_sv + t * tex_ev;
-					tex_w = (1.0f - t) * tex_sw + t * tex_ew;
+					tex_v = (1.0f - t) * tex_sv + t * tex_ev; //TODO(or,delle) maybe optimize this by moving the u and v 
+					tex_w = (1.0f - t) * tex_sw + t * tex_ew; //calulcutions into the if statement
 
 					if (tex_w > pDepthBuffer[i * screenWidth + j]) {
 						p->Draw(j, i, tex->Sample(tex_u / tex_w, tex_v / tex_w));
@@ -281,14 +281,10 @@ namespace Render {
 	//TODO(r, sushi) this still needs abstracted
 	static void Draw(olc::PixelGameEngine* p) {
 		std::vector<Triangle> drawnTriangles;
-
 		Vector3 light_direction(0, 0, -1);
-
-		
 
 		//store triangles we want to draw for sorting and copy world points to projected points
 		for (auto& t : triangles) {
-			
 			t.copy_points();
 			float light_ray1 = (Scene::light.position - t.points[0]).dot(t.get_normal());
 			//float light_ray2 = (t.points[0] - Scene::light2.position).dot(t.get_normal());
@@ -344,12 +340,8 @@ namespace Render {
 									floor(255 * 1 / dist),
 									floor(255 * 1 / dist),
 									floor(255 * 1 / dist)));
-							
-
 						}
 					}
-
-					
 					drawnTriangles.push_back(clipped[i]);
 				}
 			}
@@ -393,10 +385,6 @@ namespace Render {
 			}
 
 			for (Triangle& tr : listTriangles) {
-
-				
-				
-
 				TexturedTriangle(p,
 					tr.proj_points[0].x, tr.proj_points[0].y, tr.tex_points[0].x, tr.tex_points[0].y, tr.tex_points[0].z,
 					tr.proj_points[1].x, tr.proj_points[1].y, tr.tex_points[1].x, tr.tex_points[1].y, tr.tex_points[1].z,
@@ -451,8 +439,6 @@ namespace Render {
 		//	}
 		//}
 	}
-
-	
 
 	//draw all entities to screen
 	static void Update(olc::PixelGameEngine* p) {

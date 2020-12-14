@@ -128,7 +128,7 @@ struct Triangle {
 	Vector3 sprite_pixel_location(int x, int y) {
 		if (alt_tri) {
 			Vector3 v21 = points[2] - points[1];
-			Vector3 v01 = points[0] - points[1];
+			Vector3 v01 = points[0] - points[1]; //TODO(or,delle) maybe optimize this by combining .mag() calls since they are expensive
 			float xdiv = v21.mag() / (sprite->width);
 			float ydiv = v01.mag() / (sprite->height);
 			Vector3 v0x = points[1] + v21.normalized() * x * xdiv;
