@@ -1,28 +1,27 @@
 #pragma once
-#include "Entities.h"
-#include "Physics.h"
-#include "Mesh.h"
+#include "../internal/olcPixelGameEngine.h"
+#include "../math/Math.h"
 
-//TODO(io,delle,11/17/20) look into heap vs stack memory allocation for the func pointer
 typedef void (*Action)(olc::PixelGameEngine* p);
 
 //temporary UI class placement
-
 //I have no idea if I want UI to be a child of Entity or not yet so for now it will stay
 //as its own class.
-
 //StringDecal height is 7 pixels and width is 8 pixels at a scale of 1 
 
 class UI {
 public:
-
 	Vector2 pos;
 	Vector2 size;
 	olc::Pixel color;
+	bool visible;
+
 	UI() {}
-	UI(Vector2 pos, Vector2 size, olc::Pixel color = olc::WHITE){
+	UI(Vector2 pos, Vector2 size, olc::Pixel color = olc::WHITE, bool visible = true){
 		this->pos = pos;
+		this->size = size;
 		this->color = color;
+		this->visible = visible;
 	}
 
 	virtual void Draw(olc::PixelGameEngine* p) = 0;
@@ -92,28 +91,27 @@ public:
 	}
 };
 
-/*
-Menu layout:
-
-		|-----------------------------------|
-		|				title				|
-		|-----------------------------------|
-		|Button 1 | Button 1 description    |
-		|Button 2 | Button 2 description	|
-		|...      |	...						|
-		|...      |	...						|
-		|...      |	...						|
-		|...      |	...						|
-		|...      |	...						|
-		|-----------------------------------|
-		width of the menu is determined by either inputted size
-		or min width calculated from how many characters there are
 
 
-		currently until i figure out how to place things
-		nicely
-
-*/
+//Menu layout:
+//
+//		|-----------------------------------|
+//		|				title				|
+//		|-----------------------------------|
+//		|Button 1 | Button 1 description    |
+//		|Button 2 | Button 2 description	|
+//		|...      |	...						|
+//		|...      |	...						|
+//		|...      |	...						|
+//		|...      |	...						|
+//		|...      |	...						|
+//		|-----------------------------------|
+//		width of the menu is determined by either inputted size
+//		or min width calculated from how many characters there are
+//
+//
+//		currently until i figure out how to place things
+//		nicely
 
 class Menu : public UI {
 public:
@@ -326,52 +324,3 @@ public:
 	}
 
 };
-
-namespace Scene {
-
-	static std::vector<Entity*> entities;
-	static std::vector<Entity*> debug_layer;
-	static std::vector<UI*> ui_layer;
-
-	static Camera camera;
-	
-	static float yaw;
-	static float pitch;
-
-	static Light light(Vector3(0, 0, 1), Vector3(0, 0, 0));
-	static Light light2(Vector3(1, 0, 0), Vector3(0, -1, 4));
-
-	static void AddEntity(Entity* e) { Scene::entities.push_back(e); }
-
-	static bool paused = false;
-	static bool frame = false;
-
-	static void Init() {
-		
-	}
-
-	static void ManipulateScene(olc::PixelGameEngine* p) {
-
-	}
-
-	//we definitely will not define entire scenes in here
-	//I'm not sure if we should move things from main into here especially how
-	//organized Render above Scene
-	static void Update(olc::PixelGameEngine* p, float deltaTime){
-		
-		//do stuff to the scene here.
-		ManipulateScene(p);
-
-		
-		
-
-	}
-
-
-	static void CleanUp() {
-		
-		
-		
-	}
-
-}

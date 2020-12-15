@@ -960,12 +960,12 @@ namespace olc
 		// State of keyboard		
 		bool		pKeyNewState[256] = { 0 };
 		bool		pKeyOldState[256] = { 0 };
-		HWButton	pKeyboardState[256] = { 0 };
+		//HWButton	pKeyboardState[256] = { 0 };
 
 		// State of mouse
 		bool		pMouseNewState[nMouseButtons] = { 0 };
 		bool		pMouseOldState[nMouseButtons] = { 0 };
-		HWButton	pMouseState[nMouseButtons] = { 0 };
+		//HWButton	pMouseState[nMouseButtons] = { 0 };
 
 		// The main engine thread
 		void		EngineThread();
@@ -996,6 +996,10 @@ namespace olc
 		// NOTE: Items Here are to be deprecated, I have left them in for now
 		// in case you are using them, but they will be removed.
 		// olc::vf2d	vSubPixelOffset = { 0.0f, 0.0f };
+
+	public: //P3DPGE Changes
+		HWButton	pKeyboardState[256] = { 0 };
+		HWButton	pMouseState[nMouseButtons] = { 0 };
 
 		friend class PGEX;
 	};

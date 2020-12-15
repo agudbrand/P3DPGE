@@ -1,6 +1,8 @@
 #pragma once
 #include "../internal/olcPixelGameEngine.h"
 #include "Time.h"
+
+#include "../utils/UsefulDefines.h"
 #include "Vector3.h"
 #include "Vector4.h"
 #include "Matrix3.h"
@@ -11,34 +13,11 @@
 #include <algorithm>
 #include <numeric>
 
-//math constants
-#define M_PI 3.14159265359f
-#define M_E 2.71828f
-#define M_TWOTHIRDS 0.66666666666f
-#define M_ONETWELFTH 0.08333333333f
-
-//vector constants
-#define V3NULL	Vector3(std::numeric_limits<float>::min(), std::numeric_limits<float>::min(), std::numeric_limits<float>::min())
-#define V3ZERO	Vector3()
-#define V3ONE	Vector3(1, 1, 1)
-#define V3XU	Vector3(1, 0, 0)
-#define V3YU	Vector3(0, 1, 0)
-#define V3ZU	Vector3(0, 0, 1)
-#define V3RIGHT		Vector3(1, 0, 0)
-#define V3LEFT		Vector3(-1, 0, 0)
-#define V3UP		Vector3(0, 1, 0)
-#define V3DOWN		Vector3(0, -1, 0)
-#define V3FORWARD	Vector3(0, 0, 1)
-#define V3BACKWARD	Vector3(0, 0, -1)
-
-#define V2ZERO Vector2()
+#define V2ZERO Vector2(0,0)
 
 //qol defines
 #define RANDCOLOR olc::Pixel(rand() % 255 + 1, rand() % 255 + 1, rand() % 255 + 1)
 #define RANDVEC(a) Vector3(rand() % a + 1, rand() % a + 1, rand() % a + 1)
-
-//physics constants
-#define GRAVITY 9.81f
 
 //useful math things
 //averages vectors over a interval i and returns that average
@@ -207,9 +186,9 @@ inline void Vector3::WorldToLocal(Vector3 offsetFromOrigin) {
 	*this *= Matrix4::TranslationMatrix(offsetFromOrigin).Inverse();
 }
 
-inline void Vector3::ScreenToWorld(Matrix4 ProjMat, Matrix4 view) {
-	x /= .5f * (float)screenWidth;
-	y /= .5f * (float)screenHeight;
+inline void Vector3::ScreenToWorld(Matrix4 ProjMat, Matrix4 view, Vector2 screenDimensions) {
+	x /= .5f * (float)screenDimensions.x;
+	y /= .5f * (float)screenDimensions.y;
 	x -= 1.f; y -= 1.f; z = -1.f;
 	*this = Math::ProjMult(this->ToVector4(), ProjMat.Inverse()).ToVector3();
 	*this = Math::ProjMult(this->ToVector4(), view.Inverse()).ToVector3();
@@ -321,7 +300,7 @@ namespace Math {
 		Vector3 n;
 		for (Vector3 e : v) { n += e; }
 		if (v.size() != 0) return n / v.size();
-		else return V3ZERO;
+		else return Vector3::ZERO;
 	}
 
 	//conversions
@@ -334,20 +313,15 @@ namespace Math {
 	static Vector2 lerpv(Vector2 v1, Vector2 v2, float t) { return  v1 * (1.f - t) + v2 * t; }
 
 	//this function returns a matrix that tells a vector how to look at a specific point in space.
-	static Matrix4 PointAtMatrix(Vector3& pos, Vector3& target, Vector3& up) {
-		up.normalize();
-
+	static Matrix4 PointAtMatrix(const Vector3& pos, const Vector3& target) {
 		//get new forward direction
-		Vector3 newFor = target - pos;
-		newFor.normalize();
+		Vector3 newFor = (target - pos).normalized();
 
 		//get right direction
-		Vector3 newRight = up.cross(newFor);
-		newRight.normalize();
+		Vector3 newRight = Vector3::UP.cross(newFor).normalized();
 
 		//get up direction
-		Vector3 newUp = newRight.cross(newFor);
-		newUp.normalize();
+		Vector3 newUp = newRight.cross(newFor).normalized();
 
 		//make point at matrix
 		return Matrix4(
@@ -409,38 +383,38 @@ namespace Math {
 		return Math::ProjMult(vertex.ToVector4(), viewMatrix);
 	}
 
-	static Vector3 CameraToScreen(Vector3 csVertex, Matrix4 projectionMatrix) {
+	static Vector3 CameraToScreen(Vector3 csVertex, Matrix4 projectionMatrix, Vector2 screenDimensions) {
 		Vector3 vm = Math::ProjMult(csVertex.ToVector4(), projectionMatrix).ToVector3();
 		vm.x += 1.0f; vm.y += 1.0f;
-		vm.x *= 0.5f * (float)screenWidth;
-		vm.y *= 0.5f * (float)screenHeight;
+		vm.x *= 0.5f * (float)screenDimensions.x;
+		vm.y *= 0.5f * (float)screenDimensions.y;
 		return vm;
 	}
 
-	static Vector3 CameraToScreen(Vector3 csVertex, Matrix4 projectionMatrix, float& w) {
+	static Vector3 CameraToScreen(Vector3 csVertex, Matrix4 projectionMatrix, Vector2 screenDimensions, float& w) {
 		Vector4 bleh = csVertex.ToVector4() * projectionMatrix;
 		w = bleh.w;
 		Vector3 vm = bleh.normalized().ToVector3();
 		vm.x += 1.0f; vm.y += 1.0f;
-		vm.x *= 0.5f * (float)screenWidth;
-		vm.y *= 0.5f * (float)screenHeight;
+		vm.x *= 0.5f * (float)screenDimensions.x;
+		vm.y *= 0.5f * (float)screenDimensions.y;
 		return vm;
 	}
 
-	static Vector3 CameraToScreen(Vector4 csVertex, Matrix4 projectionMatrix) {
+	static Vector3 CameraToScreen(Vector4 csVertex, Matrix4 projectionMatrix, Vector2 screenDimensions) {
 		Vector3 vm = Math::ProjMult(csVertex, projectionMatrix).ToVector3();
 		vm.x += 1.0f; vm.y += 1.0f;
-		vm.x *= 0.5f * (float)screenWidth;
-		vm.y *= 0.5f * (float)screenHeight;
+		vm.x *= 0.5f * (float)screenDimensions.x;
+		vm.y *= 0.5f * (float)screenDimensions.y;
 		return vm;
 	}
 
-	static Vector3 WorldToScreen(Vector3 point, Matrix4 ProjMat, Matrix4 ViewMat) {
-		return CameraToScreen(WorldToCamera(point, ViewMat), ProjMat);
+	static Vector3 WorldToScreen(Vector3 point, Matrix4 ProjMat, Matrix4 ViewMat, Vector2 screenDimensions) {
+		return CameraToScreen(WorldToCamera(point, ViewMat), ProjMat, screenDimensions);
 	}
 
-	static Vector2 WorldToScreen2D(Vector3 point, Matrix4 ProjMat, Matrix4 ViewMat) {
-		Vector3 v = CameraToScreen(WorldToCamera(point, ViewMat), ProjMat);
+	static Vector2 WorldToScreen2D(Vector3 point, Matrix4 ProjMat, Matrix4 ViewMat, Vector2 screenDimensions) {
+		Vector3 v = CameraToScreen(WorldToCamera(point, ViewMat), ProjMat, screenDimensions);
 		return Vector2(v.x, v.y);
 	}
 
@@ -449,7 +423,7 @@ namespace Math {
 	static bool ClipLineToZPlanes(Vector3& lineStart, Vector3& lineEnd, float nearZ, float farZ) {
 		//clip to the near plane
 		Vector3 planePoint = Vector3(0, 0, nearZ);
-		Vector3 planeNormal = V3FORWARD;
+		Vector3 planeNormal = Vector3::FORWARD;
 		float d = planeNormal.dot(planePoint);
 		bool startBeyondPlane = planeNormal.dot(lineStart) - d < 0;
 		bool endBeyondPlane = planeNormal.dot(lineEnd) - d < 0;
@@ -466,7 +440,7 @@ namespace Math {
 
 		//clip to the far plane
 		planePoint = Vector3(0, 0, farZ);
-		planeNormal = V3BACKWARD;
+		planeNormal = Vector3::BACK;
 		d = planeNormal.dot(planePoint);
 		startBeyondPlane = planeNormal.dot(lineStart) - d < 0; //TODO(r,delle) test whether this is right
 		endBeyondPlane = planeNormal.dot(lineEnd) - d < 0;
@@ -485,7 +459,7 @@ namespace Math {
 	//cohen-sutherland algorithm https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
 	//the input vectors should be in screen space
 	//returns true if the line can be rendered after clipping, false otherwise
-	static bool ClipLineToBorderPlanes(Vector3& ssLineStart, Vector3& ssLineEnd) {
+	static bool ClipLineToBorderPlanes(Vector3& ssLineStart, Vector3& ssLineEnd, Vector2 screenDimensions) {
 		//clip to the vertical and horizontal planes
 		const int CLIP_INSIDE = 0;
 		const int CLIP_LEFT = 1;
@@ -497,13 +471,13 @@ namespace Math {
 			if (vertex.x < 0) {
 				code |= CLIP_LEFT;
 			}
-			else if (vertex.x > screenWidth) {
+			else if (vertex.x > screenDimensions.x) {
 				code |= CLIP_RIGHT;
 			}
 			if (vertex.y < 0) { //these are inverted because we are in screen space
 				code |= CLIP_TOP;
 			}
-			else if (vertex.y > screenHeight) {
+			else if (vertex.y > screenDimensions.y) {
 				code |= CLIP_BOTTOM;
 			}
 			return code;
@@ -523,7 +497,7 @@ namespace Math {
 				return false;
 			}
 			else {
-				float x, y;
+				float x{}, y{};
 				//select one of the points outside
 				int code = lineEndCode > lineStartCode ? lineEndCode : lineStartCode;
 
@@ -533,12 +507,12 @@ namespace Math {
 					y = 0;
 				}
 				else if (code & CLIP_BOTTOM) { //point is below screen
-					x = ssLineStart.x + (ssLineEnd.x - ssLineStart.x) * (screenHeight - ssLineStart.y) / (ssLineEnd.y - ssLineStart.y);
-					y = screenHeight;
+					x = ssLineStart.x + (ssLineEnd.x - ssLineStart.x) * (screenDimensions.y - ssLineStart.y) / (ssLineEnd.y - ssLineStart.y);
+					y = screenDimensions.y;
 				}
 				else if (code & CLIP_RIGHT) { //point is right of screen
-					y = ssLineStart.y + (ssLineEnd.y - ssLineStart.y) * (screenWidth - ssLineStart.x) / (ssLineEnd.x - ssLineStart.x);
-					x = screenWidth;
+					y = ssLineStart.y + (ssLineEnd.y - ssLineStart.y) * (screenDimensions.x - ssLineStart.x) / (ssLineEnd.x - ssLineStart.x);
+					x = screenDimensions.x;
 				}
 				else if (code & CLIP_LEFT) { //point is left of screen
 					y = ssLineStart.y + (ssLineEnd.y - ssLineStart.y) * (-ssLineStart.x) / (ssLineEnd.x - ssLineStart.x);
@@ -558,148 +532,6 @@ namespace Math {
 				}
 			}
 		}
-	}
-
-};
-
-
-
-//attached to entities to allow different forms of checking sides of more complex objects
-struct Edge {
-	Vector3 p[2];
-	//if lead is true then p[1] is the right most point.
-	//ditto for high but on y
-	bool lead, high;
-
-	Edge() { }
-	Edge(Vector3 point1, Vector3 point2) {
-		p[0] = point1;
-		p[1] = point2;
-		if (point1.x > point2.x) { lead = false; }
-		else { lead = true; }
-		if (point1.y > point2.y) { high = false; }
-		else { high = true; }
-	}
-
-	//TODO(?, sushi) find a good place to update edge, probably in Triangle?
-	void update(Vector3 point1, Vector3 point2) {
-		p[0] = point1;
-		p[1] = point2;
-		if (point1.x > point2.x) { lead = false; }
-		else { lead = true; }
-		if (point1.y > point2.y) { high = false; }
-		else { high = true; }
-	}
-
-	float slope() {
-		if (p[1].x == p[0].x || p[1].y == p[0].y) { return 0; }
-		else { return (p[1].y - p[0].y) / (p[1].x - p[0].x); }
-	}
-
-	//y intercept and range/domain checks
-	float ycross() { return p[!lead].y - slope() * p[!lead].x; }
-	bool within_range(Vector3 point) { return (point.y < p[high].y&& point.y > p[!high].y); }
-	bool within_range(float y_point) { return (y_point < p[high].y&& y_point > p[!high].y); }
-	bool within_domain(Vector3 point) { return (point.x < p[lead].x&& point.x > p[!lead].x); }
-	bool within_domain(float x_point) { return (x_point < p[lead].x&& x_point > p[!lead].x); }
-
-	//returns edge's normal
-	//returns a normal rotated -90
-	Vector3 edge_normal() {
-		Vector3 v = p[1] - p[0];
-		return Vector3(v.y, -v.x, 0).normalized();
-	}
-
-	Vector3 edge_midpoint() {
-		return Vector3((p[0].x + p[1].x) / 2, (p[0].y + p[1].y) / 2, 0);
-	}
-
-	//is a point on, above, or below edge
-	bool on_edge(Vector3 point) {
-		if ((point.y == slope() * point.x + ycross()) && within_domain(point)) { return true; }
-		else { return false; }
-	}
-
-	//these signs may look wrong but its to accomidate for the top left coord (maybe)
-	bool above_edge(Vector3 point) {
-		int bp = 0;
-		if (point.y < slope() * point.x + ycross()) { return true; }
-		else { return false; }
-	}
-
-	bool below_edge(Vector3 point) {
-		if (point.y > slope() * point.x + ycross()) { return true; }
-		else { return false; }
-	}
-
-	bool right_of_edge(Vector3 point) {
-		if ((point.x > (point.y - ycross()) / slope())) { return true; }
-		else { return false; }
-	}
-
-	bool left_of_edge(Vector3 point) {
-		if ((point.x < (point.y - ycross()) / slope())) { return true; }
-		else { return false; }
-	}
-
-	//checks if two edges intersect by finding their line representation's
-	//intersection and then seeing if that point lies on either of them
-	bool edge_intersect(Edge e) {
-		if (slope() == e.slope() && (!on_edge(e.p[0]) || !on_edge(e.p[1]))) { return false; }
-		Vector3 cross = Math::LineIntersect2(slope(), ycross(), e.slope(), e.ycross());
-		if (within_domain(cross) && within_range(cross) &&
-			e.within_domain(cross) && e.within_range(cross)) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-
-	std::string str() { return "{(" + p[0].str() + "), (" + p[1].str() + ")}"; }
-	std::string str2f() { return "{(" + p[0].str2f() + "), (" + p[1].str2f() + ")}"; }
-};
-
-struct Edge3 {
-	Vector3 p[2];
-	//if lead is true then p[1] is the right most point.
-	//ditto for high but on y and for deep on z
-	bool lead, high, deep;
-
-	Edge3() { }
-	Edge3(Vector3 point1, Vector3 point2) {
-		p[0] = point1;
-		p[1] = point2;
-		if (point1.x > point2.x) { lead = false; }
-		else { lead = true; }
-		if (point1.y > point2.y) { high = false; }
-		else { high = true; }
-		if (point1.z > point2.z) { deep = false; }
-		else { deep = true; }
-	}
-
-	bool within_range(Vector3 point)  { return (point.y < p[high].y && point.y > p[!high].y); }
-	bool within_range(float y_point)  { return (y_point < p[high].y && y_point > p[!high].y); }
-	bool within_domain(Vector3 point) { return (point.x < p[lead].x && point.x > p[!lead].x); }
-	bool within_domain(float x_point) { return (x_point < p[lead].x && x_point > p[!lead].x); }
-	bool within_depth(Vector3 point)  { return (point.z < p[deep].z && point.z > p[!deep].z); }
-	bool within_depth(float z_point)  { return (z_point < p[deep].z && z_point > p[!deep].z); }
-
-	std::string str() { return "{(" + p[0].str() + "), (" + p[1].str() + ")}"; }
-	std::string str2f() { return "{(" + p[0].str2f() + "), (" + p[1].str2f() + ")}"; }
-
-	Vector3 edge_midpoint() {
-		return Vector3((p[0].x + p[1].x) / 2, (p[0].y + p[1].y) / 2, (p[0].z + p[1].z) / 2);
-	}
-
-	Vector3 direction() { return p[1] - p[0]; }
-
-	bool point_on_edge(Vector3 p) {
-		if (within_range(p) && within_domain(p) && within_depth(p) &&
-			Math::round2v(direction().normalized()) == Math::round2v(p.normalized())) {
-			return true;
-		}
-		return false;
 	}
 
 };

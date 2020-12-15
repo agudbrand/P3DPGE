@@ -1,6 +1,7 @@
 #pragma once
+#include "../internal/olcPixelGameEngine.h"
+#include "UsefulDefines.h"
 
-#include "internal/olcPixelGameEngine.h"
 #include <any>
 #include <stack>
 #include <chrono>
@@ -10,10 +11,6 @@
 #include <optional>
 #include <iostream>
 #include <windows.h>
-
-#define internal static
-#define local_persist static
-#define global_variable static
 
 //global debug macros
 #define DEBUG if(GLOBAL_DEBUG)
@@ -97,15 +94,6 @@ else return vr; }\
 #   define ASSERT(condition, message) condition;
 #endif
 
-typedef signed char		int8;
-typedef signed short	int16;
-typedef signed int		int32;
-typedef signed long		int64;
-typedef unsigned char	uint8;
-typedef unsigned short	uint16;
-typedef unsigned int	uint32;
-typedef unsigned long	uint64;
-
 using namespace std::chrono;
 
 extern bool GLOBAL_DEBUG;
@@ -148,9 +136,9 @@ namespace Debug {
 
 	//// Console Output ////
 
-	internal HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	internal int color = 7;
-	internal void ResetCmd() { //resets cmd font color to white
+	static_internal HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	static_internal int color = 7;
+	static_internal void ResetCmd() { //resets cmd font color to white
 		color = 7;
 		SetConsoleTextAttribute(hConsole, color);
 	}

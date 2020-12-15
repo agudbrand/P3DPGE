@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Debug.h"
-#include "math/Vector3.h"
+#include "../math/Vector3.h"
 
 //should probably reorganize some of these eventually so they're not global
 

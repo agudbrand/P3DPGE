@@ -1,90 +1,201 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="src">
+      <UniqueIdentifier>{9f348bce-f46c-40d9-b223-f756e1ddd544}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="Header Files\math">
+    <Filter Include="src\math">
       <UniqueIdentifier>{9a52a028-63e7-426c-b2d1-c8fc62cb9ee6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\components">
+      <UniqueIdentifier>{935258c8-baec-4474-b6f0-efe325b48b46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\animation">
+      <UniqueIdentifier>{c60b15ad-ae85-4e9d-811a-0fa2ba3df411}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\internal">
+      <UniqueIdentifier>{ba2fe19b-8980-47ab-b9ce-1b4e3c1ee19f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\utils">
+      <UniqueIdentifier>{64cf791d-a889-4ef5-8c15-4701429a547f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\systems">
+      <UniqueIdentifier>{f07fb1c0-78ba-4efa-8ad3-7aedb53f83dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\components\singletons">
+      <UniqueIdentifier>{157eb905-7685-4230-988f-f2a3d0027f8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\systems\h">
+      <UniqueIdentifier>{324eb69a-40fb-46cf-ada6-ee720a183917}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\systems\cpp">
+      <UniqueIdentifier>{db6e8488-133f-483d-b1d4-74a4df6fad36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\geometry">
+      <UniqueIdentifier>{98761010-368f-4f0f-999e-4ace06bd144d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Entities.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Physics.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Render.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Time.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Debug.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Collider.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\internal\olcPixelGameEngine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\GLOBALS.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\physics\InertiaTensors.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Scene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\math\Math.h">
-      <Filter>Header Files\math</Filter>
+      <Filter>src\math</Filter>
     </ClInclude>
     <ClInclude Include="src\math\Matrix3.h">
-      <Filter>Header Files\math</Filter>
+      <Filter>src\math</Filter>
     </ClInclude>
     <ClInclude Include="src\math\Matrix4.h">
-      <Filter>Header Files\math</Filter>
+      <Filter>src\math</Filter>
     </ClInclude>
     <ClInclude Include="src\math\MatrixN.h">
-      <Filter>Header Files\math</Filter>
+      <Filter>src\math</Filter>
     </ClInclude>
     <ClInclude Include="src\math\Vector3.h">
-      <Filter>Header Files\math</Filter>
+      <Filter>src\math</Filter>
     </ClInclude>
     <ClInclude Include="src\math\Vector4.h">
-      <Filter>Header Files\math</Filter>
+      <Filter>src\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\systems\System.h">
+      <Filter>src\systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\math\Quaternion.h">
+      <Filter>src\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\animation\Armature.h">
+      <Filter>src\animation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\animation\Bone.h">
+      <Filter>src\animation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\Component.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\Transform.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\Physics.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\Mesh.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\Canvas.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\Camera.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\Keybinds.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\Scene.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\MovementState.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\Light.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\internal\olcPixelGameEngine.h">
+      <Filter>src\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EntityAdmin.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\Debug.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\GLOBALS.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\InertiaTensors.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\UI.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\UsefulDefines.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\systems\CameraSystem.h">
+      <Filter>src\systems\h</Filter>
+    </ClInclude>
+    <ClInclude Include="src\systems\RenderCanvasSystem.h">
+      <Filter>src\systems\h</Filter>
+    </ClInclude>
+    <ClInclude Include="src\systems\RenderSceneSystem.h">
+      <Filter>src\systems\h</Filter>
+    </ClInclude>
+    <ClInclude Include="src\systems\ScreenSystem.h">
+      <Filter>src\systems\h</Filter>
+    </ClInclude>
+    <ClInclude Include="src\systems\SimpleMovementSystem.h">
+      <Filter>src\systems\h</Filter>
+    </ClInclude>
+    <ClInclude Include="src\systems\TimeSystem.h">
+      <Filter>src\systems\h</Filter>
+    </ClInclude>
+    <ClInclude Include="src\systems\WorldSystem.h">
+      <Filter>src\systems\h</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\WorldSingleton.h">
+      <Filter>src\components\singletons</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\TimeSingleton.h">
+      <Filter>src\components\singletons</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\ScreenSingleton.h">
+      <Filter>src\components\singletons</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\InputSingleton.h">
+      <Filter>src\components\singletons</Filter>
+    </ClInclude>
+    <ClInclude Include="src\geometry\Edge.h">
+      <Filter>src\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\geometry\Triangle.h">
+      <Filter>src\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\systems\MeshSystem.h">
+      <Filter>src\systems\h</Filter>
+    </ClInclude>
+    <ClInclude Include="src\systems\DebugSystem.h">
+      <Filter>src\systems\h</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Entities.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\main.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Collider.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\utils\GLOBALS.cpp">
+      <Filter>src\utils</Filter>
     </ClCompile>
-    <ClCompile Include="src\GLOBALS.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\systems\WorldSystem.cpp">
+      <Filter>src\systems\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\systems\CameraSystem.cpp">
+      <Filter>src\systems\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\systems\RenderCanvasSystem.cpp">
+      <Filter>src\systems\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\systems\RenderSceneSystem.cpp">
+      <Filter>src\systems\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\systems\ScreenSystem.cpp">
+      <Filter>src\systems\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\systems\SimpleMovementSystem.cpp">
+      <Filter>src\systems\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\systems\TimeSystem.cpp">
+      <Filter>src\systems\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\systems\MeshSystem.cpp">
+      <Filter>src\systems\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\systems\DebugSystem.cpp">
+      <Filter>src\systems\cpp</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

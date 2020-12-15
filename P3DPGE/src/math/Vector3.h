@@ -1,5 +1,5 @@
 #pragma once
-#include "../Debug.h"
+#include "../utils/Debug.h"
 
 struct MatrixN;
 struct Matrix3;
@@ -10,17 +10,30 @@ namespace olc {
 	template<typename V>
 	struct v2d_generic;
 }
-#define Vector2 olc::vf2d
+typedef olc::v2d_generic<float> Vector2;
 
 struct Vector3 {
-	float x;
-	float y;
-	float z;
+	float x{};
+	float y{};
+	float z{};
 
 	Vector3();
 	Vector3(float inX, float inY, float inZ);
 	Vector3(float inX, float inY);
 	Vector3(const Vector3& v);
+
+	//vector constants
+	static const Vector3 ZERO;
+	static const Vector3 ONE;
+	static const Vector3 RIGHT;
+	static const Vector3 LEFT;
+	static const Vector3 UP;
+	static const Vector3 DOWN;
+	static const Vector3 FORWARD;
+	static const Vector3 BACK;
+	static const Vector3 UNITX;
+	static const Vector3 UNITY;
+	static const Vector3 UNITZ;
 
 	void    operator =	(const Vector3& rhs);
 	Vector3 operator *  (const float& rhs) const;
@@ -59,10 +72,6 @@ struct Vector3 {
 	Vector3 yInvert() const;
 	Vector3 zInvert() const;
 
-	void LocalToWorld(Vector3 pos);
-	void WorldToLocal(Vector3 pos);
-	void ScreenToWorld(Matrix4 ProjMat, Matrix4 view);
-
 	//Non-Vector vs Vector interactions defined in Math.h
 	Vector3(const Vector2& v);
 
@@ -76,6 +85,9 @@ struct Vector3 {
 	MatrixN ToM1x3() const;
 	MatrixN ToM1x4(float w) const;
 	Vector3 ProjectionMultiply(Matrix4 projection) const;
+	void LocalToWorld(Vector3 pos);
+	void WorldToLocal(Vector3 pos);
+	void ScreenToWorld(Matrix4 ProjMat, Matrix4 view, Vector2 screenDimensions);
 };
 
 //// Constructors ////
@@ -95,6 +107,20 @@ inline Vector3::Vector3(float inX, float inY) {
 inline Vector3::Vector3(const Vector3& v) {
 	this->x = v.x; this->y = v.y; this->z = v.z;
 }
+
+//// Static Constants ////
+
+inline const Vector3 Vector3::ZERO =		Vector3( 0, 0, 0);
+inline const Vector3 Vector3::ONE =			Vector3( 1, 1, 1);
+inline const Vector3 Vector3::RIGHT =		Vector3( 1, 0, 0);
+inline const Vector3 Vector3::LEFT =		Vector3(-1, 0, 0);
+inline const Vector3 Vector3::UP =			Vector3( 0, 1, 0);
+inline const Vector3 Vector3::DOWN =		Vector3( 0,-1, 0);
+inline const Vector3 Vector3::FORWARD =		Vector3( 0, 0, 1);
+inline const Vector3 Vector3::BACK =		Vector3( 0, 0,-1);
+inline const Vector3 Vector3::UNITX =		Vector3( 1, 0, 0);
+inline const Vector3 Vector3::UNITY =		Vector3( 0, 1, 0);
+inline const Vector3 Vector3::UNITZ =		Vector3( 0, 0, 1);
 
 //// Operators ////
 

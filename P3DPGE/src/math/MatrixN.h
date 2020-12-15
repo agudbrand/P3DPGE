@@ -1,5 +1,5 @@
 #pragma once
-#include "../Debug.h"
+#include "../utils/Debug.h"
 
 struct Vector3;
 
