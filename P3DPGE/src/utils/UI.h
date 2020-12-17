@@ -242,8 +242,8 @@ public:
 
 			//buttons
 			for (Button* b : buttons) {
-				p->FillRect(Vector2(pos.x + border_room - 2, pos.y + row_h - 2 + ((index * bspaceinc) - (bspaceinc * 0.75))), Vector2(b->title.size() * 8 + 4, bspaceinc - 2), olc::Pixel(0, 31, 31));
-				b->pos = Vector2(pos.x + border_room, pos.y + row_h - 3 + ((index * bspaceinc) - (bspaceinc * 0.75))); // could probably do this somewhere else.
+				p->FillRect(Vector2(pos.x + border_room - 2, pos.y + row_h - 2 + ((index * bspaceinc) - (bspaceinc * 0.75f))), Vector2(b->title.size() * 8 + 4, bspaceinc - 2), olc::Pixel(0, 31, 31));
+				b->pos = Vector2(pos.x + border_room, pos.y + row_h - 3 + ((index * bspaceinc) - (bspaceinc * 0.75f))); // could probably do this somewhere else.
 				b->size = Vector2(b->title.size() * 8 + 4, bspaceinc - 2);
 				p->DrawString(Vector2(pos.x + border_room, pos.y - 4 + row_h + ((index * bspaceinc) - (bspaceinc / 2))), b->title);
 				p->DrawString(Vector2(pos.x + border_room + title_max_width + 10, pos.y - 4 + row_h + ((index * bspaceinc) - (bspaceinc / 2))), b->description);

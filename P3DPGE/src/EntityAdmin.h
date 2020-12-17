@@ -25,31 +25,38 @@
 #include "systems/WorldSystem.h"
 
 //debug includes
+#ifdef DEBUG_P3DPGE
 #include "systems/DebugSystem.h"
+#endif
 
 /* TODOs
 * 
-1. create templated component iterator that loops thru a vector and returns an iterator of components of templated type
+1. create templated component tuple iterator that loops thru a vector and returns an iterator of components of templated type
 2. create UI
 3. store Light and other components on entities
 4. think about assigning entities ids based on thier components
 5. cut away alot of triangle
+6. store all components in an object pool so that i can loop over that instead of entities [combine with 1]
+7. Add TODO of fix rotation moving object up
+8. add looking up/down
+9. cleanup all warnings
+10. figure out which rotation is correct: transform vs mesh
 */
 
 /*
 ---Systems Tick Order---||----Read/Write Components-----||-----------Read Only Components--------------
-  olcPixelGameEngine	||								||
+  olcPixelGameEngine	|| InputSingleton				||
   TimeSystem			|| TimeSingleton				||
   SimpleMovementSystem	|| Camera						|| InputSingleton, Keybinds, MovementState
   ScreenSystem			|| ScreenSingleton				||
   CameraSystem			|| Camera						|| ScreenSingleton
-  MeshSystem			|| Mesh
+  MeshSystem			|| Mesh							|| Transform
   RenderSceneSystem		|| Scene						|| Mesh, Camera, InputSingleton, Keybinds,  
 						||								||	ScreenSingleton, TimeSingleton
   RenderCanvasSystem	|| Canvas						|| ScreenSingleton
   WorldSystem			|| WorldSingleton, EntityAdmin, ||
 						||	Entity						||
-  DebugSystem			|| N/A							|| N/A
+  DebugSystem			|| ALL							|| ALL
 */
 
 typedef uint32 EntityID;
@@ -77,11 +84,11 @@ struct EntityAdmin {
 	TimeSingleton* singletonTime;
 	WorldSingleton* singletonWorld;
 
-	Camera* singletonCamera;
-	Keybinds* singletonKeybinds;
-	MovementState* singletonMovementState;
-	Scene* singletonScene;
-	Canvas* singletonCanvas;
+	Camera* tempCamera;
+	Keybinds* tempKeybinds;
+	MovementState* tempMovementState;
+	Scene* tempScene;
+	Canvas* tempCanvas;
 
 	void AddSystem(System* system) {
 		systems.push_back(system);
@@ -121,51 +128,11 @@ struct EntityAdmin {
 		singletonTime = new TimeSingleton();
 		singletonWorld = new WorldSingleton();
 		//temp (maybe) singletons
-		singletonCamera = new Camera();
-		singletonKeybinds = new Keybinds();
-		singletonMovementState = new MovementState();
-		singletonScene = new Scene(p);
-
-		////temporary ui vectors
-		//std::vector<Button*> debug_b = std::vector<Button*>();
-		//debug_b.push_back(new Button(([](olc::PixelGameEngine* p) {
-		//	GLOBAL_DEBUG = !GLOBAL_DEBUG;
-		//	}), "global_debug", ""));
-
-		//debug_b.push_back(new Button(([](olc::PixelGameEngine* p) {
-		//	Box* box = new Box(Vector3(1, 1, 1), Vector3(0, 0, 3));
-		//	Input::selectedEntity = box;
-		//	Physics::AddEntity(box);
-		//	Scene::AddEntity(box);
-		//	}), "spawn_box", ""));
-
-		//debug_b.push_back(new Button(([](olc::PixelGameEngine* p) {
-		//	//sub menu
-		//	}), "spawn_complex", "", true, 0));
-
-		//std::vector<Button*> cspawn_b;
-		//cspawn_b.push_back(new Button(([](olc::PixelGameEngine* p) {
-		//	Complex* complex = new Complex("objects/bmonkey.obj", Vector3(0, 0, 3));
-		//	Input::selectedEntity = complex;
-		//	Physics::AddEntity(complex);
-		//	Scene::AddEntity(complex);
-		//	}), "bmonkey", ""));
-
-		//cspawn_b.push_back(new Button(([](olc::PixelGameEngine* p) {
-		//	Complex* complex = new Complex("objects/whale_ship.obj", Vector3(0, 0, 3));
-		//	Input::selectedEntity = complex;
-		//	Physics::AddEntity(complex);
-		//	Scene::AddEntity(complex);
-		//	}), "whale_ship", ""));
-
-		//cspawn_b.push_back(new Button(([](olc::PixelGameEngine* p) {
-		//	Complex* complex = new Complex("objects/24k_Triangles.obj", Vector3(0, 0, 3));
-		//	Input::selectedEntity = complex;
-		//	Physics::AddEntity(complex);
-		//	Scene::AddEntity(complex);
-		//	}), "24k_Triangles", ""));
-
-		singletonCanvas = new Canvas();
+		tempCamera = new Camera();
+		tempKeybinds = new Keybinds();
+		tempMovementState = new MovementState();
+		tempScene = new Scene(p);
+		tempCanvas = new Canvas();
 
 		//systems initialization
 		AddSystem(new TimeSystem());
@@ -176,7 +143,9 @@ struct EntityAdmin {
 		AddSystem(new RenderSceneSystem());
 		AddSystem(new RenderCanvasSystem());
 		AddSystem(new WorldSystem());
+#ifdef DEBUG_P3DPGE
 		AddSystem(new DebugSystem());
+#endif	
 	}
 
 	void Update(float deltaTime) {
@@ -195,10 +164,10 @@ struct EntityAdmin {
 		delete singletonInput;
 		delete singletonScreen;
 		delete singletonTime;
-		delete singletonCamera;
-		delete singletonKeybinds;
-		delete singletonMovementState;
-		delete singletonScene;
+		delete tempCamera;
+		delete tempKeybinds;
+		delete tempMovementState;
+		delete tempScene;
 	}
 
 };

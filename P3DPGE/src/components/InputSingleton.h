@@ -2,11 +2,21 @@
 #include "Component.h"
 #include "../internal/olcPixelGameEngine.h"
 
-#define LEFT_CLICK		0
-#define RIGHT_CLICK		1
-#define MIDDLE_CLICK	2
-#define MOUSE_BUTTON_4	3
-#define MOUSE_BUTTON_5	4
+#define MOUSE_BUTTON_LEFT		0
+#define MOUSE_BUTTON_RIGHT		1
+#define MOUSE_BUTTON_MIDDLE		2
+#define MOUSE_BUTTON_4			3
+#define MOUSE_BUTTON_5			4
+
+#ifdef KEYBOARD_LAYOUT_US_UK
+#define KEY_SEMICOLON		olc::OEM_1
+#define KEY_BACKSLASH		olc::OEM_2
+#define KEY_TILDE			olc::OEM_3
+#define KEY_LEFT_BRACKET	olc::OEM_4
+#define KEY_FORWARD_SLASH	olc::OEM_5
+#define KEY_RIGHT_BRACKET	olc::OEM_6
+#define KEY_SINGLE_QUOTE	olc::OEM_7
+#endif
 
 struct InputSingleton : public Component {
 	olc::HWButton (*keyboardState)[256];

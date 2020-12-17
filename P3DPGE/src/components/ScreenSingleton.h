@@ -4,13 +4,14 @@
 #include "../internal/olcPixelGameEngine.h"
 
 struct ScreenSingleton : public Component {
-	uint32 width;
-	uint32 height;
-	uint32 resolution;
+	float width;
+	float height;
+	float resolution;
 	Vector2 dimensions;
 	Vector3 dimensionsV3;
 	Vector2 mousePos;
 	Vector3 mousePosV3;
+	bool changedResolution;
 
 	ScreenSingleton(olc::PixelGameEngine* p) {
 		width = p->ScreenWidth();
@@ -20,5 +21,6 @@ struct ScreenSingleton : public Component {
 		dimensionsV3 = Vector3(width, height);
 		mousePos = p->GetMousePos();
 		mousePosV3 = Vector3(mousePos);
+		changedResolution = true;
 	}
 };

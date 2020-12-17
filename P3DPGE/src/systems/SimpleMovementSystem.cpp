@@ -8,7 +8,7 @@
 #include "../components/Keybinds.h"
 #include "../components/MovementState.h"
 
-void SimpleMovementSystem::CameraMovement(float deltaTime, Camera* camera, InputSingleton* input, Keybinds* binds, uint32 moveState) {
+void CameraMovement(float deltaTime, Camera* camera, InputSingleton* input, Keybinds* binds, uint32 moveState) {
 	if(moveState & MOVEMENT_FLYING) {
 		//translate up
 		if(input->KeyPressed(binds->movementFlyingUp) || input->KeyHeld(binds->movementFlyingUp)) {
@@ -82,57 +82,59 @@ void SimpleMovementSystem::CameraMovement(float deltaTime, Camera* camera, Input
 	
 }
 
-void SimpleMovementSystem::Update(float deltaTime, olc::PixelGameEngine* p) {
-	Camera* camera = admin->singletonCamera;
-	InputSingleton* input = admin->singletonInput;
-	Keybinds* binds = admin->singletonKeybinds;
-	uint32 moveState = admin->singletonMovementState->movementState;
-
-	CameraMovement(deltaTime, camera, input, binds, moveState);
-
+void CameraRotation(float deltaTime, Camera* camera, InputSingleton* input, Keybinds* binds) {
 	//camera rotation up
 	if(input->KeyPressed(binds->cameraRotateUp) || input->KeyHeld(binds->cameraRotateUp)) {
 		if(input->KeyHeld(olc::SHIFT)) {
-			camera->rotation.x += 100 * deltaTime;
-		} else if(input->KeyHeld(olc::CTRL)) {
-			camera->rotation.x += 25 * deltaTime;
-		} else {
 			camera->rotation.x += 50 * deltaTime;
+		} else if(input->KeyHeld(olc::CTRL)) {
+			camera->rotation.x += 5 * deltaTime;
+		} else {
+			camera->rotation.x += 25 * deltaTime;
 		}
 	}
 
 	//camera rotation down
 	if(input->KeyPressed(binds->cameraRotateDown) || input->KeyHeld(binds->cameraRotateDown)) {
 		if(input->KeyHeld(olc::SHIFT)) {
-			camera->rotation.x -= 100 * deltaTime;
-		} else if(input->KeyHeld(olc::CTRL)) {
-			camera->rotation.x -= 25 * deltaTime;
-		} else {
 			camera->rotation.x -= 50 * deltaTime;
+		} else if(input->KeyHeld(olc::CTRL)) {
+			camera->rotation.x -= 5 * deltaTime;
+		} else {
+			camera->rotation.x -= 25 * deltaTime;
 		}
 	}
 
 	//camera rotation right
 	if(input->KeyPressed(binds->cameraRotateRight) || input->KeyHeld(binds->cameraRotateRight)) {
 		if(input->KeyHeld(olc::SHIFT)) {
-			camera->rotation.y -= 100 * deltaTime;
-		} else if(input->KeyHeld(olc::CTRL)) {
-			camera->rotation.y -= 25 * deltaTime;
-		} else {
 			camera->rotation.y -= 50 * deltaTime;
+		} else if(input->KeyHeld(olc::CTRL)) {
+			camera->rotation.y -= 5 * deltaTime;
+		} else {
+			camera->rotation.y -= 25 * deltaTime;
 		}
 	}
 
 	//camera rotation left
 	if(input->KeyPressed(binds->cameraRotateLeft) || input->KeyHeld(binds->cameraRotateLeft)) {
 		if(input->KeyHeld(olc::SHIFT)) {
-			camera->rotation.y += 100 * deltaTime;
-		} else if(input->KeyHeld(olc::CTRL)) {
-			camera->rotation.y += 25 * deltaTime;
-		} else {
 			camera->rotation.y += 50 * deltaTime;
+		} else if(input->KeyHeld(olc::CTRL)) {
+			camera->rotation.y += 5 * deltaTime;
+		} else {
+			camera->rotation.y += 25 * deltaTime;
 		}
 	}
-	
-	
+}
+
+void SimpleMovementSystem::Update(float deltaTime, olc::PixelGameEngine* p) {
+	Camera* camera = admin->tempCamera;
+	InputSingleton* input = admin->singletonInput;
+	Keybinds* binds = admin->tempKeybinds;
+	uint32 moveState = admin->tempMovementState->movementState;
+
+	CameraMovement(deltaTime, camera, input, binds, moveState);
+
+	CameraRotation(deltaTime, camera, input, binds);
 }

@@ -9,6 +9,7 @@ struct Triangle {
 	Vector3 points[3];
 	Vector3 proj_points[3];
 	Vector3 tex_points[3];
+	Vector3 proj_tex_points[3];
 	Entity* e;
 
 	olc::Sprite* sprite;
@@ -99,6 +100,7 @@ struct Triangle {
 
 	void copy_points() {
 		for (int p = 0; p < 3; p++) { proj_points[p] = points[p]; }
+		for (int p = 0; p < 3; p++) { proj_tex_points[p] = tex_points[p]; }
 	}
 
 	void update_edges() {
@@ -193,7 +195,7 @@ struct Triangle {
 
 	float get_area() { return Math::TriangleArea(points[1] - points[0], points[2] - points[0]); }
 
-	bool line_intersect(Edge3* e) {
+	bool line_intersect(Edge3D* e) {
 		float t = 0;
 
 		Vector3 i = Math::VectorPlaneIntersect(points[0], get_normal(), e->p[0], e->p[1], t);

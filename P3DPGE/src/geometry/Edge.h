@@ -1,6 +1,8 @@
 #pragma once
 #include "../math/Math.h"
 
+struct Entity;
+
 //attached to entities to allow different forms of checking sides of more complex objects
 struct Edge {
 	Vector3 p[2];
@@ -8,7 +10,7 @@ struct Edge {
 	//ditto for high but on y
 	bool lead, high;
 
-	Edge() { }
+	Edge() {}
 	Edge(Vector3 point1, Vector3 point2) {
 		p[0] = point1;
 		p[1] = point2;
@@ -97,14 +99,15 @@ struct Edge {
 	std::string str2f() { return "{(" + p[0].str2f() + "), (" + p[1].str2f() + ")}"; }
 };
 
-struct Edge3 {
+struct Edge3D {
 	Vector3 p[2];
 	//if lead is true then p[1] is the right most point.
 	//ditto for high but on y and for deep on z
 	bool lead, high, deep;
+	Entity* e;
 
-	Edge3() { }
-	Edge3(Vector3 point1, Vector3 point2) {
+	Edge3D() {}
+	Edge3D(Vector3 point1, Vector3 point2) {
 		p[0] = point1;
 		p[1] = point2;
 		if (point1.x > point2.x) { lead = false; }
@@ -139,4 +142,20 @@ struct Edge3 {
 		return false;
 	}
 
+};
+
+struct RenderedEdge3D : public Edge3D {
+	olc::Pixel color;
+
+	RenderedEdge3D(Vector3 point1, Vector3 point2, olc::Pixel color = olc::WHITE) {
+		p[0] = point1;
+		p[1] = point2;
+		if (point1.x > point2.x) { lead = false; }
+		else { lead = true; }
+		if (point1.y > point2.y) { high = false; }
+		else { high = true; }
+		if (point1.z > point2.z) { deep = false; }
+		else { deep = true; }
+		this->color = color;
+	}
 };

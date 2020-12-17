@@ -13,6 +13,8 @@ struct Matrix3 {
 			float _20, float _21, float _22);
 	Matrix3(const Matrix3& m);
 
+	static const Matrix3 IDENTITY;
+
 	float&	operator () (uint32 row, uint32 col);
 	float   operator () (uint32 row, uint32 col) const;
 	void	operator =	(const Matrix3& rhs);
@@ -42,8 +44,7 @@ struct Matrix3 {
 	float Cofactor(int row, int col) const;
 	Matrix3 Adjoint() const;
 	Matrix3 Inverse() const;
-
-	static Matrix3 Identity();
+	
 	static Matrix3 RotationMatrix(Vector3 rotation);
 	static Matrix3 RotationMatrixX(float degrees);
 	static Matrix3 RotationMatrixY(float degrees);
@@ -70,6 +71,15 @@ inline Matrix3::Matrix3(const Matrix3& m) {
 	memcpy(&data, &m.data, 9*sizeof(float));
 }
 
+
+
+
+//// Static Constants ////
+
+inline const Matrix3 Matrix3::IDENTITY = Matrix3(1,0,0,0,1,0,0,0,1);
+
+
+
 //// Operators ////
 
 //element accessor: matrix(row,col)
@@ -78,18 +88,15 @@ inline float& Matrix3::operator () (uint32 row, uint32 col) {
 	return data[3*row + col];
 }
 
+//element accessor [read-only]: matrix(row,col)
 inline float Matrix3::operator () (uint32 row, uint32 col) const {
 	ASSERT(row < 3 && col < 3, "Matrix3 subscript out of bounds");
 	return data[3 * row + col];
 }
 
-//deletes current data, copies properties from rhs, creates a new copy of the data from rhs
+//copies the data from rhs
 inline void	   Matrix3::operator =  (const Matrix3& rhs) {
-	if (&data != &rhs.data) {
-		for(int i = 0; i < 9; ++i) {
-			data[i] = rhs.data[i];
-		}
-	}
+	memcpy(&data, &rhs.data, 9*sizeof(float));
 }
 
 //scalar multiplication
@@ -231,7 +238,6 @@ inline bool    Matrix3::operator	!= (const Matrix3& rhs) const {
 }
 
 
-
 //// Functions ////
 
 //TODO(c,delle) clean up Matrix3.str() and Matrix3.str2F()
@@ -334,14 +340,10 @@ inline Matrix3 Matrix3::Inverse() const {
 	return this->Adjoint() / this->Determinant();
 }
 
-//returns an identity matrix with the given dimensions
-inline Matrix3 Matrix3::Identity() {
-	return Matrix3(1,0,0,0,1,0,0,0,1);
-}
-
 //returns a rotation transformation matrix based on input in degrees
 //rotates over the Y, then Z then X, ref: https://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToMatrix/index.htm
 inline Matrix3 Matrix3::RotationMatrix(Vector3 rotation) {
+	rotation *= TO_RADIANS;
 	float cosX = cosf(rotation.x);
 	float sinX = sinf(rotation.x);
 	float cosY = cosf(rotation.y);
@@ -395,7 +397,7 @@ inline Matrix3 Matrix3::RotationMatrixZ(float degrees) {
 
 //returns a scale matrix where (0,0) = scale.x, (1,1) = scale.y, (2,2) = scale.z
 inline Matrix3 Matrix3::ScaleMatrix(Vector3 scale) {
-	Matrix3 newMatrix = Identity();
+	Matrix3 newMatrix = IDENTITY;
 	newMatrix.data[0] = scale.x;
 	newMatrix.data[4] = scale.y;
 	newMatrix.data[8] = scale.z;

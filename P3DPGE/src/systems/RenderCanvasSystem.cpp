@@ -6,7 +6,7 @@
 #include "../components/ScreenSingleton.h"
 
 void RenderCanvasSystem::Update(float deltaTime, olc::PixelGameEngine* p) {
-	Canvas* canvas = admin->singletonCanvas;
+	Canvas* canvas = admin->tempCanvas;
 	ScreenSingleton* screen = admin->singletonScreen;
 
 	if(!canvas->hideAll) {

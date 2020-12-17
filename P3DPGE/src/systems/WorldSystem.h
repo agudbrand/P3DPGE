@@ -30,6 +30,10 @@ typedef uint32 EntityID;
 struct WorldSystem : public System {
 //// Entity Lifetime Functions ////
 
+	//initializes an entity with no components and adds it to the creation buffer
+	//returns the entity that was created
+	Entity* CreateEntity();
+
 	//initializes an entity with a single component and adds it to the creation buffer
 	//returns the entity that was created
 	Entity* CreateEntity(Component* singleton);
@@ -49,11 +53,20 @@ struct WorldSystem : public System {
 //// Entity Component Functions ////
 
 	//adds a component to the end of an entity's components vector
-	//returns the position in the vector, or -1 if the entity could not be found
+	//returns the position in the vector
 	int32 AddAComponentToEntity(Entity* entity, Component* component);
 
-	//function description goes here
-	void AddComponentsToEntity(Entity* entity, std::vector<Component*> components);
+	//adds components to the end of an entity's components vector
+	//returns the position of the first added component in the entity's vector
+	int32 AddComponentsToEntity(Entity* entity, std::vector<Component*> components);
+
+	//adds a component to the end of the components vector of an entity that already exists in the world
+	//returns the position in the vector, or -1 if the entity could not be found
+	int32 AddAComponentToWorldEntity(Entity* entity, Component* component);
+
+	//adds components to the end of the components vector of an entity that already exists in the world
+	//returns the position of the first added component in the entity's vector, or -1 if the entity could not be found
+	int32 AddComponentsToWorldEntity(Entity* entity, std::vector<Component*> components);
 
 	//returns an entity's component vector
 	//returns 0 if the entity could not be found
@@ -63,7 +76,8 @@ struct WorldSystem : public System {
 	//returns true if successful removal, false otherwise
 	bool RemoveAComponentFromEntity(Entity* entity, Component* component);
 
-	//function description goes here
+	//removes and deletes a component from an entity's components vector
+	//returns true if successful removal, false otherwise
 	bool RemoveComponentsFromEntity(Entity* entity, std::vector<Component*> components);
 
 	//function description goes here

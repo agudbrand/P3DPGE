@@ -6,13 +6,14 @@ struct Vector3;
 struct Matrix3;
 struct Matrix4;
 struct Entity;
+struct Transform;
 
 struct MeshSystem : public System {
 	//function description goes here
-	Mesh* BuildBoxMesh(Entity* e, Vector3 origin, Vector3 halfDimensions);
+	Mesh* BuildBoxMesh(Entity* e, Transform* t, Vector3 halfDimensions);
 
 	//function description goes here
-	Mesh* BuildComplexMesh(Entity* e, Vector3 origin, const char* fileName, bool hasTexture);
+	Mesh* BuildComplexMesh(Entity* e, Transform* t, const char* fileName, bool hasTexture);
 
 	//function description goes here
 	void TranslateMesh(Mesh* mesh, Vector3 translation);

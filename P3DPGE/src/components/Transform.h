@@ -1,7 +1,6 @@
 #pragma once
 #include "Component.h"
-#include "../math/Vector3.h"
-//#include "../math/Quaternion.h"
+#include "../math/Math.h"
 
 struct Transform : public Component {
 	Vector3 position;
@@ -41,5 +40,17 @@ struct Transform : public Component {
 		prevPosition = position;
 		prevRotation = rotation;
 		prevScale = scale;
+	}
+
+	inline Vector3 Up() {
+		return (Vector3::UP * Matrix4::RotationMatrix(rotation)).normalized();
+	}
+
+	inline Vector3 Right() {
+		return (Vector3::RIGHT * Matrix4::RotationMatrix(rotation)).normalized();
+	}
+
+	inline Vector3 Forward() {
+		return (Vector3::FORWARD * Matrix4::RotationMatrix(rotation)).normalized();
 	}
 };

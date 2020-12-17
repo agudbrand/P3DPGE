@@ -1,5 +1,7 @@
 #pragma once
 #define OLC_PGE_APPLICATION
+#define KEYBOARD_LAYOUT_US_UK
+#define DEBUG_P3DPGE
 
 #include "internal/olcPixelGameEngine.h"
 #include "EntityAdmin.h"

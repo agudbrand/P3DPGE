@@ -24,8 +24,8 @@ struct Keybinds : public Component {
 	olc::Key debugRenderDisplayEdges;
 
 	Keybinds() {
-		movementFlyingUp =		olc::Q;
-		movementFlyingDown =	olc::E;
+		movementFlyingUp =		olc::E;
+		movementFlyingDown =	olc::Q;
 		movementFlyingForward =	olc::W;
 		movementFlyingBack =	olc::S;
 		movementFlyingRight =	olc::D;

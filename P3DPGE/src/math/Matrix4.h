@@ -14,6 +14,8 @@ struct Matrix4 {
 			float _30, float _31, float _32, float _33);
 	Matrix4(const Matrix4& m);
 
+	static const Matrix4 IDENTITY;
+
 	float&	operator () (uint32 row, uint32 col);
 	float   operator () (uint32 row, uint32 col) const;
 	void	operator =	(const Matrix4& rhs);
@@ -44,7 +46,6 @@ struct Matrix4 {
 	Matrix4 Adjoint() const;
 	Matrix4 Inverse() const;
 
-	static Matrix4 Identity();
 	static Matrix4 RotationMatrix(Vector3 rotation);
 	static Matrix4 RotationMatrixX(float degrees);
 	static Matrix4 RotationMatrixY(float degrees);
@@ -66,15 +67,23 @@ inline Matrix4::Matrix4(float _00, float _01, float _02, float _03,
 				float _10, float _11, float _12, float _13,
 				float _20, float _21, float _22, float _23,
 				float _30, float _31, float _32, float _33) {
-	data[0] = _00; data[1] = _01; data[2] = _02; data[3] = _03;
-	data[4] = _10; data[5] = _11; data[6] = _12; data[7] = _13;
-	data[8] = _20; data[9] = _21; data[10] = _22; data[11] = _23;
+	data[0] = _00;	data[1] = _01;	data[2] = _02;	data[3] = _03;
+	data[4] = _10;	data[5] = _11;	data[6] = _12;	data[7] = _13;
+	data[8] = _20;	data[9] = _21;	data[10] = _22; data[11] = _23;
 	data[12] = _30; data[13] = _31; data[14] = _32; data[15] = _33;
 }
 
 inline Matrix4::Matrix4(const Matrix4& m) {
 	memcpy(&data, &m.data, 16*sizeof(float));
 }
+
+
+
+//// Static Constants ////
+
+inline const Matrix4 Matrix4::IDENTITY = Matrix4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+
+
 
 //// Operators ////
 
@@ -89,13 +98,9 @@ inline float Matrix4::operator () (uint32 row, uint32 col) const {
 	return data[4 * row + col];
 }
 
-//deletes current data, copies properties from rhs, creates a new copy of the data from rhs
+//creates the data from rhs
 inline void	   Matrix4::operator =  (const Matrix4& rhs) {
-	if (&data != &rhs.data) {
-		for(int i = 0; i < 16; ++i) {
-			data[i] = rhs.data[i];
-		}
-	}
+	memcpy(&data, &rhs.data, 16*sizeof(float));
 }
 
 //scalar multiplication
@@ -349,14 +354,10 @@ inline Matrix4 Matrix4::Inverse() const {
 	return this->Adjoint() / this->Determinant();
 }
 
-//returns an identity matrix with the given dimensions
-inline Matrix4 Matrix4::Identity() {
-	return Matrix4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
-}
-
 //returns a rotation transformation matrix based on input in degrees
 //rotates over the Y, then Z then X, ref: https://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToMatrix/index.htm
 inline Matrix4 Matrix4::RotationMatrix(Vector3 rotation) {
+	rotation *= TO_RADIANS;
 	float cosX = cosf(rotation.x);
 	float sinX = sinf(rotation.x);
 	float cosY = cosf(rotation.y);
@@ -423,7 +424,7 @@ inline Matrix4 Matrix4::TranslationMatrix(Vector3 translation) {
 
 //returns a scale matrix where (0,0) = scale.x, (1,1) = scale.y, (2,2) = scale.z
 inline Matrix4 Matrix4::ScaleMatrix(Vector3 scale) {
-	Matrix4 newMatrix = Identity();
+	Matrix4 newMatrix = IDENTITY;
 	newMatrix.data[0] = scale.x;
 	newMatrix.data[4] = scale.y;
 	newMatrix.data[8] = scale.z;
@@ -433,6 +434,7 @@ inline Matrix4 Matrix4::ScaleMatrix(Vector3 scale) {
 //returns a transformation matrix of the combined translation, rotation, and scale matrices from input vectors
 //rotates over the Y, then Z then X
 inline Matrix4 Matrix4::TransformationMatrix(Vector3 translation, Vector3 rotation, Vector3 scale) {
+	rotation *= TO_RADIANS;
 	float cosX = cosf(rotation.x);
 	float sinX = sinf(rotation.x);
 	float cosY = cosf(rotation.y);
@@ -453,6 +455,7 @@ inline Matrix4 Matrix4::TransformationMatrix(Vector3 translation, Vector3 rotati
 //rotates over the Y, then Z then X, ref: https://www.euclideanspace.com/maths/geometry/affine/aroundPoint/index.htm
 inline Matrix4 Matrix4::RotationMatrixAroundPoint(Vector3 pivot, Vector3 rotation) {
 	pivot = -pivot; //gotta negate this for some reason :)
+	rotation *= TO_RADIANS;
 	float cosX = cosf(rotation.x);
 	float sinX = sinf(rotation.x);
 	float cosY = cosf(rotation.y);

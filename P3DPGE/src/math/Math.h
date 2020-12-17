@@ -318,10 +318,16 @@ namespace Math {
 		Vector3 newFor = (target - pos).normalized();
 
 		//get right direction
-		Vector3 newRight = Vector3::UP.cross(newFor).normalized();
+		Vector3 newRight; 
+		if(newFor == Vector3::UP || newFor == Vector3::DOWN) { 
+			newRight = Vector3::RIGHT;
+			//newRight = Vector3(0,.999f,0).cross(newFor);
+		} else {
+			newRight = Vector3::UP.cross(newFor); 
+		}
 
 		//get up direction
-		Vector3 newUp = newRight.cross(newFor).normalized();
+		Vector3 newUp = newRight.cross(newFor); 
 
 		//make point at matrix
 		return Matrix4(
@@ -409,6 +415,14 @@ namespace Math {
 		return vm;
 	}
 
+	static Vector4 CameraToScreenV4(Vector4 csVertex, Matrix4 projectionMatrix, Vector2 screenDimensions) {
+		Vector4 vm = (csVertex * projectionMatrix).normalized();
+		vm.x += 1.0f; vm.y += 1.0f;
+		vm.x *= 0.5f * (float)screenDimensions.x;
+		vm.y *= 0.5f * (float)screenDimensions.y;
+		return vm;
+	}
+
 	static Vector3 WorldToScreen(Vector3 point, Matrix4 ProjMat, Matrix4 ViewMat, Vector2 screenDimensions) {
 		return CameraToScreen(WorldToCamera(point, ViewMat), ProjMat, screenDimensions);
 	}
@@ -417,121 +431,4 @@ namespace Math {
 		Vector3 v = CameraToScreen(WorldToCamera(point, ViewMat), ProjMat, screenDimensions);
 		return Vector2(v.x, v.y);
 	}
-
-	//the input vectors should be in viewMatrix/camera space
-	//returns true if the line can be rendered after clipping, false otherwise
-	static bool ClipLineToZPlanes(Vector3& lineStart, Vector3& lineEnd, float nearZ, float farZ) {
-		//clip to the near plane
-		Vector3 planePoint = Vector3(0, 0, nearZ);
-		Vector3 planeNormal = Vector3::FORWARD;
-		float d = planeNormal.dot(planePoint);
-		bool startBeyondPlane = planeNormal.dot(lineStart) - d < 0;
-		bool endBeyondPlane = planeNormal.dot(lineEnd) - d < 0;
-		float t;
-		if (startBeyondPlane && !endBeyondPlane) {
-			lineStart = Math::VectorPlaneIntersect(planePoint, planeNormal, lineStart, lineEnd, t);
-		}
-		else if (!startBeyondPlane && endBeyondPlane) {
-			lineEnd = Math::VectorPlaneIntersect(planePoint, planeNormal, lineStart, lineEnd, t);
-		}
-		else if (startBeyondPlane && endBeyondPlane) {
-			return false;
-		}
-
-		//clip to the far plane
-		planePoint = Vector3(0, 0, farZ);
-		planeNormal = Vector3::BACK;
-		d = planeNormal.dot(planePoint);
-		startBeyondPlane = planeNormal.dot(lineStart) - d < 0; //TODO(r,delle) test whether this is right
-		endBeyondPlane = planeNormal.dot(lineEnd) - d < 0;
-		if (startBeyondPlane && !endBeyondPlane) {
-			lineStart = Math::VectorPlaneIntersect(planePoint, planeNormal, lineStart, lineEnd, t);
-		}
-		else if (!startBeyondPlane && endBeyondPlane) {
-			lineEnd = Math::VectorPlaneIntersect(planePoint, planeNormal, lineStart, lineEnd, t);
-		}
-		else if (startBeyondPlane && endBeyondPlane) {
-			return false;
-		}
-		return true;
-	}
-
-	//cohen-sutherland algorithm https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
-	//the input vectors should be in screen space
-	//returns true if the line can be rendered after clipping, false otherwise
-	static bool ClipLineToBorderPlanes(Vector3& ssLineStart, Vector3& ssLineEnd, Vector2 screenDimensions) {
-		//clip to the vertical and horizontal planes
-		const int CLIP_INSIDE = 0;
-		const int CLIP_LEFT = 1;
-		const int CLIP_RIGHT = 2;
-		const int CLIP_BOTTOM = 4;
-		const int CLIP_TOP = 8;
-		auto ComputeOutCode = [&](Vector3& vertex) {
-			int code = CLIP_INSIDE;
-			if (vertex.x < 0) {
-				code |= CLIP_LEFT;
-			}
-			else if (vertex.x > screenDimensions.x) {
-				code |= CLIP_RIGHT;
-			}
-			if (vertex.y < 0) { //these are inverted because we are in screen space
-				code |= CLIP_TOP;
-			}
-			else if (vertex.y > screenDimensions.y) {
-				code |= CLIP_BOTTOM;
-			}
-			return code;
-		};
-
-		int lineStartCode = ComputeOutCode(ssLineStart);
-		int lineEndCode = ComputeOutCode(ssLineEnd);
-
-		//loop until all points are within or outside the screen zone
-		while (true) {
-			if (!(lineStartCode | lineEndCode)) {
-				//both points are inside the screen zone
-				return true;
-			}
-			else if (lineStartCode & lineEndCode) {
-				//both points are in the same outside zone
-				return false;
-			}
-			else {
-				float x{}, y{};
-				//select one of the points outside
-				int code = lineEndCode > lineStartCode ? lineEndCode : lineStartCode;
-
-				//clip the points the the screen bounds by finding the intersection point
-				if (code & CLIP_TOP) { //point is above screen
-					x = ssLineStart.x + (ssLineEnd.x - ssLineStart.x) * (-ssLineStart.y) / (ssLineEnd.y - ssLineStart.y);
-					y = 0;
-				}
-				else if (code & CLIP_BOTTOM) { //point is below screen
-					x = ssLineStart.x + (ssLineEnd.x - ssLineStart.x) * (screenDimensions.y - ssLineStart.y) / (ssLineEnd.y - ssLineStart.y);
-					y = screenDimensions.y;
-				}
-				else if (code & CLIP_RIGHT) { //point is right of screen
-					y = ssLineStart.y + (ssLineEnd.y - ssLineStart.y) * (screenDimensions.x - ssLineStart.x) / (ssLineEnd.x - ssLineStart.x);
-					x = screenDimensions.x;
-				}
-				else if (code & CLIP_LEFT) { //point is left of screen
-					y = ssLineStart.y + (ssLineEnd.y - ssLineStart.y) * (-ssLineStart.x) / (ssLineEnd.x - ssLineStart.x);
-					x = 0;
-				}
-
-				//update the vector's points and restart loop
-				if (code == lineStartCode) {
-					ssLineStart.x = x;
-					ssLineStart.y = y;
-					lineStartCode = ComputeOutCode(ssLineStart);
-				}
-				else {
-					ssLineEnd.x = x;
-					ssLineEnd.y = y;
-					lineEndCode = ComputeOutCode(ssLineEnd);
-				}
-			}
-		}
-	}
-
 };

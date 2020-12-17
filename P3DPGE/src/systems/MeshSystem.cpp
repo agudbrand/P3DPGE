@@ -5,17 +5,18 @@
 #include "../components/Mesh.h"
 #include "../components/Transform.h"
 
-Mesh* MeshSystem::BuildBoxMesh(Entity* e, Vector3 position, Vector3 halfDims) {
+Mesh* MeshSystem::BuildBoxMesh(Entity* e, Transform* t, Vector3 halfDims) {
+	
 	std::vector<Triangle> triangles;
 
-	Vector3 p1 = position + -halfDims;
-	Vector3 p2 = position + halfDims.yInvert().zInvert();
-	Vector3 p3 = position + halfDims.xInvert().zInvert();
-	Vector3 p4 = position + halfDims.xInvert().yInvert();
-	Vector3 p5 = position + halfDims.xInvert();
-	Vector3 p6 = position + halfDims.yInvert();
-	Vector3 p7 = position + halfDims.zInvert();
-	Vector3 p8 = position + halfDims;
+	Vector3 p1 = t->position + halfDims.xInvert().yInvert().zInvert();
+	Vector3 p2 = t->position + halfDims.yInvert().zInvert();
+	Vector3 p3 = t->position + halfDims.xInvert().zInvert();
+	Vector3 p4 = t->position + halfDims.xInvert().yInvert();
+	Vector3 p5 = t->position + halfDims.xInvert();
+	Vector3 p6 = t->position + halfDims.yInvert();
+	Vector3 p7 = t->position + halfDims.zInvert();
+	Vector3 p8 = t->position + halfDims;
 
 	//west
 	triangles.push_back(Triangle(p3, p1, p4, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1), e)); 
@@ -36,10 +37,14 @@ Mesh* MeshSystem::BuildBoxMesh(Entity* e, Vector3 position, Vector3 halfDims) {
 	triangles.push_back(Triangle(p7, p2, p1, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1), e)); 
 	triangles.push_back(Triangle(p7, p1, p3, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1), e)); 
 
-	return new Mesh(triangles);
+	Mesh* m = new Mesh(triangles);
+	m->entity = e;
+	RotateMesh(m, Matrix4::RotationMatrixAroundPoint(t->position, t->rotation));
+	ScaleMesh(m, Matrix3::ScaleMatrix(t->scale));
+	return m;
 }
 
-Mesh* MeshSystem::BuildComplexMesh(Entity* e, Vector3 origin, const char* fileName, bool hasTexture) {
+Mesh* MeshSystem::BuildComplexMesh(Entity* e, Transform* t, const char* fileName, bool hasTexture) {
 	std::ifstream f(fileName);
 	if (!f.is_open()) { return 0; }
 	
@@ -95,7 +100,11 @@ Mesh* MeshSystem::BuildComplexMesh(Entity* e, Vector3 origin, const char* fileNa
 		}
 	}
 
-	return new Mesh(triangles);
+	Mesh* m = new Mesh(triangles);
+	m->entity = e;
+	RotateMesh(m, Matrix4::RotationMatrixAroundPoint(t->position, t->rotation));
+	ScaleMesh(m, Matrix3::ScaleMatrix(t->scale));
+	return m;
 }
 
 void MeshSystem::TranslateMesh(Mesh* mesh, Vector3 translation) {

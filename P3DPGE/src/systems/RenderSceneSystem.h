@@ -1,10 +1,11 @@
 #pragma once
 #include "System.h"
 
-struct Triangle;
+/*struct Triangle;
 struct Vector3;
 struct Scene;
 struct ScreenSingleton;
+struct Camera;
 
 namespace olc {
 	struct Sprite;
@@ -20,10 +21,14 @@ struct RenderSceneSystem : public System {
 		olc::Sprite* tex);
 
 	//function description goes here
-	int ClipTriangles(
-		const Vector3& plane_p, Vector3 plane_n, Triangle& in_tri, 
-		Triangle& out_tri1, Triangle& out_tri2);
+	int ClipTriangles(const Vector3& plane_p, Vector3 plane_n, Triangle* in_tri, std::array<Triangle*, 2>& out_tris);
+
+	int RenderTriangles(Scene* scene, Camera* camera, ScreenSingleton* screen, olc::PixelGameEngine* p);
 
 	//function description goes here
+	void Update(float deltaTime, olc::PixelGameEngine* p) override;
+};*/
+
+struct RenderSceneSystem : public System {
 	void Update(float deltaTime, olc::PixelGameEngine* p) override;
 };

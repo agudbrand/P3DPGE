@@ -8,10 +8,10 @@
 #include "../components/ScreenSingleton.h"
 
 Matrix4 CameraSystem::MakeViewMatrix(Camera* camera) {
-	//camera->lookDir = Vector3::FORWARD * Matrix3::RotationMatrix(camera->rotation);
 	camera->lookDir = Vector3::FORWARD * Matrix3::RotationMatrixY(camera->rotation.y);
+	//camera->lookDir = (Vector3::FORWARD * Matrix4::RotationMatrix(camera->rotation.xInvert()));
 	//BUFFERLOG(1, camera->lookDir);
-	return Math::PointAtMatrix(camera->position, (camera->position + camera->lookDir)).Inverse();
+	return Math::PointAtMatrix(camera->position, camera->position+camera->lookDir).Inverse();
 }
 
 Matrix4 CameraSystem::MakeProjectionMatrix(Camera* camera, ScreenSingleton* screen) {
@@ -19,15 +19,15 @@ Matrix4 CameraSystem::MakeProjectionMatrix(Camera* camera, ScreenSingleton* scre
 	float aspectRatio = screen->height / screen->width;
 	float fovRad = 1.f / tanf(camera->fieldOfView * .5f * TO_RADIANS);
 
-	return Matrix4(
+	return Matrix4( //NOTE setting (1,1) to negative flips the y-axis, but it might cause problems somewhere
 		aspectRatio * fovRad,	0,		0,												0,
-		0,						fovRad, 0,												0,
+		0,						-fovRad, 0,												0,
 		0,						0,		camera->farZ / renderDistance,					1,
 		0,						0,		(-camera->farZ*camera->nearZ) / renderDistance,	0);
 }
 
 void CameraSystem::Update(float deltaTime, olc::PixelGameEngine* p) {
-	Camera* camera = admin->singletonCamera;
+	Camera* camera = admin->tempCamera;
 	ScreenSingleton* screen = admin->singletonScreen;
 
 	camera->viewMatrix = MakeViewMatrix(camera);
