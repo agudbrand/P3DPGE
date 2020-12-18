@@ -39,7 +39,7 @@ public:
 
 	Entity (EntityDefaultParams);
 	virtual ~Entity();
-	virtual bool LineIntersect(Edge3* e);
+	virtual bool LineIntersect(Edge3 e);
 	virtual void Draw(olc::PixelGameEngine* p, Matrix4 ProjMat, Matrix4 view);
 	virtual bool SpecialDraw();
 	//these functions are virtual but aren't implemented

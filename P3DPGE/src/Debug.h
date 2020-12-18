@@ -194,6 +194,9 @@ namespace Debug {
 
 	template<class... T>
 	static std::string ToStringReturn(T... args) { return (ToStringReturn(args) + ...); }
+	
+
+
 
 	//// Call Tracing ////
 
@@ -290,7 +293,6 @@ public:
 			for (int i = container.size(); i < index; i++) {
 				container.push_back(o);
 			}
-
 			return true;
 		}
 		return false;

@@ -306,23 +306,16 @@ namespace Input {
 			if (!ui_clicked) {
 				if (selectedEntity) { selectedEntity->ENTITY_DEBUG = false; selectedEntity = nullptr; }
 				pos.ScreenToWorld(c->ProjectionMatrix(), c->MakeViewMatrix(Scene::yaw));
-				LOG("Screen to world ", pos);
-				
 				pos.WorldToLocal(c->position);
-				LOG("World to local  ", pos);
 				pos.normalize();
-				LOG("Normalize       ", pos);
 				pos *= 1000;
-				LOG("Times 1000      ", pos);
 				pos.LocalToWorld(c->position);
-				LOG("Local to world  ", pos);
-				Line3* ray = new Line3(pos, c->position);
-				LOG(c->position);
+				Edge3 ray = Edge3(c->position, pos);
 				//draw ray if debugging
-				Scene::entities.push_back(ray);
+				Scene::entities.push_back(new Line3(pos, c->position));
 
 				for (Entity* e : Scene::entities) {
-					if (e->LineIntersect(&ray->edge)) {
+					if (e->LineIntersect(ray)) {
 						selectedEntity = e;
 						selectedEntity->ENTITY_DEBUG = true;
 						break;

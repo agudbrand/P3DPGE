@@ -89,11 +89,23 @@ public:
 		Scene::ui_layer.push_back(new Menu(Vector2(50, 50), "debug_menu", "dm", debug_b,
 			std::vector<Menu*>{new Menu(V2ZERO, "complex_spawn", "", cspawn_b)}));
 
+
+		Edge3 e = Edge3(V3ZERO, Vector3(0, 1, 1));
+
+		Vector3 v = (e.p[1] - e.p[0]).normalized() * 2;
+
+		LOG(e.point_on_edge(V3ZERO));
+		LOG(e.point_on_edge(Vector3(0, 1, 1)));
+		LOG(e.point_on_edge(v));
+
 		return true;
 	}
 
 	bool OnUserUpdate(float deltaTime) {
 		Clear(olc::BLACK);
+		float t = 0;
+		Math::round2f(2.5675435f);
+		Math::VectorPlaneIntersect(Vector3(0, 1, 0), Vector3(0, 1, 0), Vector3(0, 0, 0), Vector3(0, 1, 1), t);
 
 		Time::Update(deltaTime);
 		Input::Update(this, Time::deltaTime);

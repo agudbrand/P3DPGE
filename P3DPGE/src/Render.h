@@ -38,12 +38,17 @@ namespace Render {
 	static void Init() {
 		timer = new Timer;
 		Scene::ui_layer.push_back(new Menu(Vector2(80, 50), "BUFFERLOG", "buflog", std::vector<Button*>{}));
+		
+		//DebugTriangle* dtri = new DebugTriangle(Triangle(
+		//	Vector3(0, 0, 1), Vector3(0, 1, 1), Vector3(1, 0, 1), new olc::Sprite(25, 25)));
+		//Scene::entities.push_back(dtri);
+		
 		TIMER_S;
 	}
 
 	//TODO(rc, sushi) change this to take in types and not individual values
 	//in essence this algorithm scans down a triangle and fills each row it occupies
-	//with the texture. this is necessary to account for us clipping triangles.
+	/*with the texture. this is necessary to account for us clipping triangles.
 	void TexturedTriangle(olc::PixelGameEngine* p,
 		int x1, int y1, float u1, float v1, float w1,
 		int x2, int y2, float u2, float v2, float w2,
@@ -169,12 +174,14 @@ namespace Render {
 				float tstep = 1.0f / ((float)(bx - ax));
 				float t = 0.0f;
 
+				
 				for (int j = ax; j < bx; j++){
 					tex_u = (1.0f - t) * tex_su + t * tex_eu;
 					tex_v = (1.0f - t) * tex_sv + t * tex_ev;
 					tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 
 					if (tex_w > pDepthBuffer[i * screenWidth + j]) {
+
 						p->Draw(j, i, tex->Sample(tex_u / tex_w, tex_v / tex_w));
 						pDepthBuffer[i * screenWidth + j] = tex_w;
 					}
@@ -182,7 +189,231 @@ namespace Render {
 				}
 			}
 		}
+	}*/
+
+
+
+	void TexturedTriangle(olc::PixelGameEngine* p, Triangle tri){
+		//int x1, int y1, float u1, float v1, float w1,
+		//int x2, int y2, float u2, float v2, float w2,
+		//int x3, int y3, float u3, float v3, float w3,
+		//olc::Sprite* tex) { //TODO(or,delle) this took about 50% CPU time (in release), look into optimizing this
+		
+		int x1 = tri.proj_points[0].x; int x2 = tri.proj_points[1].x; int x3 = tri.proj_points[2].x;
+		int y1 = tri.proj_points[0].y; int y2 = tri.proj_points[1].y; int y3 = tri.proj_points[2].y;
+		
+		float u1 = tri.tex_points[0].x; float u2 = tri.tex_points[1].x; float u3 = tri.tex_points[2].x;
+		float v1 = tri.tex_points[0].y; float v2 = tri.tex_points[1].y; float v3 = tri.tex_points[2].y;
+		float w1 = tri.tex_points[0].z; float w2 = tri.tex_points[1].z; float w3 = tri.tex_points[2].z;
+
+		Vector3 lpos = Scene::light.position; // do not feel like writing this every time
+
+		//tri.set_normal();
+
+		if (y2 < y1) { std::swap(y1, y2); std::swap(x1, x2); std::swap(u1, u2); std::swap(v1, v2); std::swap(w1, w2); }
+
+		if (y3 < y1) { std::swap(y1, y3); std::swap(x1, x3); std::swap(u1, u3); std::swap(v1, v3); std::swap(w1, w3); }
+
+		if (y3 < y2) { std::swap(y2, y3); std::swap(x2, x3); std::swap(u2, u3); std::swap(v2, v3); std::swap(w2, w3); }
+
+		int dy1 = y2 - y1;
+		int dx1 = x2 - x1;
+		float dv1 = v2 - v1;
+		float du1 = u2 - u1;
+		float dw1 = w2 - w1;
+
+		int dy2 = y3 - y1;
+		int dx2 = x3 - x1;
+		float dv2 = v3 - v1;
+		float du2 = u3 - u1;
+		float dw2 = w3 - w1;
+
+		float tex_u, tex_v, tex_w;
+
+		float dax_step = 0, dbx_step = 0,
+			du1_step = 0, dv1_step = 0,
+			du2_step = 0, dv2_step = 0,
+			dw1_step = 0, dw2_step = 0;
+
+		if (dy1) dax_step = dx1 / (float)abs(dy1);
+		if (dy2) dbx_step = dx2 / (float)abs(dy2);
+
+		if (dy1) du1_step = du1 / (float)abs(dy1);
+		if (dy1) dv1_step = dv1 / (float)abs(dy1);
+		if (dy1) dw1_step = dw1 / (float)abs(dy1);
+
+		if (dy2) du2_step = du2 / (float)abs(dy2);
+		if (dy2) dv2_step = dv2 / (float)abs(dy2);
+		if (dy2) dw2_step = dw2 / (float)abs(dy2);
+
+		if (dy1) {
+			for (int i = y1; i <= y2; i++) {
+				int ax = x1 + (float)(i - y1) * dax_step;
+				int bx = x1 + (float)(i - y1) * dbx_step;
+
+				float tex_su = u1 + (float)(i - y1) * du1_step;
+				float tex_sv = v1 + (float)(i - y1) * dv1_step;
+				float tex_sw = w1 + (float)(i - y1) * dw1_step;
+
+				float tex_eu = u1 + (float)(i - y1) * du2_step;
+				float tex_ev = v1 + (float)(i - y1) * dv2_step;
+				float tex_ew = w1 + (float)(i - y1) * dw2_step;
+
+				if (ax > bx) {
+					std::swap(ax, bx);
+					std::swap(tex_su, tex_eu);
+					std::swap(tex_sv, tex_ev);
+					std::swap(tex_sw, tex_ew);
+				}
+
+				tex_u = tex_su;
+				tex_v = tex_sv;
+				tex_w = tex_sw;
+
+				float tstep = 1.0f / ((float)(bx - ax));
+				float t = 0.0f;
+
+				for (int j = ax; j < bx; j++) {
+					tex_u = (1.0f - t) * tex_su + t * tex_eu;
+					tex_v = (1.0f - t) * tex_sv + t * tex_ev; //TODO(or,delle) maybe optimize this by moving the u and v 
+					tex_w = (1.0f - t) * tex_sw + t * tex_ew; //calulcutions into the if statement
+
+					if (tex_w > pDepthBuffer[i * screenWidth + j]) {
+						//Vector3 dir_to = (t.sprite_pixel_location(x, y) - lpos).normalized();
+						
+						int su = (tex_u / tex_w) * tri.orig->sprite->width;
+						int sv = (tex_v / tex_w) * tri.orig->sprite->height;
+						Edge3 ray = Edge3(lpos, tri.orig->sprite_pixel_location(su, sv));
+
+
+
+						bool collided = false;
+						for (Triangle& tr : triangles) {
+							if (tri.orig != &tr) {
+								if (tr.line_intersect(ray)) {
+									collided = true;
+									break;
+								}
+							}
+						}
+
+						if (!collided) {
+							float dist = (tri.orig->sprite_pixel_location(su, sv) - Scene::light.position).mag();
+							
+
+							tri.orig->sprite->SetPixel(Vector2(su, sv),
+								olc::Pixel(
+									floor(std::clamp(255 * (1 / (dist)), 0.f, 255.f)),
+									floor(std::clamp(255 * (1 / (dist)), 0.f, 255.f)),
+									floor(std::clamp(255 * (1 / (dist)), 0.f, 255.f))));
+						}
+						else {
+							tri.orig->sprite->SetPixel(Vector2(su, sv), olc::BLACK);
+						}
+
+
+						p->Draw(j, i, tri.orig->sprite->Sample(tex_u / tex_w, tex_v / tex_w));
+						pDepthBuffer[i * screenWidth + j] = tex_w;
+					}
+					t += tstep;
+				}
+
+			}
+		}
+
+		dy1 = y3 - y2;
+		dx1 = x3 - x2;
+		dv1 = v3 - v2;
+		du1 = u3 - u2;
+		dw1 = w3 - w2;
+
+		if (dy1) dax_step = dx1 / (float)abs(dy1);
+		if (dy2) dbx_step = dx2 / (float)abs(dy2);
+
+		du1_step = 0, dv1_step = 0;
+		if (dy1) du1_step = du1 / (float)abs(dy1);
+		if (dy1) dv1_step = dv1 / (float)abs(dy1);
+		if (dy1) dw1_step = dw1 / (float)abs(dy1);
+
+		if (dy1) {
+			for (int i = y2; i <= y3; i++) {
+				int ax = x2 + (float)(i - y2) * dax_step;
+				int bx = x1 + (float)(i - y1) * dbx_step;
+
+				float tex_su = u2 + (float)(i - y2) * du1_step;
+				float tex_sv = v2 + (float)(i - y2) * dv1_step;
+				float tex_sw = w2 + (float)(i - y2) * dw1_step;
+
+				float tex_eu = u1 + (float)(i - y1) * du2_step;
+				float tex_ev = v1 + (float)(i - y1) * dv2_step;
+				float tex_ew = w1 + (float)(i - y1) * dw2_step;
+
+				if (ax > bx) {
+					std::swap(ax, bx);
+					std::swap(tex_su, tex_eu);
+					std::swap(tex_sv, tex_ev);
+					std::swap(tex_sw, tex_ew);
+				}
+
+				tex_u = tex_su;
+				tex_v = tex_sv;
+				tex_w = tex_sw;
+
+				float tstep = 1.0f / ((float)(bx - ax));
+				float t = 0.0f;
+
+				int ray_iter = 0.1;
+				Vector3 lpos = Scene::light.position; // do not feel like writing this every time
+
+				for (int j = ax; j < bx; j++) {
+					tex_u = (1.0f - t) * tex_su + t * tex_eu;
+					tex_v = (1.0f - t) * tex_sv + t * tex_ev;
+					tex_w = (1.0f - t) * tex_sw + t * tex_ew;
+
+					if (tex_w > pDepthBuffer[i * screenWidth + j]) {
+
+						int su = (tex_u / tex_w) * tri.orig->sprite->width;
+						int sv = (tex_v / tex_w) * tri.orig->sprite->height;
+						Edge3 ray = Edge3(lpos, tri.orig->sprite_pixel_location(su, sv));
+
+						bool collided = false;
+						for (Triangle& tr : triangles) {
+							if (tri.orig != &tr) {
+								if (tr.line_intersect(ray)) {
+									collided = true;
+									break;
+								}
+							}
+						}
+
+						if (!collided) {
+							float dist = (tri.orig->sprite_pixel_location(su, sv) - Scene::light.position).mag();
+
+
+							tri.orig->sprite->SetPixel(Vector2(su, sv),
+								olc::Pixel(
+									floor(std::clamp(255 * (1 / (dist)), 0.f, 255.f)),
+									floor(std::clamp(255 * (1 / (dist)), 0.f, 255.f)),
+									floor(std::clamp(255 * (1 / (dist)), 0.f, 255.f))));
+						}
+						else {
+							tri.orig->sprite->SetPixel(Vector2(su, sv), olc::BLACK);
+						}
+
+
+						p->Draw(j, i, tri.orig->sprite->Sample(tex_u / tex_w, tex_v / tex_w));
+						pDepthBuffer[i * screenWidth + j] = tex_w;
+					}
+					t += tstep;
+				}
+			}
+		}
 	}
+
+
+
+
+	
 
 	static int ClipTriangles(Vector3 plane_p, Vector3 plane_n, Triangle in_tri, Triangle& out_tri1, Triangle& out_tri2) {
 		plane_n.normalize();
@@ -220,11 +451,14 @@ namespace Render {
 		if (nInsidePointCount == 3) { out_tri1 = in_tri; return 1; }
 		if (nInsidePointCount == 1 && nOutsidePointCount == 2) {
 			out_tri1.color = in_tri.color;
+			out_tri1.sprite = in_tri.sprite;
 			out_tri1.e = in_tri.e;
 
 			//the inside point is valid so we keep it
 			out_tri1.proj_points[0] = *inside_points[0];
 			out_tri1.tex_points[0] = *inside_tex[0];
+
+
 
 			//but the two new points are not where the original triangle intersects with the plane
 			float t;
@@ -248,6 +482,8 @@ namespace Render {
 			out_tri2.color = in_tri.color;
 			out_tri1.e = in_tri.e;
 			out_tri2.e = in_tri.e;
+			out_tri1.sprite = in_tri.sprite;
+			out_tri2.sprite = in_tri.sprite;
 
 			out_tri1.proj_points[0] = *inside_points[0];
 			out_tri1.proj_points[1] = *inside_points[1];
@@ -260,7 +496,6 @@ namespace Render {
 			out_tri1.tex_points[2].y = t * (outside_tex[0]->y - inside_tex[0]->y) + inside_tex[0]->y;
 			out_tri1.tex_points[2].z = t * (outside_tex[0]->z - inside_tex[0]->z) + inside_tex[0]->z;
 
-
 			out_tri2.proj_points[0] = *inside_points[1];
 			out_tri2.tex_points[0] = *inside_tex[1];
 			out_tri2.proj_points[1] = out_tri1.proj_points[2];
@@ -269,6 +504,7 @@ namespace Render {
 			out_tri2.tex_points[2].x = t * (outside_tex[0]->x - inside_tex[1]->x) + inside_tex[1]->x;
 			out_tri2.tex_points[2].y = t * (outside_tex[0]->y - inside_tex[1]->y) + inside_tex[1]->y;
 			out_tri2.tex_points[2].z = t * (outside_tex[0]->z - inside_tex[1]->z) + inside_tex[1]->z;
+
 			return 2;
 		}
 
@@ -283,9 +519,13 @@ namespace Render {
 		std::vector<Triangle> drawnTriangles;
 		Vector3 light_direction(0, 0, -1);
 
+		
+
 		//store triangles we want to draw for sorting and copy world points to projected points
 		for (auto& t : triangles) {
 			t.copy_points();
+			t.set_normal();
+			t.set_area();
 			float light_ray1 = (Scene::light.position - t.points[0]).dot(t.get_normal());
 			//float light_ray2 = (t.points[0] - Scene::light2.position).dot(t.get_normal());
 			
@@ -294,12 +534,18 @@ namespace Render {
 
 			float dp = light_ray1;
 			//float dp = light_direction.dot(t.get_normal());
+
+			
+			//for (int y = 0; y < t.sprite->height; y++) {
+			//	for (int x = 0; x < t.sprite->width - y; x++) {
+			//
+			//		
+			//	}
+			//}
+			//Line3 debugray = Line3(t.sprite_pixel_location(x0, y0), lpos);
+			//debugray.Draw(p, Scene::camera.ProjectionMatrix(), viewMatrix);
+
 			if (t.get_normal().dot(t.midpoint() - Scene::camera.position) < 0) {
-				t.set_color(olc::Pixel(
-					std::clamp(50 * dp,  0.f, 50.f),
-					std::clamp(75 * dp,  0.f, 75.f),
-					std::clamp(200 * dp, 0.f, 200.f)
-				));
 				for (Vector3& n : t.proj_points) {
 					n = Math::WorldToCamera(n, viewMatrix).ToVector3();
 				}
@@ -310,9 +556,6 @@ namespace Render {
 				
 				
 				for (int i = 0; i < clippedTriangles; i++) {
-					//for (Vector3& n : clipped[i].proj_points) {
-					//	n.ProjToScreen(Scene::camera.ProjectionMatrix(p), p, w);
-					//}
 					float w;
 					for (int o = 0; o < 3; o++) {
 						clipped[i].proj_points[o] = Math::CameraToScreen(clipped[i].proj_points[o], projectionMatrix, w);
@@ -321,32 +564,10 @@ namespace Render {
 						clipped[i].tex_points[o].z = 1 / w;
 					}
 
-					clipped[i].e = t.e;
-					clipped[i].sprite = t.sprite;
-					
-					float ti = g_totalTime;
-					for (int ox = 0; ox < 25; ox++) {
-						for (int oy = 0; oy < 25; oy++) {
-							ti += 0.1;
-
-							float dist = (clipped[i].sprite_pixel_location(ox, oy) - Scene::light.position).mag();
-							float dp = (Scene::light.position - clipped[i].points[0]).dot(clipped[i].get_normal());
-
-
-							clipped[i].sprite->SetPixel(Vector2(ox, oy),
-								olc::Pixel(
-									floor(std::clamp(255 * (1 /  (2 * dist)), 0.f, 255.f)),
-									floor(std::clamp(255 * (1 /  (2 * dist)), 0.f, 255.f)),
-									floor(std::clamp(255 * (1 /  (2 * dist)), 0.f, 255.f))));
-							
-
-							//Vector3 dir_to = clipped[i].sprite_pixel_location(ox, oy) - Scene::light.position;
-
-							
-							
-
-						}
-					}
+					//clipped[i].e = t.e;
+					//clipped[i].sprite = t.sprite;
+					clipped[i].orig = &t;
+					clipped[i].color = olc::BLUE;
 					drawnTriangles.push_back(clipped[i]);
 				}
 			}
@@ -383,6 +604,8 @@ namespace Render {
 					for (int wa = 0; wa < trisToAdd; wa++) {
 						clipped[wa].e = t.e;
 						clipped[wa].sprite = t.sprite;
+						clipped[wa].color = olc::RED;
+						clipped[wa].orig = test.orig;
 						listTriangles.push_back(clipped[wa]);
 					}
 				}
@@ -390,14 +613,16 @@ namespace Render {
 			}
 
 			for (Triangle& tr : listTriangles) {
-				TexturedTriangle(p,
-					tr.proj_points[0].x, tr.proj_points[0].y, tr.tex_points[0].x, tr.tex_points[0].y, tr.tex_points[0].z,
-					tr.proj_points[1].x, tr.proj_points[1].y, tr.tex_points[1].x, tr.tex_points[1].y, tr.tex_points[1].z,
-					tr.proj_points[2].x, tr.proj_points[2].y, tr.tex_points[2].x, tr.tex_points[2].y, tr.tex_points[2].z,
-					tr.sprite);
 
+
+
+				//TexturedTriangle(p,
+				//	tr.proj_points[0].x, tr.proj_points[0].y, tr.tex_points[0].x, tr.tex_points[0].y, tr.tex_points[0].z,
+				//	tr.proj_points[1].x, tr.proj_points[1].y, tr.tex_points[1].x, tr.tex_points[1].y, tr.tex_points[1].z,
+				//	tr.proj_points[2].x, tr.proj_points[2].y, tr.tex_points[2].x, tr.tex_points[2].y, tr.tex_points[2].z,
+				//	tr.sprite);
+				TexturedTriangle(p, tr);
 				//p->DrawCircle(Math::WorldToScreen2D(tr.sprite_pixel_location(x0, y0), Scene::camera.ProjectionMatrix(), viewMatrix), 10);
-
 
 				//This has been rendered (lol) useless by textures but
 				//could be used for debugging or something later
@@ -474,10 +699,10 @@ namespace Render {
 			}
 		}
 
-		if (TIMER_GET > 0.01) {
+		if (TIMER_GET > 0.1) {
 			TIMER_E;
-			if (up ? x0 >= 100 - y0 : x0 <= 0) {
-				if (y0 >= 100) {
+			if (up ? x0 >= 25 - y0 : x0 <= 0) {
+				if (y0 >= 25) {
 					y0 = 0;
 					x0 = 0;
 				}

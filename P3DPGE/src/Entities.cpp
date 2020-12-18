@@ -30,17 +30,20 @@ void Entity::SetColor(olc::Pixel newColor) {
 }
 
 //override this later please
-bool Entity::LineIntersect(Edge3* e) {
-	for (Triangle& t : mesh->triangles) {
-		if (t.line_intersect(e)) { return true; }
+bool Entity::LineIntersect(Edge3 e) {
+	if (mesh) {
+		for (Triangle& t : mesh->triangles) {
+			if (t.line_intersect(e)) { return true; }
+		}
 	}
+	
 	return false;
 }
 
 void Entity::Draw(olc::PixelGameEngine* p, Matrix4 ProjMat, Matrix4 view) {
 	//do nothing if not SpecialDraw unless debug is enabled
-	DEBUGE DrawPosition(p, ProjMat, view);
-	DEBUGE DrawVertices(p, ProjMat, view);
+	//DEBUGE DrawPosition(p, ProjMat, view);
+	//DEBUGE DrawVertices(p, ProjMat, view);
 
 	
 
@@ -54,7 +57,7 @@ void Entity::DrawPosition(olc::PixelGameEngine* p, Matrix4 ProjMat, Matrix4 view
 	Vector3 nuposition =  Math::WorldToScreen(position, ProjMat, view);
 	
 	std::vector<Vector3> points;
-	for (Triangle t : mesh->triangles) {
+	for (Triangle& t : mesh->triangles) {
 		for (Vector3 po : t.points) {
 			Vector3 newp = Math::WorldToScreen(po, ProjMat, view);
 			points.push_back(newp);
@@ -238,9 +241,8 @@ void PhysEntity::PhysUpdate(float deltaTime) {
 
 			
 		forces.clear();
-		velocity += acceleration * g_fixedDeltaTime;
-		LOG(velocity.mag());
-		if (velocity.mag() > 50) { velocity.clampMag(50); }
+		velocity += acceleration * g_fixedDeltaTime * 100;
+		if (velocity.mag() > 100) { velocity.clampMag(100); }
 	
 		rotVelocity += rotAcceleration * g_fixedDeltaTime;
 		rotation += rotVelocity * g_fixedDeltaTime * 10;
@@ -555,8 +557,8 @@ std::string Line2::str() {
 }
 
 Line3::Line3(Vector3 endPosition, EntityParams) : Entity(EntityArgs) {
-	mesh = new Mesh();
-	timer = new Timer();
+	//mesh = new Mesh();
+	//timer = new Timer();
 	this->endPosition = endPosition;
 	this->id = id;
 	
@@ -584,7 +586,12 @@ void Line3::Draw(olc::PixelGameEngine* p, Matrix4 ProjMat, Matrix4 view) {
 bool Line3::SpecialDraw() { return true; }
 
 void Line3::SetColor(olc::Pixel newColor) { color = newColor; }
-bool Line3::ContainsPoint(Vector3 point) { return false; }
+bool Line3::ContainsPoint(Vector3 point) { 
+	edge = Edge3(position, endPosition);
+
+	if (edge.point_on_edge(point)) { return true; }
+	else { return false; }
+}
 bool Line3::ContainsScreenPoint(Vector3 point) { return false; }
 void Line3::Update(float deltaTime) {}
 
@@ -604,6 +611,7 @@ std::string Line3::str() {
 
 DebugTriangle::DebugTriangle(Triangle triangle, EntityParams) : Entity(EntityArgs) {
 	mesh = new Mesh(triangle);
+	//sprite = new olc::Sprite(25, 25);
 }
 
 bool DebugTriangle::ContainsPoint(Vector3 point) {
@@ -656,19 +664,17 @@ Matrix4 Camera::ProjectionMatrix() {
 bool Camera::ContainsPoint(Vector3 point) { return false; }
 bool Camera::ContainsScreenPoint(Vector3 point) { return false; }
 
-void Camera::Update(float deltaTime) {
-}
+void Camera::Update(float deltaTime) {}
 
 std::string Camera::str() {
 	std::string s =
-		"tag         " + tag + "\n" +
+		"tag         " + tag				+ "\n" +
 		"id          " + std::to_string(id) + "\n" +
-		"position    " + position.str2f() + "\n" +
-		"rotation    " + rotation.str2f() + "\n" +
-		"scale       " + scale.str2f() + "\n" +
+		"position    " + position.str2f()	+ "\n" +
+		"rotation    " + rotation.str2f()	+ "\n" +
+		"scale       " + scale.str2f()		+ "\n" +
 		"entity_type: camera";
 	return s;
-
 }
 
 //// Light ////
