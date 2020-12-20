@@ -334,7 +334,7 @@ namespace Math {
 			newRight.x, newRight.y, newRight.z, 0,
 			newUp.x,	newUp.y,	newUp.z,	0,
 			newFor.x,	newFor.y,	newFor.z,	0,
-			pos.x,		pos.y,		pos.z,		1
+			pos.x, pos.y, pos.z, 1
 		);
 	}
 

@@ -1,8 +1,9 @@
 #pragma once
 #include "../internal/olcPixelGameEngine.h"
 #include "../math/Math.h"
+#include "../components/Command.h"
 
-typedef void (*Action)(olc::PixelGameEngine* p);
+struct EntityAdmin;
 
 //temporary UI class placement
 //I have no idea if I want UI to be a child of Entity or not yet so for now it will stay
@@ -14,10 +15,13 @@ public:
 	Vector2 pos;
 	Vector2 size;
 	olc::Pixel color;
+
 	bool visible;
+	EntityAdmin* admin;
 
 	UI() {}
-	UI(Vector2 pos, Vector2 size, olc::Pixel color = olc::WHITE, bool visible = true){
+	UI(EntityAdmin* admin, Vector2 pos, Vector2 size, olc::Pixel color = olc::WHITE, bool visible = true){
+		this->admin = admin;
 		this->pos = pos;
 		this->size = size;
 		this->color = color;
@@ -25,7 +29,7 @@ public:
 	}
 
 	virtual void Draw(olc::PixelGameEngine* p) = 0;
-	virtual bool Clicked(Vector2 point, olc::PixelGameEngine* p) { return false; };
+	virtual bool Clicked(Vector2 point) { return false; };
 
 	virtual std::string str() {
 		std::string s = "pos: " + pos.str() + "\n" +
@@ -40,9 +44,7 @@ public:
 
 class Button : public UI {
 public:
-
-	Vector2 size;
-	Action action;
+	Command* command;
 
 	std::string title;
 	std::string description;
@@ -52,16 +54,17 @@ public:
 
 	//pos is defined as the upper left corner of buttons for right now unless
 	//I change it later idk yet
-	Button(Vector2 pos, Vector2 size, Action action, std::string title = "", std::string description = "", olc::Pixel color = olc::WHITE) : UI(pos, size, color) {
-		this->action = action;
+	Button(EntityAdmin* admin, Vector2 pos, Vector2 size, Command* command, std::string title = "", std::string description = "", olc::Pixel color = olc::WHITE) : UI(admin, pos, size, color) {
+		this->command = command;
 		this->title = title;
 		this->description = description;
 	}
 
 	//for buttons to be put in a menu
 	//could make it so buttons determine their own color on a menu
-	Button(Action action, std::string title = "", std::string description = "", bool holds_menu = false, int sub_menu_id = 0, olc::Pixel color = olc::WHITE) {
-		this->action = action;
+	Button(EntityAdmin* admin, Command* command, std::string title = "", std::string description = "", bool holds_menu = false, int sub_menu_id = 0, olc::Pixel color = olc::WHITE) {
+		this->admin = admin;
+		this->command = command;
 		this->title = title;
 		this->description = description;
 		this->holds_menu = holds_menu;
@@ -72,9 +75,9 @@ public:
 		p->FillRect(pos, size, color);
 	}
 
-	bool Clicked(Vector2 point, olc::PixelGameEngine* p) override {
+	bool Clicked(Vector2 point) override {
 		if (Math::PointInRect(size, pos, point)) {
-			action(p);
+			if(command) { command->Exec(admin); }
 			return true;
 		}
 		return false;
@@ -140,8 +143,8 @@ public:
 	int border_room = 10;
 	int height_room = 10;
 
-	Menu(Vector2 pos, std::string title, std::string cl_title, std::vector<Button*> buttons, 
-		std::vector<Menu*> sub_menus = std::vector<Menu*>(), olc::Pixel color = olc::WHITE) : UI(pos, V2ZERO, color) {
+	Menu(EntityAdmin* admin, Vector2 pos, std::string title, std::string cl_title, std::vector<Button*> buttons, 
+		std::vector<Menu*> sub_menus = std::vector<Menu*>(), olc::Pixel color = olc::WHITE) : UI(admin, pos, V2ZERO, color) {
 		this->title = title;
 		this->cl_title = cl_title;
 		this->buttons = buttons;
@@ -150,7 +153,7 @@ public:
 		resize();
 		
 		this->sub_menus = sub_menus;
-		cl_button = new Button(([](olc::PixelGameEngine* p) {}), "X");
+		cl_button = new Button(admin, 0, "X");
 	}
 
 	void calc_min_width() {
@@ -284,10 +287,9 @@ public:
 		return false;
 	}
 
-	bool Clicked(Vector2 point, olc::PixelGameEngine* p) override {
-
+	bool Clicked(Vector2 point) override {
 		if (disp_sub_menu) {
-			if (!sub_menus[sub_disp]->Clicked(point, p)) {
+			if (!sub_menus[sub_disp]->Clicked(point)) {
 				disp_sub_menu = false;
 			}
 			else {
@@ -295,11 +297,11 @@ public:
 			}
 		}
 		if (Math::PointInRect(size, pos, point)) {
-			if (cl_button && cl_button->Clicked(point, p)) {
+			if (cl_button && cl_button->Clicked(point)) {
 				closed = !closed;
 			}
 			for (Button* b : buttons) {
-				if (b->Clicked(point, p)) {
+				if (b->Clicked(point)) {
 					if (b->holds_menu) {
 						disp_sub_menu = true;
 						sub_disp = b->sub_menu_id;

@@ -162,6 +162,12 @@
     <ClInclude Include="src\systems\DebugSystem.h">
       <Filter>src\systems\h</Filter>
     </ClInclude>
+    <ClInclude Include="src\systems\CommandSystem.h">
+      <Filter>src\systems\h</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\Command.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -195,6 +201,9 @@
       <Filter>src\systems\cpp</Filter>
     </ClCompile>
     <ClCompile Include="src\systems\DebugSystem.cpp">
+      <Filter>src\systems\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\systems\CommandSystem.cpp">
       <Filter>src\systems\cpp</Filter>
     </ClCompile>
   </ItemGroup>

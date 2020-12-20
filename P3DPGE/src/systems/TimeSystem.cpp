@@ -3,14 +3,29 @@
 
 #include "../components/TimeSingleton.h"
 
-void TimeSystem::Update(float deltaTime, olc::PixelGameEngine* p) {
+void TimeSystem::Update() {
 	TimeSingleton* time = admin->singletonTime;
 
-	time->totalTime += deltaTime;
-	++time->updateCount;
+	if(!time->paused) {
+		time->deltaTime = admin->p->GetElapsedTime();
+		time->totalTime += time->deltaTime;
+		++time->updateCount;
 
-	time->physicsCounter += deltaTime;
-	if(time->physicsCounter > time->physicsDeltaTime) {
-		time->physicsCounter = 0; //TODO(pr,delle) separate physics ticks from render ticks
+		time->physicsCounter += time->deltaTime;
+		if(time->physicsCounter > time->physicsDeltaTime) {
+			time->physicsCounter = 0; //TODO(pr,delle) separate physics ticks from render ticks
+		}
+	} else if(time->frame) {
+		time->deltaTime = admin->p->GetElapsedTime();
+		time->totalTime += time->deltaTime;
+		++time->updateCount;
+
+		time->physicsCounter += time->deltaTime;
+		if(time->physicsCounter > time->physicsDeltaTime) {
+			time->physicsCounter = 0; //TODO(pr,delle) separate physics ticks from render ticks
+		}
+		time->frame = false;
+	} else {
+		time->deltaTime = 0.f;
 	}
 }

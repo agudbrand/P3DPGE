@@ -15,7 +15,8 @@ struct Scene : public Component {
 	bool WIRE_FRAME				= false;
 	bool DISPLAY_EDGES			= false;
 	bool WIRE_FRAME_NO_TEXTURE	= false;
-	bool TRANSFORM_LOCAL_AXES	= false;
+	bool LOCAL_AXIS				= false;
+	bool GLOBAL_AXIS			= false;
 
 	Scene(olc::PixelGameEngine* p) {
 		triangles = std::vector<Triangle*>();

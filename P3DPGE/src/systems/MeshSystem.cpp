@@ -6,7 +6,6 @@
 #include "../components/Transform.h"
 
 Mesh* MeshSystem::BuildBoxMesh(Entity* e, Transform* t, Vector3 halfDims) {
-	
 	std::vector<Triangle> triangles;
 
 	Vector3 p1 = t->position + halfDims.xInvert().yInvert().zInvert();
@@ -139,7 +138,7 @@ void MeshSystem::TransformMesh(Mesh* mesh, Matrix4 transformation) {
 	}
 }
 
-void MeshSystem::Update(float deltaTime, olc::PixelGameEngine* p) {
+void MeshSystem::Update() {
 	for(auto e : admin->entities) {
 		bool hasMesh = false;
 		bool hasTransform = false;

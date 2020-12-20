@@ -23,6 +23,7 @@
     <ClInclude Include="src\animation\Bone.h" />
     <ClInclude Include="src\components\Camera.h" />
     <ClInclude Include="src\components\Canvas.h" />
+    <ClInclude Include="src\components\Command.h" />
     <ClInclude Include="src\components\Component.h" />
     <ClInclude Include="src\components\Keybinds.h" />
     <ClInclude Include="src\components\Light.h" />
@@ -47,6 +48,7 @@
     <ClInclude Include="src\math\Vector4.h" />
     <ClInclude Include="src\EntityAdmin.h" />
     <ClInclude Include="src\systems\CameraSystem.h" />
+    <ClInclude Include="src\systems\CommandSystem.h" />
     <ClInclude Include="src\systems\DebugSystem.h" />
     <ClInclude Include="src\systems\MeshSystem.h" />
     <ClInclude Include="src\systems\RenderCanvasSystem.h" />
@@ -65,6 +67,7 @@
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\systems\CameraSystem.cpp" />
+    <ClCompile Include="src\systems\CommandSystem.cpp" />
     <ClCompile Include="src\systems\DebugSystem.cpp" />
     <ClCompile Include="src\systems\MeshSystem.cpp" />
     <ClCompile Include="src\systems\RenderCanvasSystem.cpp" />
@@ -168,7 +171,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\src\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
@@ -187,7 +190,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\src\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <SuppressStartupBanner>false</SuppressStartupBanner>
@@ -207,7 +210,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\src\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>

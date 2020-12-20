@@ -11,7 +11,7 @@
 void CameraMovement(float deltaTime, Camera* camera, InputSingleton* input, Keybinds* binds, uint32 moveState) {
 	if(moveState & MOVEMENT_FLYING) {
 		//translate up
-		if(input->KeyPressed(binds->movementFlyingUp) || input->KeyHeld(binds->movementFlyingUp)) {
+		if(input->KeyDown(binds->movementFlyingUp)) {
 			if(input->KeyHeld(olc::SHIFT)) {
 				camera->position.y += 16 * deltaTime;
 			} else if(input->KeyHeld(olc::CTRL)) {
@@ -22,7 +22,7 @@ void CameraMovement(float deltaTime, Camera* camera, InputSingleton* input, Keyb
 		}
 
 		//translate down
-		if(input->KeyPressed(binds->movementFlyingDown) || input->KeyHeld(binds->movementFlyingDown)) {
+		if(input->KeyDown(binds->movementFlyingDown)) {
 			if(input->KeyHeld(olc::SHIFT)) {
 				camera->position.y -= 16 * deltaTime;
 			} else if(input->KeyHeld(olc::CTRL)) {
@@ -36,7 +36,7 @@ void CameraMovement(float deltaTime, Camera* camera, InputSingleton* input, Keyb
 	}
 
 	//translate forward
-	if(input->KeyPressed(binds->movementFlyingForward) || input->KeyHeld(binds->movementFlyingForward)) {
+	if(input->KeyDown(binds->movementFlyingForward)) {
 		if(input->KeyHeld(olc::SHIFT)) {
 			camera->position += camera->lookDir * 16 * deltaTime;
 		} else if(input->KeyHeld(olc::CTRL)) {
@@ -47,7 +47,7 @@ void CameraMovement(float deltaTime, Camera* camera, InputSingleton* input, Keyb
 	}
 
 	//translate back
-	if(input->KeyPressed(binds->movementFlyingBack) || input->KeyHeld(binds->movementFlyingBack)) {
+	if(input->KeyDown(binds->movementFlyingBack)) {
 		if(input->KeyHeld(olc::SHIFT)) {
 			camera->position -= camera->lookDir * 16 * deltaTime;
 		} else if(input->KeyHeld(olc::CTRL)) {
@@ -58,7 +58,7 @@ void CameraMovement(float deltaTime, Camera* camera, InputSingleton* input, Keyb
 	}
 
 	//translate right
-	if(input->KeyPressed(binds->movementFlyingRight) || input->KeyHeld(binds->movementFlyingRight)) {
+	if(input->KeyDown(binds->movementFlyingRight)) {
 		if(input->KeyHeld(olc::SHIFT)) {
 			camera->position -= camera->lookDir.cross(Vector3::UP) * 16 * deltaTime;
 		} else if(input->KeyHeld(olc::CTRL)) {
@@ -69,7 +69,7 @@ void CameraMovement(float deltaTime, Camera* camera, InputSingleton* input, Keyb
 	}
 
 	//translate left
-	if(input->KeyPressed(binds->movementFlyingLeft) || input->KeyHeld(binds->movementFlyingLeft)) {
+	if(input->KeyDown(binds->movementFlyingLeft)) {
 		if(input->KeyHeld(olc::SHIFT)) {
 			camera->position += camera->lookDir.cross(Vector3::UP) * 16 * deltaTime;
 		} else if(input->KeyHeld(olc::CTRL)) {
@@ -128,11 +128,12 @@ void CameraRotation(float deltaTime, Camera* camera, InputSingleton* input, Keyb
 	}
 }
 
-void SimpleMovementSystem::Update(float deltaTime, olc::PixelGameEngine* p) {
-	Camera* camera = admin->tempCamera;
-	InputSingleton* input = admin->singletonInput;
-	Keybinds* binds = admin->tempKeybinds;
-	uint32 moveState = admin->tempMovementState->movementState;
+void SimpleMovementSystem::Update() {
+	Camera*				camera = admin->tempCamera;
+	InputSingleton*		input = admin->singletonInput;
+	Keybinds*			binds = admin->tempKeybinds;
+	uint32				moveState = admin->tempMovementState->movementState;
+	float				deltaTime = admin->singletonTime->deltaTime;
 
 	CameraMovement(deltaTime, camera, input, binds, moveState);
 

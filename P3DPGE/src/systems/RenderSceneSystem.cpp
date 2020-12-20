@@ -253,7 +253,7 @@ int RenderTriangles(Scene* scene, Camera* camera, ScreenSingleton* screen, olc::
 
 		//if the angle between the middle of the triangle and the camera is greater less 90 degrees, it should show
 		if(triNormal.dot(t->midpoint() - camera->position) < 0) {  //TODO(or,delle) see if zClipIndex can remove the .midpoint()
-																   //project points to view/camera space
+	//project points to view/camera space
 			for(Vector3& pp : t->proj_points) {
 				pp = Math::WorldToCamera(pp, camera->viewMatrix).ToVector3();
 			}
@@ -486,28 +486,29 @@ int RenderLines(Scene* scene, Camera* camera, ScreenSingleton* screen, olc::Pixe
 	}
 } //RenderLines
 
-void RenderSceneSystem::Update(float deltaTime, olc::PixelGameEngine* p) {
+void RenderSceneSystem::Update() {
 	Scene* scene = admin->tempScene;
 	Camera* camera = admin->tempCamera;
 	InputSingleton* input = admin->singletonInput;
 	Keybinds* binds = admin->tempKeybinds;
 	ScreenSingleton* screen = admin->singletonScreen;
+	olc::PixelGameEngine* p = admin->p;
 
 //// Keybinds ////
 
 	//toggle wireframe
-	if(input->KeyPressed(binds->debugRenderWireframe) && !input->KeyHeld(olc::CTRL) && !input->KeyHeld(olc::SHIFT)) {
+	if(input->KeyPressed(binds->debugRenderWireframe, NONE_HELD)) {
 		scene->WIRE_FRAME = scene->WIRE_FRAME ? false : true;
 	}
 
 	//toggle wireframe with no textures
-	if(input->KeyPressed(binds->debugRenderWireframe) && input->KeyHeld(olc::SHIFT) && !input->KeyHeld(olc::CTRL)) {
+	if(input->KeyPressed(binds->debugRenderWireframe, SHIFT_HELD)) {
 		scene->WIRE_FRAME_NO_TEXTURE = scene->WIRE_FRAME_NO_TEXTURE ? false : true;
-		scene->TRANSFORM_LOCAL_AXES = scene->TRANSFORM_LOCAL_AXES ? false : true;
+		scene->LOCAL_AXIS = scene->LOCAL_AXIS ? false : true;
 	}
 
 	//toggle edge display
-	if(input->KeyPressed(binds->debugRenderDisplayEdges) && !input->KeyHeld(olc::CTRL) && !input->KeyHeld(olc::SHIFT)) {
+	if(input->KeyPressed(binds->debugRenderDisplayEdges, NONE_HELD)) {
 		scene->DISPLAY_EDGES = scene->DISPLAY_EDGES ? false : true;
 	}
 
@@ -528,14 +529,20 @@ void RenderSceneSystem::Update(float deltaTime, olc::PixelGameEngine* p) {
 			/*if(SpriteRenderer* sr = dynamic_cast<SpriteRenderer*>(comp)) { //idea for 2d drawing
 			
 			}*/
-			if(scene->TRANSFORM_LOCAL_AXES) {
+			if(scene->LOCAL_AXIS) {
 				if(Transform* t = dynamic_cast<Transform*>(comp)) {
-					scene->lines.push_back(new RenderedEdge3D(t->position, t->position + t->Right() * 5,	olc::RED));
-					scene->lines.push_back(new RenderedEdge3D(t->position, t->position + t->Up() * 5,		olc::GREEN));
-					scene->lines.push_back(new RenderedEdge3D(t->position, t->position + t->Forward() * 5,	olc::BLUE));
+					scene->lines.push_back(new RenderedEdge3D(t->position, t->position + t->Right(),	olc::RED));
+					scene->lines.push_back(new RenderedEdge3D(t->position, t->position + t->Up(),		olc::GREEN));
+					scene->lines.push_back(new RenderedEdge3D(t->position, t->position + t->Forward(),	olc::BLUE));
 				}
 			}
 		}
+	}
+
+	//global axis
+	if(scene->GLOBAL_AXIS) {
+		//scene->lines.push_back(new RenderedEdge3D());
+		//TODO(r,delle) implement global axis like in blender
 	}
 
 	scene->lights.push_back(new Light(Vector3(0, 0, 1), Vector3(0, 0, 0))); //TODO replace this with light components on entities
@@ -549,15 +556,16 @@ void RenderSceneSystem::Update(float deltaTime, olc::PixelGameEngine* p) {
 	//render lines
 	int drawnLineCount = RenderLines(scene, camera, screen, p);
 
+	p->DrawCircle(Math::WorldToScreen2D(scene->lights[0]->position, camera->projectionMatrix, camera->viewMatrix, screen->dimensions), 10);
+	p->DrawStringDecal(olc::vf2d(screen->width-300, screen->height - 10), "Tri Total: " + std::to_string(scene->triangles.size()) + "  Tri Drawn: " + std::to_string(drawnTriCount));
+
+
 //// Rendering Cleanup ////
 
 	//cleanup after drawing
 	for(auto l : scene->lights) { if(l->entity == 0) delete l; } //temporary
 	scene->lights.clear();
-	if(scene->TRANSFORM_LOCAL_AXES) { for(Edge3D* l : scene->lines) { if(l->e == 0) delete l; } }
+	for(Edge3D* l : scene->lines) { if(l->e == 0) delete l; }
 	scene->lines.clear();
-
-	p->DrawCircle(Math::WorldToScreen2D(scene->lights[0]->position, camera->projectionMatrix, camera->viewMatrix, screen->dimensions), 10);
-	p->DrawStringDecal(olc::vf2d(screen->width-300, screen->height - 10), "Tri Total: " + std::to_string(scene->triangles.size()) + "  Tri Drawn: " + std::to_string(drawnTriCount));
 
 } //Update

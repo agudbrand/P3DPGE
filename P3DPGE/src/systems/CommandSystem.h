@@ -1,7 +1,7 @@
 #pragma once
 #include "System.h"
 
-struct RenderCanvasSystem : public System {
+struct CommandSystem : public System {
 	void Init() override;
 	void Update() override;
 };

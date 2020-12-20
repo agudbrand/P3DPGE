@@ -30,5 +30,5 @@ struct RenderSceneSystem : public System {
 };*/
 
 struct RenderSceneSystem : public System {
-	void Update(float deltaTime, olc::PixelGameEngine* p) override;
+	void Update() override;
 };

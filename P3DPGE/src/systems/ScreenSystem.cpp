@@ -3,8 +3,9 @@
 
 #include "../components/ScreenSingleton.h"
 
-void ScreenSystem::Update(float deltaTime, olc::PixelGameEngine* p) {
-	ScreenSingleton* screen = admin->singletonScreen;
+void ScreenSystem::Update() {
+	ScreenSingleton*		screen = admin->singletonScreen;
+	olc::PixelGameEngine*	p = admin->p;
 
 	//clear the screen to black
 	p->Clear(olc::BLACK);

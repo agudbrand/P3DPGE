@@ -13,9 +13,11 @@
 #include "components/MovementState.h"
 #include "components/Scene.h"
 #include "components/Canvas.h"
+#include "components/Command.h"
 
 //system includes
 #include "systems/TimeSystem.h"
+#include "systems/CommandSystem.h"
 #include "systems/SimpleMovementSystem.h"
 #include "systems/ScreenSystem.h"
 #include "systems/CameraSystem.h"
@@ -47,12 +49,13 @@
 ---Systems Tick Order---||----Read/Write Components-----||-----------Read Only Components--------------
   olcPixelGameEngine	|| InputSingleton				||
   TimeSystem			|| TimeSingleton				||
+  CommandSystem			|| 
   SimpleMovementSystem	|| Camera						|| InputSingleton, Keybinds, MovementState
   ScreenSystem			|| ScreenSingleton				||
   CameraSystem			|| Camera						|| ScreenSingleton
   MeshSystem			|| Mesh							|| Transform
   RenderSceneSystem		|| Scene						|| Mesh, Camera, InputSingleton, Keybinds,  
-						||								||	ScreenSingleton, TimeSingleton
+						||								||	ScreenSingleton, TimeSingleton, Transform
   RenderCanvasSystem	|| Canvas						|| ScreenSingleton
   WorldSystem			|| WorldSingleton, EntityAdmin, ||
 						||	Entity						||
@@ -77,6 +80,7 @@ struct EntityAdmin {
 	std::map<EntityID, Entity*> entities;
 	//object_pool<Component>* componentsPtr;
 	std::vector<Component*> components;
+	std::map<std::string, Command*> commands;
 
 	//singletons
 	InputSingleton* singletonInput;
@@ -93,6 +97,7 @@ struct EntityAdmin {
 	void AddSystem(System* system) {
 		systems.push_back(system);
 		system->admin = this;
+		system->Init();
 	}
 
 	void RemoveSystem(System* system) {
@@ -116,11 +121,21 @@ struct EntityAdmin {
 		}
 	}
 
+	Command* GetCommand(std::string command) {
+		try {
+			return commands.at(command);
+		} catch(std::exception e) {
+			ASSERT(false, "Command \"" + command + "\" does not exist");
+			return 0;
+		}
+	}
+
 	void Create(olc::PixelGameEngine* p) {
 		this->p = p;
 		systems = std::vector<System*>();
 		entities = std::map<EntityID, Entity*>();
 		components = std::vector<Component*>();
+		commands = std::map<std::string, Command*>();
 
 		//singleton initialization
 		singletonInput = new InputSingleton(p);
@@ -136,6 +151,7 @@ struct EntityAdmin {
 
 		//systems initialization
 		AddSystem(new TimeSystem());
+		AddSystem(new CommandSystem());
 		AddSystem(new SimpleMovementSystem());
 		AddSystem(new ScreenSystem());
 		AddSystem(new CameraSystem());
@@ -150,24 +166,27 @@ struct EntityAdmin {
 
 	void Update(float deltaTime) {
 		for(System* s : systems) {
-			s->Update(deltaTime, p);
+			s->Update();
 		}
 	}
 
 	void Cleanup() {
 		//cleanup collections
 		for(System* s : systems)		{ delete s; }			systems.clear();
-		for(auto it : entities)			{ delete it.second; }	entities.clear();
+		for(auto pair : entities)		{ delete pair.second; }	entities.clear();
 		for(Component* c : components)	{ delete c; }			components.clear();
+		for(auto pair : commands)		{ delete pair.second; }	commands.clear();
 
 		//clean up singletons
 		delete singletonInput;
 		delete singletonScreen;
 		delete singletonTime;
+		delete singletonWorld;
 		delete tempCamera;
 		delete tempKeybinds;
 		delete tempMovementState;
 		delete tempScene;
+		delete tempCanvas;
 	}
 
 };
