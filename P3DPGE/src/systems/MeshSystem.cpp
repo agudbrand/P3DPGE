@@ -1,109 +1,87 @@
 #include "MeshSystem.h"
 #include "../math/Math.h"
-#include "../EntityAdmin.h"
+#include "../geometry/Edge.h"
 
 #include "../components/Mesh.h"
 #include "../components/Transform.h"
+#include "../components/Physics.h"
 
-Mesh* MeshSystem::BuildBoxMesh(Entity* e, Transform* t, Vector3 halfDims) {
-	std::vector<Triangle> triangles;
+#include "../utils/Command.h"
+#include "../components/InputSingleton.h"
+#include "../components/Camera.h"
+#include "../components/Scene.h"
+#include "../components/ScreenSingleton.h"
 
-	Vector3 p1 = t->position + halfDims.xInvert().yInvert().zInvert();
-	Vector3 p2 = t->position + halfDims.yInvert().zInvert();
-	Vector3 p3 = t->position + halfDims.xInvert().zInvert();
-	Vector3 p4 = t->position + halfDims.xInvert().yInvert();
-	Vector3 p5 = t->position + halfDims.xInvert();
-	Vector3 p6 = t->position + halfDims.yInvert();
-	Vector3 p7 = t->position + halfDims.zInvert();
-	Vector3 p8 = t->position + halfDims;
+inline void AddSelectEntityCommand(EntityAdmin* admin) {
+	admin->commands["select_entity"] = new Command([](EntityAdmin* admin) {
+		admin->singletonInput->selectedEntity = nullptr;
+		Vector3 pos = Math::ScreenToWorld(admin->singletonInput->mousePos, admin->currentCamera->projectionMatrix, 
+											admin->currentCamera->viewMatrix, admin->singletonScreen->dimensions);
+		LOG("Screen to world ", pos);
+		pos.WorldToLocal(admin->currentCamera->position);
+		LOG("World to local  ", pos);
+		pos.normalize();
+		LOG("Normalize       ", pos);
+		pos *= 1000;
+		LOG("Times 1000      ", pos);
+		pos.LocalToWorld(admin->currentCamera->position);
+		LOG("Local to world  ", pos);
+		LOG(admin->currentCamera->position);
 
-	//west
-	triangles.push_back(Triangle(p3, p1, p4, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1), e)); 
-	triangles.push_back(Triangle(p3, p4, p5, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1), e)); 
-	//top	
-	triangles.push_back(Triangle(p4, p1, p2, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1), e)); 
-	triangles.push_back(Triangle(p4, p2, p6, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1), e)); 
-	//east	
-	triangles.push_back(Triangle(p8, p6, p2, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1), e)); 
-	triangles.push_back(Triangle(p8, p2, p7, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1), e)); 
-	//bottom
-	triangles.push_back(Triangle(p3, p5, p8, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1), e)); 
-	triangles.push_back(Triangle(p3, p8, p7, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1), e)); 
-	//south	
-	triangles.push_back(Triangle(p5, p4, p6, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1), e)); 
-	triangles.push_back(Triangle(p5, p6, p8, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1), e)); 
-	//north	
-	triangles.push_back(Triangle(p7, p2, p1, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1), e)); 
-	triangles.push_back(Triangle(p7, p1, p3, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1), e)); 
+		//draw ray if debugging
+		RenderedEdge3D* ray = new RenderedEdge3D(pos, admin->currentCamera->position);
+		DEBUG ray->e = (Entity*)1; //to make it not delete every frame
+		DEBUG admin->currentScene->lines.push_back(ray);
 
-	Mesh* m = new Mesh(triangles);
-	m->entity = e;
-	RotateMesh(m, Matrix4::RotationMatrixAroundPoint(t->position, t->rotation));
-	ScaleMesh(m, Matrix3::ScaleMatrix(t->scale));
-	return m;
+		for (Mesh* m : admin->currentScene->meshes) {
+			if (MeshSystem::LineIntersect(m, ray)) {
+				admin->singletonInput->selectedEntity = m->entity;
+				break;
+			}
+		}
+
+		if (!admin->singletonInput->selectedEntity) { ERROR("No object selected"); }
+		//TODO(i,delle) change this to take in an ID once we figure that out
+	}, "select_entity", "select_entity <EntityID>");
 }
 
-Mesh* MeshSystem::BuildComplexMesh(Entity* e, Transform* t, const char* fileName, bool hasTexture) {
-	std::ifstream f(fileName);
-	if (!f.is_open()) { return 0; }
-	
-	std::vector<Triangle> triangles;
-	std::vector<Vector3> vertices;
-	std::vector<Vector3> textices;
+void MeshSystem::Init() {
+	AddSelectEntityCommand(admin);
+}
 
-	while (!f.eof()) {
-		char line[128];
-		f.getline(line, 128);
-		std::stringstream s;
-		s << line;
-		char junk;
-
-		if (line[0] == 'v') {
-			if (line[1] == 't') {
-				Vector3 t;
-				s >> junk >> junk >> t.x >> t.y;
-				textices.push_back(t);
-			} else {
-				Vector3 v;
-				s >> junk >> v.x >> v.y >> v.z;
-				vertices.push_back(v);
+void MeshSystem::Update() {
+	for(auto e : admin->entities) {
+		Mesh* m = 0;
+		Transform* t = 0;
+		Physics* p = 0;
+		for(auto c : e.second->components) {
+			if(Mesh* mesh = dynamic_cast<Mesh*>(c)) {
+				m = mesh;
+			} else if(Transform* transform = dynamic_cast<Transform*>(c)) {
+				t = transform;
+			} else if(Physics* physics = dynamic_cast<Physics*>(c)) {
+				p = physics;
 			}
 		}
-
-		if (!hasTexture) {
-			if (line[0] == 'f') {
-				int f[3];
-				s >> junk >> f[0] >> f[1] >> f[2];
-
-				triangles.push_back(Triangle(vertices[f[0] - 1], vertices[f[1] - 1], vertices[f[2] - 1], e));
+		if(m && t && p) {
+			if(t->position != t->prevPosition) {
+				TranslateMesh(m, t->position - t->prevPosition);
+				t->prevPosition = t->position;
 			}
-		} else {
-			if (line[0] == 'f') {
-				s >> junk;
-				std::string tokens[6];
-				int tokenCount = -1;
-
-				while (!s.eof()) {
-					char c = s.get();
-					if (c == ' ' || c == '/') {
-						tokenCount++;
-					} else {
-						tokens[tokenCount].append(1, c);
-					}
-				}
-				tokens[tokenCount].pop_back();
-
-				triangles.push_back(Triangle( vertices[stoi(tokens[0]) - 1], vertices[stoi(tokens[2]) - 1], vertices[stoi(tokens[4]) - 1],
-					textices[stoi(tokens[1]) - 1], textices[stoi(tokens[3]) - 1], textices[stoi(tokens[5]) - 1], e));
+			if(t->rotation != t->prevRotation) {
+				RotateMesh(m, Matrix4::RotationMatrixAroundPoint(t->position, t->rotation - t->prevRotation));
+				t->prevRotation = t->rotation;
 			}
+			break;
 		}
 	}
+}
 
-	Mesh* m = new Mesh(triangles);
-	m->entity = e;
-	RotateMesh(m, Matrix4::RotationMatrixAroundPoint(t->position, t->rotation));
-	ScaleMesh(m, Matrix3::ScaleMatrix(t->scale));
-	return m;
+bool MeshSystem::LineIntersect(Mesh* mesh, Edge3D* line) {
+	for(Triangle& t : mesh->triangles) {
+		if(t.line_intersect(line)) { return true; }
+	}
+	return false;
 }
 
 void MeshSystem::TranslateMesh(Mesh* mesh, Vector3 translation) {
@@ -138,33 +116,3 @@ void MeshSystem::TransformMesh(Mesh* mesh, Matrix4 transformation) {
 	}
 }
 
-void MeshSystem::Update() {
-	for(auto e : admin->entities) {
-		bool hasMesh = false;
-		bool hasTransform = false;
-		Mesh* m = 0;
-		Transform* t = 0;
-		for(auto c : e.second->components) {
-			if(m = dynamic_cast<Mesh*>(c)) {
-				hasMesh = true;
-			} else if(t = dynamic_cast<Transform*>(c)) {
-				hasTransform = true;
-			}
-			if(hasMesh && hasTransform) {
-				if(t->position != t->prevPosition) {
-					TranslateMesh(m, t->position - t->prevPosition);
-					t->prevPosition = t->position;
-				}
-				if(t->rotation != t->prevRotation) {
-					RotateMesh(m, Matrix4::RotationMatrixAroundPoint(t->position, t->rotation - t->prevRotation));
-					t->prevRotation = t->rotation;
-				}
-				if(t->scale != t->prevScale) {
-					ScaleMesh(m, Matrix3::ScaleMatrix(t->scale - t->prevScale));
-					t->prevScale = t->scale;
-				}
-				break;
-			}
-		}
-	}
-}

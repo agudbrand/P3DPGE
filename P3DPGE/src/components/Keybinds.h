@@ -1,6 +1,5 @@
 #pragma once
 #include "Component.h"
-#include "../internal/olcPixelGameEngine.h"
 
 //TODO(i,delle) look into bit combining so that CTRL = 1024 and SHIFT = 2048
 
@@ -21,7 +20,8 @@ struct Keybinds : public Component {
 
 	//render debug
 	olc::Key debugRenderWireframe;
-	olc::Key debugRenderDisplayEdges;
+	olc::Key debugRenderEdgesNumbers;
+	olc::Key debugRenderDisplayAxis;
 
 	Keybinds() {
 		movementFlyingUp =		olc::E;
@@ -37,7 +37,8 @@ struct Keybinds : public Component {
 		cameraRotateLeft =	olc::LEFT;
 
 		debugRenderWireframe =		olc::COMMA;
-		debugRenderDisplayEdges =	olc::PERIOD;
+		debugRenderEdgesNumbers =	olc::PERIOD;
+		debugRenderDisplayAxis =	INPUT_FORWARDSLASH;
 	}
 
 	//Keybinds(file ...) {} //TODO(i,delle) look into saving/loading keybinds with a file

@@ -1,11 +1,12 @@
 #pragma once
-#include "Component.h"
+#include "Debug.h"
 
 struct EntityAdmin;
 
 typedef void (*CommandAction)(EntityAdmin* admin);
+//typedef void (*CommandActionArgs)(EntityAdmin* admin, std::string args);
 
-struct Command : public Component {
+struct Command {
 	CommandAction action;
 	bool triggered;
 	std::string name;

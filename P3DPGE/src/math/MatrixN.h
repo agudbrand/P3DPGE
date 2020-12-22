@@ -79,9 +79,9 @@ The transformation matrix will follow the format to the right:						|0,				0,			
 */
 
 struct MatrixN {
-	uint32 rows;
-	uint32 cols;
-	uint32 elementCount;
+	uint32 rows = 0;
+	uint32 cols = 0;
+	uint32 elementCount = 0;
 	std::vector<float> data;
 
 	MatrixN() {}
@@ -168,12 +168,12 @@ inline MatrixN::MatrixN(const MatrixN& m) : rows(m.rows), cols(m.cols), elementC
 //element accessor: matrix(row,col)
 inline float& MatrixN::operator () (uint32 row, uint32 col) {
 	ASSERT(row < rows && col < cols, "MatrixN subscript out of bounds");
-	return data[cols*row + col];
+	return data[(size_t)cols*row + col];
 }
 
 inline float  MatrixN::operator () (uint32 row, uint32 col) const {
 	ASSERT(row < rows && col < cols, "MatrixN subscript out of bounds");
-	return data[cols * row + col];
+	return data[(size_t)cols * row + col];
 }
 
 //deletes current data, copies properties from rhs, creates a new copy of the data from rhs
@@ -263,7 +263,7 @@ inline MatrixN  MatrixN::operator *  (const MatrixN& rhs) const{
 	for (int i = 0; i < this->rows; ++i) { //i=m
 		for (int j = 0; j < rhs.cols; ++j) { //j=p
 			for (int k = 0; k < rhs.rows; ++k) { //k=n
-				newMatrix.data[rhs.cols * i + j] += this->data[this->cols * i + k] * rhs.data[rhs.cols * k + j];
+				newMatrix.data[(size_t)rhs.cols * i + j] += this->data[(size_t)this->cols * i + k] * rhs.data[(size_t)rhs.cols * k + j];
 			}
 		}
 	}
@@ -276,7 +276,7 @@ inline void    MatrixN::operator *= (const MatrixN& rhs){
 	for (int i = 0; i < this->rows; ++i) { //i=m
 		for (int j = 0; j < rhs.cols; ++j) { //j=p
 			for (int k = 0; k < rhs.rows; ++k) { //k=n
-				newMatrix.data[rhs.cols * i + j] += this->data[this->cols * i + k] * rhs.data[rhs.cols * k + j];
+				newMatrix.data[(size_t)rhs.cols * i + j] += this->data[(size_t)this->cols * i + k] * rhs.data[(size_t)rhs.cols * k + j];
 			}
 		}
 	}
@@ -414,7 +414,7 @@ inline const std::string MatrixN::str2f() const {
 inline MatrixN MatrixN::Transpose() const{
 	MatrixN newMatrix(cols, rows);
 	for (int i = 0; i < elementCount; ++i) {
-		newMatrix.data[i] = data[cols * (i%rows) + (i/rows)];
+		newMatrix.data[i] = data[(size_t)cols * (i%rows) + (i/rows)];
 	}
 	return newMatrix;
 }
@@ -426,7 +426,7 @@ inline MatrixN MatrixN::Submatrix(std::vector<uint32> inRows, std::vector<uint32
 	MatrixN newMatrix(inRows.size(), inCols.size());
 	for (int i = 0; i < inRows.size(); ++i) {
 		for (int j = 0; j < inCols.size(); ++j) {
-			newMatrix.data[newMatrix.cols * i + j] = data[cols * inRows[i] + inCols[j]];
+			newMatrix.data[(size_t)newMatrix.cols * i + j] = data[(size_t)cols * inRows[i] + inCols[j]];
 		}
 	}
 	return newMatrix;
@@ -442,7 +442,7 @@ inline float MatrixN::Minor(int row, int col) const {
 		if (i == row) continue;
 		for (int j = 0; j < cols; ++j) {
 			if (j == col) continue;
-			newMatrix.data[index++] = data[cols * i + j];
+			newMatrix.data[index++] = data[(size_t)cols * i + j];
 		}
 	}
 	return newMatrix.Determinant();

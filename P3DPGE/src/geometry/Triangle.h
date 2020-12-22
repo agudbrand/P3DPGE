@@ -10,9 +10,9 @@ struct Triangle {
 	Vector3 proj_points[3];
 	Vector3 tex_points[3];
 	Vector3 proj_tex_points[3];
-	Entity* e;
 
-	olc::Sprite* sprite;
+	Entity* e = nullptr;
+	olc::Sprite* sprite = nullptr;
 
 	bool alt_tri = false;
 

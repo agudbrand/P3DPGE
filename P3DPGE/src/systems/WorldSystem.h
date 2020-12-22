@@ -29,6 +29,9 @@ struct EntityAdmin;
 typedef uint32 EntityID;
 
 struct WorldSystem : public System {
+	void Init() override;
+	void Update() override;
+
 //// Entity Lifetime Functions ////
 
 	//initializes an entity with no components and adds it to the creation buffer
@@ -84,7 +87,4 @@ struct WorldSystem : public System {
 	//removes and deletes a component from an entity's components vector
 	//returns true if successful removal, false otherwise
 	static bool RemoveComponentsFromEntity(EntityAdmin* admin, Entity* entity, std::vector<Component*> components);
-
-	//function description goes here
-	void Update() override;
 };

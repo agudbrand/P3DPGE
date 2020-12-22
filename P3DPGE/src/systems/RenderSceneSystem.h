@@ -30,5 +30,6 @@ struct RenderSceneSystem : public System {
 };*/
 
 struct RenderSceneSystem : public System {
+	void Init() override;
 	void Update() override;
 };

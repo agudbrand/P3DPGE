@@ -8,7 +8,8 @@ struct Edge {
 	Vector3 p[2];
 	//if lead is true then p[1] is the right most point.
 	//ditto for high but on y
-	bool lead, high;
+	bool lead = false;
+	bool high = false;
 
 	Edge() {}
 	Edge(Vector3 point1, Vector3 point2) {
@@ -103,8 +104,10 @@ struct Edge3D {
 	Vector3 p[2];
 	//if lead is true then p[1] is the right most point.
 	//ditto for high but on y and for deep on z
-	bool lead, high, deep;
-	Entity* e;
+	bool lead = false;
+	bool high = false;
+	bool deep = false;
+	Entity* e = nullptr;
 
 	Edge3D() {}
 	Edge3D(Vector3 point1, Vector3 point2) {

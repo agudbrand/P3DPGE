@@ -36,10 +36,10 @@ struct Vector3 {
 	static const Vector3 UNITZ;
 
 	void    operator =	(const Vector3& rhs);
-	Vector3 operator *  (const float& rhs) const;
-	void    operator *= (const float& rhs);
-	Vector3 operator /  (const float& rhs) const;
-	void    operator /= (const float& rhs);
+	Vector3 operator *  (float rhs) const;
+	void    operator *= (float rhs);
+	Vector3 operator /  (float rhs) const;
+	void    operator /= (float rhs);
 	Vector3 operator +  (const Vector3& rhs) const;
 	void    operator += (const Vector3& rhs);
 	Vector3 operator -  (const Vector3& rhs) const;
@@ -51,7 +51,7 @@ struct Vector3 {
 	Vector3 operator -  () const;
 	bool    operator == (const Vector3& rhs) const;
 	bool    operator != (const Vector3& rhs) const;
-	friend Vector3 operator * (const float& lhs, const Vector3& rhs) { return   rhs * lhs; }
+	friend Vector3 operator * (float lhs, const Vector3& rhs) { return   rhs * lhs; }
 
 	const std::string str() const;
 	const std::string str2f() const;
@@ -61,8 +61,8 @@ struct Vector3 {
 	float	mag() const;
 	void	normalize();
 	Vector3	normalized() const;
-	void    clampMag(const float& rhs);
-	Vector3 clampedMag(const float& rhs) const;
+	void    clampMag(float min, float max);
+	Vector3 clampedMag(float min, float max) const;
 	float	distanceTo(const Vector3& rhs) const;
 	float	projectOn(Vector3& rhs) const;
 	Vector3 componentOn(Vector3& rhs) const;
@@ -129,19 +129,19 @@ inline void    Vector3::operator =	(const Vector3& rhs) {
 	this->x = rhs.x; this->y = rhs.y; this->z = rhs.z;
 }
 
-inline Vector3 Vector3::operator *  (const float& rhs) const {
+inline Vector3 Vector3::operator *  (float rhs) const {
 	return Vector3(this->x * rhs, this->y * rhs, this->z * rhs);
 }
 
-inline void    Vector3::operator *= (const float& rhs) {
+inline void    Vector3::operator *= (float rhs) {
 	this->x *= rhs; this->y *= rhs; this->z *= rhs;
 }
 
-inline Vector3 Vector3::operator /  (const float& rhs) const {
+inline Vector3 Vector3::operator /  (float rhs) const {
 	return Vector3(this->x / rhs, this->y / rhs, this->z / rhs);
 }
 
-inline void    Vector3::operator /= (const float& rhs) {
+inline void    Vector3::operator /= (float rhs) {
 	this->x /= rhs; this->y /= rhs; this->z /= rhs;
 }
 
@@ -242,14 +242,25 @@ inline Vector3 Vector3::normalized() const {
 	return Vector3(*this);
 }
 
-inline void Vector3::clampMag(const float& rhs) {
-	if (this->mag() < rhs) {  }
-	else { *this = normalized() * rhs; }
+inline void Vector3::clampMag(float min, float max) {
+	float mag = this->mag();
+	if (mag < min) {
+		this->normalize();
+		*this *= min; 
+	} else if(mag > max){ 
+		this->normalize();
+		*this *= max; 
+	}
 }
 
-inline Vector3 Vector3::clampedMag(const float& rhs) const {
-	if(this->mag() > rhs) {
-		return normalized() * rhs;
+inline Vector3 Vector3::clampedMag(float min, float max) const {
+	float mag = this->mag();
+	if (mag < min) {
+		return normalized() * min; 
+	} else if(mag > max){ 
+		return normalized() * max; 
+	} else {
+		return Vector3(this->x, this->y, this->z);
 	}
 }
 

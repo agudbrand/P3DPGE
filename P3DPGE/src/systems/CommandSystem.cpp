@@ -1,102 +1,80 @@
 #include "CommandSystem.h"
-#include "../internal/olcPixelGameEngine.h"
-#include "../EntityAdmin.h"
+
+#include "../utils/Command.h"
+#include "../systems/WorldSystem.h"
 
 #include "../components/InputSingleton.h"
-#include "../components/Command.h"
+#include "../components/Keybinds.h"
+#include "../components/Canvas.h"
 #include "../components/Transform.h"
 #include "../components/Mesh.h"
-#include "../components/TimeSingleton.h"
 #include "../components/Scene.h"
+#include "../components/Physics.h"
 
 inline void AddSpawnCommands(EntityAdmin* admin) {
 	admin->commands["spawn_box"] = new Command([](EntityAdmin* admin) {
 		Entity* box = WorldSystem::CreateEntity(admin);
 
 		Transform* t = new Transform(Vector3(0,0,3), Vector3::ZERO, Vector3::ONE);
-		Mesh* m = MeshSystem::BuildBoxMesh(box, t, Vector3::ONE);
-		WorldSystem::AddComponentsToEntity(box, {t, m});
+		Mesh* m = Mesh::CreateBox(box, Vector3::ONE, t->position);
+		Physics* p = new Physics(t->position, t->rotation);
+		WorldSystem::AddComponentsToEntity(box, {t, m, p});
+		admin->singletonInput->selectedEntity = box;
 	}, "spawn_box", "spawn_box <halfDimensions: Vector3> <position: Vector3> [rotation: Vector3] [scale: Vector3]");
 
 	admin->commands["spawn_complex"] = new Command([](EntityAdmin* admin) {
 		Entity* c = WorldSystem::CreateEntity(admin);
 
 		Transform* t = new Transform(Vector3(0,0,3), Vector3::ZERO, Vector3::ONE);
-		Mesh* m = MeshSystem::BuildComplexMesh(c, t, "objects/bmonkey.obj", false);
+		Mesh* m = Mesh::CreateComplex(c, "objects/bmonkey.obj", false, t->position);
 		WorldSystem::AddComponentsToEntity(c, {t, m});
-	}, "spawn_complex", "spawn_box <filePath: String> <position: Vector3> [rotation: Vector3] [scale: Vector3]");
+	}, "spawn_complex", "spawn_box <filePath: String> <hasTexture: Boolean> <position: Vector3> [rotation: Vector3] [scale: Vector3]");
 
 	admin->commands["spawn_complex1"] = new Command([](EntityAdmin* admin) {
 		Entity* c = WorldSystem::CreateEntity(admin);
 
 		Transform* t = new Transform(Vector3(0,0,3), Vector3::ZERO, Vector3::ONE);
-		Mesh* m = MeshSystem::BuildComplexMesh(c, t, "objects/whale_ship.obj", false);
+		Mesh* m = Mesh::CreateComplex(c, "objects/whale_ship.obj", false, t->position);
 		WorldSystem::AddComponentsToEntity(c, {t, m});
-	}, "spawn_complex1", "spawn_box <filePath: String> <position: Vector3> [rotation: Vector3] [scale: Vector3]");
+	}, "spawn_complex1", "spawn_box <filePath: String> <hasTexture: Boolean> <position: Vector3> [rotation: Vector3] [scale: Vector3]");
 
 	admin->commands["spawn_complex2"] = new Command([](EntityAdmin* admin) {
 		Entity* c = WorldSystem::CreateEntity(admin);
 
 		Transform* t = new Transform(Vector3(0,0,3), Vector3::ZERO, Vector3::ONE);
-		Mesh* m = MeshSystem::BuildComplexMesh(c, t, "objects/24K_Triangles.obj", false);
+		Mesh* m = Mesh::CreateComplex(c, "objects/24K_Triangles.obj", false, t->position);
 		WorldSystem::AddComponentsToEntity(c, {t, m});
-	}, "spawn_complex2", "spawn_box <filePath: String> <position: Vector3> [rotation: Vector3] [scale: Vector3]");
-}
-
-inline void AddTimeCommands(EntityAdmin* admin) {
-	admin->commands["time_pause_engine"] = new Command([](EntityAdmin* admin) {
-		admin->singletonTime->paused = !admin->singletonTime->paused;
-		if(admin->singletonTime->paused) {
-			admin->singletonTime->deltaTime = 0.f;
-		}
-	}, "time_pause_engine", "time_pause_engine");
-
-	admin->commands["time_next_frame"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonTime->paused) {
-			admin->singletonTime->frame = true;
-		}
-	}, "time_next_frame", "time_next_frame");
+	}, "spawn_complex2", "spawn_box <filePath: String> <hasTexture: Boolean> <position: Vector3> [rotation: Vector3] [scale: Vector3]");
 }
 
 inline void AddRenderCommands(EntityAdmin* admin) {
 	admin->commands["render_wireframe"] = new Command([](EntityAdmin* admin) {
-		admin->tempScene->WIRE_FRAME = !admin->tempScene->WIRE_FRAME;
+		admin->currentScene->RENDER_WIREFRAME = !admin->currentScene->RENDER_WIREFRAME;
 	}, "render_wireframe", "render_wireframe");
 
-	admin->commands["render_wireframe_notexture"] = new Command([](EntityAdmin* admin) {
-		admin->tempScene->WIRE_FRAME_NO_TEXTURE = !admin->tempScene->WIRE_FRAME_NO_TEXTURE;
-		admin->tempScene->LOCAL_AXIS = !admin->tempScene->LOCAL_AXIS;
-	}, "render_wireframe_notexture", "render_wireframe_notexture");
+	admin->commands["render_textures"] = new Command([](EntityAdmin* admin) {
+		admin->currentScene->RENDER_TEXTURES = !admin->currentScene->RENDER_TEXTURES;
+	}, "render_textures", "render_textures");
 
 	admin->commands["render_display_edges"] = new Command([](EntityAdmin* admin) {
-		admin->tempScene->DISPLAY_EDGES = !admin->tempScene->DISPLAY_EDGES;
+		admin->currentScene->RENDER_EDGE_NUMBERS = !admin->currentScene->RENDER_EDGE_NUMBERS;
 	}, "render_display_edges", "render_display_edges");
 
+	admin->commands["render_local_axis"] = new Command([](EntityAdmin* admin) {
+		admin->currentScene->RENDER_LOCAL_AXIS = !admin->currentScene->RENDER_LOCAL_AXIS;
+	}, "render_local_axis", "render_local_axis");
+
 	admin->commands["render_global_axis"] = new Command([](EntityAdmin* admin) {
-		admin->tempScene->GLOBAL_AXIS = !admin->tempScene->GLOBAL_AXIS;
+		admin->currentScene->RENDER_GLOBAL_AXIS = !admin->currentScene->RENDER_GLOBAL_AXIS;
 	}, "render_global_axis", "render_global_axis");
 }
 
-//add default commands here
-void CommandSystem::Init() {
-	admin->commands["debug_global"] = new Command([](EntityAdmin* admin) {
-		GLOBAL_DEBUG = !GLOBAL_DEBUG;
-	}, "debug_global", "debug_global");
-
-	admin->commands["reset_camera"] = new Command([](EntityAdmin* admin) {
-		admin->tempCamera->position = Vector3::ZERO;
-		admin->tempCamera->rotation = Vector3::ZERO;
-	}, "reset_camera", "reset_camera");
-	
-	AddSpawnCommands(admin);
-	AddTimeCommands(admin);
-	AddRenderCommands(admin);
-}
-
-inline void HandleCanvasInteractions(EntityAdmin* admin, InputSingleton* input) {
+inline void HandleMouseInputs(EntityAdmin* admin, InputSingleton* input) {
 	Canvas* canvas = admin->tempCanvas;
 
-	if(input->MousePressed(MOUSE_BUTTON_LEFT)) {
+	//mouse left click pressed
+	if(input->MousePressed(INPUT_MOUSE_LEFT)) {
+		//check if mouse clicked on a UI element
 		if(!canvas->hideAll) {
 			for(UI* ui : canvas->elements) {
 				if(Button* b = dynamic_cast<Button*>(ui)){
@@ -116,7 +94,17 @@ inline void HandleCanvasInteractions(EntityAdmin* admin, InputSingleton* input) 
 				}
 			}
 		}
-	} else if(input->MouseHeld(MOUSE_BUTTON_LEFT)) {
+
+		//if the click wasnt on a UI element, trigger select_entity command
+		if(!input->ui_clicked) {
+			admin->TriggerCommand("select_entity"); //TODO(i,delle) test that you can select an entity
+		}
+
+		//set click pos to mouse pos
+		input->mouseClickPos = input->mousePos;
+	}
+	//mouse left click held
+	else if(input->MouseHeld(INPUT_MOUSE_LEFT)) {
 		static_internal Vector2 offset;
 		if(input->selectedUI) {
 			if(!input->ui_drag_latch) {
@@ -125,28 +113,91 @@ inline void HandleCanvasInteractions(EntityAdmin* admin, InputSingleton* input) 
 			}
 			input->selectedUI->pos = input->mousePos + offset;
 		}
-	} else if(input->MouseReleased(MOUSE_BUTTON_LEFT)) {
-		if(input->selectedUI) {
+	} 
+	//mouse left click released
+	else if(input->MouseReleased(INPUT_MOUSE_LEFT)) {
+		if(input->selectedUI) {					//deselect UI
 			input->selectedUI = 0;
 			input->ui_drag_latch = false;
+		} else if(input->selectedEntity && input->mousePos != input->mouseClickPos) { //add force to selected entity
+			admin->ExecCommand("add_force");
 		}
+
+		//reset click pos to null
+		input->mouseClickPos = Vector2(admin->p->ScreenWidth(), admin->p->ScreenHeight());
 	}
+}
+
+inline void HandleSelectedEntityInputs(EntityAdmin* admin, InputSingleton* input) {
+	if(input->KeyDown(olc::L, INPUT_NONE_HELD)) {
+		admin->ExecCommand("translate_right");
+	}
+
+	if(input->KeyDown(olc::J, INPUT_NONE_HELD)) {
+		admin->ExecCommand("translate_left");
+	}
+
+	if(input->KeyDown(olc::O, INPUT_NONE_HELD)) {
+		admin->ExecCommand("translate_up");
+	}
+
+	if(input->KeyDown(olc::U, INPUT_NONE_HELD)) {
+		admin->ExecCommand("translate_down");
+	}
+
+	if(input->KeyDown(olc::I, INPUT_NONE_HELD)) {
+		admin->ExecCommand("translate_forward");
+	}
+
+	if(input->KeyDown(olc::K, INPUT_NONE_HELD)) {
+		admin->ExecCommand("translate_backward");
+	}
+}
+
+inline void HandleRenderInputs(EntityAdmin* admin, InputSingleton* input, Keybinds* binds) {
+	//toggle wireframe
+	if(input->KeyPressed(binds->debugRenderWireframe, INPUT_NONE_HELD)) {
+		admin->ExecCommand("render_wireframe");
+	}
+
+	//toggle textures
+	if(input->KeyPressed(binds->debugRenderWireframe, INPUT_SHIFT_HELD)) {
+		admin->ExecCommand("render_textures");
+	}
+
+	//toggle edge numbers
+	if(input->KeyPressed(binds->debugRenderEdgesNumbers, INPUT_NONE_HELD)) {
+		admin->ExecCommand("render_display_edges");
+	}
+
+	//toggle edge numbers
+	if(input->KeyPressed(binds->debugRenderDisplayAxis, INPUT_NONE_HELD)) {
+		admin->ExecCommand("render_local_axis");
+	}
+
+	//toggle edge numbers
+	if(input->KeyPressed(binds->debugRenderDisplayAxis, INPUT_SHIFT_HELD)) {
+		admin->ExecCommand("render_global_axis");
+	}
+}
+
+//add generic commands here
+void CommandSystem::Init() {
+	admin->commands["debug_global"] = new Command([](EntityAdmin* admin) {
+		GLOBAL_DEBUG = !GLOBAL_DEBUG;
+	}, "debug_global", "debug_global");
+
+	AddSpawnCommands(admin);
+	AddRenderCommands(admin);
 }
 
 void CommandSystem::Update() {
 	InputSingleton* input = admin->singletonInput;
+	Keybinds* binds = admin->currentKeybinds;
 
 	input->mousePos = admin->p->GetMousePos();
 
-	//execute all triggered commands
-	for(auto& c : admin->commands) {
-		if(c.second->triggered) {
-			c.second->action(admin);
-			c.second->triggered = false;
-		}
-	}
-
-	HandleCanvasInteractions(admin, input);
-
-	//TODO(i,delle) re-implement object selection
+	HandleMouseInputs(admin, input);
+	HandleSelectedEntityInputs(admin, input);
+	HandleRenderInputs(admin, input, binds);
 }

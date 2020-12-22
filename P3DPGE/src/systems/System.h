@@ -1,8 +1,5 @@
 #pragma once
-#include "../utils/UsefulDefines.h"
-#include <vector>
-
-struct EntityAdmin;
+#include "../EntityAdmin.h"
 
 struct System {
 	EntityAdmin* admin; //reference to owning admin

@@ -1,7 +1,6 @@
 #pragma once
 #include "System.h"
 
-struct CameraSystem : public System {
-	void Init() override;
+struct TriggeredCommandSystem : public System {
 	void Update() override;
 };

@@ -1,7 +1,7 @@
 #pragma once
 #include "../internal/olcPixelGameEngine.h"
 #include "../math/Math.h"
-#include "../components/Command.h"
+#include "Command.h"
 
 struct EntityAdmin;
 
@@ -10,8 +10,7 @@ struct EntityAdmin;
 //as its own class.
 //StringDecal height is 7 pixels and width is 8 pixels at a scale of 1 
 
-class UI {
-public:
+struct UI {
 	Vector2 pos;
 	Vector2 size;
 	olc::Pixel color;
@@ -42,8 +41,7 @@ public:
 	}
 };
 
-class Button : public UI {
-public:
+struct Button : public UI {
 	Command* command;
 
 	std::string title;
@@ -116,8 +114,7 @@ public:
 //		currently until i figure out how to place things
 //		nicely
 
-class Menu : public UI {
-public:
+struct Menu : public UI {
 	std::vector<Button*> buttons;
 	std::string title;
 

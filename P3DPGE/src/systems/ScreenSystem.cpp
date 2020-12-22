@@ -1,5 +1,4 @@
 #include "ScreenSystem.h"
-#include "../EntityAdmin.h"
 
 #include "../components/ScreenSingleton.h"
 

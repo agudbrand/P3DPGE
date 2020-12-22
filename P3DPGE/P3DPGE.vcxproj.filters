@@ -108,9 +108,6 @@
     <ClInclude Include="src\utils\GLOBALS.h">
       <Filter>src\utils</Filter>
     </ClInclude>
-    <ClInclude Include="src\utils\InertiaTensors.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
     <ClInclude Include="src\utils\UI.h">
       <Filter>src\utils</Filter>
     </ClInclude>
@@ -165,8 +162,23 @@
     <ClInclude Include="src\systems\CommandSystem.h">
       <Filter>src\systems\h</Filter>
     </ClInclude>
-    <ClInclude Include="src\components\Command.h">
+    <ClInclude Include="src\components\Collider.h">
       <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\math\InertiaTensors.h">
+      <Filter>src\math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\systems\PhysicsSystem.h">
+      <Filter>src\systems\h</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\PhysicsWorld.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\systems\TriggeredCommandSystem.h">
+      <Filter>src\systems\h</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\Command.h">
+      <Filter>src\utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -205,6 +217,15 @@
     </ClCompile>
     <ClCompile Include="src\systems\CommandSystem.cpp">
       <Filter>src\systems\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\systems\PhysicsSystem.cpp">
+      <Filter>src\systems\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\systems\TriggeredCommandSystem.cpp">
+      <Filter>src\systems\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EntityAdmin.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

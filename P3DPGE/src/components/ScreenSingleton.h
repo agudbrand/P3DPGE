@@ -1,7 +1,6 @@
 #pragma once
 #include "Component.h"
 #include "../math/Vector3.h"
-#include "../internal/olcPixelGameEngine.h"
 
 struct ScreenSingleton : public Component {
 	float width;

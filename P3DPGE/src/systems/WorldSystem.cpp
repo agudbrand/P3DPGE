@@ -3,6 +3,12 @@
 #include "../utils/Debug.h"
 
 #include "../components/WorldSingleton.h"
+#include "../components/Transform.h"
+#include "../components/Mesh.h"
+
+void WorldSystem::Init() {
+	
+}
 
 void WorldSystem::Update() {
 	WorldSingleton* world = admin->singletonWorld;

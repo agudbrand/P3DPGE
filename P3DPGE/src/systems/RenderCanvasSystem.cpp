@@ -1,22 +1,18 @@
 #include "RenderCanvasSystem.h"
-#include "../internal/olcPixelGameEngine.h"
-#include "../EntityAdmin.h"
 
 #include "../components/Canvas.h"
 #include "../components/ScreenSingleton.h"
 
-void RenderCanvasSystem::Init() {
-	Canvas* canvas = admin->tempCanvas;
-	
-	//debug menu
+inline void AddDebugMenu(EntityAdmin* admin, Canvas* canvas) {
 	std::vector<Button*> debug_buttons = std::vector<Button*>();
 	debug_buttons.push_back(new Button(admin, admin->GetCommand("debug_global"), "global debug toggle"));
 	debug_buttons.push_back(new Button(admin, admin->GetCommand("time_pause_engine"), "pause engine toggle"));
 	debug_buttons.push_back(new Button(admin, admin->GetCommand("time_next_frame"), "next frame"));
 
 	canvas->elements.push_back(new Menu(admin, Vector2(5, 5), "debug_menu", "debug", debug_buttons));
+}
 
-	//spawn menu
+inline void AddSpawnMenu(EntityAdmin* admin, Canvas* canvas) {
 	std::vector<Button*> spawn_buttons;
 	spawn_buttons.push_back(new Button(admin, admin->GetCommand("spawn_box"), "spawn_box"));
 	spawn_buttons.push_back(new Button(admin, 0, "spawn_complex", "", true, 0));
@@ -28,16 +24,26 @@ void RenderCanvasSystem::Init() {
 
 	canvas->elements.push_back(new Menu(admin, Vector2(canvas->elements[0]->size.x + 10, 5), "spawn_menu", "spawn", spawn_buttons,
 			std::vector<Menu*>{new Menu(admin, V2ZERO, "complex_spawn", "", complex_spawn_buttons)}));
+}
 
-	//render menu
+inline void AddRenderMenu(EntityAdmin* admin, Canvas* canvas) {
 	std::vector<Button*> render_buttons = std::vector<Button*>();
 	render_buttons.push_back(new Button(admin, admin->GetCommand("reset_camera"), "reset camera"));
 	render_buttons.push_back(new Button(admin, admin->GetCommand("render_wireframe"), "wireframe"));
-	render_buttons.push_back(new Button(admin, admin->GetCommand("render_wireframe_notexture"), "wireframe only"));
+	render_buttons.push_back(new Button(admin, admin->GetCommand("render_textures"), "textures"));
 	render_buttons.push_back(new Button(admin, admin->GetCommand("render_display_edges"), "edge numbers"));
+	render_buttons.push_back(new Button(admin, admin->GetCommand("render_local_axis"), "local axis"));
 	render_buttons.push_back(new Button(admin, admin->GetCommand("render_global_axis"), "global axis"));
 
-	canvas->elements.push_back(new Menu(admin, Vector2(canvas->elements[1]->pos.x + canvas->elements[1]->size.x + 10, 5), "render_menu", "render", render_buttons));
+	canvas->elements.push_back(new Menu(admin, Vector2(canvas->elements[1]->pos.x + canvas->elements[1]->size.x + 10, 5), 
+								"render_menu", "render", render_buttons));
+}
+
+void RenderCanvasSystem::Init() {
+	Canvas* canvas = admin->tempCanvas;
+	AddDebugMenu(admin, canvas);
+	AddSpawnMenu(admin, canvas);
+	AddRenderMenu(admin, canvas);
 }
 
 void RenderCanvasSystem::Update() {

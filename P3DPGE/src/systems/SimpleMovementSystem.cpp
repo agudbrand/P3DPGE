@@ -4,9 +4,10 @@
 #include "../internal/olcPixelGameEngine.h"
 
 #include "../components/InputSingleton.h"
-#include "../components/Camera.h"
 #include "../components/Keybinds.h"
+#include "../components/Camera.h"
 #include "../components/MovementState.h"
+#include "../components/TimeSingleton.h"
 
 void CameraMovement(float deltaTime, Camera* camera, InputSingleton* input, Keybinds* binds, uint32 moveState) {
 	if(moveState & MOVEMENT_FLYING) {
@@ -31,8 +32,6 @@ void CameraMovement(float deltaTime, Camera* camera, InputSingleton* input, Keyb
 				camera->position.y -= 8 * deltaTime;
 			}
 		}
-	} else {
-		camera->position.y -= GRAVITY * deltaTime;
 	}
 
 	//translate forward
@@ -129,13 +128,12 @@ void CameraRotation(float deltaTime, Camera* camera, InputSingleton* input, Keyb
 }
 
 void SimpleMovementSystem::Update() {
-	Camera*				camera = admin->tempCamera;
+	Camera*				camera = admin->currentCamera;
 	InputSingleton*		input = admin->singletonInput;
-	Keybinds*			binds = admin->tempKeybinds;
+	Keybinds*			binds = admin->currentKeybinds;
 	uint32				moveState = admin->tempMovementState->movementState;
 	float				deltaTime = admin->singletonTime->deltaTime;
 
 	CameraMovement(deltaTime, camera, input, binds, moveState);
-
 	CameraRotation(deltaTime, camera, input, binds);
 }

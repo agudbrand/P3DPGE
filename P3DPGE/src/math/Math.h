@@ -1,7 +1,4 @@
 #pragma once
-#include "../internal/olcPixelGameEngine.h"
-#include "Time.h"
-
 #include "../utils/UsefulDefines.h"
 #include "Vector3.h"
 #include "Vector4.h"
@@ -430,5 +427,15 @@ namespace Math {
 	static Vector2 WorldToScreen2D(Vector3 point, Matrix4 ProjMat, Matrix4 ViewMat, Vector2 screenDimensions) {
 		Vector3 v = CameraToScreen(WorldToCamera(point, ViewMat), ProjMat, screenDimensions);
 		return Vector2(v.x, v.y);
+	}
+
+	static Vector3 ScreenToWorld(Vector2 pos, Matrix4 ProjMat, Matrix4 view, Vector2 screenDimensions) {
+		Vector3 out(pos);
+		out.x /= .5f * (float)screenDimensions.x;
+		out.y /= .5f * (float)screenDimensions.y;
+		out.x -= 1.f; out.y -= 1.f; out.z = -1.f;
+		out = Math::ProjMult(out.ToVector4(), ProjMat.Inverse()).ToVector3();
+		out = Math::ProjMult(out.ToVector4(), view.Inverse()).ToVector3();
+		return out;
 	}
 };
