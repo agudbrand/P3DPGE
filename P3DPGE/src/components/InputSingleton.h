@@ -33,23 +33,23 @@ struct InputSingleton : public Component {
 
 	bool KeyPressed(olc::Key key, uint32 modifiers) {
 		switch(modifiers) {
-			case(INPUT_NONE_HELD): {				//!shift && !ctrl && (pressed || held)
+			case(INPUT_NONE_HELD): {				//!shift && !ctrl && pressed
 				return (*keyboardState)[key].bPressed && 
 					!((*keyboardState)[olc::CTRL].bHeld || (*keyboardState)[olc::SHIFT].bHeld);
 			}
-			case(INPUT_CTRL_HELD): {				//!shift && ctrl && (pressed || held)
+			case(INPUT_CTRL_HELD): {				//!shift && ctrl && pressed
 				return (*keyboardState)[key].bPressed &&
 					(*keyboardState)[olc::CTRL].bHeld && !((*keyboardState)[olc::SHIFT].bHeld);
 			}
-			case(INPUT_SHIFT_HELD): {				//shift && !ctrl && (pressed || held)
+			case(INPUT_SHIFT_HELD): {				//shift && !ctrl && pressed
 				return (*keyboardState)[key].bPressed && 
 					(*keyboardState)[olc::SHIFT].bHeld && !((*keyboardState)[olc::CTRL].bHeld);
 			}
-			case(INPUT_CTRL_HELD | INPUT_SHIFT_HELD): { //shift && ctrl && (pressed || held)
+			case(INPUT_CTRL_HELD | INPUT_SHIFT_HELD): { //shift && ctrl && pressed
 				return (*keyboardState)[key].bPressed &&
 					((*keyboardState)[olc::SHIFT].bHeld && (*keyboardState)[olc::CTRL].bHeld);
 			}
-			default: {								//pressed || held
+			default: {								//pressed
 				return (*keyboardState)[key].bPressed;
 			}
 		}
@@ -62,8 +62,8 @@ struct InputSingleton : public Component {
 	bool KeyDown(olc::Key key, uint32 modifiers = INPUT_ANY_HELD) {
 		switch(modifiers) {
 			case(INPUT_NONE_HELD): {				//!shift && !ctrl && (pressed || held)
-				return !((*keyboardState)[olc::CTRL].bHeld || (*keyboardState)[olc::SHIFT].bHeld) &&
-					(*keyboardState)[key].bPressed || (*keyboardState)[key].bHeld;
+				return !(*keyboardState)[olc::CTRL].bHeld && !(*keyboardState)[olc::SHIFT].bHeld &&
+					((*keyboardState)[key].bPressed || (*keyboardState)[key].bHeld);
 			}
 			case(INPUT_CTRL_HELD): {				//!shift && ctrl && (pressed || held)
 				return (*keyboardState)[olc::CTRL].bHeld && !((*keyboardState)[olc::SHIFT].bHeld) &&
@@ -99,7 +99,7 @@ struct InputSingleton : public Component {
 		switch(modifiers) {
 			case(INPUT_NONE_HELD): {				//!shift && !ctrl && (pressed || held)
 				return !((*keyboardState)[olc::CTRL].bHeld || (*keyboardState)[olc::SHIFT].bHeld) &&
-					(*mouseState)[button].bPressed || (*mouseState)[button].bHeld;
+					((*mouseState)[button].bPressed || (*mouseState)[button].bHeld);
 			}
 			case(INPUT_CTRL_HELD): {				//!shift && ctrl && (pressed || held)
 				return (*keyboardState)[olc::CTRL].bHeld && !((*keyboardState)[olc::SHIFT].bHeld) &&

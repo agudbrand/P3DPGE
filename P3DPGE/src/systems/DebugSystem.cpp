@@ -20,6 +20,9 @@
 #include "../components/Transform.h"
 #include "../components/Physics.h"
 
+void DebugSystem::Init() {
+}
+
 void DebugSystem::Update() {
 	InputSingleton*		input = admin->singletonInput;
 	Camera*				camera = admin->currentCamera;

@@ -59,20 +59,15 @@ void MeshSystem::Update() {
 				m = mesh;
 			} else if(Transform* transform = dynamic_cast<Transform*>(c)) {
 				t = transform;
-			} else if(Physics* physics = dynamic_cast<Physics*>(c)) {
-				p = physics;
 			}
 		}
-		if(m && t && p) {
+		if(m && t) {
 			if(t->position != t->prevPosition) {
 				TranslateMesh(m, t->position - t->prevPosition);
-				t->prevPosition = t->position;
 			}
 			if(t->rotation != t->prevRotation) {
 				RotateMesh(m, Matrix4::RotationMatrixAroundPoint(t->position, t->rotation - t->prevRotation));
-				t->prevRotation = t->rotation;
 			}
-			break;
 		}
 	}
 }

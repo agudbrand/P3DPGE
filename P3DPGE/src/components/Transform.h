@@ -17,6 +17,8 @@ struct Transform : public Component {
 		//rotation = Quaternion();
 		rotation = Vector3::ZERO;
 		scale = Vector3::ONE;
+		prevPosition = position;
+		prevRotation = rotation;
 	}
 
 	/*Transform(const Vector3& position, const Quaternion& rotation, const Vector3& scale) {
@@ -29,6 +31,8 @@ struct Transform : public Component {
 		this->position = position;
 		this->rotation = rotation;
 		this->scale = scale;
+		prevPosition = position;
+		prevRotation = rotation;
 	}
 
 	inline Vector3 Up() {

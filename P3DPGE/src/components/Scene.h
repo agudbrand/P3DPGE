@@ -11,11 +11,16 @@ struct Scene : public Component {
 	std::vector<Light*> lights;
 	std::vector<float> pixelDepthBuffer;
 
-	bool RENDER_WIREFRAME				= false;
+	bool RENDER_WIREFRAME				= true;
 	bool RENDER_EDGE_NUMBERS			= false;
-	bool RENDER_TEXTURES				= true;
-	bool RENDER_LOCAL_AXIS				= false;
-	bool RENDER_GLOBAL_AXIS				= false;
+	bool RENDER_TEXTURES				= false;
+	bool RENDER_LOCAL_AXIS				= true;
+	bool RENDER_GLOBAL_AXIS				= false; //TODO(r,delle) implement global axis like in blender
+	bool RENDER_TRANSFORMS				= false;
+	bool RENDER_PHYSICS					= true;
+	bool RENDER_SCREEN_BOUNDING_BOX		= false; 
+	bool RENDER_MESH_VERTICES			= false; 
+	bool RENDER_GRID					= false; //TODO(r,delle) upgrade grid to follow camera in smart way
 
 	Scene(olc::PixelGameEngine* p) {
 		meshes = std::vector<Mesh*>();

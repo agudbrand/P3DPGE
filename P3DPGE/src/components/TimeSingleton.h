@@ -23,7 +23,7 @@ struct TimeSingleton : public Component {
 		physicsTimeStep		= 300.f;
 		physicsDeltaTime	= 1.f / physicsTimeStep;
 		physicsTotalTime	= 0.f;
-		physicsAccumulator		= 0.f;
+		physicsAccumulator	= 0.f;
 
 		paused	= false;
 		frame	= false;

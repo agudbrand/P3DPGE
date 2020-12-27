@@ -181,12 +181,17 @@ inline Vector3 Vector3::operator -  () const {
 	return Vector3( -x, -y, -z );
 }
 
+//floating point accuracy in our vectors is .001 :)
 inline bool    Vector3::operator == (const Vector3& rhs) const {
-	return this->x == rhs.x && this->y == rhs.y && this->z == rhs.z;
+	return abs(this->x - rhs.x) < .001f && abs(this->y - rhs.y) < .001f && abs(this->z - rhs.z) < .001f;
 }
 
+//inline bool    Vector3::operator == (const Vector3& rhs) const {
+//	return this->y == rhs.y  && this->y == rhs.y && this->z == rhs.z;
+//}
+
 inline bool    Vector3::operator != (const Vector3& rhs) const {
-	return this->x != rhs.x || this->y != rhs.y || this->z != rhs.z;
+	return !(*this == rhs);
 }
 
 //// Functions ////

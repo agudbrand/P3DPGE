@@ -180,6 +180,9 @@
     <ClInclude Include="src\utils\Command.h">
       <Filter>src\utils</Filter>
     </ClInclude>
+    <ClInclude Include="src\geometry\Geometry.h">
+      <Filter>src\geometry</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">

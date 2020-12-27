@@ -7,6 +7,7 @@
 #include "../components/Light.h"
 #include "../components/ScreenSingleton.h"
 #include "../components/Transform.h"
+#include "../components/Physics.h"
 
 void RenderSceneSystem::Init() {
 	
@@ -245,7 +246,14 @@ int ClipTriangles(const Vector3& plane_p, Vector3 plane_n, Triangle* in_tri, std
 int RenderTriangles(Scene* scene, Camera* camera, ScreenSingleton* screen, olc::PixelGameEngine* p) {
 	int drawnTriCount = 0;
 	for(Mesh* mesh : scene->meshes) {
+		std::vector<Vector3*> screenSpaceVertices;
 		for(Triangle& t : mesh->triangles) {
+			if(scene->RENDER_MESH_VERTICES) {
+				scene->lines.push_back(new RenderedEdge3D(t.points[0], t.points[0] + Vector3(0, .01f, 0),	olc::GREEN));
+				scene->lines.push_back(new RenderedEdge3D(t.points[1], t.points[1] + Vector3(0, .01f, 0),	olc::GREEN));
+				scene->lines.push_back(new RenderedEdge3D(t.points[2], t.points[2] + Vector3(0, .01f, 0),	olc::GREEN));
+			}
+
 			t.copy_points(); //copy worldspace points to proj_points
 			Vector3 triNormal = t.get_normal();
 			float light_ray1 = (scene->lights[0]->position - t.points[0]).dot(triNormal);
@@ -279,6 +287,10 @@ int RenderTriangles(Scene* scene, Camera* camera, ScreenSingleton* screen, olc::
 						zClipped[zClipIndex]->proj_tex_points[pIndex].x /= w;
 						zClipped[zClipIndex]->proj_tex_points[pIndex].y /= w;
 						zClipped[zClipIndex]->proj_tex_points[pIndex].z = 1.f / w;
+
+						if(scene->RENDER_SCREEN_BOUNDING_BOX) {
+							screenSpaceVertices.push_back(&zClipped[zClipIndex]->proj_points[pIndex]);
+						}
 					}
 					zClipped[zClipIndex]->sprite = t.sprite;
 
@@ -348,6 +360,22 @@ int RenderTriangles(Scene* scene, Camera* camera, ScreenSingleton* screen, olc::
 					}
 				}
 			}
+		}
+		if(scene->RENDER_SCREEN_BOUNDING_BOX && screenSpaceVertices.size() > 0) {
+			Vector3* leftMost;
+			Vector3* rightMost;
+			Vector3* topMost;
+			Vector3* bottomMost;
+
+			std::sort(screenSpaceVertices.begin(), screenSpaceVertices.end(), ([](Vector3* v1, Vector3* v2) {return v1->x > v2->x; }));
+			leftMost = screenSpaceVertices[screenSpaceVertices.size() - 1];
+			rightMost = screenSpaceVertices[0];
+			
+			std::sort(screenSpaceVertices.begin(), screenSpaceVertices.end(), ([](Vector3* v1, Vector3* v2) {return v1->y > v2->y; }));
+			topMost = screenSpaceVertices[screenSpaceVertices.size() - 1];
+			bottomMost = screenSpaceVertices[0];
+
+			p->DrawRect(Vector2(leftMost->x, topMost->y), Vector2(rightMost->x - leftMost->x, bottomMost->y - topMost->y));
 		}
 	}
 	return drawnTriCount;
@@ -462,24 +490,27 @@ bool ClipLineToBorderPlanes(Vector3& start, Vector3& end, ScreenSingleton* scree
 } //ClipLineToBorderPlanes
 
 int RenderLines(Scene* scene, Camera* camera, ScreenSingleton* screen, olc::PixelGameEngine* p) {
+	int out = 0;
 	for(Edge3D* l : scene->lines) {
 	//convert vertexes from world to camera/viewMatrix space
 		Vector3 startVertex = Math::WorldToCamera(l->p[0], camera->viewMatrix).ToVector3();
 		Vector3 endVertex = Math::WorldToCamera(l->p[1], camera->viewMatrix).ToVector3();
 
 	//clip vertexes to the near and far z planes in camera/viewMatrix space
-		if (!ClipLineToZPlanes(startVertex, endVertex, camera)) { return 0; }
+		if (!ClipLineToZPlanes(startVertex, endVertex, camera)) { continue; }
 
 	//convert vertexes from camera/viewMatrix space to clip space
 		startVertex = Math::CameraToScreen(startVertex, camera->projectionMatrix, screen->dimensions);
 		endVertex = Math::CameraToScreen(endVertex, camera->projectionMatrix, screen->dimensions);
 
 	//clip vertexes to border planes in clip space
-		if (!ClipLineToBorderPlanes(startVertex, endVertex, screen)) { return 0; }
+		if (!ClipLineToBorderPlanes(startVertex, endVertex, screen)) { continue; }
 
 	//draw the lines after all clipping and space conversion
+		++out;
 		p->DrawLine(startVertex.toVector2(), endVertex.toVector2(), ((RenderedEdge3D*)l)->color);
 	}
+	return out;
 } //RenderLines
 
 void RenderSceneSystem::Update() {
@@ -502,6 +533,7 @@ void RenderSceneSystem::Update() {
 
 	//collect all meshes and transform lines
 	int totalTriCount = 0;
+	std::vector<std::pair<Vector2, std::string>> render_transforms;
 	for(auto pair : admin->entities) {
 		for(Component* comp : pair.second->components) {
 			if(Mesh* mesh = dynamic_cast<Mesh*>(comp)) {
@@ -511,20 +543,25 @@ void RenderSceneSystem::Update() {
 			/*if(SpriteRenderer* sr = dynamic_cast<SpriteRenderer*>(comp)) { //idea for 2d drawing
 			
 			}*/
-			if(scene->RENDER_LOCAL_AXIS) {
-				if(Transform* t = dynamic_cast<Transform*>(comp)) {
-					scene->lines.push_back(new RenderedEdge3D(t->position, t->position + t->Right(),	olc::RED));
-					scene->lines.push_back(new RenderedEdge3D(t->position, t->position + t->Up(),		olc::GREEN));
-					scene->lines.push_back(new RenderedEdge3D(t->position, t->position + t->Forward(),	olc::BLUE));
+			if(Transform* t = dynamic_cast<Transform*>(comp)) {
+				if(scene->RENDER_LOCAL_AXIS) {
+					scene->lines.push_back(new RenderedEdge3D(t->position, t->position + t->Right(), olc::RED));
+					scene->lines.push_back(new RenderedEdge3D(t->position, t->position + t->Up(), olc::GREEN));
+					scene->lines.push_back(new RenderedEdge3D(t->position, t->position + t->Forward(), olc::BLUE));
+				}
+				if(scene->RENDER_TRANSFORMS) {
+					Vector2 pos = Math::WorldToScreen2D(t->position, camera->projectionMatrix, camera->viewMatrix, screen->dimensions);
+					render_transforms.push_back(std::make_pair(pos, t->position.str2f()));
+					render_transforms.push_back(std::make_pair(pos + Vector2(0, 10), t->rotation.str2f()));
+				}
+			}
+			if(scene->RENDER_PHYSICS) {
+				if(Physics* phys = dynamic_cast<Physics*>(comp)) {
+					scene->lines.push_back(new RenderedEdge3D(phys->position + phys->velocity, phys->position, olc::DARK_MAGENTA));
+					scene->lines.push_back(new RenderedEdge3D(phys->position + phys->acceleration, phys->position, olc::DARK_YELLOW));
 				}
 			}
 		}
-	}
-
-	//global axis
-	if(scene->RENDER_GLOBAL_AXIS) {
-		//scene->lines.push_back(new RenderedEdge3D());
-		//TODO(r,delle) implement global axis like in blender
 	}
 
 	scene->lights.push_back(new Light(Vector3(0, 0, 1), Vector3(0, 0, 0))); //TODO replace this with light components on entities
@@ -537,6 +574,33 @@ void RenderSceneSystem::Update() {
 
 	//render lines
 	int drawnLineCount = RenderLines(scene, camera, screen, p);
+
+	//render debug stuff
+
+	if(scene->RENDER_GRID) {
+		for(int i = -20; i < 21; ++i) {
+			scene->lines.push_back(new RenderedEdge3D(Vector3(-100, 0, i*5), Vector3(100, 0, i*5), olc::GREY));
+			scene->lines.push_back(new RenderedEdge3D(Vector3(i*5, 0, -100), Vector3(i*5, 0, 100), olc::GREY));
+		}
+		scene->lines.push_back(new RenderedEdge3D(Vector3(-100, 0, 0), Vector3(100, 0, 0), olc::RED));
+		scene->lines.push_back(new RenderedEdge3D(Vector3(0, 0, -100), Vector3(0, 0, 100), olc::BLUE));
+	}
+
+	if(scene->RENDER_TRANSFORMS) {
+		for(auto& pair : render_transforms) {
+			p->DrawString(pair.first, pair.second);
+		}
+	}
+
+	if(scene->RENDER_GLOBAL_AXIS) {
+		Vector2 zeroVertex = Math::WorldToScreen2D(Vector3::ZERO, camera->projectionMatrix, camera->viewMatrix, screen->dimensions);
+		Vector2 yVertex = Math::WorldToScreen2D(Vector3::UP, camera->projectionMatrix, camera->viewMatrix, screen->dimensions);
+		Vector2 xVertex = Math::WorldToScreen2D(Vector3::RIGHT, camera->projectionMatrix, camera->viewMatrix, screen->dimensions);
+		Vector2 zVertex = Math::WorldToScreen2D(Vector3::FORWARD, camera->projectionMatrix, camera->viewMatrix, screen->dimensions);
+		p->DrawLine(Vector2(screen->dimensions.x-50, 50), Vector2(screen->dimensions.x-50, 50) + (yVertex-zeroVertex).norm()*20, olc::GREEN);
+		p->DrawLine(Vector2(screen->dimensions.x-50, 50), Vector2(screen->dimensions.x-50, 50) + (xVertex-zeroVertex).norm()*20, olc::RED);
+		p->DrawLine(Vector2(screen->dimensions.x-50, 50), Vector2(screen->dimensions.x-50, 50) + (zVertex-zeroVertex).norm()*20, olc::BLUE);
+	}
 
 	p->DrawCircle(Math::WorldToScreen2D(scene->lights[0]->position, camera->projectionMatrix, camera->viewMatrix, screen->dimensions), 10);
 	p->DrawStringDecal(olc::vf2d(screen->width-300, screen->height - 10), "Tri Total: " + std::to_string(totalTriCount) + "  Tri Drawn: " + std::to_string(drawnTriCount));

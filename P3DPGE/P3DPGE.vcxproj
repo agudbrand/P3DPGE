@@ -37,6 +37,7 @@
     <ClInclude Include="src\components\Transform.h" />
     <ClInclude Include="src\components\WorldSingleton.h" />
     <ClInclude Include="src\geometry\Edge.h" />
+    <ClInclude Include="src\geometry\Geometry.h" />
     <ClInclude Include="src\geometry\Triangle.h" />
     <ClInclude Include="src\internal\olcPixelGameEngine.h" />
     <ClInclude Include="src\math\InertiaTensors.h" />

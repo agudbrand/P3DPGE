@@ -1,6 +1,60 @@
+/* General TODOs and NOTEs board
+   TODOs should be ordered about NOTEs and TODOs should be listed in order of
+   severity.
+
+Tags: + GitIssue, s Severe, u Unimportant, p Physics, r Render, e Entity, i Input,
+	  m Math, o Optimization, g General, c Clean Up Code
+
+TODO(g, sushi) create a WorldMatrix that takes in several matrix operations and
+	  gets there product in the order specified then apply that final matrix
+	  to the object. this would probably eliminate the need to constantly
+	  throw the object between local and world space everytime we do an
+	  operation on it
+
+TODO(p,delle) add physics based collision resolution for all entities
+
+
+*/
+
+/* ECS conversion TODOs
+
+16. update tick order and .cpp includes
+
+1.  create templated component tuple iterator that loops thru a vector and returns an iterator of components of templated type
+3.  store Light and other components on entities
+5.  cut away alot of triangle
+6.  store all components in an object pool so that i can loop over that instead of entities [combine with 1]
+8.  add looking up/down
+9.  cleanup all warnings
+11. rename singletons to normal
+14. cut down physics to be better
+18. figure out why rotation degenerates in collision
+19. rotation around y is local but every other axis is global? (might be because of perspective matrix)
+
+*/
+
+/*
+---Systems Tick Order---||--------Read/Write Components---------||------------Read Only Components-------------------
+  olcPixelGameEngine	|| InputSingleton						|| N/A
+  TimeSystem			|| TimeSingleton, Command				|| N/A
+  ScreenSystem			|| ScreenSingleton						|| N/A
+  CommandSystem			|| Command, InputSingleton, Canvas		|| N/A 
+  SimpleMovementSystem	|| Camera								|| InputSingleton, Keybinds, MovementState
+						||										||	TimeSingleton
+  PhysicsSystem			|| TimeSingleton, Transform, Physics	|| Camera, Screen
+  CameraSystem			|| Camera								|| ScreenSingleton
+  MeshSystem			|| Mesh									|| Transform
+  RenderSceneSystem		|| Scene								|| Mesh, Camera, InputSingleton, Keybinds, 
+						||										||	ScreenSingleton, TimeSingleton, Transform
+  RenderCanvasSystem	|| Canvas								|| ScreenSingleton
+  WorldSystem			|| WorldSingleton, EntityAdmin,	Entity	|| N/A
+  TriggeredCommandSystem|| Command								|| N/A
+  DebugSystem			|| ALL									|| ALL
+*/
+
 #include "EntityAdmin.h"						//UsefulDefines.h, Debug.h
 #include "utils/PhysicsWorld.h"					//
-#include "utils/Command.h"					//Component.h
+#include "utils/Command.h"						//Debug.h
 //#include "utils/UsefulDefines.h"				//olcPixelGameEngine.h
 //#include "math/Math.h"						//UsefulDefines.h, Vector3.h, Vector4.h, Matrix3.h, Matrix4.h, MatrixN.h,
 												//	<math.h>, <algorithm>, <numeric>
@@ -44,8 +98,6 @@
 #ifdef DEBUG_P3DPGE
 #include "systems/DebugSystem.h"
 #endif
-
-
 
 //// EntityAdmin ////
 
@@ -183,6 +235,15 @@ uint32 Entity::AddComponent(Component* component) {
 	components.push_back(component);
 	component->entity = this;
 	return components.size()-1;
+}
+
+uint32 Entity::AddComponents(std::vector<Component*> comps) {
+	uint32 value = this->components.size();
+	for(auto& c : comps) {
+		this->components.push_back(c);
+		c->entity = this;
+	}
+	return value;
 }
 
 Entity::~Entity() {

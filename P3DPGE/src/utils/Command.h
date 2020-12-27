@@ -12,6 +12,8 @@ struct Command {
 	std::string name;
 	std::string description;
 
+	static bool CONSOLE_PRINT_EXEC;
+
 	Command(CommandAction action, std::string name, std::string description = "") {
 		this->triggered = false;
 		this->action = action;
@@ -21,10 +23,12 @@ struct Command {
 
 	//execute command action function
 	inline void Exec(EntityAdmin* admin) const {
-		LOG("Executing command: ", name);
+		DEBUG if(CONSOLE_PRINT_EXEC) LOG("Executing command: ", name);
 		action(admin);
 	}
 };
+
+inline bool Command::CONSOLE_PRINT_EXEC = true;
 
 //TODO(i,delle) maybe add delayed and repeating commands
 //struct DelayedCommand : public Command { 

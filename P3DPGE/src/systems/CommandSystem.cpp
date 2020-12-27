@@ -10,6 +10,7 @@
 #include "../components/Mesh.h"
 #include "../components/Scene.h"
 #include "../components/Physics.h"
+#include "../components/Collider.h"
 
 inline void AddSpawnCommands(EntityAdmin* admin) {
 	admin->commands["spawn_box"] = new Command([](EntityAdmin* admin) {
@@ -28,6 +29,7 @@ inline void AddSpawnCommands(EntityAdmin* admin) {
 		Transform* t = new Transform(Vector3(0,0,3), Vector3::ZERO, Vector3::ONE);
 		Mesh* m = Mesh::CreateComplex(c, "objects/bmonkey.obj", false, t->position);
 		WorldSystem::AddComponentsToEntity(c, {t, m});
+		admin->singletonInput->selectedEntity = c;
 	}, "spawn_complex", "spawn_box <filePath: String> <hasTexture: Boolean> <position: Vector3> [rotation: Vector3] [scale: Vector3]");
 
 	admin->commands["spawn_complex1"] = new Command([](EntityAdmin* admin) {
@@ -36,6 +38,7 @@ inline void AddSpawnCommands(EntityAdmin* admin) {
 		Transform* t = new Transform(Vector3(0,0,3), Vector3::ZERO, Vector3::ONE);
 		Mesh* m = Mesh::CreateComplex(c, "objects/whale_ship.obj", false, t->position);
 		WorldSystem::AddComponentsToEntity(c, {t, m});
+		admin->singletonInput->selectedEntity = c;
 	}, "spawn_complex1", "spawn_box <filePath: String> <hasTexture: Boolean> <position: Vector3> [rotation: Vector3] [scale: Vector3]");
 
 	admin->commands["spawn_complex2"] = new Command([](EntityAdmin* admin) {
@@ -44,6 +47,7 @@ inline void AddSpawnCommands(EntityAdmin* admin) {
 		Transform* t = new Transform(Vector3(0,0,3), Vector3::ZERO, Vector3::ONE);
 		Mesh* m = Mesh::CreateComplex(c, "objects/24K_Triangles.obj", false, t->position);
 		WorldSystem::AddComponentsToEntity(c, {t, m});
+		admin->singletonInput->selectedEntity = c;
 	}, "spawn_complex2", "spawn_box <filePath: String> <hasTexture: Boolean> <position: Vector3> [rotation: Vector3] [scale: Vector3]");
 }
 
@@ -67,6 +71,26 @@ inline void AddRenderCommands(EntityAdmin* admin) {
 	admin->commands["render_global_axis"] = new Command([](EntityAdmin* admin) {
 		admin->currentScene->RENDER_GLOBAL_AXIS = !admin->currentScene->RENDER_GLOBAL_AXIS;
 	}, "render_global_axis", "render_global_axis");
+
+	admin->commands["render_transforms"] = new Command([](EntityAdmin* admin) {
+		admin->currentScene->RENDER_TRANSFORMS = !admin->currentScene->RENDER_TRANSFORMS;
+	}, "render_transforms", "render_transforms");
+
+	admin->commands["render_physics"] = new Command([](EntityAdmin* admin) {
+		admin->currentScene->RENDER_PHYSICS = !admin->currentScene->RENDER_PHYSICS;
+	}, "render_physics", "render_physics");
+
+	admin->commands["render_screen_bounding_box"] = new Command([](EntityAdmin* admin) {
+		admin->currentScene->RENDER_SCREEN_BOUNDING_BOX = !admin->currentScene->RENDER_SCREEN_BOUNDING_BOX;
+	}, "render_screen_bounding_box", "render_screen_bounding_box");
+
+	admin->commands["render_mesh_vertices"] = new Command([](EntityAdmin* admin) {
+		admin->currentScene->RENDER_MESH_VERTICES = !admin->currentScene->RENDER_MESH_VERTICES;
+	}, "render_mesh_vertices", "render_mesh_vertices");
+
+	admin->commands["render_grid"] = new Command([](EntityAdmin* admin) {
+		admin->currentScene->RENDER_GRID = !admin->currentScene->RENDER_GRID;
+	}, "render_grid", "render_grid");
 }
 
 inline void HandleMouseInputs(EntityAdmin* admin, InputSingleton* input) {
@@ -129,6 +153,7 @@ inline void HandleMouseInputs(EntityAdmin* admin, InputSingleton* input) {
 }
 
 inline void HandleSelectedEntityInputs(EntityAdmin* admin, InputSingleton* input) {
+	//translation
 	if(input->KeyDown(olc::L, INPUT_NONE_HELD)) {
 		admin->ExecCommand("translate_right");
 	}
@@ -151,6 +176,31 @@ inline void HandleSelectedEntityInputs(EntityAdmin* admin, InputSingleton* input
 
 	if(input->KeyDown(olc::K, INPUT_NONE_HELD)) {
 		admin->ExecCommand("translate_backward");
+	}
+
+	//rotation
+	if(input->KeyDown(olc::L, INPUT_SHIFT_HELD)) {
+		admin->ExecCommand("rotate_+x");
+	}
+
+	if(input->KeyDown(olc::J, INPUT_SHIFT_HELD)) {
+		admin->ExecCommand("rotate_-x");
+	}
+
+	if(input->KeyDown(olc::O, INPUT_SHIFT_HELD)) {
+		admin->ExecCommand("rotate_+y");
+	}
+
+	if(input->KeyDown(olc::U, INPUT_SHIFT_HELD)) {
+		admin->ExecCommand("rotate_-y");
+	}
+
+	if(input->KeyDown(olc::I, INPUT_SHIFT_HELD)) {
+		admin->ExecCommand("rotate_+z");
+	}
+
+	if(input->KeyDown(olc::K, INPUT_SHIFT_HELD)) {
+		admin->ExecCommand("rotate_-z");
 	}
 }
 
@@ -187,6 +237,10 @@ void CommandSystem::Init() {
 		GLOBAL_DEBUG = !GLOBAL_DEBUG;
 	}, "debug_global", "debug_global");
 
+	admin->commands["debug_command_exec"] = new Command([](EntityAdmin* admin) {
+		Command::CONSOLE_PRINT_EXEC = !Command::CONSOLE_PRINT_EXEC;
+	}, "debug_command_exec", "debug_command_exec");
+
 	AddSpawnCommands(admin);
 	AddRenderCommands(admin);
 }
@@ -200,4 +254,23 @@ void CommandSystem::Update() {
 	HandleMouseInputs(admin, input);
 	HandleSelectedEntityInputs(admin, input);
 	HandleRenderInputs(admin, input, binds);
+
+	if(input->KeyPressed(olc::F1, INPUT_SHIFT_HELD)) {
+		Entity* box = WorldSystem::CreateEntity(admin);
+		Transform* t = new Transform(Vector3(-10, 0, 20), Vector3::ZERO, Vector3::ONE);
+		Mesh* m = Mesh::CreateBox(box, Vector3(5, 5, 5), t->position);
+		Physics* p = new Physics(t->position, t->rotation, 100.f, 0.1f); //heavy concrete cube
+		AABBCollider* c = new AABBCollider(box, Vector3(5, 5, 5), p->mass);
+		WorldSystem::AddComponentsToEntity(box, {t, m, p, c});
+
+		Entity* sphere = WorldSystem::CreateEntity(admin);
+		Transform* t2 = new Transform(Vector3(30, 0, 20), Vector3::ZERO, Vector3::ONE);
+		Mesh* m2 = Mesh::CreateBox(sphere, Vector3(.3f, .3f, .3f), t2->position);
+		Physics* p2 = new Physics(t2->position, t2->rotation, Vector3(-30, 2, 0)); //light rubber ball
+		p2->elasticity = .5f;
+		SphereCollider* c2 = new SphereCollider(sphere, 1, p2->mass);
+		sphere->AddComponents({t2, m2, p2, c2});
+
+		admin->singletonInput->selectedEntity = box;
+	}
 }

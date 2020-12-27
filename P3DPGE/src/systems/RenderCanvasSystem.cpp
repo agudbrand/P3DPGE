@@ -1,4 +1,5 @@
 #include "RenderCanvasSystem.h"
+#include "../utils/GLOBALS.h"
 
 #include "../components/Canvas.h"
 #include "../components/ScreenSingleton.h"
@@ -6,6 +7,7 @@
 inline void AddDebugMenu(EntityAdmin* admin, Canvas* canvas) {
 	std::vector<Button*> debug_buttons = std::vector<Button*>();
 	debug_buttons.push_back(new Button(admin, admin->GetCommand("debug_global"), "global debug toggle"));
+	debug_buttons.push_back(new Button(admin, admin->GetCommand("debug_command_exec"), "print command exec"));
 	debug_buttons.push_back(new Button(admin, admin->GetCommand("time_pause_engine"), "pause engine toggle"));
 	debug_buttons.push_back(new Button(admin, admin->GetCommand("time_next_frame"), "next frame"));
 
@@ -34,9 +36,19 @@ inline void AddRenderMenu(EntityAdmin* admin, Canvas* canvas) {
 	render_buttons.push_back(new Button(admin, admin->GetCommand("render_display_edges"), "edge numbers"));
 	render_buttons.push_back(new Button(admin, admin->GetCommand("render_local_axis"), "local axis"));
 	render_buttons.push_back(new Button(admin, admin->GetCommand("render_global_axis"), "global axis"));
+	render_buttons.push_back(new Button(admin, admin->GetCommand("render_transforms"), "transforms"));
+	render_buttons.push_back(new Button(admin, admin->GetCommand("render_physics"), "physics vectors"));
+	render_buttons.push_back(new Button(admin, admin->GetCommand("render_screen_bounding_box"), "screen aabb"));
+	render_buttons.push_back(new Button(admin, admin->GetCommand("render_mesh_vertices"), "vertices"));
+	render_buttons.push_back(new Button(admin, admin->GetCommand("render_grid"), "grid"));
 
 	canvas->elements.push_back(new Menu(admin, Vector2(canvas->elements[1]->pos.x + canvas->elements[1]->size.x + 10, 5), 
 								"render_menu", "render", render_buttons));
+}
+
+inline void AddBufferLog(EntityAdmin* admin, Canvas* canvas) {
+	g_cBuffer.allocate_space(100);
+	canvas->elements.push_back(new Menu(admin, Vector2(80, 50), "BUFFERLOG", "buflog", std::vector<Button*>{}));
 }
 
 void RenderCanvasSystem::Init() {
@@ -44,6 +56,7 @@ void RenderCanvasSystem::Init() {
 	AddDebugMenu(admin, canvas);
 	AddSpawnMenu(admin, canvas);
 	AddRenderMenu(admin, canvas);
+	AddBufferLog(admin, canvas);
 }
 
 void RenderCanvasSystem::Update() {
@@ -55,7 +68,7 @@ void RenderCanvasSystem::Update() {
 		for(UI* ui : canvas->elements) {
 			if(Menu* m = dynamic_cast<Menu*>(ui)) {
 				if(m->title == "BUFFERLOG") {
-					//m->update_dyn_strings(); //TODO(,sushi) idk this bufferlog stuff
+					m->update_dyn_strings(g_cBuffer); //TODO(,sushi) idk this bufferlog stuff
 				}
 			}
 			ui->Draw(p);

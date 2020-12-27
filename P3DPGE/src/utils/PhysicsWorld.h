@@ -30,7 +30,10 @@ struct PhysicsWorld {
 	CollisionDetectionMode collisionMode	= CollisionDetectionMode::DISCRETE;
 
 	float maxVelocity = 50.f;
-	float minVelocity = 0.1f;
+	float minVelocity = 0.15f;
+
+	float maxRotVelocity =  360.f;
+	float minRotVelocity = 1.f;
 
 	float gravity		= 9.81f;
 	float frictionAir	= 0.01f; //TODO(p,delle) this should depend on object shape
