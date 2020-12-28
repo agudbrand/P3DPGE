@@ -2,7 +2,7 @@
 #include "Component.h"
 #include <time.h>
 
-struct TimeSingleton : public Component {
+struct Time : public Component {
 	float deltaTime;
 	float totalTime;
 	uint64 updateCount;
@@ -15,7 +15,7 @@ struct TimeSingleton : public Component {
 	bool paused;
 	bool frame;
 
-	TimeSingleton() {
+	Time() {
 		deltaTime	= 0.f;
 		totalTime	= 0.f;
 		updateCount = 0.f;
@@ -29,7 +29,7 @@ struct TimeSingleton : public Component {
 		frame	= false;
 	}
 
-	TimeSingleton(float physicsTicksPerSecond) {
+	Time(float physicsTicksPerSecond) {
 		deltaTime	= 0.f;
 		totalTime	= 0.f;
 		updateCount = 0.f;

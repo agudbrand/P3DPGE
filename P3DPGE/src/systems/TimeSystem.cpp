@@ -1,6 +1,6 @@
 #include "TimeSystem.h"
 
-#include "../components/TimeSingleton.h"
+#include "../components/Time.h"
 #include "../utils/Command.h"
 
 inline void AddTimeCommands(EntityAdmin* admin) {
@@ -23,7 +23,7 @@ void TimeSystem::Init() {
 }
 
 void TimeSystem::Update() {
-	TimeSingleton* time = admin->singletonTime;
+	Time* time = admin->singletonTime;
 
 	if(!time->paused) {
 		time->deltaTime = admin->p->GetElapsedTime();

@@ -2,7 +2,7 @@
 #include "Component.h"
 #include "../math/Vector3.h"
 
-struct ScreenSingleton : public Component {
+struct Screen : public Component {
 	float width;
 	float height;
 	float resolution;
@@ -12,7 +12,7 @@ struct ScreenSingleton : public Component {
 	Vector3 mousePosV3;
 	bool changedResolution;
 
-	ScreenSingleton(olc::PixelGameEngine* p) {
+	Screen(olc::PixelGameEngine* p) {
 		width = p->ScreenWidth();
 		height = p->ScreenHeight();
 		resolution = width * height;

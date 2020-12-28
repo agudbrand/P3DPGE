@@ -29,13 +29,13 @@
     <ClInclude Include="src\components\Light.h" />
     <ClInclude Include="src\components\MovementState.h" />
     <ClInclude Include="src\components\Scene.h" />
-    <ClInclude Include="src\components\ScreenSingleton.h" />
-    <ClInclude Include="src\components\InputSingleton.h" />
+    <ClInclude Include="src\components\Screen.h" />
+    <ClInclude Include="src\components\Input.h" />
     <ClInclude Include="src\components\Mesh.h" />
     <ClInclude Include="src\components\Physics.h" />
-    <ClInclude Include="src\components\TimeSingleton.h" />
+    <ClInclude Include="src\components\Time.h" />
     <ClInclude Include="src\components\Transform.h" />
-    <ClInclude Include="src\components\WorldSingleton.h" />
+    <ClInclude Include="src\components\World.h" />
     <ClInclude Include="src\geometry\Edge.h" />
     <ClInclude Include="src\geometry\Geometry.h" />
     <ClInclude Include="src\geometry\Triangle.h" />

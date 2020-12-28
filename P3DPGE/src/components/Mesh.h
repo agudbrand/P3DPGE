@@ -6,12 +6,13 @@
 #include "../animation/Armature.h"
 
 struct Mesh : public Component {
-	Armature* armature;
+	Armature* armature = nullptr;
 	std::vector<Triangle> triangles;
 
-	Mesh() {
-		armature = 0;
-		triangles = std::vector<Triangle>();
+	//single triangle mesh for testing
+	Mesh(Triangle t) {
+		t.sprite = new olc::Sprite(25, 25);
+		triangles.push_back(t);
 	}
 
 	Mesh(std::vector<Triangle> triangles, Armature* armature = 0) {

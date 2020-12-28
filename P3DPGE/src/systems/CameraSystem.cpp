@@ -2,7 +2,7 @@
 #include "../math/Math.h"
 
 #include "../components/Camera.h"
-#include "../components/ScreenSingleton.h"
+#include "../components/Screen.h"
 
 #include "../utils/Command.h"
 
@@ -24,7 +24,7 @@ Matrix4 MakeViewMatrix(Camera* camera) {
 	return Math::PointAtMatrix(camera->position, camera->position+camera->lookDir).Inverse();
 }
 
-Matrix4 MakeProjectionMatrix(Camera* camera, ScreenSingleton* screen) {
+Matrix4 MakeProjectionMatrix(Camera* camera, Screen* screen) {
 	float renderDistance = camera->farZ - camera->nearZ;
 	float aspectRatio = screen->height / screen->width;
 	float fovRad = 1.f / tanf(camera->fieldOfView * .5f * TO_RADIANS);
@@ -38,7 +38,7 @@ Matrix4 MakeProjectionMatrix(Camera* camera, ScreenSingleton* screen) {
 
 void CameraSystem::Update() {
 	Camera* camera = admin->currentCamera;
-	ScreenSingleton* screen = admin->singletonScreen;
+	Screen* screen = admin->singletonScreen;
 
 	camera->viewMatrix = MakeViewMatrix(camera);
 	camera->projectionMatrix = MakeProjectionMatrix(camera, screen);

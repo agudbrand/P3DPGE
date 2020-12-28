@@ -5,7 +5,7 @@
 #include "../components/Mesh.h"
 #include "../components/Camera.h"
 #include "../components/Light.h"
-#include "../components/ScreenSingleton.h"
+#include "../components/Screen.h"
 #include "../components/Transform.h"
 #include "../components/Physics.h"
 
@@ -14,10 +14,9 @@ void RenderSceneSystem::Init() {
 }
 
 //TODO(or,delle) this took about 50% CPU time (in release), look into optimizing this
-//TODO(rc, sushi) change this to take in types and not individual values
 //in essence this algorithm scans down a triangle and fills each row it occupies
 //with the texture. this is necessary to account for us clipping triangles.
-void TexturedTriangle(Scene* scene, ScreenSingleton* screen, olc::PixelGameEngine* p,
+/*void TexturedTriangle(Scene* scene, Screen* screen, olc::PixelGameEngine* p,
 										int x1, int y1, float u1, float v1, float w1,
 										int x2, int y2, float u2, float v2, float w2,
 										int x3, int y3, float u3, float v3, float w3,
@@ -147,8 +146,215 @@ void TexturedTriangle(Scene* scene, ScreenSingleton* screen, olc::PixelGameEngin
 			}
 		}
 	}
-} //TexturedTriangle
+} //TexturedTriangle*/
 
+void TexturedTriangle(Scene* scene, Screen* screen, olc::PixelGameEngine* p, Triangle tri){	
+	int x1 = tri.proj_points[0].x; int x2 = tri.proj_points[1].x; int x3 = tri.proj_points[2].x;
+	int y1 = tri.proj_points[0].y; int y2 = tri.proj_points[1].y; int y3 = tri.proj_points[2].y;
+		
+	float u1 = tri.tex_points[0].x; float u2 = tri.tex_points[1].x; float u3 = tri.tex_points[2].x;
+	float v1 = tri.tex_points[0].y; float v2 = tri.tex_points[1].y; float v3 = tri.tex_points[2].y;
+	float w1 = tri.tex_points[0].z; float w2 = tri.tex_points[1].z; float w3 = tri.tex_points[2].z;
+
+	Vector3 lpos = scene->lights[0]->position; // do not feel like writing this every time
+
+	//tri.set_normal();
+
+	if (y2 < y1) { std::swap(y1, y2); std::swap(x1, x2); std::swap(u1, u2); std::swap(v1, v2); std::swap(w1, w2); }
+
+	if (y3 < y1) { std::swap(y1, y3); std::swap(x1, x3); std::swap(u1, u3); std::swap(v1, v3); std::swap(w1, w3); }
+
+	if (y3 < y2) { std::swap(y2, y3); std::swap(x2, x3); std::swap(u2, u3); std::swap(v2, v3); std::swap(w2, w3); }
+
+	int dy1 = y2 - y1;
+	int dx1 = x2 - x1;
+	float dv1 = v2 - v1;
+	float du1 = u2 - u1;
+	float dw1 = w2 - w1;
+
+	int dy2 = y3 - y1;
+	int dx2 = x3 - x1;
+	float dv2 = v3 - v1;
+	float du2 = u3 - u1;
+	float dw2 = w3 - w1;
+
+	float tex_u, tex_v, tex_w;
+
+	float	dax_step = 0, dbx_step = 0,
+			du1_step = 0, dv1_step = 0,
+			du2_step = 0, dv2_step = 0,
+			dw1_step = 0, dw2_step = 0;
+
+	if (dy1) dax_step = dx1 / (float)abs(dy1);
+	if (dy2) dbx_step = dx2 / (float)abs(dy2);
+
+	if (dy1) du1_step = du1 / (float)abs(dy1);
+	if (dy1) dv1_step = dv1 / (float)abs(dy1);
+	if (dy1) dw1_step = dw1 / (float)abs(dy1);
+
+	if (dy2) du2_step = du2 / (float)abs(dy2);
+	if (dy2) dv2_step = dv2 / (float)abs(dy2);
+	if (dy2) dw2_step = dw2 / (float)abs(dy2);
+
+	if (dy1) {
+		for (int i = y1; i <= y2; i++) {
+			int ax = x1 + (float)(i - y1) * dax_step;
+			int bx = x1 + (float)(i - y1) * dbx_step;
+
+			float tex_su = u1 + (float)(i - y1) * du1_step;
+			float tex_sv = v1 + (float)(i - y1) * dv1_step;
+			float tex_sw = w1 + (float)(i - y1) * dw1_step;
+
+			float tex_eu = u1 + (float)(i - y1) * du2_step;
+			float tex_ev = v1 + (float)(i - y1) * dv2_step;
+			float tex_ew = w1 + (float)(i - y1) * dw2_step;
+
+			if (ax > bx) {
+				std::swap(ax, bx);
+				std::swap(tex_su, tex_eu);
+				std::swap(tex_sv, tex_ev);
+				std::swap(tex_sw, tex_ew);
+			}
+
+			tex_u = tex_su;
+			tex_v = tex_sv;
+			tex_w = tex_sw;
+
+			float tstep = 1.0f / ((float)(bx - ax));
+			float t = 0.0f;
+
+			for (int j = ax; j < bx; j++) {
+				tex_u = (1.0f - t) * tex_su + t * tex_eu;
+				tex_v = (1.0f - t) * tex_sv + t * tex_ev; //TODO(or,delle) maybe optimize this by moving the u and v 
+				tex_w = (1.0f - t) * tex_sw + t * tex_ew; //calulcutions into the if statement
+
+				if (tex_w > scene->pixelDepthBuffer[i * (size_t)screen->width + j]) {
+					//Vector3 dir_to = (t.sprite_pixel_location(x, y) - lpos).normalized();
+					int su = (tex_u / tex_w) * tri.orig->sprite->width;
+					int sv = (tex_v / tex_w) * tri.orig->sprite->height;
+					Edge3D ray = Edge3D(lpos, tri.orig->sprite_pixel_location(su, sv));
+
+					bool collided = false;
+					for(Mesh* mesh : scene->meshes) {
+						for(Triangle& tr : mesh->triangles) {
+							if(tri.orig != &tr) {
+								if(tr.line_intersect(&ray)) {
+									collided = true;
+									break;
+								}
+							}
+						}
+					}
+
+					if (!collided) {
+						float dist = (tri.orig->sprite_pixel_location(su, sv) - scene->lights[0]->position).mag();
+						tri.orig->sprite->SetPixel(Vector2(su, sv),
+							olc::Pixel(
+								floor(std::clamp(255 * (1 / (dist)), 0.f, 255.f)),
+								floor(std::clamp(255 * (1 / (dist)), 0.f, 255.f)),
+								floor(std::clamp(255 * (1 / (dist)), 0.f, 255.f))));
+					} else {
+						tri.orig->sprite->SetPixel(Vector2(su, sv), olc::BLACK);
+					}
+
+					p->Draw(j, i, tri.orig->sprite->Sample(tex_u / tex_w, tex_v / tex_w));
+					scene->pixelDepthBuffer[i * (size_t)screen->width + j] = tex_w;
+				}
+				t += tstep;
+			}
+		}
+	}
+
+	dy1 = y3 - y2;
+	dx1 = x3 - x2;
+	dv1 = v3 - v2;
+	du1 = u3 - u2;
+	dw1 = w3 - w2;
+
+	if (dy1) dax_step = dx1 / (float)abs(dy1);
+	if (dy2) dbx_step = dx2 / (float)abs(dy2);
+
+	du1_step = 0, dv1_step = 0;
+	if (dy1) du1_step = du1 / (float)abs(dy1);
+	if (dy1) dv1_step = dv1 / (float)abs(dy1);
+	if (dy1) dw1_step = dw1 / (float)abs(dy1);
+
+	if (dy1) {
+		for (int i = y2; i <= y3; i++) {
+			int ax = x2 + (float)(i - y2) * dax_step;
+			int bx = x1 + (float)(i - y1) * dbx_step;
+
+			float tex_su = u2 + (float)(i - y2) * du1_step;
+			float tex_sv = v2 + (float)(i - y2) * dv1_step;
+			float tex_sw = w2 + (float)(i - y2) * dw1_step;
+
+			float tex_eu = u1 + (float)(i - y1) * du2_step;
+			float tex_ev = v1 + (float)(i - y1) * dv2_step;
+			float tex_ew = w1 + (float)(i - y1) * dw2_step;
+
+			if (ax > bx) {
+				std::swap(ax, bx);
+				std::swap(tex_su, tex_eu);
+				std::swap(tex_sv, tex_ev);
+				std::swap(tex_sw, tex_ew);
+			}
+
+			tex_u = tex_su;
+			tex_v = tex_sv;
+			tex_w = tex_sw;
+
+			float tstep = 1.0f / ((float)(bx - ax));
+			float t = 0.0f;
+
+			int ray_iter = 0.1;
+			Vector3 lpos = scene->lights[0]->position; // do not feel like writing this every time
+
+			for (int j = ax; j < bx; j++) {
+				tex_u = (1.0f - t) * tex_su + t * tex_eu;
+				tex_v = (1.0f - t) * tex_sv + t * tex_ev;
+				tex_w = (1.0f - t) * tex_sw + t * tex_ew;
+
+				if (tex_w > scene->pixelDepthBuffer[i * (size_t)screen->width + j]) {
+
+					int su = (tex_u / tex_w) * tri.orig->sprite->width;
+					int sv = (tex_v / tex_w) * tri.orig->sprite->height;
+					Edge3D ray = Edge3D(lpos, tri.orig->sprite_pixel_location(su, sv));
+
+					bool collided = false;
+					for(Mesh* mesh : scene->meshes) {
+						for(Triangle& tr : mesh->triangles) {
+							if(tri.orig != &tr) {
+								if(tr.line_intersect(&ray)) {
+									collided = true;
+									break;
+								}
+							}
+						}
+					}
+
+					if (!collided) {
+						float dist = (tri.orig->sprite_pixel_location(su, sv) - scene->lights[0]->position).mag();
+
+
+						tri.orig->sprite->SetPixel(Vector2(su, sv),
+							olc::Pixel(
+								floor(std::clamp(255 * (1 / (dist)), 0.f, 255.f)),
+								floor(std::clamp(255 * (1 / (dist)), 0.f, 255.f)),
+								floor(std::clamp(255 * (1 / (dist)), 0.f, 255.f))));
+					}
+					else {
+						tri.orig->sprite->SetPixel(Vector2(su, sv), olc::BLACK);
+					}
+
+
+					p->Draw(j, i, tri.orig->sprite->Sample(tex_u / tex_w, tex_v / tex_w));
+					scene->pixelDepthBuffer[i * (size_t)screen->width + j] = tex_w;
+				}
+				t += tstep;
+			}
+		}
+	}
+}
 
 int ClipTriangles(const Vector3& plane_p, Vector3 plane_n, Triangle* in_tri, std::array<Triangle*, 2>& out_tris) {
 	plane_n.normalize();
@@ -190,6 +396,7 @@ int ClipTriangles(const Vector3& plane_p, Vector3 plane_n, Triangle* in_tri, std
 	} else if (nInsidePointCount == 1 && nOutsidePointCount == 2) {
 		Triangle* newTri = new Triangle();
 		newTri->color = in_tri->color;
+		newTri->sprite = in_tri->sprite;
 		newTri->e = 0; //set pointer to zero, so we can mark it for deletion
 
 		//the inside point is valid so we keep it
@@ -213,6 +420,7 @@ int ClipTriangles(const Vector3& plane_p, Vector3 plane_n, Triangle* in_tri, std
 	//triangle will be clipped and becomes a quad which is cut into two more triangles
 		Triangle* newTri = new Triangle();
 		newTri->color = in_tri->color;
+		newTri->sprite = in_tri->sprite;
 		newTri->e = 0; //set pointer to zero, so we can mark it for deletion
 		newTri->proj_points[0] = *inside_points[0];
 		newTri->proj_points[1] = *inside_points[1];
@@ -225,6 +433,7 @@ int ClipTriangles(const Vector3& plane_p, Vector3 plane_n, Triangle* in_tri, std
 
 		Triangle* newTri2 = new Triangle();
 		newTri2->color = in_tri->color;
+		newTri2->sprite = in_tri->sprite;
 		newTri2->e = 0; //set pointer to zero, so we can mark it for deletion
 		newTri2->proj_points[0] = *inside_points[1];
 		newTri2->proj_tex_points[0] = *inside_tex[1];
@@ -243,7 +452,7 @@ int ClipTriangles(const Vector3& plane_p, Vector3 plane_n, Triangle* in_tri, std
 	}
 } //ClipTriangles
 
-int RenderTriangles(Scene* scene, Camera* camera, ScreenSingleton* screen, olc::PixelGameEngine* p) {
+int RenderTriangles(Scene* scene, Camera* camera, Screen* screen, olc::PixelGameEngine* p) {
 	int drawnTriCount = 0;
 	for(Mesh* mesh : scene->meshes) {
 		std::vector<Vector3*> screenSpaceVertices;
@@ -255,6 +464,9 @@ int RenderTriangles(Scene* scene, Camera* camera, ScreenSingleton* screen, olc::
 			}
 
 			t.copy_points(); //copy worldspace points to proj_points
+			t.set_normal();
+			t.set_area();
+
 			Vector3 triNormal = t.get_normal();
 			float light_ray1 = (scene->lights[0]->position - t.points[0]).dot(triNormal);
 
@@ -266,14 +478,15 @@ int RenderTriangles(Scene* scene, Camera* camera, ScreenSingleton* screen, olc::
 				}
 
 		//darken pixels based on light in camera space
-				for(int spriteX = 0; spriteX < 25; ++spriteX) {
-					for(int spriteY = 0; spriteY < 25; ++spriteY) {
-						float dist = (t.sprite_pixel_location(spriteX, spriteY) - scene->lights[0]->position).mag();
-						//float dp = (scene->lights[0]->position - zClipped[zClipIndex]->points[0]).dot(zClipped[zClipIndex]->get_normal());
-						float rgb = floor(std::clamp(255 * (1 /  (2 * dist)), 0.f, 255.f));
-						t.sprite->SetPixel(Vector2(spriteX, spriteY), olc::Pixel(rgb, rgb, rgb));
-					}
-				}
+				//for(int spriteX = 0; spriteX < 25; ++spriteX) {
+				//	for(int spriteY = 0; spriteY < 25; ++spriteY) {
+				//		float dist = (t.sprite_pixel_location(spriteX, spriteY) - scene->lights[0]->position).mag();
+				//		//float dp = (scene->lights[0]->position - zClipped[zClipIndex]->points[0]).dot(zClipped[zClipIndex]->get_normal());
+				//		float rgb = floor(std::clamp(255 * (1 /  (2 * dist)), 0.f, 255.f));
+				//		t.sprite->SetPixel(Vector2(spriteX, spriteY), olc::Pixel(rgb, rgb, rgb));
+				//	}
+				//}
+
 
 		//clip to the nearZ plane
 				std::array<Triangle*, 2> zClipped = {};
@@ -292,7 +505,9 @@ int RenderTriangles(Scene* scene, Camera* camera, ScreenSingleton* screen, olc::
 							screenSpaceVertices.push_back(&zClipped[zClipIndex]->proj_points[pIndex]);
 						}
 					}
-					zClipped[zClipIndex]->sprite = t.sprite;
+					zClipped[zClipIndex]->orig = &t;
+					zClipped[zClipIndex]->color = olc::BLUE;
+					//zClipped[zClipIndex]->sprite = t.sprite;
 
 		//clip to screen borders
 					std::list<std::pair<bool, Triangle*>> borderClippedTris;
@@ -315,6 +530,8 @@ int RenderTriangles(Scene* scene, Camera* camera, ScreenSingleton* screen, olc::
 
 							for(int bClipIndex = 0; bClipIndex < numBClipped; ++bClipIndex) {
 								bClipped[bClipIndex]->sprite = zClipped[zClipIndex]->sprite;
+								bClipped[bClipIndex]->color = olc::RED;
+								bClipped[bClipIndex]->orig = tri->orig;
 
 								//if its a new triangle, mark it for deletion since its not owned by a mesh
 								if(bClipped[bClipIndex]->e) {
@@ -332,11 +549,12 @@ int RenderTriangles(Scene* scene, Camera* camera, ScreenSingleton* screen, olc::
 						Triangle* tr = pair.second;
 						//draw textures
 						if(scene->RENDER_TEXTURES) {				
-							TexturedTriangle(scene, screen, p,
-								tr->proj_points[0].x, tr->proj_points[0].y, tr->proj_tex_points[0].x, tr->proj_tex_points[0].y, tr->proj_tex_points[0].z,
-								tr->proj_points[1].x, tr->proj_points[1].y, tr->proj_tex_points[1].x, tr->proj_tex_points[1].y, tr->proj_tex_points[1].z,
-								tr->proj_points[2].x, tr->proj_points[2].y, tr->proj_tex_points[2].x, tr->proj_tex_points[2].y, tr->proj_tex_points[2].z,
-								tr->sprite);
+							TexturedTriangle(scene, screen, p, *tr);
+							//TexturedTriangle(scene, screen, p,
+							//	tr->proj_points[0].x, tr->proj_points[0].y, tr->proj_tex_points[0].x, tr->proj_tex_points[0].y, tr->proj_tex_points[0].z,
+							//	tr->proj_points[1].x, tr->proj_points[1].y, tr->proj_tex_points[1].x, tr->proj_tex_points[1].y, tr->proj_tex_points[1].z,
+							//	tr->proj_points[2].x, tr->proj_points[2].y, tr->proj_tex_points[2].x, tr->proj_tex_points[2].y, tr->proj_tex_points[2].z,
+							//	tr->sprite);
 						}
 
 						//draw wireframe
@@ -418,7 +636,7 @@ bool ClipLineToZPlanes(Vector3& start, Vector3& end, Camera* camera) {
 //cohen-sutherland algorithm https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
 //the input vectors should be in screen space
 //returns true if the line can be rendered after clipping, false otherwise
-bool ClipLineToBorderPlanes(Vector3& start, Vector3& end, ScreenSingleton* screen) {
+bool ClipLineToBorderPlanes(Vector3& start, Vector3& end, Screen* screen) {
 	//clip to the vertical and horizontal planes
 	const int CLIP_INSIDE = 0;
 	const int CLIP_LEFT = 1;
@@ -489,7 +707,7 @@ bool ClipLineToBorderPlanes(Vector3& start, Vector3& end, ScreenSingleton* scree
 	}
 } //ClipLineToBorderPlanes
 
-int RenderLines(Scene* scene, Camera* camera, ScreenSingleton* screen, olc::PixelGameEngine* p) {
+int RenderLines(Scene* scene, Camera* camera, Screen* screen, olc::PixelGameEngine* p) {
 	int out = 0;
 	for(Edge3D* l : scene->lines) {
 	//convert vertexes from world to camera/viewMatrix space
@@ -516,9 +734,9 @@ int RenderLines(Scene* scene, Camera* camera, ScreenSingleton* screen, olc::Pixe
 void RenderSceneSystem::Update() {
 	Scene* scene = admin->currentScene;
 	Camera* camera = admin->currentCamera;
-	InputSingleton* input = admin->singletonInput;
+	Input* input = admin->singletonInput;
 	Keybinds* binds = admin->currentKeybinds;
-	ScreenSingleton* screen = admin->singletonScreen;
+	Screen* screen = admin->singletonScreen;
 	olc::PixelGameEngine* p = admin->p;
 
 //// Scene Manangement ////
@@ -569,14 +787,7 @@ void RenderSceneSystem::Update() {
 
 //// Scene Rendering ////
 
-	//render triangles
-	int drawnTriCount = RenderTriangles(scene, camera, screen, p);
-
-	//render lines
-	int drawnLineCount = RenderLines(scene, camera, screen, p);
-
-	//render debug stuff
-
+	//render world grid
 	if(scene->RENDER_GRID) {
 		for(int i = -20; i < 21; ++i) {
 			scene->lines.push_back(new RenderedEdge3D(Vector3(-100, 0, i*5), Vector3(100, 0, i*5), olc::GREY));
@@ -586,17 +797,32 @@ void RenderSceneSystem::Update() {
 		scene->lines.push_back(new RenderedEdge3D(Vector3(0, 0, -100), Vector3(0, 0, 100), olc::BLUE));
 	}
 
+	//render light rays
+	if(scene->RENDER_LIGHT_RAYS) {
+		for(Light* l : scene->lights) {
+			scene->lines.push_back(new RenderedEdge3D(l->position, l->direction * l->strength, olc::YELLOW));
+		}
+	}
+
+	//render triangles
+	int drawnTriCount = RenderTriangles(scene, camera, screen, p);
+
+	//render lines
+	int drawnLineCount = RenderLines(scene, camera, screen, p);
+
+	//render local transforms
 	if(scene->RENDER_TRANSFORMS) {
 		for(auto& pair : render_transforms) {
 			p->DrawString(pair.first, pair.second);
 		}
 	}
 
+	//render global axis in top right of screen
 	if(scene->RENDER_GLOBAL_AXIS) {
 		Vector2 zeroVertex = Math::WorldToScreen2D(Vector3::ZERO, camera->projectionMatrix, camera->viewMatrix, screen->dimensions);
-		Vector2 yVertex = Math::WorldToScreen2D(Vector3::UP, camera->projectionMatrix, camera->viewMatrix, screen->dimensions);
-		Vector2 xVertex = Math::WorldToScreen2D(Vector3::RIGHT, camera->projectionMatrix, camera->viewMatrix, screen->dimensions);
-		Vector2 zVertex = Math::WorldToScreen2D(Vector3::FORWARD, camera->projectionMatrix, camera->viewMatrix, screen->dimensions);
+		Vector2 yVertex =	 Math::WorldToScreen2D(Vector3::UP, camera->projectionMatrix, camera->viewMatrix, screen->dimensions);
+		Vector2 xVertex =	 Math::WorldToScreen2D(Vector3::RIGHT, camera->projectionMatrix, camera->viewMatrix, screen->dimensions);
+		Vector2 zVertex =	 Math::WorldToScreen2D(Vector3::FORWARD, camera->projectionMatrix, camera->viewMatrix, screen->dimensions);
 		p->DrawLine(Vector2(screen->dimensions.x-50, 50), Vector2(screen->dimensions.x-50, 50) + (yVertex-zeroVertex).norm()*20, olc::GREEN);
 		p->DrawLine(Vector2(screen->dimensions.x-50, 50), Vector2(screen->dimensions.x-50, 50) + (xVertex-zeroVertex).norm()*20, olc::RED);
 		p->DrawLine(Vector2(screen->dimensions.x-50, 50), Vector2(screen->dimensions.x-50, 50) + (zVertex-zeroVertex).norm()*20, olc::BLUE);

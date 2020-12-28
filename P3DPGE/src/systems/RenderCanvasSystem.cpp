@@ -2,7 +2,7 @@
 #include "../utils/GLOBALS.h"
 
 #include "../components/Canvas.h"
-#include "../components/ScreenSingleton.h"
+#include "../components/Screen.h"
 
 inline void AddDebugMenu(EntityAdmin* admin, Canvas* canvas) {
 	std::vector<Button*> debug_buttons = std::vector<Button*>();
@@ -61,7 +61,7 @@ void RenderCanvasSystem::Init() {
 
 void RenderCanvasSystem::Update() {
 	Canvas*					canvas = admin->tempCanvas;
-	ScreenSingleton*		screen = admin->singletonScreen;
+	Screen*		screen = admin->singletonScreen;
 	olc::PixelGameEngine*	p = admin->p;
 
 	if(!canvas->hideAll) {

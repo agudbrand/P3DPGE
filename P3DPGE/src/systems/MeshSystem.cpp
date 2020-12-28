@@ -7,26 +7,20 @@
 #include "../components/Physics.h"
 
 #include "../utils/Command.h"
-#include "../components/InputSingleton.h"
+#include "../components/Input.h"
 #include "../components/Camera.h"
 #include "../components/Scene.h"
-#include "../components/ScreenSingleton.h"
+#include "../components/Screen.h"
 
 inline void AddSelectEntityCommand(EntityAdmin* admin) {
 	admin->commands["select_entity"] = new Command([](EntityAdmin* admin) {
 		admin->singletonInput->selectedEntity = nullptr;
 		Vector3 pos = Math::ScreenToWorld(admin->singletonInput->mousePos, admin->currentCamera->projectionMatrix, 
 											admin->currentCamera->viewMatrix, admin->singletonScreen->dimensions);
-		LOG("Screen to world ", pos);
-		pos.WorldToLocal(admin->currentCamera->position);
-		LOG("World to local  ", pos);
+		pos *= Math::WorldToLocal(admin->currentCamera->position);
 		pos.normalize();
-		LOG("Normalize       ", pos);
 		pos *= 1000;
-		LOG("Times 1000      ", pos);
-		pos.LocalToWorld(admin->currentCamera->position);
-		LOG("Local to world  ", pos);
-		LOG(admin->currentCamera->position);
+		pos *= Math::LocalToWorld(admin->currentCamera->position);
 
 		//draw ray if debugging
 		RenderedEdge3D* ray = new RenderedEdge3D(pos, admin->currentCamera->position);

@@ -9,10 +9,10 @@ struct Component;
 struct Command;
 
 struct PhysicsWorld;
-struct InputSingleton;
-struct ScreenSingleton;
-struct TimeSingleton;
-struct WorldSingleton;
+struct Input;
+struct Screen;
+struct Time;
+struct World;
 
 struct Camera;
 struct Keybinds;
@@ -30,10 +30,10 @@ struct EntityAdmin {
 	PhysicsWorld* physicsWorld;
 
 	//singletons
-	InputSingleton* singletonInput;
-	ScreenSingleton* singletonScreen;
-	TimeSingleton* singletonTime;
-	WorldSingleton* singletonWorld;
+	Input* singletonInput;
+	Screen* singletonScreen;
+	Time* singletonTime;
+	World* singletonWorld;
 
 	Camera* currentCamera;
 	Keybinds* currentKeybinds;

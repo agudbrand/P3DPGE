@@ -11,8 +11,12 @@ struct Triangle {
 	Vector3 tex_points[3];
 	Vector3 proj_tex_points[3];
 
-	Entity* e = nullptr;
+	Triangle* orig		= nullptr;
+	Entity* e			= nullptr;
 	olc::Sprite* sprite = nullptr;
+
+	Vector3 normal;
+	float area;
 
 	bool alt_tri = false;
 
@@ -40,14 +44,7 @@ struct Triangle {
 		tex_points[1] = Vector3(0, 1, 1);
 		tex_points[2] = Vector3(1, 0, 1);
 
-		sprite = new olc::Sprite(50, 50);
-
-		for (int i = 0; i < 50; i++) {
-			for (int o = 0; o < 50; o++) {
-				sprite->SetPixel(Vector2(i, o), olc::Pixel(floor(255 * ((float)i / 50)), floor(255 * ((float)o / 50)), 50));
-			}
-		}
-
+		//sprite = new olc::Sprite(50, 50);
 	};
 
 	Triangle(Vector3 p1, Vector3 p2, Vector3 p3, Entity* e) {
@@ -61,7 +58,9 @@ struct Triangle {
 		edges[2] = Edge(p3, p1);
 
 		this->e = e;
+		sprite = new olc::Sprite(15, 15);
 	}
+
 	//for constructing a triangle with texture points
 	Triangle(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 t1, Vector3 t2, Vector3 t3, Entity* e) {
 		points[0] = p1;
@@ -69,27 +68,18 @@ struct Triangle {
 		points[2] = p3;
 		copy_points();
 
-
-
-
 		edges[0] = Edge(p1, p2);
 		edges[1] = Edge(p2, p3);
 		edges[2] = Edge(p3, p1);
 
-		sprite = new olc::Sprite(25, 25);
+		sprite = new olc::Sprite(15, 15);
 
 		if ((points[2] - points[0]).mag() > (points[2] - points[1]).mag()) {
 			alt_tri = true;
-
-
 			tex_points[0] = Vector3(0, 1, 1);
 			tex_points[1] = Vector3(0, 0, 1);
 			tex_points[2] = Vector3(1, 0, 1);
-
-		}
-		else {
-
-
+		} else {
 			tex_points[0] = Vector3(0, 1, 1);
 			tex_points[1] = Vector3(1, 0, 1);
 			tex_points[2] = Vector3(0, 0, 1);
@@ -97,6 +87,35 @@ struct Triangle {
 
 		this->e = e;
 	}
+
+	Triangle(Vector3 p1, Vector3 p2, Vector3 p3, olc::Sprite* sprite, Entity* e) {
+		points[0] = p1;
+		points[1] = p2;
+		points[2] = p3;
+		copy_points();
+
+		edges[0] = Edge(p1, p2);
+		edges[1] = Edge(p2, p3);
+		edges[2] = Edge(p3, p1);
+
+		sprite = new olc::Sprite(15, 15);
+
+		if ((points[2] - points[0]).mag() > (points[2] - points[1]).mag()) {
+			alt_tri = true;
+			tex_points[0] = Vector3(0, 1, 1);
+			tex_points[1] = Vector3(0, 0, 1);
+			tex_points[2] = Vector3(1, 0, 1);
+		} else {
+			tex_points[0] = Vector3(0, 1, 1);
+			tex_points[1] = Vector3(1, 0, 1);
+			tex_points[2] = Vector3(0, 0, 1);
+		}
+
+		this->sprite = sprite;
+		this->e = e;
+	}
+
+	~Triangle() {}
 
 	void copy_points() {
 		for (int p = 0; p < 3; p++) { proj_points[p] = points[p]; }
@@ -119,9 +138,11 @@ struct Triangle {
 	}
 
 	Vector3 get_normal() {
-		Vector3 l1 = points[1] - points[0];
-		Vector3 l2 = points[2] - points[0];
-		return l1.cross(l2).yInvert().normalized();
+		return (points[1] - points[0]).cross(points[2] - points[0]).yInvert().normalized();
+	}
+
+	void set_normal() {
+		normal = (points[1] - points[0]).cross(points[2] - points[0]).yInvert().normalized();
 	}
 
 	Vector3 get_proj_normal() {
@@ -153,12 +174,34 @@ struct Triangle {
 
 	}
 
+	//for giving normalized sprite coordinates
+	Vector3 sprite_pixel_location(float nx, float ny) {
+		int x = nx * sprite->width;
+		int y = ny * sprite->height;
+		if (alt_tri) {
+			Vector3 v21 = points[2] - points[1];
+			Vector3 v01 = points[0] - points[1]; //TODO(or,delle) maybe optimize this by combining .mag() calls since they are expensive
+			float xdiv = v21.mag() / (sprite->width);
+			float ydiv = v01.mag() / (sprite->height);
+			Vector3 v0x = points[1] + v21.normalized() * x * xdiv;
+			Vector3 v0y = points[1] + v01.normalized() * y * ydiv;
+			return points[1] + (v0x - points[1]) + (v0y - points[1]);
+		} else {
+			Vector3 v21 = points[1] - points[2];
+			Vector3 v20 = points[0] - points[2];
+			float xdiv = v21.mag() / (sprite->width);
+			float ydiv = v20.mag() / (sprite->height);
+			Vector3 v0x = points[2] + v21.normalized() * x * xdiv;
+			Vector3 v0y = points[2] + v20.normalized() * y * ydiv;
+			return points[2] + (v0x - points[2]) + (v0y - points[2]);
+		}
+	}
+
 	//checks if a triangle contains a point in screen space
 	//this works by forming a line between each point on the triangle
 	//and checks to see if the test point is within the region enclosed
 	//by those three lines
 	bool contains_point(Vector3 point) {
-
 		update_edges();
 
 		//if normal points up then bool is true
@@ -190,25 +233,27 @@ struct Triangle {
 
 		if (the_final_truth) { return true; }
 		else { return false; }
-
 	}
 
 	float get_area() { return Math::TriangleArea(points[1] - points[0], points[2] - points[0]); }
+	void set_area()	 { area = Math::TriangleArea(points[1] - points[0], points[2] - points[0]); }
 
 	bool line_intersect(Edge3D* e) {
 		float t = 0;
 
 		Vector3 i = Math::VectorPlaneIntersect(points[0], get_normal(), e->p[0], e->p[1], t);
 
-		float a1 = Triangle(i, points[0], points[2]).get_area();
-		float a2 = Triangle(i, points[2], points[1]).get_area();
-		float a3 = Triangle(i, points[1], points[0]).get_area();
+		float a1 = Math::TriangleArea(points[0] - i, points[2] - i);
+		float a2 = Math::TriangleArea(points[2] - i, points[1] - i);
+		float a3 = Math::TriangleArea(points[1] - i, points[0] - i);
 
 		float ta = Math::round2f((a1 + a2 + a3));
 
-		if (ta > Math::round2f(get_area())) { return false; }
-		else { return true; }
-
+		if (ta > Math::round2f(area) || !e->point_on_edge(i)) { 
+			return false; 
+		} else {
+			return true; 
+		}
 	}
 
 	//debug

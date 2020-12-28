@@ -29,10 +29,10 @@ struct PhysicsWorld {
 	IntegrationMode integrationMode			= IntegrationMode::EULER;
 	CollisionDetectionMode collisionMode	= CollisionDetectionMode::DISCRETE;
 
-	float maxVelocity = 50.f;
+	float maxVelocity = 100.f;
 	float minVelocity = 0.15f;
 
-	float maxRotVelocity =  360.f;
+	float maxRotVelocity =  360.f; //per axis in degrees
 	float minRotVelocity = 1.f;
 
 	float gravity		= 9.81f;

@@ -92,6 +92,7 @@ namespace Math {
 }
 
 
+
 //// Vector3 vs Vector4 Interactions ////
 
 inline Vector4::Vector4(const Vector3& v, const float& w) {
@@ -173,26 +174,6 @@ inline void Vector4::operator *= (const Matrix4& rhs) {
 	x * rhs.data[1] + y * rhs.data[5] + z * rhs.data[9]  + w * rhs.data[13],
 	x * rhs.data[2] + y * rhs.data[6] + z * rhs.data[10] + w * rhs.data[14],
 	x * rhs.data[3] + y * rhs.data[7] + z * rhs.data[11] + w * rhs.data[15]);
-}
-
-inline void Vector3::LocalToWorld(Vector3 offsetFromOrigin) {
-	*this *= Matrix4::TranslationMatrix(offsetFromOrigin);
-}
-
-inline void Vector3::WorldToLocal(Vector3 offsetFromOrigin) {
-	*this *= Matrix4::TranslationMatrix(offsetFromOrigin).Inverse();
-}
-
-inline void Vector3::ScreenToWorld(Matrix4 ProjMat, Matrix4 view, Vector2 screenDimensions) {
-	x /= .5f * (float)screenDimensions.x;
-	y /= .5f * (float)screenDimensions.y;
-	x -= 1.f; y -= 1.f; z = -1.f;
-	*this = Math::ProjMult(this->ToVector4(), ProjMat.Inverse()).ToVector3();
-	*this = Math::ProjMult(this->ToVector4(), view.Inverse()).ToVector3();
-}
-
-inline Vector3 Vector3::ProjectionMultiply(Matrix4 projection) const{
-	return Math::ProjMult(this->ToVector4(), projection).ToVector3();
 }
 
 
@@ -355,7 +336,7 @@ namespace Math {
 
 	//where a line intersects with a plane
 	static Vector3 VectorPlaneIntersect(Vector3 plane_p, Vector3 plane_n, Vector3 line_start, Vector3 line_end, float& t) {
-		plane_n.normalize();
+		//plane_n.normalize();
 		float plane_d = -plane_n.dot(plane_p);
 		float ad = line_start.dot(plane_n);
 		float bd = line_end.dot(plane_n);

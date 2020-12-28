@@ -8,10 +8,10 @@
 #include "../components/Collider.h"
 
 #include "../utils/Command.h"
-#include "../components/InputSingleton.h"
-#include "../components/TimeSingleton.h"
+#include "../components/Input.h"
+#include "../components/Time.h"
 #include "../components/Camera.h"
-#include "../components/ScreenSingleton.h"
+#include "../components/Screen.h"
 
 inline void AddSelectedEntityCommands(EntityAdmin* admin) {
 //// translation ////
@@ -163,7 +163,7 @@ inline std::vector<PhysicsTuple> GetPhysicsTuples(EntityAdmin* admin) {
 
 //TODO(p,delle) look into bettering this physics tick
 //https://gafferongames.com/post/physics_in_3d/
-inline void PhysicsTick(PhysicsTuple& t, PhysicsWorld* pw, TimeSingleton* time) {
+inline void PhysicsTick(PhysicsTuple& t, PhysicsWorld* pw, Time* time) {
 //// translation ////
 
 	//add input forces
@@ -344,7 +344,7 @@ inline void CollisionTick(std::vector<PhysicsTuple>& tuples, PhysicsTuple& t){
 }
 
 void PhysicsSystem::Update() {
-	TimeSingleton* time = admin->singletonTime;
+	Time* time = admin->singletonTime;
 	PhysicsWorld* pw = admin->physicsWorld;
 	
 	std::vector<PhysicsTuple> tuples = GetPhysicsTuples(admin);

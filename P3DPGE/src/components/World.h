@@ -3,16 +3,16 @@
 
 struct Entity;
 
-struct WorldSingleton : public Component {
+struct World : public Component {
 	std::vector<Entity*> creationBuffer;
 	std::vector<Entity*> deletionBuffer;
 
-	WorldSingleton() {
+	World() {
 		creationBuffer = std::vector<Entity*>();
 		deletionBuffer = std::vector<Entity*>();
 	}
 
-	~WorldSingleton() {
+	~World() {
 		for(Entity* e : creationBuffer) delete e;
 		creationBuffer.clear();
 		for(Entity* e : deletionBuffer) delete e;

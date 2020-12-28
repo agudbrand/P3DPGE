@@ -22,9 +22,6 @@
     <Filter Include="src\systems">
       <UniqueIdentifier>{f07fb1c0-78ba-4efa-8ad3-7aedb53f83dd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\components\singletons">
-      <UniqueIdentifier>{157eb905-7685-4230-988f-f2a3d0027f8e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\systems\h">
       <UniqueIdentifier>{324eb69a-40fb-46cf-ada6-ee720a183917}</UniqueIdentifier>
     </Filter>
@@ -135,18 +132,6 @@
     <ClInclude Include="src\systems\WorldSystem.h">
       <Filter>src\systems\h</Filter>
     </ClInclude>
-    <ClInclude Include="src\components\WorldSingleton.h">
-      <Filter>src\components\singletons</Filter>
-    </ClInclude>
-    <ClInclude Include="src\components\TimeSingleton.h">
-      <Filter>src\components\singletons</Filter>
-    </ClInclude>
-    <ClInclude Include="src\components\ScreenSingleton.h">
-      <Filter>src\components\singletons</Filter>
-    </ClInclude>
-    <ClInclude Include="src\components\InputSingleton.h">
-      <Filter>src\components\singletons</Filter>
-    </ClInclude>
     <ClInclude Include="src\geometry\Edge.h">
       <Filter>src\geometry</Filter>
     </ClInclude>
@@ -182,6 +167,18 @@
     </ClInclude>
     <ClInclude Include="src\geometry\Geometry.h">
       <Filter>src\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\Input.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\Screen.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\Time.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\World.h">
+      <Filter>src\components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

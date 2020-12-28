@@ -86,9 +86,6 @@ struct Vector3 {
 	MatrixN ToM1x3() const;
 	MatrixN ToM1x4(float w) const;
 	Vector3 ProjectionMultiply(Matrix4 projection) const;
-	void LocalToWorld(Vector3 pos);
-	void WorldToLocal(Vector3 pos);
-	void ScreenToWorld(Matrix4 ProjMat, Matrix4 view, Vector2 screenDimensions);
 };
 
 //// Constructors ////
@@ -218,31 +215,58 @@ inline Vector3 Vector3::cross(const Vector3& rhs) const {
 	return Vector3(this->y * rhs.z - rhs.y * this->z, this->x * rhs.z - rhs.x * this->z, this->x * rhs.y - rhs.x * this->y);
 }
 
+//inline float Vector3::mag() const {
+//	return std::sqrt(x * x + y * y + z * z);
+//}
+
+//ref: https://betterexplained.com/articles/understanding-quakes-fast-inverse-square-root/
 inline float Vector3::mag() const {
-	return std::sqrt(x * x + y * y + z * z);
+	ASSERT(CHAR_BIT*sizeof(float) == 32 && CHAR_BIT*sizeof(int32) == 32, "This mag method only works if float and int are 32bit");
+	float k = x * x + y * y + z * z;
+	float kHalf = .5f * k;
+	int32 i = *(int32*)&k;
+	i = 0x5f3759df - (i >> 1);
+	k = *(float*)&i;
+	k = k*(1.5f - kHalf*k*k);
+	return 1.f / k;
 }
 
-////ref: https://betterexplained.com/articles/understanding-quakes-fast-inverse-square-root/
-//inline float Vector3::mag() const {
-//	ASSERT(CHAR_BIT*sizeof(float) == 32 && CHAR_BIT*sizeof(int32) == 32, "This mag method only works if float and int are 32bit");
-//	float k = x * x + y * y + z * z;
-//	float kHalf = .5f * k;
-//	int32 i = *(int32*)&k;
-//	i = 0x5f3759df - (i >> 1);
-//	k = *(float*)&i;
-//	k = k*(1.5f - kHalf*k*k);
-//	return 1.f / k;
+//inline void Vector3::normalize() {
+//	if (*this != Vector3(0, 0, 0)) {
+//		*this /= this->mag();
+//	}
 //}
 
 inline void Vector3::normalize() {
 	if (*this != Vector3(0, 0, 0)) {
-		*this /= this->mag();
+		ASSERT(CHAR_BIT*sizeof(float) == 32 && CHAR_BIT*sizeof(int32) == 32, "This mag method only works if float and int are 32bit");
+		float k = x * x + y * y + z * z;
+		float kHalf = .5f * k;
+		int32 i = *(int32*)&k;
+		i = 0x5f3759df - (i >> 1);
+		k = *(float*)&i;
+		k = k*(1.5f - kHalf*k*k);
+		*this *= k;
 	}
 }
 
+//inline Vector3 Vector3::normalized() const {
+//	if (*this != Vector3(0, 0, 0)) {
+//		return *this / this->mag();
+//	}
+//	return Vector3(*this);
+//}
+
 inline Vector3 Vector3::normalized() const {
 	if (*this != Vector3(0, 0, 0)) {
-		return *this / this->mag();
+		ASSERT(CHAR_BIT*sizeof(float) == 32 && CHAR_BIT*sizeof(int32) == 32, "This mag method only works if float and int are 32bit");
+		float k = x * x + y * y + z * z;
+		float kHalf = .5f * k;
+		int32 i = *(int32*)&k;
+		i = 0x5f3759df - (i >> 1);
+		k = *(float*)&i;
+		k = k*(1.5f - kHalf*k*k);
+		return *this * k;
 	}
 	return Vector3(*this);
 }

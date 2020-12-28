@@ -2,7 +2,7 @@
 #include "../EntityAdmin.h"
 #include "../utils/Debug.h"
 
-#include "../components/WorldSingleton.h"
+#include "../components/World.h"
 #include "../components/Transform.h"
 #include "../components/Mesh.h"
 
@@ -11,7 +11,7 @@ void WorldSystem::Init() {
 }
 
 void WorldSystem::Update() {
-	WorldSingleton* world = admin->singletonWorld;
+	World* world = admin->singletonWorld;
 
 	//deletion buffer
 	for(Entity* entity : world->deletionBuffer) {
@@ -35,14 +35,14 @@ void WorldSystem::Update() {
 }
 
 Entity* WorldSystem::CreateEntity(EntityAdmin* admin) {
-	WorldSingleton* world = admin->singletonWorld;
+	World* world = admin->singletonWorld;
 	Entity* e = new Entity;
 	world->creationBuffer.push_back(e);
 	return e;
 }
 
 Entity* WorldSystem::CreateEntity(EntityAdmin* admin, Component* singleton) {
-	WorldSingleton* world = admin->singletonWorld;
+	World* world = admin->singletonWorld;
 	Entity* e = new Entity;
 	AddAComponentToEntity(e, singleton);
 	world->creationBuffer.push_back(e);
@@ -50,7 +50,7 @@ Entity* WorldSystem::CreateEntity(EntityAdmin* admin, Component* singleton) {
 }
 
 Entity* WorldSystem::CreateEntity(EntityAdmin* admin, std::vector<Component*> components) {
-	WorldSingleton* world = admin->singletonWorld;
+	World* world = admin->singletonWorld;
 	Entity* e = new Entity;
 	e->components = components;
 	AddComponentsToEntity(e, components);
@@ -59,13 +59,13 @@ Entity* WorldSystem::CreateEntity(EntityAdmin* admin, std::vector<Component*> co
 }
 
 int32 WorldSystem::AddEntityToCreationBuffer(EntityAdmin* admin, Entity* entity) {
-	WorldSingleton* world = admin->singletonWorld;
+	World* world = admin->singletonWorld;
 	world->creationBuffer.push_back(entity);
 	return world->deletionBuffer.size()-1;
 }
 
 int32 WorldSystem::AddEntityToDeletionBuffer(EntityAdmin* admin, Entity* entity) {
-	WorldSingleton* world = admin->singletonWorld;
+	World* world = admin->singletonWorld;
 	try {
 		admin->entities.at(entity->id);
 		world->deletionBuffer.push_back(entity);

@@ -9,10 +9,10 @@ struct Command;
 
 struct Collider : public Component {
 	Matrix3 inertiaTensor;
-	int8 collisionLayer;
+	int8 collisionLayer = 0;
 
-	bool isTrigger;
-	Command* command; //TODO(p,delle) implement trigger colliders
+	bool isTrigger = false;
+	Command* command = nullptr; //TODO(p,delle) implement trigger colliders
 };
 
 //rotatable box

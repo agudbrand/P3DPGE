@@ -5,7 +5,7 @@
 struct UI;
 struct Entity;
 
-struct InputSingleton : public Component {
+struct Input : public Component {
 	olc::HWButton (*keyboardState)[256];
 	olc::HWButton (*mouseState)[olc::nMouseButtons];
 
@@ -20,7 +20,7 @@ struct InputSingleton : public Component {
 	//entity stuff
 	Entity* selectedEntity = nullptr;
 
-	InputSingleton(olc::PixelGameEngine* p) {
+	Input(olc::PixelGameEngine* p) {
 		keyboardState = &p->pKeyboardState;
 		mouseState = &p->pMouseState;
 		mousePos = Vector2(p->ScreenWidth(), p->ScreenHeight());

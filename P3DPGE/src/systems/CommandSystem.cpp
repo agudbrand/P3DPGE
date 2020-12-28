@@ -1,9 +1,9 @@
 #include "CommandSystem.h"
-
 #include "../utils/Command.h"
+
 #include "../systems/WorldSystem.h"
 
-#include "../components/InputSingleton.h"
+#include "../components/Input.h"
 #include "../components/Keybinds.h"
 #include "../components/Canvas.h"
 #include "../components/Transform.h"
@@ -93,7 +93,7 @@ inline void AddRenderCommands(EntityAdmin* admin) {
 	}, "render_grid", "render_grid");
 }
 
-inline void HandleMouseInputs(EntityAdmin* admin, InputSingleton* input) {
+inline void HandleMouseInputs(EntityAdmin* admin, Input* input) {
 	Canvas* canvas = admin->tempCanvas;
 
 	//mouse left click pressed
@@ -152,7 +152,7 @@ inline void HandleMouseInputs(EntityAdmin* admin, InputSingleton* input) {
 	}
 }
 
-inline void HandleSelectedEntityInputs(EntityAdmin* admin, InputSingleton* input) {
+inline void HandleSelectedEntityInputs(EntityAdmin* admin, Input* input) {
 	//translation
 	if(input->KeyDown(olc::L, INPUT_NONE_HELD)) {
 		admin->ExecCommand("translate_right");
@@ -204,7 +204,7 @@ inline void HandleSelectedEntityInputs(EntityAdmin* admin, InputSingleton* input
 	}
 }
 
-inline void HandleRenderInputs(EntityAdmin* admin, InputSingleton* input, Keybinds* binds) {
+inline void HandleRenderInputs(EntityAdmin* admin, Input* input, Keybinds* binds) {
 	//toggle wireframe
 	if(input->KeyPressed(binds->debugRenderWireframe, INPUT_NONE_HELD)) {
 		admin->ExecCommand("render_wireframe");
@@ -246,7 +246,7 @@ void CommandSystem::Init() {
 }
 
 void CommandSystem::Update() {
-	InputSingleton* input = admin->singletonInput;
+	Input* input = admin->singletonInput;
 	Keybinds* binds = admin->currentKeybinds;
 
 	input->mousePos = admin->p->GetMousePos();

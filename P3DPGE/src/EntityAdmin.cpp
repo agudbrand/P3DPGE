@@ -29,27 +29,29 @@ TODO(p,delle) add physics based collision resolution for all entities
 11. rename singletons to normal
 14. cut down physics to be better
 18. figure out why rotation degenerates in collision
-19. rotation around y is local but every other axis is global? (might be because of perspective matrix)
+19. rotation around y is local but every other axis is global? (maybe because of perspective matrix?)
+20. add a .str() method to Component.h
+21. add a .time() method to System.h
+22. finish Scene.h render option todos
 
 */
 
 /*
----Systems Tick Order---||--------Read/Write Components---------||------------Read Only Components-------------------
-  olcPixelGameEngine	|| InputSingleton						|| N/A
-  TimeSystem			|| TimeSingleton, Command				|| N/A
-  ScreenSystem			|| ScreenSingleton						|| N/A
-  CommandSystem			|| Command, InputSingleton, Canvas		|| N/A 
-  SimpleMovementSystem	|| Camera								|| InputSingleton, Keybinds, MovementState
-						||										||	TimeSingleton
-  PhysicsSystem			|| TimeSingleton, Transform, Physics	|| Camera, Screen
-  CameraSystem			|| Camera								|| ScreenSingleton
-  MeshSystem			|| Mesh									|| Transform
-  RenderSceneSystem		|| Scene								|| Mesh, Camera, InputSingleton, Keybinds, 
-						||										||	ScreenSingleton, TimeSingleton, Transform
-  RenderCanvasSystem	|| Canvas								|| ScreenSingleton
-  WorldSystem			|| WorldSingleton, EntityAdmin,	Entity	|| N/A
-  TriggeredCommandSystem|| Command								|| N/A
-  DebugSystem			|| ALL									|| ALL
+---Systems Tick Order---||--------Read/Write Components-----||------------Read Only Components-------------------
+  olcPixelGameEngine	|| Input							|| N/A
+  TimeSystem			|| Time								|| N/A
+  ScreenSystem			|| Screen							|| N/A
+  CommandSystem			|| Input, Keybinds, Canvas					|| N/A 
+  SimpleMovementSystem	|| Camera							|| Input, Keybinds, MovementState, Time
+  PhysicsSystem			|| Time, Transform, Physics			|| Camera, Screen
+  CameraSystem			|| Camera							|| Screen
+  MeshSystem			|| Mesh								|| Transform
+  RenderSceneSystem		|| Scene							|| Mesh, Camera, Screen, Light, Time, 
+						||									||	Transform, Physics
+  RenderCanvasSystem	|| Canvas							|| Screen
+  WorldSystem			|| World, Entity					|| N/A
+  TriggeredCommandSystem|| N/A								|| N/A
+  DebugSystem			|| ALL								|| ALL
 */
 
 #include "EntityAdmin.h"						//UsefulDefines.h, Debug.h
@@ -64,10 +66,10 @@ TODO(p,delle) add physics based collision resolution for all entities
 
 //component includes
 #include "components/Component.h"				//UsefulDefines.h, <vector>
-#include "components/InputSingleton.h"			//Component.h, Vector3.h
-#include "components/ScreenSingleton.h"			//Component.h, Vector3.h
-#include "components/TimeSingleton.h"			//Component.h, <time.h>
-#include "components/WorldSingleton.h"			//Component.h
+#include "components/Input.h"					//Component.h, Vector3.h
+#include "components/Screen.h"					//Component.h, Vector3.h
+#include "components/Time.h"					//Component.h, <time.h>
+#include "components/World.h"					//Component.h
 #include "components/Camera.h"					//Component.h, Vector3.h, Matrix4.h
 #include "components/Keybinds.h"				//Component.h
 #include "components/MovementState.h"			//Component.h
@@ -80,18 +82,16 @@ TODO(p,delle) add physics based collision resolution for all entities
 
 //system includes
 #include "systems/System.h"						//EntityAdmin.h
-#include "systems/TimeSystem.h"					//System.h |cpp->| TimeSingleton.h, Command.h
-#include "systems/ScreenSystem.h"				//System.h |cpp->| ScreenSingleton.h
-#include "systems/CommandSystem.h"				//System.h |cpp->| Command.h, InputSingleton.h, Canvas.h
-#include "systems/SimpleMovementSystem.h"		//System.h |cpp->| InputSingleton.h, Keybinds.h, Camera.h, MovementState.h, TimeSingleton.h
-#include "systems/PhysicsSystem.h"				//System.h |cpp->| PhysicsWorld.h, Math.h, Transform.h, Physics.h, InputSingleton.h,
-												//		   |	 |	Command.h, InputSingleton.h, TimeSingleton.h, Camera.h, ScreenSingleton.h
-#include "systems/CameraSystem.h"				//System.h |cpp->| Camera.h, ScreenSingleton.h, Command.h
-#include "systems/MeshSystem.h"					//System.h |cpp->| Mesh.h, Transform.h, Physics.h, 
-												//		   |	 |	Command.h, InputSingleton.h, Camera.h, Scene.h, ScreenSingleton.h
-#include "systems/RenderSceneSystem.h"			//System.h |cpp->| Math.h, Scene.h, Mesh.h, Camera.h, Light.h, ScreenSingleton.h, Transform.h, Command.h
-#include "systems/RenderCanvasSystem.h"			//System.h |cpp->| Canvas.h, ScreenSingleton.h
-#include "systems/WorldSystem.h"				//System.h |cpp->| WorldSingleton.h, Transform.h, Mesh.h, Command.h, InputSingleton.h
+#include "systems/TimeSystem.h"					//System.h |cpp->| Time.h, Command.h
+#include "systems/ScreenSystem.h"				//System.h |cpp->| Screen.h
+#include "systems/CommandSystem.h"				//System.h |cpp->| Command.h, Input.h, Canvas.h
+#include "systems/SimpleMovementSystem.h"		//System.h |cpp->| Input.h, Keybinds.h, Camera.h, MovementState.h, Time.h
+#include "systems/PhysicsSystem.h"				//System.h |cpp->| PhysicsWorld.h, Math.h, Transform.h, Physics.h, Input.h, Command.h, Input.h, Time.h, Camera.h, Screen.h
+#include "systems/CameraSystem.h"				//System.h |cpp->| Camera.h, Screen.h, Command.h
+#include "systems/MeshSystem.h"					//System.h |cpp->| Mesh.h, Transform.h, Physics.h, Command.h, Input.h, Camera.h, Scene.h, Screen.h, Light.h
+#include "systems/RenderSceneSystem.h"			//System.h |cpp->| Math.h, Scene.h, Mesh.h, Camera.h, Light.h, Screen.h, Transform.h, Command.h
+#include "systems/RenderCanvasSystem.h"			//System.h |cpp->| Canvas.h, Screen.h
+#include "systems/WorldSystem.h"				//System.h |cpp->| World.h, Transform.h, Mesh.h, Command.h, Input.h
 #include "systems/TriggeredCommandSystem.h"		//System.h |cpp->| Command.h
 
 //debug includes
@@ -110,10 +110,10 @@ void EntityAdmin::Create(olc::PixelGameEngine* p) {
 	physicsWorld = new PhysicsWorld();
 
 	//singleton initialization
-	singletonInput = new InputSingleton(p);
-	singletonScreen = new ScreenSingleton(p);
-	singletonTime = new TimeSingleton();
-	singletonWorld = new WorldSingleton();
+	singletonInput = new Input(p);
+	singletonScreen = new Screen(p);
+	singletonTime = new Time();
+	singletonWorld = new World();
 
 	//current admin components
 	currentCamera = new Camera();
