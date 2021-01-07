@@ -344,3 +344,4 @@ healthchecksdb
 #CodeGraph
 CodeGraphData/
 *.diagsession
+/docs/doxygen
