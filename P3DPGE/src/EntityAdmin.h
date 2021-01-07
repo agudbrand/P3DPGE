@@ -28,7 +28,7 @@ struct EntityAdmin {
 	std::vector<Component*> components;
 	std::map<std::string, Command*> commands;
 	PhysicsWorld* physicsWorld;
-
+	
 	//singletons
 	Input* singletonInput;
 	Screen* singletonScreen;

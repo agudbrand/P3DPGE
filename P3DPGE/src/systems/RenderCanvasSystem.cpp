@@ -39,8 +39,10 @@ inline void AddRenderMenu(EntityAdmin* admin, Canvas* canvas) {
 	render_buttons.push_back(new Button(admin, admin->GetCommand("render_transforms"), "transforms"));
 	render_buttons.push_back(new Button(admin, admin->GetCommand("render_physics"), "physics vectors"));
 	render_buttons.push_back(new Button(admin, admin->GetCommand("render_screen_bounding_box"), "screen aabb"));
-	render_buttons.push_back(new Button(admin, admin->GetCommand("render_mesh_vertices"), "vertices"));
+	render_buttons.push_back(new Button(admin, admin->GetCommand("render_mesh_vertices"), "mesh vertices"));
+	render_buttons.push_back(new Button(admin, admin->GetCommand("render_mesh_normals"), "mesh normals"));
 	render_buttons.push_back(new Button(admin, admin->GetCommand("render_grid"), "grid"));
+	render_buttons.push_back(new Button(admin, admin->GetCommand("render_light_rays"), "light rays"));
 
 	canvas->elements.push_back(new Menu(admin, Vector2(canvas->elements[1]->pos.x + canvas->elements[1]->size.x + 10, 5), 
 								"render_menu", "render", render_buttons));

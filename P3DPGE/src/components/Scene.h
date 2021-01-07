@@ -22,6 +22,7 @@ struct Scene : public Component {
 	bool RENDER_MESH_VERTICES			= false; 
 	bool RENDER_GRID					= false; //TODO(r,delle) upgrade grid to follow camera in smart way
 	bool RENDER_LIGHT_RAYS				= false;
+	bool RENDER_MESH_NORMALS			= false;
 
 	Scene(olc::PixelGameEngine* p) {
 		meshes = std::vector<Mesh*>();

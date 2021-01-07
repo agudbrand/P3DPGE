@@ -247,7 +247,7 @@ struct Triangle {
 		float a2 = Math::TriangleArea(points[2] - i, points[1] - i);
 		float a3 = Math::TriangleArea(points[1] - i, points[0] - i);
 
-		float ta = Math::round2f((a1 + a2 + a3));
+		float ta = Math::round2f(a1 + a2 + a3);
 
 		if (ta > Math::round2f(area) || !e->point_on_edge(i)) { 
 			return false; 

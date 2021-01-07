@@ -91,6 +91,14 @@ inline void AddRenderCommands(EntityAdmin* admin) {
 	admin->commands["render_grid"] = new Command([](EntityAdmin* admin) {
 		admin->currentScene->RENDER_GRID = !admin->currentScene->RENDER_GRID;
 	}, "render_grid", "render_grid");
+
+	admin->commands["render_light_rays"] = new Command([](EntityAdmin* admin) {
+		admin->currentScene->RENDER_LIGHT_RAYS = !admin->currentScene->RENDER_LIGHT_RAYS;
+	}, "render_light_rays", "render_light_rays");
+
+	admin->commands["render_mesh_normals"] = new Command([](EntityAdmin* admin) {
+		admin->currentScene->RENDER_MESH_NORMALS = !admin->currentScene->RENDER_MESH_NORMALS;
+	}, "render_mesh_normals", "render_mesh_normals");
 }
 
 inline void HandleMouseInputs(EntityAdmin* admin, Input* input) {

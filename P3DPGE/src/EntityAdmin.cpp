@@ -26,12 +26,11 @@ TODO(p,delle) add physics based collision resolution for all entities
 6.  store all components in an object pool so that i can loop over that instead of entities [combine with 1]
 8.  add looking up/down
 9.  cleanup all warnings
-11. rename singletons to normal
 14. cut down physics to be better
 18. figure out why rotation degenerates in collision
-19. rotation around y is local but every other axis is global? (maybe because of perspective matrix?)
+19. rotation around y is local but every other axis is global? maybe because of perspective matrix?
 20. add a .str() method to Component.h
-21. add a .time() method to System.h
+21. add a .time() method to System.h to get the time it took to finish
 22. finish Scene.h render option todos
 
 */
@@ -41,7 +40,7 @@ TODO(p,delle) add physics based collision resolution for all entities
   olcPixelGameEngine	|| Input							|| N/A
   TimeSystem			|| Time								|| N/A
   ScreenSystem			|| Screen							|| N/A
-  CommandSystem			|| Input, Keybinds, Canvas					|| N/A 
+  CommandSystem			|| Input, Keybinds, Canvas			|| N/A 
   SimpleMovementSystem	|| Camera							|| Input, Keybinds, MovementState, Time
   PhysicsSystem			|| Time, Transform, Physics			|| Camera, Screen
   CameraSystem			|| Camera							|| Screen
