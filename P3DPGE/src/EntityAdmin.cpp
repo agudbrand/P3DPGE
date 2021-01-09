@@ -22,13 +22,15 @@ TODO(p,delle) add physics based collision resolution for all entities
 3.  cut away alot of triangle
 4.  store all components in an object pool so that i can loop over that instead of entities [combine with 1]
 5.  add looking up/down
-6.  cleanup all (most) warnings
+6.  cleanup some warnings
 7.  cut down physics to be better
-8.  figure out why rotation degenerates in collision
-9.  rotation around y is local but every other axis is global? maybe because of perspective matrix?
+8.  figure out why rotation degenerates in collision, interpolation, and at higher than max velocities
+9.  local y-axis rotation is visually wrong
 10. add a .str() method to Component.h
 11. add a .time() method to System.h to get the time it took to finish
 12. finish Scene.h render option todos
+13. fix UI min widths
+14. fix rotation interpolation
 
 */
 

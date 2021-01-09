@@ -13,9 +13,58 @@
 #include "../components/Camera.h"
 #include "../components/Screen.h"
 
+//TODO(ip,delle) update entity movement commands to be based on EntityID
 inline void AddSelectedEntityCommands(EntityAdmin* admin) {
 //// translation ////
-	//TODO(ip,delle) update entity movement commands to be based on EntityID
+	admin->commands["reset_position"] = new Command([](EntityAdmin* admin) {
+		if(admin->singletonInput->selectedEntity) {
+			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+				p->acceleration = Vector3::ZERO;
+				p->velocity = Vector3::ZERO;
+				p->position = Vector3::ZERO;
+			}
+		}
+	}, "reset_position", "reset_position <EntityID> [String: xyz]");
+
+	admin->commands["reset_position_x"] = new Command([](EntityAdmin* admin) {
+		if(admin->singletonInput->selectedEntity) {
+			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+				p->acceleration = Vector3(0, p->acceleration.y, p->acceleration.z);
+				p->velocity = Vector3(0, p->velocity.y, p->velocity.z);
+				p->position = Vector3(0, p->position.y, p->position.z);
+			}
+		}
+	}, "reset_position_x", "temp");
+
+	admin->commands["reset_position_y"] = new Command([](EntityAdmin* admin) {
+		if(admin->singletonInput->selectedEntity) {
+			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+				p->acceleration = Vector3(p->acceleration.x, 0, p->acceleration.z);
+				p->velocity = Vector3(p->velocity.x, 0, p->velocity.z);
+				p->position = Vector3(p->position.x, 0, p->position.z);
+			}
+		}
+	}, "reset_position_y", "temp");
+
+	admin->commands["reset_position_z"] = new Command([](EntityAdmin* admin) {
+		if(admin->singletonInput->selectedEntity) {
+			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+				p->acceleration = Vector3(p->acceleration.x, p->acceleration.y, 0);
+				p->velocity = Vector3(p->velocity.x, p->velocity.y, 0);
+				p->position = Vector3(p->position.x, p->position.y, 0);
+			}
+		}
+	}, "reset_position_z", "temp");
+
+	admin->commands["reset_velocity"] = new Command([](EntityAdmin* admin) {
+		if(admin->singletonInput->selectedEntity) {
+			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+				p->acceleration = Vector3::ZERO;
+				p->velocity = Vector3::ZERO;
+			}
+		}
+	}, "reset_velocity", "reset_position <EntityID> [String: xyz]");
+
 	admin->commands["translate_right"] = new Command([](EntityAdmin* admin) {
 		if(admin->singletonInput->selectedEntity) {
 			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
@@ -65,6 +114,55 @@ inline void AddSelectedEntityCommands(EntityAdmin* admin) {
 	}, "translate_backward", "translate_backward <EntityID> <amount> [speed]");
 
 //// rotation ////
+
+	admin->commands["reset_rotation"] = new Command([](EntityAdmin* admin) {
+		if(admin->singletonInput->selectedEntity) {
+			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+				p->rotAcceleration = Vector3::ZERO;
+				p->rotVelocity = Vector3::ZERO;
+				p->rotation = Vector3::ZERO;
+			}
+		}
+	}, "reset_rotation", "reset_rotation <EntityID> [String: xyz]");
+
+	admin->commands["reset_rotation_x"] = new Command([](EntityAdmin* admin) {
+		if(admin->singletonInput->selectedEntity) {
+			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+				p->rotAcceleration = Vector3(0, p->rotAcceleration.y, p->rotAcceleration.z);
+				p->rotVelocity = Vector3(0, p->rotVelocity.y, p->rotVelocity.z);
+				p->rotation = Vector3(0, p->rotation.y, p->rotation.z);
+			}
+		}
+	}, "reset_rotation_x", "temp");
+
+	admin->commands["reset_rotation_y"] = new Command([](EntityAdmin* admin) {
+		if(admin->singletonInput->selectedEntity) {
+			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+				p->rotAcceleration = Vector3(p->rotAcceleration.x, 0, p->rotAcceleration.z);
+				p->rotVelocity = Vector3(p->rotVelocity.x, 0, p->rotVelocity.z);
+				p->rotation = Vector3(p->rotation.x, 0, p->rotation.z);
+			}
+		}
+	}, "reset_rotation_y", "temp");
+
+	admin->commands["reset_rotation_z"] = new Command([](EntityAdmin* admin) {
+		if(admin->singletonInput->selectedEntity) {
+			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+				p->rotAcceleration = Vector3(p->rotAcceleration.x, p->rotAcceleration.y, 0);
+				p->rotVelocity = Vector3(p->rotVelocity.x, p->rotVelocity.y, 0);
+				p->rotation = Vector3(p->rotation.x, p->rotation.y, 0);
+			}
+		}
+	}, "reset_rotation_z", "temp");
+
+	admin->commands["reset_rotation_velocity"] = new Command([](EntityAdmin* admin) {
+		if(admin->singletonInput->selectedEntity) {
+			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+				p->rotAcceleration = Vector3::ZERO;
+				p->rotVelocity = Vector3::ZERO;
+			}
+		}
+	}, "reset_rotation_velocity", "reset_rotation_velocity <EntityID> [String: xyz]");
 
 	admin->commands["rotate_+x"] = new Command([](EntityAdmin* admin) {
 		if(admin->singletonInput->selectedEntity) {

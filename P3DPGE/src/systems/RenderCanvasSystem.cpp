@@ -11,7 +11,7 @@ inline void AddDebugMenu(EntityAdmin* admin, Canvas* canvas) {
 	debug_buttons.push_back(new Button(admin, admin->GetCommand("time_pause_engine"), "pause engine toggle"));
 	debug_buttons.push_back(new Button(admin, admin->GetCommand("time_next_frame"), "next frame"));
 
-	canvas->elements.push_back(new Menu(admin, Vector2(5, 5), "debug_menu", "debug", debug_buttons));
+	canvas->elements.push_back(new Menu(admin, Vector2(5, 5), "debug menu", "debug", debug_buttons));
 }
 
 inline void AddSpawnMenu(EntityAdmin* admin, Canvas* canvas) {
@@ -24,8 +24,8 @@ inline void AddSpawnMenu(EntityAdmin* admin, Canvas* canvas) {
 	complex_spawn_buttons.push_back(new Button(admin, admin->GetCommand("spawn_complex1"), "whale_ship", ""));
 	complex_spawn_buttons.push_back(new Button(admin, admin->GetCommand("spawn_complex2"), "24k_Triangles", ""));
 
-	canvas->elements.push_back(new Menu(admin, Vector2(canvas->elements[0]->size.x + 10, 5), "spawn_menu", "spawn", spawn_buttons,
-			std::vector<Menu*>{new Menu(admin, V2ZERO, "complex_spawn", "", complex_spawn_buttons)}));
+	canvas->elements.push_back(new Menu(admin, Vector2(canvas->elements[0]->size.x + 10, 5), "spawn menu", "spawn", spawn_buttons,
+			std::vector<Menu*>{new Menu(admin, V2ZERO, "complex spawn menu", "", complex_spawn_buttons)}));
 }
 
 inline void AddRenderMenu(EntityAdmin* admin, Canvas* canvas) {
@@ -45,7 +45,25 @@ inline void AddRenderMenu(EntityAdmin* admin, Canvas* canvas) {
 	render_buttons.push_back(new Button(admin, admin->GetCommand("render_light_rays"), "light rays"));
 
 	canvas->elements.push_back(new Menu(admin, Vector2(canvas->elements[1]->pos.x + canvas->elements[1]->size.x + 10, 5), 
-								"render_menu", "render", render_buttons));
+								"render menu", "render", render_buttons));
+}
+
+//TODO(,delle) update this to blender-ish style menu with editable values
+inline void AddPropertiesMenu(EntityAdmin* admin, Canvas* canvas) {
+	std::vector<Button*> entity_buttons = std::vector<Button*>();
+	entity_buttons.push_back(new Button(admin, admin->GetCommand("reset_position"), "reset position"));
+	entity_buttons.push_back(new Button(admin, admin->GetCommand("reset_position_x"), "reset x position"));
+	entity_buttons.push_back(new Button(admin, admin->GetCommand("reset_position_y"), "reset y position"));
+	entity_buttons.push_back(new Button(admin, admin->GetCommand("reset_position_z"), "reset z position"));
+	entity_buttons.push_back(new Button(admin, admin->GetCommand("reset_velocity"), "reset velocity"));
+	entity_buttons.push_back(new Button(admin, admin->GetCommand("reset_rotation"), "reset rotation"));
+	entity_buttons.push_back(new Button(admin, admin->GetCommand("reset_rotation_x"), "reset x rotation"));
+	entity_buttons.push_back(new Button(admin, admin->GetCommand("reset_rotation_y"), "reset y rotation"));
+	entity_buttons.push_back(new Button(admin, admin->GetCommand("reset_rotation_z"), "reset z rotation"));
+	entity_buttons.push_back(new Button(admin, admin->GetCommand("reset_rotation_velocity"), "reset rotation velocity"));
+
+	canvas->elements.push_back(new Menu(admin, Vector2(canvas->elements[2]->pos.x + canvas->elements[2]->size.x + 10, 5), 
+								"entity properties", "entity", entity_buttons));
 }
 
 inline void AddBufferLog(EntityAdmin* admin, Canvas* canvas) {
@@ -58,6 +76,7 @@ void RenderCanvasSystem::Init() {
 	AddDebugMenu(admin, canvas);
 	AddSpawnMenu(admin, canvas);
 	AddRenderMenu(admin, canvas);
+	AddPropertiesMenu(admin, canvas);
 	AddBufferLog(admin, canvas);
 }
 
