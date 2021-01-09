@@ -81,15 +81,15 @@ void RenderCanvasSystem::Init() {
 }
 
 void RenderCanvasSystem::Update() {
-	Canvas*					canvas = admin->tempCanvas;
-	Screen*		screen = admin->singletonScreen;
-	olc::PixelGameEngine*	p = admin->p;
+	Canvas*	canvas =			admin->tempCanvas;
+	Screen*	screen =			admin->singletonScreen;
+	olc::PixelGameEngine*p =	admin->p;
 
 	if(!canvas->hideAll) {
 		for(UI* ui : canvas->elements) {
 			if(Menu* m = dynamic_cast<Menu*>(ui)) {
 				if(m->title == "BUFFERLOG") {
-					m->update_dyn_strings(g_cBuffer); //TODO(,sushi) idk this bufferlog stuff
+					m->update_dyn_strings(g_cBuffer);
 				}
 			}
 			ui->Draw(p);

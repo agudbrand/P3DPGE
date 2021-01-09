@@ -16,7 +16,8 @@ TODO(p,delle) add physics based collision resolution for all entities
 
 */
 
-/* ECS conversion TODOs
+/* TODOs
+
 1.  create templated component tuple iterator that loops thru a vector and returns an iterator of components of templated type
 2.  store Light and other components on entities
 3.  cut away alot of triangle
@@ -31,6 +32,7 @@ TODO(p,delle) add physics based collision resolution for all entities
 12. finish Scene.h render option todos
 13. fix UI min widths
 14. fix rotation interpolation
+15. add auto organization to UI
 
 */
 

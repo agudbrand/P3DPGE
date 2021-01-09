@@ -3,6 +3,9 @@
 #include "../math/Math.h"
 #include "Command.h"
 
+#define FONT_HEIGHT	7
+#define FONT_WIDTH	8
+
 struct EntityAdmin;
 
 //temporary UI class placement
@@ -134,7 +137,7 @@ struct Menu : public UI {
 	int descr_max_width;
 	bool no_desc = false;
 
-	int str_max_width;
+	int str_max_width = 0;
 
 	int row_h = 15;
 	int border_room = 10;
@@ -159,42 +162,51 @@ struct Menu : public UI {
 		int b_min_width = 0;
 
 		for (Button* b : buttons) {
-			bt_width = 8 * b->title.size();
-			bd_width = 8 * b->description.size();
+			bt_width = FONT_WIDTH * b->title.size();
+			bd_width = FONT_WIDTH * b->description.size();
 			b_min_width = bt_width + bd_width + 10;
 			if (b_min_width > min_width) { min_width = b_min_width; }
 			if (bt_width > title_max_width) { title_max_width = bt_width; }
 			if (bd_width > descr_max_width) { descr_max_width = bd_width; }
 		} 
 
+		Debug::ToString(1, title + std::string(": ") + std::to_string(min_width));
+
 		for (auto& s : dynamic_strings.container) {
-			if (s) {
-				if (s.value().size() * 8 > str_max_width) { str_max_width = s.value().size() * 8; }
+			if (s && s.value().size() * FONT_WIDTH > str_max_width) {
+				str_max_width = s.value().size() * FONT_WIDTH; 
+				min_width = bt_width + bd_width + str_max_width;
 			}
-			min_width = bt_width + bd_width + str_max_width;
 		}
 
 		if (descr_max_width == 0) {
 			no_desc = true;
+			min_width += str_max_width;
+		} else {
 			min_width = bt_width + bd_width + str_max_width;
-			
 		}
 
+		Debug::ToString(1, title + std::string(": ") + std::to_string(min_width));
 	}
 
 	void resize() {
 
 		if (buttons.size() == 0 && dynamic_strings.real_size == 0) {
-			size = Vector2(title.size() * 8 + 35, 20);
+			size = Vector2(title.size() * FONT_WIDTH + 35, 20);
 		}
 		else {
 			calc_min_width();
+			Debug::ToString(0, std::to_string(min_width));
 			size.x = min_width + 2 * border_room;
+			Debug::ToString(0, std::to_string(size.x));
 			size.y = row_h * (buttons.size() + dynamic_strings.real_size) + row_h + height_room;
-			if (size.x < title.size() * 8 + 35) {
-				size.x = title.size() * 8 + 35;
+			if (size.x < title.size() * FONT_WIDTH + 35) {
+				size.x = title.size() * FONT_WIDTH + 35;
 			}
+			Debug::ToString(0, std::to_string(size.x));
 		}
+
+		Debug::ToString(0, title + std::string(": ") + size.str());
 	}
 
 	void add_button(Button* b) {
@@ -216,8 +228,8 @@ struct Menu : public UI {
 		int index = 1;
 
 		if (closed) {
-			p->FillRect(Vector2(pos.x - 1, pos.y - 2), Vector2(cl_title.size() * 8 + 4, 9), olc::VERY_DARK_CYAN);
-			cl_button->size = Vector2(cl_title.size() * 8 + 4, 9);
+			p->FillRect(Vector2(pos.x - 1, pos.y - 2), Vector2(cl_title.size() * FONT_WIDTH + 4, 9), olc::VERY_DARK_CYAN);
+			cl_button->size = Vector2(cl_title.size() * FONT_WIDTH + 4, 9);
 			cl_button->pos = Vector2(pos.x - 1, pos.y - 2);
 			p->DrawString(pos, cl_title);
 		}
@@ -229,7 +241,7 @@ struct Menu : public UI {
 			p->FillRect(pos, Vector2(size.x, row_h), olc::VERY_DARK_CYAN);
 
 			//title
-			p->DrawString(Vector2(pos.x + ((size.x / 2) - (8 * title.size() / 2)), pos.y + (row_h / 2) - 4), title);
+			p->DrawString(Vector2(pos.x + ((size.x / 2) - (FONT_WIDTH * title.size() / 2)), pos.y + (row_h / 2) - 4), title);
 
 			int bspaceinc = (size.y - row_h) / (buttons.size() + dynamic_strings.real_size);
 
@@ -242,9 +254,9 @@ struct Menu : public UI {
 
 			//buttons
 			for (Button* b : buttons) {
-				p->FillRect(Vector2(pos.x + border_room - 2, pos.y + row_h - 2 + ((index * bspaceinc) - (bspaceinc * 0.75f))), Vector2(b->title.size() * 8 + 4, bspaceinc - 2), olc::Pixel(0, 31, 31));
+				p->FillRect(Vector2(pos.x + border_room - 2, pos.y + row_h - 2 + ((index * bspaceinc) - (bspaceinc * 0.75f))), Vector2(b->title.size() * FONT_WIDTH + 4, bspaceinc - 2), olc::Pixel(0, 31, 31));
 				b->pos = Vector2(pos.x + border_room, pos.y + row_h - 3 + ((index * bspaceinc) - (bspaceinc * 0.75f))); // could probably do this somewhere else.
-				b->size = Vector2(b->title.size() * 8 + 4, bspaceinc - 2);
+				b->size = Vector2(b->title.size() * FONT_WIDTH + 4, bspaceinc - 2);
 				p->DrawString(Vector2(pos.x + border_room, pos.y - 4 + row_h + ((index * bspaceinc) - (bspaceinc / 2))), b->title);
 				p->DrawString(Vector2(pos.x + border_room + title_max_width + 10, pos.y - 4 + row_h + ((index * bspaceinc) - (bspaceinc / 2))), b->description);
 				index++;

@@ -195,7 +195,7 @@ namespace Debug {
 
 	//TODO(,sushi) fix variadic ToStringReturn
 	//template<class... T>
-	//static void ToString(int mtype, T... args) { (ToString(mtype, args, false) + ...); ToString(0, "", true); }
+	//static void ToStringReturn(int mtype, T... args) { (ToString(mtype, args, false) + ...); ToString(0, "", true); }
 
 	//// Call Tracing ////
 
