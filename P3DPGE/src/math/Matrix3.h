@@ -45,38 +45,15 @@ struct Matrix3 {
 	Matrix3 Adjoint() const;
 	Matrix3 Inverse() const;
 	
-	static Matrix3 RotationMatrix(Vector3 rotation);
 	static Matrix3 RotationMatrixX(float degrees);
 	static Matrix3 RotationMatrixY(float degrees);
 	static Matrix3 RotationMatrixZ(float degrees);
-	static Matrix3 ScaleMatrix(Vector3 scale);
 
 	//Non-Matrix3 vs Matrix3 interactions defined in Matrix.h/Math.h
 	Matrix4 To4x4();
+	static Matrix3 RotationMatrix(Vector3 rotation);
+	static Matrix3 ScaleMatrix(Vector3 scale);
 };
-
-
-
-//// Constructors ////
-
-inline Matrix3::Matrix3(float _00, float _01, float _02,
-				float _10, float _11, float _12,
-				float _20, float _21, float _22) {
-	data[0] = _00; data[1] = _01; data[2] = _02;
-	data[3] = _10; data[4] = _11; data[5] = _12;
-	data[6] = _20; data[7] = _21; data[8] = _22;
-}
-
-inline Matrix3::Matrix3(const Matrix3& m) {
-	memcpy(&data, &m.data, 9*sizeof(float));
-}
-
-
-
-
-//// Static Constants ////
-
-inline const Matrix3 Matrix3::IDENTITY = Matrix3(1,0,0,0,1,0,0,0,1);
 
 
 
@@ -341,29 +318,10 @@ inline Matrix3 Matrix3::Inverse() const {
 }
 
 //returns a rotation transformation matrix based on input in degrees
-//rotates over the Y, then Z then X, ref: https://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToMatrix/index.htm
-inline Matrix3 Matrix3::RotationMatrix(Vector3 rotation) {
-	rotation *= TO_RADIANS;
-	float cosX = cosf(rotation.x);
-	float sinX = sinf(rotation.x);
-	float cosY = cosf(rotation.y);
-	float sinY = sinf(rotation.y);
-	float cosZ = cosf(rotation.z);
-	float sinZ = sinf(rotation.z);
-	float r00 = cosY*cosZ;	float r01 = -cosY*sinZ*cosX + sinY*sinX;	float r02 = cosY*sinZ*sinX + sinY*cosX;
-	float r10 = sinZ;		float r11 = cosZ*cosX;						float r12 = -cosZ*sinX;
-	float r20 = -sinY*cosZ;	float r21 = sinY*sinZ*cosX + cosY*sinX;		float r22 = -sinY*sinZ*sinX + cosY*cosX;
-	return Matrix3(
-		r00,	r01,	r02,
-		r10,	r11,	r12,
-		r20,	r21,	r22);
-}
-
-//returns a rotation transformation matrix based on input in degrees
 inline Matrix3 Matrix3::RotationMatrixX(float degrees) {
-	float r = degrees * (3.14159265359f / 180.f);
-	float c = cosf(r);
-	float s = sinf(r);
+	degrees *= TO_RADIANS;
+	float c = cosf(degrees);
+	float s = sinf(degrees);
 	return Matrix3(
 		1,	0,	0,
 		0,	c,	-s,
@@ -373,9 +331,9 @@ inline Matrix3 Matrix3::RotationMatrixX(float degrees) {
 
 //returns a rotation transformation matrix based on input in degrees
 inline Matrix3 Matrix3::RotationMatrixY(float degrees) {
-	float r = degrees * (3.14159265359f / 180.f);
-	float c = cosf(r);
-	float s = sinf(r);
+	degrees *= TO_RADIANS;
+	float c = cosf(degrees);
+	float s = sinf(degrees);
 	return Matrix3(
 		c,	0,	s,
 		0,	1,	0,
@@ -385,21 +343,12 @@ inline Matrix3 Matrix3::RotationMatrixY(float degrees) {
 
 //returns a rotation transformation matrix based on input in degrees
 inline Matrix3 Matrix3::RotationMatrixZ(float degrees) {
-	float r = degrees * (3.14159265359f / 180.f);
-	float c = cosf(r);
-	float s = sinf(r);
+	degrees *= TO_RADIANS;
+	float c = cosf(degrees);
+	float s = sinf(degrees);
 	return Matrix3(
 		c,	-s,	0,
 		s,	c,	0,
 		0,	0,	1
 	);
-}
-
-//returns a scale matrix where (0,0) = scale.x, (1,1) = scale.y, (2,2) = scale.z
-inline Matrix3 Matrix3::ScaleMatrix(Vector3 scale) {
-	Matrix3 newMatrix = IDENTITY;
-	newMatrix.data[0] = scale.x;
-	newMatrix.data[4] = scale.y;
-	newMatrix.data[8] = scale.z;
-	return newMatrix;
 }

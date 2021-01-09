@@ -246,9 +246,9 @@ void TexturedTriangle(Scene* scene, Screen* screen, olc::PixelGameEngine* p, Tri
 					if (!collided) {
 						float dist = (tri->orig->sprite_pixel_location(su, sv) - scene->lights[0]->position).mag();
 						tri->orig->sprite->SetPixel(Vector2(su, sv),
-							olc::Pixel(floor(std::clamp(255 * (1 / (dist)), 0.f, 255.f)),
-										floor(std::clamp(255 * (1 / (dist)), 0.f, 255.f)),
-										floor(std::clamp(255 * (1 / (dist)), 0.f, 255.f))));
+							olc::Pixel(floor(Math::clamp(255 * (1 / (dist)), 0.f, 255.f)),
+										floor(Math::clamp(255 * (1 / (dist)), 0.f, 255.f)),
+										floor(Math::clamp(255 * (1 / (dist)), 0.f, 255.f))));
 					} else {
 						tri->orig->sprite->SetPixel(Vector2(su, sv), olc::BLACK);
 					}
@@ -330,9 +330,9 @@ void TexturedTriangle(Scene* scene, Screen* screen, olc::PixelGameEngine* p, Tri
 					if (!collided) {
 						float dist = (tri->orig->sprite_pixel_location(su, sv) - scene->lights[0]->position).mag();
 						tri->orig->sprite->SetPixel(Vector2(su, sv),
-							olc::Pixel(floor(std::clamp(255 * (1 / (dist)), 0.f, 255.f)),
-										floor(std::clamp(255 * (1 / (dist)), 0.f, 255.f)),
-										floor(std::clamp(255 * (1 / (dist)), 0.f, 255.f))));
+							olc::Pixel(floor(Math::clamp(255 * (1 / (dist)), 0.f, 255.f)),
+										floor(Math::clamp(255 * (1 / (dist)), 0.f, 255.f)),
+										floor(Math::clamp(255 * (1 / (dist)), 0.f, 255.f))));
 					} else {
 						tri->orig->sprite->SetPixel(Vector2(su, sv), olc::BLACK);
 					}
@@ -719,7 +719,7 @@ int RenderLines(Scene* scene, Camera* camera, Screen* screen, olc::PixelGameEngi
 
 	//draw the lines after all clipping and space conversion
 		++out;
-		p->DrawLine(startVertex.toVector2(), endVertex.toVector2(), ((RenderedEdge3D*)l)->color);
+		p->DrawLine(startVertex.ToVector2(), endVertex.ToVector2(), ((RenderedEdge3D*)l)->color);
 	}
 	return out;
 } //RenderLines

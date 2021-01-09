@@ -262,7 +262,7 @@ struct Triangle {
 
 		int n = 1;
 		for (Edge e : edges) {
-			p->DrawString((e.edge_midpoint() + e.edge_normal() * -10).toVector2(), std::to_string(n));
+			p->DrawString((e.edge_midpoint() + e.edge_normal() * -10).ToVector2(), std::to_string(n));
 			n++;
 		}
 

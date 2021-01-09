@@ -8,8 +8,9 @@
 #include <string>
 #include <vector>
 #include <cstdarg>
-#include <optional>
 #include <iostream>
+#include <utility>
+#include <functional>
 #include <windows.h>
 
 //global debug macros
@@ -111,6 +112,17 @@ struct has_str_method {
 	static constexpr bool value = decltype(test<T>(0))::value;
 };
 
+//ref: https://stackoverflow.com/questions/51005897/what-is-a-good-alternative-to-this-c17-fold-expression-in-c14
+template<class F, class A0>
+auto fold(F&&, A0&& a0) {
+    return std::forward<A0>(a0);
+}
+
+template<class F, class A0, class...As>
+auto fold(F&& f, A0&&a0, As&&...as) {
+    return f(std::forward<A0>(a0), fold(f, std::forward<As>(as)...));
+}
+
 enum ConsoleColor {
 	BLUE = 1,
 	GREEN = 2,
@@ -136,9 +148,9 @@ namespace Debug {
 
 	//// Console Output ////
 
-	static_internal HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	static_internal int color = 7;
-	static_internal void ResetCmd() { //resets cmd font color to white
+	static HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	static int color = 7;
+	static void ResetCmd() { //resets cmd font color to white
 		color = 7;
 		SetConsoleTextAttribute(hConsole, color);
 	}
@@ -166,8 +178,9 @@ namespace Debug {
 	template<class T, typename std::enable_if<has_str_method<T>::value, bool>::type = true>
 	static void ToString(int mtype, T t, bool newline = true) { ToString(mtype, t.str(), newline); }
 
-	template<class... T>
-	static void ToString(int mtype, T... args) { (ToString(mtype, args, false), ...); ToString(0, "", true); }
+	//TODO(,sushi) fix variadic ToString
+	//template<class... T>
+	//static void ToString(int mtype, T... args) { (ToString(mtype, args, false), ...); ToString(0, "", true); }
 
 	//returns the string for in engine printing
 	static std::string ToStringReturn(const char* str) { return std::string(str); }
@@ -180,8 +193,9 @@ namespace Debug {
 	template<class T, typename std::enable_if<has_str_method<T>::value, bool>::type = true>
 	static std::string ToStringReturn(T t) { return ToStringReturn(t.str()); }
 
-	template<class... T>
-	static std::string ToStringReturn(T... args) { return (ToStringReturn(args) + ...); }
+	//TODO(,sushi) fix variadic ToStringReturn
+	//template<class... T>
+	//static void ToString(int mtype, T... args) { (ToString(mtype, args, false) + ...); ToString(0, "", true); }
 
 	//// Call Tracing ////
 
@@ -207,118 +221,6 @@ namespace Debug {
 	};
 };
 
-template<class T>
-class ContainerManager {
-public:
-	//std::vector<std::pair<std::optional<T>, int>> container;
-
-	std::vector<std::optional<T>> container;
-	std::vector<int> empties;
-
-	int real_size = 0;
-
-	ContainerManager() {}
-
-	//T t& operator [](int i) { return container[i]; }
-	//void operator = (ContainerManager<T> c) { this->copy(c); }
-
-	void add_to(T t) {
-		if (empties.size() == 0) {
-			container.push_back(t);
-			real_size++;
-			return container.size() - 1;
-		}
-		else {
-			container[empties[0]] = t;
-			int index = empties[0];
-			empties.erase(empties.begin());
-			real_size++;
-			return index;
-		}
-	}
-
-	void add_to_index(T t, int index) {
-		ASSERT(allocate_space(index), "Container was unable to allocate space at specified index");
-		if(!container[index]){ real_size++; }
-		container[index] = t;
-		
-	}
-
-	//idk why i have this?
-	void set_index(T t, int index) {
-		if (!container[index]) { real_size++; }
-		container[index] = t;
-
-	}
-
-	void remove_from(int index) {
-		//ASSERT(container[index], "Container at index " + std::to_string(index) + " is already empty.");
-		ASSERT(index <= container.size() - 1, "Trying to access container at an index that doesn't exist.");
-
-		//if (index == container.size() - 1) {
-		//	container.pop_back();
-		//}
-		//else {
-		real_size--;
-		container[index].first.reset();
-		//empties.push_back(index);
-	//}
-	}
-
-	bool allocate_space(int index) {
-		ASSERT(index >= 0, "Attempted to pass negative index.");
-		//ASSERT(index >= container.size(), "Attempted to allocate space at an index larger than container size.");
-		if (index < container.size()) {
-			//space already exists, there is no check to actually see if
-			//it's already used by something else yet though
-			return true;
-		}
-		else {
-			std::optional<T> o;
-			for (int i = container.size(); i < index; i++) {
-				container.push_back(o);
-			}
-
-			return true;
-		}
-		return false;
-	}
-
-	int size() {
-		return container.size();
-	}
-
-	void copy(ContainerManager<T> cm) {
-		container = cm.container;
-		empties = cm.empties;
-	}
-
-	void empty() {
-		//this probably isn't what I should do so fix this if it isn't
-		empties.clear();
-		for (int i = 0; i < container.size(); i++) {
-			container[i].first.reset();
-			empties.push_back(i);
-		}
-		real_size = 0;
-	}
-
-	void clear() {
-		container.clear();
-		real_size = 0;
-	}
-
-	void str() {
-		std::string s = "";
-		int index = 1;
-		for (auto t : container) {
-			s += t.value()->str + " " + std::to_string(t.value()->index) + " " + std::to_string(index) + "\n";
-			index++;
-		}
-		LOG(s);
-	}
-};
-
 class StringedBuffer {
 public:
 
@@ -331,7 +233,7 @@ public:
 	}
 };
 
-inline static std::vector<int> id_buffer;
+static std::vector<int> id_buffer;
 
 //global tracing variable
 extern Debug::CallTrace TRACE;

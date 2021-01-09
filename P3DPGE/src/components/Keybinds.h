@@ -1,8 +1,6 @@
 #pragma once
 #include "Component.h"
 
-//TODO(i,delle) look into bit combining so that CTRL = 1024 and SHIFT = 2048
-
 struct Keybinds : public Component {
 	//flying movement
 	olc::Key movementFlyingUp;

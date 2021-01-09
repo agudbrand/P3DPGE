@@ -19,6 +19,7 @@ void ScreenSystem::Update() {
 	screen->height = p->ScreenHeight();
 	screen->width = screen->width * screen->height;
 	screen->dimensions = Vector2(screen->width, screen->height);
-	SUCCESS(__FILENAME__, ": Changing resolution from ", screen->dimensionsV3, " to ", Vector3(screen->width, screen->height));
+	//SUCCESS(__FILENAME__, ": Changing resolution from ", screen->dimensionsV3, " to ", Vector3(screen->width, screen->height));
+	Debug::ToString(2, __FILENAME__ + std::string(": Changing resolution from ") + screen->dimensionsV3.str2f() + std::string(" to ") + Vector3(screen->width, screen->height).str2f());
 	screen->dimensionsV3 = Vector3(screen->width, screen->height);
 }

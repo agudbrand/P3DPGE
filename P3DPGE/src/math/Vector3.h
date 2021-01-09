@@ -22,7 +22,6 @@ struct Vector3 {
 	Vector3(float inX, float inY);
 	Vector3(const Vector3& v);
 
-	//vector constants
 	static const Vector3 ZERO;
 	static const Vector3 ONE;
 	static const Vector3 RIGHT;
@@ -82,43 +81,12 @@ struct Vector3 {
 	void    operator *= (const Matrix4& rhs);
 
 	Vector4 ToVector4() const;
-	Vector2 toVector2() const; 
+	Vector2 ToVector2() const; 
 	MatrixN ToM1x3() const;
 	MatrixN ToM1x4(float w) const;
 	Vector3 ProjectionMultiply(Matrix4 projection) const;
 };
 
-//// Constructors ////
-
-inline Vector3::Vector3() {
-	this->x = 0; this->y = 0; this->z = 0;
-}
-
-inline Vector3::Vector3(float inX, float inY, float inZ) {
-	this->x = inX; this->y = inY; this->z = inZ;
-}
-
-inline Vector3::Vector3(float inX, float inY) {
-	this->x = inX; this->y = inY; this->z = 0;
-}
-
-inline Vector3::Vector3(const Vector3& v) {
-	this->x = v.x; this->y = v.y; this->z = v.z;
-}
-
-//// Static Constants ////
-
-inline const Vector3 Vector3::ZERO =		Vector3( 0, 0, 0);
-inline const Vector3 Vector3::ONE =			Vector3( 1, 1, 1);
-inline const Vector3 Vector3::RIGHT =		Vector3( 1, 0, 0);
-inline const Vector3 Vector3::LEFT =		Vector3(-1, 0, 0);
-inline const Vector3 Vector3::UP =			Vector3( 0, 1, 0);
-inline const Vector3 Vector3::DOWN =		Vector3( 0,-1, 0);
-inline const Vector3 Vector3::FORWARD =		Vector3( 0, 0, 1);
-inline const Vector3 Vector3::BACK =		Vector3( 0, 0,-1);
-inline const Vector3 Vector3::UNITX =		Vector3( 1, 0, 0);
-inline const Vector3 Vector3::UNITY =		Vector3( 0, 1, 0);
-inline const Vector3 Vector3::UNITZ =		Vector3( 0, 0, 1);
 
 //// Operators ////
 

@@ -1,7 +1,5 @@
 #pragma once
-
-#include "Debug.h"
-#include "../math/Vector3.h"
+#include "ContainerManager.h"
 
 //should probably reorganize some of these eventually so they're not global
 
@@ -12,8 +10,6 @@ extern float g_totalTime;
 
 extern int screenHeight;
 extern int screenWidth;
-
-extern Vector3 g_MouseWorldPos;
 
 //master buffer size indicator
 //this is VERY prone to errors so probably implement a better way to handle it 

@@ -17,21 +17,18 @@ TODO(p,delle) add physics based collision resolution for all entities
 */
 
 /* ECS conversion TODOs
-
-16. update tick order and .cpp includes
-
 1.  create templated component tuple iterator that loops thru a vector and returns an iterator of components of templated type
-3.  store Light and other components on entities
-5.  cut away alot of triangle
-6.  store all components in an object pool so that i can loop over that instead of entities [combine with 1]
-8.  add looking up/down
-9.  cleanup all warnings
-14. cut down physics to be better
-18. figure out why rotation degenerates in collision
-19. rotation around y is local but every other axis is global? maybe because of perspective matrix?
-20. add a .str() method to Component.h
-21. add a .time() method to System.h to get the time it took to finish
-22. finish Scene.h render option todos
+2.  store Light and other components on entities
+3.  cut away alot of triangle
+4.  store all components in an object pool so that i can loop over that instead of entities [combine with 1]
+5.  add looking up/down
+6.  cleanup all (most) warnings
+7.  cut down physics to be better
+8.  figure out why rotation degenerates in collision
+9.  rotation around y is local but every other axis is global? maybe because of perspective matrix?
+10. add a .str() method to Component.h
+11. add a .time() method to System.h to get the time it took to finish
+12. finish Scene.h render option todos
 
 */
 
@@ -201,7 +198,8 @@ Command* EntityAdmin::GetCommand(std::string command) {
 	try {
 		return commands.at(command);
 	} catch(std::exception e) {
-		ERROR("Command \"", command, "\" does not exist");
+		//ERROR("Command \"", command, "\" does not exist");
+		Debug::ToString(0, std::string("Command \"") + command + std::string("\" does not exist"));
 		return 0;
 	}
 }
@@ -211,7 +209,8 @@ bool EntityAdmin::ExecCommand(std::string command) {
 		commands.at(command)->Exec(this);
 		return true;
 	} catch(std::exception e) {
-		ERROR("Command \"", command, "\" does not exist");
+		//ERROR("Command \"", command, "\" does not exist");
+		Debug::ToString(0, std::string("Command \"") + command + std::string("\" does not exist"));
 		return false;
 	}
 }
@@ -221,7 +220,8 @@ bool EntityAdmin::TriggerCommand(std::string command) {
 		commands.at(command)->triggered = true;
 		return true;
 	} catch(std::exception e) {
-		ERROR("Command \"", command, "\" does not exist");
+		//ERROR("Command \"", command, "\" does not exist");
+		Debug::ToString(0, std::string("Command \"") + command + std::string("\" does not exist"));
 		return false;
 	}
 }

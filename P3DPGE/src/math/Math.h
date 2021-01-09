@@ -176,7 +176,112 @@ inline void Vector4::operator *= (const Matrix4& rhs) {
 	x * rhs.data[3] + y * rhs.data[7] + z * rhs.data[11] + w * rhs.data[15]);
 }
 
+//returns a rotation transformation matrix based on input in degrees
+//rotates over the Y, then Z then X, ref: https://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToMatrix/index.htm
+inline Matrix3 Matrix3::RotationMatrix(Vector3 rotation) {
+	rotation *= TO_RADIANS;
+	float cosX = cosf(rotation.x);
+	float sinX = sinf(rotation.x);
+	float cosY = cosf(rotation.y);
+	float sinY = sinf(rotation.y);
+	float cosZ = cosf(rotation.z);
+	float sinZ = sinf(rotation.z);
+	float r00 = cosY*cosZ;	float r01 = -cosY*sinZ*cosX + sinY*sinX;	float r02 = cosY*sinZ*sinX + sinY*cosX;
+	float r10 = sinZ;		float r11 = cosZ*cosX;						float r12 = -cosZ*sinX;
+	float r20 = -sinY*cosZ;	float r21 = sinY*sinZ*cosX + cosY*sinX;		float r22 = -sinY*sinZ*sinX + cosY*cosX;
+	return Matrix3(
+		r00,	r01,	r02,
+		r10,	r11,	r12,
+		r20,	r21,	r22);
+}
 
+//returns a scale matrix where (0,0) = scale.x, (1,1) = scale.y, (2,2) = scale.z
+inline Matrix3 Matrix3::ScaleMatrix(Vector3 scale) {
+	Matrix3 newMatrix = Matrix3::IDENTITY;
+	newMatrix.data[0] = scale.x;
+	newMatrix.data[4] = scale.y;
+	newMatrix.data[8] = scale.z;
+	return newMatrix;
+}
+
+//returns a rotation transformation matrix based on input in degrees
+//rotates over the Y, then Z then X
+inline Matrix4 Matrix4::RotationMatrix(Vector3 rotation) {
+	rotation *= TO_RADIANS;
+	float cosX = cosf(rotation.x);
+	float sinX = sinf(rotation.x);
+	float cosY = cosf(rotation.y);
+	float sinY = sinf(rotation.y);
+	float cosZ = cosf(rotation.z);
+	float sinZ = sinf(rotation.z);
+	float r00 = cosY*cosZ;	float r01 = -cosY*sinZ*cosX + sinY*sinX;	float r02 = cosY*sinZ*sinX + sinY*cosX;
+	float r10 = sinZ;		float r11 = cosZ*cosX;						float r12 = -cosZ*sinX;
+	float r20 = -sinY*cosZ;	float r21 = sinY*sinZ*cosX + cosY*sinX;		float r22 = -sinY*sinZ*sinX + cosY*cosX;
+	return Matrix4(
+		r00,	r01,	r02,	0,
+		r10,	r11,	r12,	0,
+		r20,	r21,	r22,	0,
+		0,		0,		0,		1);
+}
+
+//returns a translation matrix where (0,3) = translation.x, (1,3) = translation.y, (2,3) = translation.z
+inline Matrix4 Matrix4::TranslationMatrix(Vector3 translation) {
+	return Matrix4(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		translation.x, translation.y, translation.z, 1);
+}
+
+//returns a scale matrix where (0,0) = scale.x, (1,1) = scale.y, (2,2) = scale.z
+inline Matrix4 Matrix4::ScaleMatrix(Vector3 scale) {
+	Matrix4 newMatrix = Matrix4::IDENTITY;
+	newMatrix.data[0] = scale.x;
+	newMatrix.data[4] = scale.y;
+	newMatrix.data[8] = scale.z;
+	return newMatrix;
+}
+
+//returns a transformation matrix of the combined translation, rotation, and scale matrices from input vectors
+//rotates over the Y, then Z then X
+inline Matrix4 Matrix4::TransformationMatrix(Vector3 translation, Vector3 rotation, Vector3 scale) {
+	rotation *= TO_RADIANS;
+	float cosX = cosf(rotation.x);
+	float sinX = sinf(rotation.x);
+	float cosY = cosf(rotation.y);
+	float sinY = sinf(rotation.y);
+	float cosZ = cosf(rotation.z);
+	float sinZ = sinf(rotation.z);
+	float r00 = cosY*cosZ;	float r01 = -cosY*sinZ*cosX + sinY*sinX;	float r02 = cosY*sinZ*sinX + sinY*cosX;
+	float r10 = sinZ;		float r11 = cosZ*cosX;						float r12 = -cosZ*sinX;
+	float r20 = -sinY*cosZ;	float r21 = sinY*sinZ*cosX + cosY*sinX;		float r22 = -sinY*sinZ*sinX + cosY*cosX;
+	return Matrix4(
+		scale.x*r00,	r01,			r02,			0,
+		r10,			scale.y*r11,	r12,			0,
+		r20,			r21,			scale.z*r22,	0,
+		translation.x,	translation.y,	translation.z,	1);
+}
+
+//returns a transformation matrix of the combined translation, rotation, and scale matrices from input vectors
+//rotates over the Y, then Z then X, ref: https://www.euclideanspace.com/maths/geometry/affine/aroundPoint/index.htm
+inline Matrix4 Matrix4::RotationMatrixAroundPoint(Vector3 pivot, Vector3 rotation) {
+	pivot = -pivot; //gotta negate this for some reason :)
+	rotation *= TO_RADIANS;
+	float cosX = cosf(rotation.x);
+	float sinX = sinf(rotation.x);
+	float cosY = cosf(rotation.y);
+	float sinY = sinf(rotation.y);
+	float cosZ = cosf(rotation.z);
+	float sinZ = sinf(rotation.z);
+	float r00 = cosY*cosZ;	float r01 = -cosY*sinZ*cosX + sinY*sinX;	float r02 = cosY*sinZ*sinX + sinY*cosX;
+	float r10 = sinZ;		float r11 = cosZ*cosX;						float r12 = -cosZ*sinX;
+	float r20 = -sinY*cosZ;	float r21 = sinY*sinZ*cosX + cosY*sinX;		float r22 = -sinY*sinZ*sinX + cosY*cosX;
+	return Matrix4(
+		r00, r01, r02, 0,
+		r10, r11, r12, 0,
+		r20, r21, r22, 0,
+		pivot.x - r00*pivot.x - r01*pivot.y - r02*pivot.z, pivot.y - r10*pivot.x - r11*pivot.y - r12*pivot.z, pivot.z - r20*pivot.x - r21*pivot.y - r22*pivot.z, 1);
+}
 
 //// Non-Vector vs Vector Interactions ////
 
@@ -184,7 +289,7 @@ inline Vector3::Vector3(const Vector2& v) {
 	this->x = v.x; this->y = v.y; this->z = 0;
 }
 
-inline Vector2 Vector3::toVector2() const {
+inline Vector2 Vector3::ToVector2() const {
 	return Vector2(x, y);
 }
 
@@ -221,6 +326,12 @@ namespace Math {
 
 	inline static Vector3 to_radians(Vector3& vector) { return vector * (M_PI / 180); }
 	inline static Vector3 to_degrees(Vector3& vector) { return vector * (180 / M_PI); }
+
+	//ref: https://en.cppreference.com/w/cpp/algorithm/clamp
+	static float clamp(float v, float lo, float hi) {
+		ASSERT(lo < hi, "The low must be less than the high clamp");
+		return (v < lo) ? lo : (hi < v) ? hi : v;
+	}
 
 	//for debugging with floats or doubles
 	static std::string append_decimal(std::string s) {
@@ -291,7 +402,7 @@ namespace Math {
 	static Vector2 lerpv(Vector2 v1, Vector2 v2, float t) { return  v1 * (1.f - t) + v2 * t; }
 
 	//this function returns a matrix that tells a vector how to look at a specific point in space.
-	static Matrix4 PointAtMatrix(const Vector3& pos, const Vector3& target) {
+	static Matrix4 LookAtMatrix(const Vector3& pos, const Vector3& target) {
 		//get new forward direction
 		Vector3 newFor = (target - pos).normalized();
 
@@ -301,7 +412,7 @@ namespace Math {
 			newRight = Vector3::RIGHT;
 			//newRight = Vector3(0,.999f,0).cross(newFor);
 		} else {
-			newRight = Vector3::UP.cross(newFor); 
+			newRight = (Vector3::UP.cross(newFor)).normalized(); 
 		}
 
 		//get up direction

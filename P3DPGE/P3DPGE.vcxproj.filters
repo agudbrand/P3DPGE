@@ -180,6 +180,9 @@
     <ClInclude Include="src\components\World.h">
       <Filter>src\components</Filter>
     </ClInclude>
+    <ClInclude Include="src\utils\ContainerManager.h">
+      <Filter>src\utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -226,6 +229,18 @@
     </ClCompile>
     <ClCompile Include="src\EntityAdmin.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\math\Vector3.cpp">
+      <Filter>src\math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\math\Matrix4.cpp">
+      <Filter>src\math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\math\Matrix3.cpp">
+      <Filter>src\math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\Command.cpp">
+      <Filter>src\utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,5 +1,6 @@
 #pragma once
 #include "../internal/olcPixelGameEngine.h"
+#include "../utils/GLOBALS.h"
 
 //math constants
 #define M_PI			3.14159265359f
