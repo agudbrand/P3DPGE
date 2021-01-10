@@ -7,9 +7,11 @@ struct Camera : public Component {
 	Vector3 position;
 	Vector3 rotation;
 	Vector3 lookDir;
+
 	float nearZ; //the distance from the camera's position to screen plane
 	float farZ; //the maximum render distance
 	float fieldOfView;
+
 	Matrix4 viewMatrix;
 	Matrix4 projectionMatrix;
 

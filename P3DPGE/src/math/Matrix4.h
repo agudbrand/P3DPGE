@@ -228,7 +228,7 @@ inline const std::string Matrix4::str() const {
 		char buffer[15];
 		std::snprintf(buffer, 15, "%+.6f", data[i]);
 		str += std::string(buffer);
-		if ((i+1) % 3 != 0) {
+		if ((i+1) % 4 != 0) {
 			str += ", ";
 		} else {
 			str += "|\n|";
@@ -246,7 +246,7 @@ inline const std::string Matrix4::str2f() const {
 		char buffer[15];
 		std::snprintf(buffer, 15, "%+.2f", data[i]);
 		str += std::string(buffer);
-		if ((i + 1) % 3 != 0) {
+		if ((i+1) % 4 != 0) {
 			str += ", ";
 		} else {
 			str += "|\n|";

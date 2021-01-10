@@ -129,7 +129,7 @@ void CameraRotation(float deltaTime, Camera* camera, Input* input, Keybinds* bin
 
 void SimpleMovementSystem::Update() {
 	Camera*				camera = admin->currentCamera;
-	Input*		input = admin->singletonInput;
+	Input*				input = admin->singletonInput;
 	Keybinds*			binds = admin->currentKeybinds;
 	uint32				moveState = admin->tempMovementState->movementState;
 	float				deltaTime = admin->singletonTime->deltaTime;

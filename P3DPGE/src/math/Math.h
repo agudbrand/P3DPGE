@@ -141,16 +141,18 @@ inline Vector3 Vector3::operator *  (const Matrix3& rhs) const {
 
 inline void Vector3::operator *= (const Matrix3& rhs) {
 	*this = Vector3(
-	x * rhs.data[0] + y * rhs.data[3] + z * rhs.data[6],
-	x * rhs.data[1] + y * rhs.data[4] + z * rhs.data[7],
-	x * rhs.data[2] + y * rhs.data[5] + z * rhs.data[8]);
+		x * rhs.data[0] + y * rhs.data[3] + z * rhs.data[6],
+		x * rhs.data[1] + y * rhs.data[4] + z * rhs.data[7],
+		x * rhs.data[2] + y * rhs.data[5] + z * rhs.data[8]
+	);
 }
 
 inline Vector3 Vector3::operator *  (const Matrix4& rhs) const {
 	return Vector3(
 		x*rhs.data[0] + y*rhs.data[4] + z*rhs.data[8] + rhs.data[12],
 		x*rhs.data[1] + y*rhs.data[5] + z*rhs.data[9] + rhs.data[13],
-		x*rhs.data[2] + y*rhs.data[6] + z*rhs.data[10] + rhs.data[14]);
+		x*rhs.data[2] + y*rhs.data[6] + z*rhs.data[10] + rhs.data[14]
+	);
 }
 
 inline void Vector3::operator *= (const Matrix4& rhs) {
@@ -159,6 +161,24 @@ inline void Vector3::operator *= (const Matrix4& rhs) {
 	x * rhs.data[1] + y * rhs.data[5] + z * rhs.data[9]  + rhs.data[13],
 	x * rhs.data[2] + y * rhs.data[6] + z * rhs.data[10] + rhs.data[14]);
 }
+
+//inline Vector3 Vector3::operator *  (const Matrix4& rhs) const {
+//	float w = x*rhs.data[3] + y*rhs.data[7] + z*rhs.data[11] + rhs.data[15];
+//	return Vector3(
+//		x*rhs.data[0] + y*rhs.data[4] + z*rhs.data[8] + rhs.data[12],
+//		x*rhs.data[1] + y*rhs.data[5] + z*rhs.data[9] + rhs.data[13],
+//		x*rhs.data[2] + y*rhs.data[6] + z*rhs.data[10] + rhs.data[14]
+//	) / w;
+//}
+//
+//inline void Vector3::operator *= (const Matrix4& rhs) {
+//	float w = x*rhs.data[3] + y*rhs.data[7] + z*rhs.data[11] + rhs.data[15];
+//	*this = Vector3(
+//		x * rhs.data[0] + y * rhs.data[4] + z * rhs.data[8]  + rhs.data[12],
+//		x * rhs.data[1] + y * rhs.data[5] + z * rhs.data[9]  + rhs.data[13],
+//		x * rhs.data[2] + y * rhs.data[6] + z * rhs.data[10] + rhs.data[14]
+//	) / w;
+//}
 
 inline Vector4 Vector4::operator *  (const Matrix4& rhs) const {
 	return Vector4(
@@ -403,6 +423,8 @@ namespace Math {
 
 	//this function returns a matrix that tells a vector how to look at a specific point in space.
 	static Matrix4 LookAtMatrix(const Vector3& pos, const Vector3& target) {
+		if(pos == target) { return LookAtMatrix(pos, target + Vector3(.01f, 0, 0)); }
+
 		//get new forward direction
 		Vector3 newFor = (target - pos).normalized();
 
@@ -418,12 +440,12 @@ namespace Math {
 		//get up direction
 		Vector3 newUp = newRight.cross(newFor); 
 
-		//make point at matrix
+		//make look-at matrix
 		return Matrix4(
 			newRight.x, newRight.y, newRight.z, 0,
 			newUp.x,	newUp.y,	newUp.z,	0,
 			newFor.x,	newFor.y,	newFor.z,	0,
-			pos.x, pos.y, pos.z, 1
+			pos.x,		pos.y,		pos.z,		1
 		);
 	}
 
