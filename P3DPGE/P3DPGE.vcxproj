@@ -55,6 +55,7 @@
     <ClInclude Include="src\systems\MeshSystem.h" />
     <ClInclude Include="src\systems\PhysicsSystem.h" />
     <ClInclude Include="src\systems\RenderCanvasSystem.h" />
+    <ClInclude Include="src\systems\RenderCUDAInterface.h" />
     <ClInclude Include="src\systems\RenderSceneSystem.h" />
     <ClInclude Include="src\systems\ScreenSystem.h" />
     <ClInclude Include="src\systems\SimpleMovementSystem.h" />
@@ -90,6 +91,9 @@
     <ClCompile Include="src\systems\WorldSystem.cpp" />
     <ClCompile Include="src\utils\Command.cpp" />
     <ClCompile Include="src\utils\GLOBALS.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="src\systems\RenderCUDAInterface.cu" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -127,6 +131,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 11.2.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -244,5 +249,6 @@
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 11.2.targets" />
   </ImportGroup>
 </Project>

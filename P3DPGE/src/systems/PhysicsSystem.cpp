@@ -462,8 +462,10 @@ void PhysicsSystem::Update() {
 	for(auto& t : tuples) {
 		t.transform->prevPosition = t.transform->position;
 		t.transform->prevRotation = t.transform->rotation;
-		t.transform->position = t.transform->position*(1.f - alpha) + t.physics->position*alpha;
-		t.transform->rotation = t.transform->rotation*(1.f - alpha) + t.physics->rotation*alpha;
+		t.transform->position = t.transform->position * (1.f - alpha) + t.physics->position * alpha;
+		t.transform->rotation = t.transform->rotation * (1.f - alpha) + t.physics->rotation * alpha;
+		//t.transform->rotation = Quaternion::QuatSlerp(t.transform->rotation, t.transform->prevRotation, alpha).ToVector3();
+
 		//t.transform->rotation *= Matrix4::RotationMatrixAroundPoint(t.transform->position, t.transform->rotation*(1.f - alpha) + t.physics->rotation*alpha);
 		//TODO(p,delle) look into better rotational interpolation once we switch to quaternions
 	}

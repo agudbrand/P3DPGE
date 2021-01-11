@@ -5,6 +5,7 @@ struct MatrixN;
 struct Matrix3;
 struct Matrix4;
 struct Vector4;
+struct Quaternion;
 
 namespace olc {
 	template<typename V>
@@ -85,6 +86,7 @@ struct Vector3 {
 	MatrixN ToM1x3() const;
 	MatrixN ToM1x4(float w) const;
 	Vector3 ProjectionMultiply(Matrix4 projection) const;
+	
 };
 
 

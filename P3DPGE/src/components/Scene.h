@@ -15,7 +15,7 @@ struct Scene : public Component {
 	bool RENDER_EDGE_NUMBERS			= false;
 	bool RENDER_TEXTURES				= false;
 	bool RENDER_LOCAL_AXIS				= true;
-	bool RENDER_GLOBAL_AXIS				= false; //TODO(r,delle) implement global axis like in blender
+	bool RENDER_GLOBAL_AXIS				= true; //TODO(r,delle) implement global axis like in blender
 	bool RENDER_TRANSFORMS				= false;
 	bool RENDER_PHYSICS					= true;
 	bool RENDER_SCREEN_BOUNDING_BOX		= false; 

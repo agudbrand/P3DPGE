@@ -30,9 +30,8 @@ TODO(p,delle) add physics based collision resolution for all entities
 10. add a .str() method to Component.h
 11. add a .time() method to System.h to get the time it took to finish
 12. finish Scene.h render option todos
-13. fix UI min widths
-14. fix rotation interpolation
-15. add auto organization to UI
+13. fix rotation interpolation
+14. add auto organization to UI
 
 */
 
