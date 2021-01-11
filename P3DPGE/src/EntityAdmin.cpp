@@ -30,7 +30,7 @@ TODO(p,delle) add physics based collision resolution for all entities
 10. add a .str() method to Component.h
 11. add a .time() method to System.h to get the time it took to finish
 12. finish Scene.h render option todos
-13. spawning complexes doesnt work
+13. spawning some complexes doesnt work
 14. fix rotation interpolation
 15. add auto organization to UI
 
@@ -167,7 +167,9 @@ void EntityAdmin::Cleanup() {
 
 void EntityAdmin::Update() {
 	for(System* s : systems) {
+		steady_clock::time_point startTime = steady_clock::now(); //TODO(,delle) test that system durations work
 		s->Update();
+		s->time = duration_cast<duration<double>>(steady_clock::now() - startTime).count();
 	}
 }
 
