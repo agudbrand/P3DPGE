@@ -170,8 +170,6 @@ struct Menu : public UI {
 			if (bd_width > descr_max_width) { descr_max_width = bd_width; }
 		} 
 
-		Debug::ToString(1, title + std::string(": ") + std::to_string(min_width));
-
 		for (auto& s : dynamic_strings.container) {
 			if (s && s.value().size() * FONT_WIDTH > str_max_width) {
 				str_max_width = s.value().size() * FONT_WIDTH; 
@@ -185,8 +183,6 @@ struct Menu : public UI {
 		} else {
 			min_width = bt_width + bd_width + str_max_width;
 		}
-
-		Debug::ToString(1, title + std::string(": ") + std::to_string(min_width));
 	}
 
 	void resize() {
@@ -196,17 +192,12 @@ struct Menu : public UI {
 		}
 		else {
 			calc_min_width();
-			Debug::ToString(0, std::to_string(min_width));
 			size.x = min_width + 2 * border_room;
-			Debug::ToString(0, std::to_string(size.x));
 			size.y = row_h * (buttons.size() + dynamic_strings.real_size) + row_h + height_room;
 			if (size.x < title.size() * FONT_WIDTH + 35) {
 				size.x = title.size() * FONT_WIDTH + 35;
 			}
-			Debug::ToString(0, std::to_string(size.x));
 		}
-
-		Debug::ToString(0, title + std::string(": ") + size.str());
 	}
 
 	void add_button(Button* b) {
