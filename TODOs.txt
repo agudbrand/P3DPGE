@@ -4,7 +4,7 @@ TODO List successfully generated with 93 TODOs found.
 CameraSystem.cpp, Line: 69
 Creator:  sushi
 ----------------------
-Tags: TODOP, render
+Tags: render
 ----------------------
 figure out how to make the camera screen work with ortho nicely
 
@@ -12,7 +12,7 @@ figure out how to make the camera screen work with ortho nicely
 CameraSystem.cpp, Line: 70
 Creator:  sushi
 ----------------------
-Tags: TODOP, render
+Tags: render
 ----------------------
 implement ortho triangle clipping
 
@@ -20,7 +20,7 @@ implement ortho triangle clipping
 Collider.cpp, Line: 20
 Creator: delle
 ----------------------
-Tags: TODOP, optimization
+Tags: optimization
 ----------------------
 check if the compiler optimizes this to be inline
 
@@ -28,7 +28,7 @@ check if the compiler optimizes this to be inline
 Collider.cpp, Line: 36
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 implement aabb-aabb collision and resolution
 
@@ -36,7 +36,7 @@ implement aabb-aabb collision and resolution
 Collider.cpp, Line: 42
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 implement sphere-aabb dynamic resolution
 
@@ -44,7 +44,7 @@ implement sphere-aabb dynamic resolution
 Collider.cpp, Line: 43
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 maybe abstract out closest point calculations for each collider
 
@@ -52,7 +52,7 @@ maybe abstract out closest point calculations for each collider
 Collider.cpp, Line: 60
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 test this
 
@@ -60,7 +60,7 @@ test this
 Collider.cpp, Line: 79
 Creator: delle
 ----------------------
-Tags: TODOP, clean up
+Tags: clean up
 ----------------------
 remove this, only for testing
 
@@ -68,7 +68,7 @@ remove this, only for testing
 Collider.cpp, Line: 82
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 test this
 
@@ -76,7 +76,7 @@ test this
 Collider.cpp, Line: 92
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 implement aabb-box collision and resolution
 
@@ -84,7 +84,7 @@ implement aabb-box collision and resolution
 Collider.cpp, Line: 98
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 implement aabb-complex collision and resolution
 
@@ -92,7 +92,7 @@ implement aabb-complex collision and resolution
 Collider.cpp, Line: 115
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 test this
 
@@ -100,7 +100,7 @@ test this
 Collider.cpp, Line: 149
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 implement rotational collision resolution
 
@@ -108,7 +108,7 @@ implement rotational collision resolution
 Collider.cpp, Line: 167
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 test this in 3d
 
@@ -116,7 +116,7 @@ test this in 3d
 Collider.cpp, Line: 174
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 implement sphere-box collision and resolution
 
@@ -124,7 +124,7 @@ implement sphere-box collision and resolution
 Collider.cpp, Line: 180
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 implement sphere-complex collision and resolution
 
@@ -132,7 +132,7 @@ implement sphere-complex collision and resolution
 Collider.cpp, Line: 221
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 implement 
 
@@ -140,7 +140,7 @@ implement
 Collider.cpp, Line: 227
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 implement box-box collision and resolution
 
@@ -148,7 +148,7 @@ implement box-box collision and resolution
 Collider.cpp, Line: 233
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 implement box-complex collision and resolution
 
@@ -156,7 +156,7 @@ implement box-complex collision and resolution
 Collider.cpp, Line: 317
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 implement complex-complex collision and resolution
 
@@ -164,7 +164,7 @@ implement complex-complex collision and resolution
 Collider.h, Line: 14
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 implement trigger colliders
 
@@ -172,7 +172,7 @@ implement trigger colliders
 Collider.h, Line: 88
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 implement convexPolyCollider
 
@@ -180,7 +180,7 @@ implement convexPolyCollider
 Collider.h, Line: 89
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 implement capsuleCollider
 
@@ -188,7 +188,7 @@ implement capsuleCollider
 Collider.h, Line: 90
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 implement cylinder collider
 
@@ -196,14 +196,14 @@ implement cylinder collider
 Collider.h, Line: 91
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 implement complex collider (collider list)
 ~~~~~~~ TODO 25 ~~~~~~~
 Command.h, Line: 31
 Creator: delle
 ----------------------
-Tags: TODOP, input
+Tags: input
 ----------------------
 maybe add delayed and repeating commands
 
@@ -211,7 +211,7 @@ maybe add delayed and repeating commands
 CommandSystem.cpp, Line: 131
 Creator: delle
 ----------------------
-Tags: TODOP, input
+Tags: input
 ----------------------
 test that you can select an entity
 
@@ -219,7 +219,7 @@ test that you can select an entity
 Debug.h, Line: 50
 Creator:  sushi
 ----------------------
-Tags: TODOP, general
+Tags: general
 ----------------------
 write a macro for running once in a loop
 
@@ -227,7 +227,7 @@ write a macro for running once in a loop
 Debug.h, Line: 182
 Creator: sushi
 ----------------------
-Tags: TODOP
+Tags: No Tags
 ----------------------
 fix variadic ToString
 
@@ -235,7 +235,7 @@ fix variadic ToString
 Debug.h, Line: 197
 Creator: sushi
 ----------------------
-Tags: TODOP
+Tags: No Tags
 ----------------------
 fix variadic ToStringReturn
 
@@ -243,7 +243,7 @@ fix variadic ToStringReturn
 Edge.h, Line: 23
 Creator:  sushi
 ----------------------
-Tags: TODOP
+Tags: No Tags
 ----------------------
 find a good place to update edge, probably in Triangle?
 
@@ -252,7 +252,7 @@ Entities.cpp, Line: 292
 Creator: delle
 ----------------------
 Date: 11/13/20
-Tags: TODOP, unimportant, physics
+Tags: unimportant, physics
 ----------------------
 change air friction to calculate for shape of object
 
@@ -261,7 +261,7 @@ Entities.cpp, Line: 309
 Creator: delle
 ----------------------
 Date: 11/13/20
-Tags: TODOP, unimportant, physics
+Tags: unimportant, physics
 ----------------------
 create the GenerateRadialForce function
 
@@ -270,7 +270,7 @@ Entities.cpp, Line: 332
 Creator: delle
 ----------------------
 Date: 11/9/20
-Tags: TODOP, severe, physics
+Tags: severe, physics
 ----------------------
 expand this to a general entity check, but right now it just checks circles
 
@@ -279,7 +279,7 @@ Entities.cpp, Line: 333
 Creator: delle
 ----------------------
 Date: 11/9/20
-Tags: TODOP, optimization, unimportant, physics
+Tags: optimization, unimportant, physics
 ----------------------
 if other object is sphere, can optimize the equation to not use sqrt
 
@@ -288,7 +288,7 @@ Entities.cpp, Line: 345
 Creator: delle
 ----------------------
 Date: 11/9/20
-Tags: TODOP, severe, physics
+Tags: severe, physics
 ----------------------
 expand this to a general entity check, but right now it just checks circles
 
@@ -297,7 +297,7 @@ Entities.cpp, Line: 346
 Creator: delle
 ----------------------
 Date: 11/17/20
-Tags: TODOP, optimization, unimportant, physics
+Tags: optimization, unimportant, physics
 ----------------------
 can optimize this by recieving info from CheckCollision
 
@@ -306,7 +306,7 @@ Entities.cpp, Line: 421
 Creator: delle
 ----------------------
 Date: 11/9/20
-Tags: TODOP, severe, physics
+Tags: severe, physics
 ----------------------
 expand this to a general entity check
 
@@ -315,7 +315,7 @@ Entities.cpp, Line: 426
 Creator: delle
 ----------------------
 Date: 11/9/20
-Tags: TODOP, severe, physics
+Tags: severe, physics
 ----------------------
 expand this to a general entity check
 
@@ -323,7 +323,7 @@ expand this to a general entity check
 Entities.cpp, Line: 605
 Creator: delle
 ----------------------
-Tags: TODOP, render
+Tags: render
 ----------------------
 change the third parameter to the camera variable
 
@@ -331,7 +331,7 @@ change the third parameter to the camera variable
 Entities.h, Line: 30
 Creator:  sushi
 ----------------------
-Tags: TODOP, render, entity, optimization
+Tags: render, entity, optimization
 ----------------------
 implement this eventually
 
@@ -339,7 +339,7 @@ implement this eventually
 Entities.h, Line: 152
 Creator:  sushi
 ----------------------
-Tags: TODOP, entity
+Tags: entity
 ----------------------
 generate complex object relative to input position
 
@@ -347,7 +347,7 @@ generate complex object relative to input position
 EntityAdmin.cpp, Line: 7
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 add physics based collision resolution for all entities
 
@@ -355,14 +355,14 @@ add physics based collision resolution for all entities
 EntityAdmin.h, Line: 79
 Creator: delle
 ----------------------
-Tags: TODOP
+Tags: No Tags
 ----------------------
 move WorldSystem entity-component functions into Entity
 ~~~~~~~ TODO 44 ~~~~~~~
 Geometry.h, Line: 17
 Creator: delle
 ----------------------
-Tags: TODOP
+Tags: No Tags
 ----------------------
 test ClosestPointOnBox
 
@@ -370,7 +370,7 @@ test ClosestPointOnBox
 Keybinds.h, Line: 41
 Creator: delle
 ----------------------
-Tags: TODOP, input
+Tags: input
 ----------------------
 look into saving/loading keybinds with a file
 
@@ -378,7 +378,7 @@ look into saving/loading keybinds with a file
 Math.h, Line: 599
 Creator: sushi
 ----------------------
-Tags: TODOP
+Tags: No Tags
 ----------------------
 implement this
 
@@ -386,7 +386,7 @@ implement this
 Matrix.h, Line: 75
 Creator: delle
 ----------------------
-Tags: TODOP, optimization
+Tags: optimization
 ----------------------
 test that there is no memory leak on destruction of Matrix objects
 
@@ -394,7 +394,7 @@ test that there is no memory leak on destruction of Matrix objects
 Matrix.h, Line: 120
 Creator:  delle
 ----------------------
-Tags: TODOP
+Tags: No Tags
 ----------------------
 define these in Math.h
 
@@ -402,7 +402,7 @@ define these in Math.h
 Matrix.h, Line: 121
 Creator:  delle
 ----------------------
-Tags: TODOP
+Tags: No Tags
 ----------------------
 define this in Math.h
 
@@ -410,7 +410,7 @@ define this in Math.h
 Matrix.h, Line: 122
 Creator:  delle
 ----------------------
-Tags: TODOP
+Tags: No Tags
 ----------------------
 define this in Math.h
 
@@ -418,7 +418,7 @@ define this in Math.h
 Matrix.h, Line: 162
 Creator not specified!
 ----------------------
-Tags: TODOP, entity, entity
+Tags: entity, entity
 ----------------------
 test that you can use this to assign values to the matrix
 
@@ -426,7 +426,7 @@ test that you can use this to assign values to the matrix
 Matrix.h, Line: 250
 Creator: delle
 ----------------------
-Tags: TODOP, optimization
+Tags: optimization
 ----------------------
 look into optimizing this by transposing to remove a loop, see Unreal implementation
 
@@ -434,7 +434,7 @@ look into optimizing this by transposing to remove a loop, see Unreal implementa
 Matrix.h, Line: 335
 Creator: delle
 ----------------------
-Tags: TODOP, clean up
+Tags: clean up
 ----------------------
 clean up Matrix.str() and Matrix.str2F()
 
@@ -442,7 +442,7 @@ clean up Matrix.str() and Matrix.str2F()
 Matrix3.h, Line: 144
 Creator: delle
 ----------------------
-Tags: TODOP, optimization
+Tags: optimization
 ----------------------
 look into optimizing this by transposing to remove a loop, see Unreal Matrix.h
 
@@ -450,7 +450,7 @@ look into optimizing this by transposing to remove a loop, see Unreal Matrix.h
 Matrix3.h, Line: 219
 Creator: delle
 ----------------------
-Tags: TODOP, clean up
+Tags: clean up
 ----------------------
 clean up Matrix3.str() and Matrix3.str2F()
 
@@ -458,7 +458,7 @@ clean up Matrix3.str() and Matrix3.str2F()
 Matrix4.h, Line: 147
 Creator: delle
 ----------------------
-Tags: TODOP, optimization
+Tags: optimization
 ----------------------
 look into optimizing this by transposing to remove a loop, see Unreal Matrix.h
 
@@ -466,7 +466,7 @@ look into optimizing this by transposing to remove a loop, see Unreal Matrix.h
 Matrix4.h, Line: 223
 Creator: delle
 ----------------------
-Tags: TODOP, clean up
+Tags: clean up
 ----------------------
 clean up Matrix4.str() and Matrix4.str2F()
 
@@ -474,7 +474,7 @@ clean up Matrix4.str() and Matrix4.str2F()
 MatrixN.h, Line: 258
 Creator: delle
 ----------------------
-Tags: TODOP, optimization
+Tags: optimization
 ----------------------
 look into optimizing this by transposing to remove a loop, see Unreal implementation
 
@@ -482,7 +482,7 @@ look into optimizing this by transposing to remove a loop, see Unreal implementa
 MatrixN.h, Line: 343
 Creator: delle
 ----------------------
-Tags: TODOP, clean up
+Tags: clean up
 ----------------------
 clean up MatrixN.str() and MatrixN.str2F()
 
@@ -490,7 +490,7 @@ clean up MatrixN.str() and MatrixN.str2F()
 Mesh.h, Line: 29
 Creator:  sushi
 ----------------------
-Tags: TODOP, render
+Tags: render
 ----------------------
 make it so you can do this with a custom texture
 
@@ -498,7 +498,7 @@ make it so you can do this with a custom texture
 MeshSystem.cpp, Line: 21
 Creator:  sushi
 ----------------------
-Tags: TODOP, input
+Tags: input
 ----------------------
 fix selecting objects
 
@@ -506,7 +506,7 @@ fix selecting objects
 MeshSystem.cpp, Line: 52
 Creator: delle
 ----------------------
-Tags: TODOP, input
+Tags: input
 ----------------------
 change this to take in an ID once we figure that out
 
@@ -514,7 +514,7 @@ change this to take in an ID once we figure that out
 MeshSystem.cpp, Line: 109
 Creator: delle
 ----------------------
-Tags: TODOP
+Tags: No Tags
 ----------------------
 test 3x3 scale matrices
 
@@ -522,7 +522,7 @@ test 3x3 scale matrices
 PhysicsSystem.cpp, Line: 15
 Creator: delle
 ----------------------
-Tags: TODOP, input, physics
+Tags: input, physics
 ----------------------
 update entity movement commands to be based on EntityID
 
@@ -530,7 +530,7 @@ update entity movement commands to be based on EntityID
 PhysicsSystem.cpp, Line: 217
 Creator:  sushi
 ----------------------
-Tags: TODOP
+Tags: No Tags
 ----------------------
 implement ScreenToWorld for ortho projection
 
@@ -538,7 +538,7 @@ implement ScreenToWorld for ortho projection
 PhysicsSystem.cpp, Line: 229
 Creator: delle
 ----------------------
-Tags: TODOP, physics, input
+Tags: physics, input
 ----------------------
 test that you can add force to a selected entity
 
@@ -546,7 +546,7 @@ test that you can add force to a selected entity
 PhysicsSystem.cpp, Line: 268
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 look into bettering this physics tick
 
@@ -554,7 +554,7 @@ look into bettering this physics tick
 PhysicsSystem.cpp, Line: 476
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 look into better rotational interpolation once we switch to quaternions
 
@@ -563,7 +563,7 @@ PhysicsSystem.cpp, Line: 495
 Creator: delle
 ----------------------
 Date: 11/13/20
-Tags: TODOP, unimportant, physics
+Tags: unimportant, physics
 ----------------------
 change air friction to calculate for shape of object
 
@@ -572,7 +572,7 @@ PhysicsSystem.cpp, Line: 499
 Creator: delle
 ----------------------
 Date: 12/21/20
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 implement sliding friction between two objects 
 
@@ -580,7 +580,7 @@ implement sliding friction between two objects
 PhysicsWorld.h, Line: 23
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 look into maybe having physics here instead
 
@@ -588,7 +588,7 @@ look into maybe having physics here instead
 PhysicsWorld.h, Line: 38
 Creator: delle
 ----------------------
-Tags: TODOP, physics
+Tags: physics
 ----------------------
 this should depend on object shape
 
@@ -596,7 +596,7 @@ this should depend on object shape
 Quaternion.h, Line: 7
 Creator: delle
 ----------------------
-Tags: TODOP
+Tags: No Tags
 ----------------------
 implement quaternions
 
@@ -604,7 +604,7 @@ implement quaternions
 Render.h, Line: 8
 Creator:  sushi
 ----------------------
-Tags: TODOP, render
+Tags: render
 ----------------------
 separate objects into different layers like debug, main, etc. to be drawn in certain orders
 
@@ -612,7 +612,7 @@ separate objects into different layers like debug, main, etc. to be drawn in cer
 Render.h, Line: 34
 Creator:  sushi
 ----------------------
-Tags: TODOP, render
+Tags: render
 ----------------------
 set up a way that debug can be applied to certain objects. this is important in the case of edge numbers
 
@@ -620,7 +620,7 @@ set up a way that debug can be applied to certain objects. this is important in 
 Render.h, Line: 82
 Creator:  sushi
 ----------------------
-Tags: TODOP, render, clean up
+Tags: render, clean up
 ----------------------
 change this to take in types and not individual values
 
@@ -628,7 +628,7 @@ change this to take in types and not individual values
 Render.h, Line: 303
 Creator:  sushi
 ----------------------
-Tags: TODOP, render
+Tags: render
 ----------------------
 this still needs abstracted
 
@@ -636,7 +636,7 @@ this still needs abstracted
 Render.h, Line: 359
 Creator:  sushi
 ----------------------
-Tags: TODOP, optimization
+Tags: optimization
 ----------------------
 optimize this for loop 
 
@@ -644,7 +644,7 @@ optimize this for loop
 Render.h, Line: 448
 Creator:  sushi
 ----------------------
-Tags: TODOP, general
+Tags: general
 ----------------------
 fix this so it works with additions
 
@@ -653,7 +653,7 @@ Render.h, Line: 544
 Creator:  sushi
 ----------------------
 Date:  11/18/2020
-Tags: TODOP, render
+Tags: render
 ----------------------
 writing this is probably important
 
@@ -661,7 +661,7 @@ writing this is probably important
 RenderCanvasSystem.cpp, Line: 50
 Creator: delle
 ----------------------
-Tags: TODOP
+Tags: No Tags
 ----------------------
 update this to blender-ish style menu with editable values
 
@@ -669,7 +669,7 @@ update this to blender-ish style menu with editable values
 RenderSceneSystem.cpp, Line: 315
 Creator: delle
 ----------------------
-Tags: TODOP, optimization, render
+Tags: optimization, render
 ----------------------
 see if zClipIndex can remove the .midpoint()
 
@@ -677,7 +677,7 @@ see if zClipIndex can remove the .midpoint()
 RenderSceneSystem.cpp, Line: 530
 Creator:  sushi
 ----------------------
-Tags: TODOP, optimization
+Tags: optimization
 ----------------------
 use something other than olc::Sprite since it stores RGB info and we dont need that
 
@@ -685,7 +685,7 @@ use something other than olc::Sprite since it stores RGB info and we dont need t
 Scene.h, Line: 18
 Creator: delle
 ----------------------
-Tags: TODOP, render
+Tags: render
 ----------------------
 implement global axis like in blender
 
@@ -693,7 +693,7 @@ implement global axis like in blender
 Scene.h, Line: 23
 Creator: delle
 ----------------------
-Tags: TODOP, render
+Tags: render
 ----------------------
 upgrade grid to follow camera in smart way
 
@@ -701,7 +701,7 @@ upgrade grid to follow camera in smart way
 Vector.h, Line: 65
 Creator:  delle
 ----------------------
-Tags: TODOP
+Tags: No Tags
 ----------------------
 rename this to negatedX
 
@@ -709,7 +709,7 @@ rename this to negatedX
 Vector.h, Line: 66
 Creator:  delle
 ----------------------
-Tags: TODOP
+Tags: No Tags
 ----------------------
 rename this to negatedY
 
@@ -717,7 +717,7 @@ rename this to negatedY
 Vector.h, Line: 67
 Creator:  delle
 ----------------------
-Tags: TODOP
+Tags: No Tags
 ----------------------
 rename this to negatedZ
 
@@ -725,7 +725,7 @@ rename this to negatedZ
 Vector.h, Line: 69
 Creator not specified!
 ----------------------
-Tags: TODOP, entity, entity
+Tags: entity, entity
 ----------------------
 define these in Math.h
 
@@ -733,7 +733,7 @@ define these in Math.h
 Vector.h, Line: 187
 Creator:  delle
 ----------------------
-Tags: TODOP
+Tags: No Tags
 ----------------------
 test this
 
@@ -741,7 +741,7 @@ test this
 Vector.h, Line: 236
 Creator:  delle
 ----------------------
-Tags: TODOP
+Tags: No Tags
 ----------------------
 test this
 
@@ -749,7 +749,7 @@ test this
 WorldSystem.cpp, Line: 30
 Creator: delle
 ----------------------
-Tags: TODOP, optimization
+Tags: optimization
 ----------------------
 see if this is worth it vs regular insert
 
