@@ -9,9 +9,10 @@ struct Mesh : public Component {
 	Armature* armature = nullptr;
 	std::vector<Triangle> triangles;
 
+	olc::Sprite* texture = nullptr;
+
 	//single triangle mesh for testing
 	Mesh(Triangle t) {
-		t.sprite = new olc::Sprite(25, 25);
 		triangles.push_back(t);
 	}
 
@@ -26,6 +27,7 @@ struct Mesh : public Component {
 		}
 	}
 
+	//TODO(r, sushi) make it so you can do this with a custom texture
 	static Mesh* CreateBox(Entity* e, Vector3 halfDims, Vector3 position) {
 		std::vector<Triangle> triangles;
 
@@ -59,9 +61,9 @@ struct Mesh : public Component {
 
 		Mesh* m = new Mesh(triangles);
 		m->entity = e;
+		m->texture = new olc::Sprite("sprites/UV_Grid_Sm.jpg");
 		return m;
 	}
-
 	static Mesh* CreateComplex(Entity* e, const char* fileName, bool hasTexture, Vector3 position) {
 		std::ifstream f(fileName);
 		if (!f.is_open()) { return 0; }

@@ -215,14 +215,19 @@ inline void AddSelectedEntityCommands(EntityAdmin* admin) {
 //// other ////
 
 	admin->commands["add_force"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonInput->selectedEntity) {
-			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
-				Vector3 pos = Math::ScreenToWorld(admin->singletonInput->mousePos, admin->currentCamera->projectionMatrix, 
-													admin->currentCamera->viewMatrix, admin->singletonScreen->dimensions);
-				Vector3 clickPos = Math::ScreenToWorld(admin->singletonInput->mouseClickPos, admin->currentCamera->projectionMatrix, 
-														admin->currentCamera->viewMatrix, admin->singletonScreen->dimensions);
-				//TODO(pi,delle) test that you can add force to a selected entity
-				PhysicsSystem::AddForce(nullptr, p, (pos - clickPos).normalized() * 5);
+		if (USE_ORTHO) { //TODO(, sushi) implement ScreenToWorld for ortho projection
+			LOG("\nWarning: ScreenToWorld not yet implemented for orthographic projection. World interaction with mouse will not work.\n");
+		}
+		else {
+			if (admin->singletonInput->selectedEntity) {
+				if (Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+					Vector3 pos = Math::ScreenToWorld(admin->singletonInput->mousePos, admin->currentCamera->projectionMatrix,
+						admin->currentCamera->viewMatrix, admin->singletonScreen->dimensions);
+					Vector3 clickPos = Math::ScreenToWorld(admin->singletonInput->mouseClickPos, admin->currentCamera->projectionMatrix,
+						admin->currentCamera->viewMatrix, admin->singletonScreen->dimensions);
+					//TODO(pi,delle) test that you can add force to a selected entity
+					PhysicsSystem::AddForce(nullptr, p, (pos - clickPos).normalized() * 5);
+				}
 			}
 		}
 	}, "add_force", "add_force <EntityID> <force_vector> [constant_force?]");

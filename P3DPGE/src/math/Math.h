@@ -96,6 +96,14 @@ namespace Math {
 	inline static Vector3 to_radians(Vector3& vector) { return vector * (M_PI / 180); }
 	inline static Vector3 to_degrees(Vector3& vector) { return vector * (180 / M_PI); }
 
+	static Matrix4 MakeOrthoProjMat(float r, float l, float t, float b, float f, float n) {
+		return Matrix4(
+		2 / (r - l),			0,						0,												0,
+		0,						2 / (t - b),			0,												0,
+		0,						0,						-2 / (f - n),						0,
+		-(r + l) / (r - l),		-(t + b) / (t - b),		-(f + n) / (f - n),	1);
+	}
+
 }
 
 

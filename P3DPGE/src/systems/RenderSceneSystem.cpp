@@ -23,10 +23,6 @@ void TexturedTriangle(Scene* scene, Screen* screen, olc::PixelGameEngine* p, Tri
 	float v1 = tri->proj_tex_points[0].y; float v2 = tri->proj_tex_points[1].y; float v3 = tri->proj_tex_points[2].y;
 	float w1 = tri->proj_tex_points[0].z; float w2 = tri->proj_tex_points[1].z; float w3 = tri->proj_tex_points[2].z;
 
-	Vector3 lpos = scene->lights[0]->position; // do not feel like writing this every time
-
-	//tri->set_normal();
-
 	if (y2 < y1) { std::swap(y1, y2); std::swap(x1, x2); std::swap(u1, u2); std::swap(v1, v2); std::swap(w1, w2); }
 	if (y3 < y1) { std::swap(y1, y3); std::swap(x1, x3); std::swap(u1, u3); std::swap(v1, v3); std::swap(w1, w3); }
 	if (y3 < y2) { std::swap(y2, y3); std::swap(x2, x3); std::swap(u2, u3); std::swap(v2, v3); std::swap(w2, w3); }
@@ -94,34 +90,7 @@ void TexturedTriangle(Scene* scene, Screen* screen, olc::PixelGameEngine* p, Tri
 				tex_w = (1.0f - t) * tex_sw + t * tex_ew; 
 
 				if (tex_w > scene->pixelDepthBuffer[i * (size_t)screen->width + j]) {
-					//Vector3 dir_to = (t.sprite_pixel_location(x, y) - lpos).normalized();
-					int su = (tex_u / tex_w) * tri->orig->sprite->width;
-					int sv = (tex_v / tex_w) * tri->orig->sprite->height;
-					Edge3D ray = Edge3D(lpos, tri->orig->sprite_pixel_location(su, sv));
-
-					bool collided = false;
-					//for(Mesh* mesh : scene->meshes) {
-					//	for(Triangle& tr : mesh->triangles) {
-					//		if(tri->orig != &tr) {
-					//			if(tr.line_intersect(&ray)) {
-					//				collided = true;
-					//				break;
-					//			}
-					//		}
-					//	}
-					//}
-
-					if (!collided) {
-						float dist = (tri->orig->sprite_pixel_location(su, sv) - scene->lights[0]->position).mag();
-						tri->orig->sprite->SetPixel(Vector2(su, sv),
-							olc::Pixel(floor(Math::clamp(255 * (1 / (dist)), 0.f, 255.f)),
-										floor(Math::clamp(255 * (1 / (dist)), 0.f, 255.f)),
-										floor(Math::clamp(255 * (1 / (dist)), 0.f, 255.f))));
-					} else {
-						tri->orig->sprite->SetPixel(Vector2(su, sv), olc::BLACK);
-					}
-
-					p->Draw(j, i, tri->orig->sprite->Sample(tex_u / tex_w, tex_v / tex_w));
+					p->Draw(j, i, tri->e->GetComponent<Mesh>()->texture->Sample(tex_u / tex_w, tex_v / tex_w));
 					scene->pixelDepthBuffer[i * (size_t)screen->width + j] = tex_w;
 				}
 				t += tstep;
@@ -170,43 +139,14 @@ void TexturedTriangle(Scene* scene, Screen* screen, olc::PixelGameEngine* p, Tri
 			float tstep = 1.0f / ((float)(bx - ax));
 			float t = 0.0f;
 
-			int ray_iter = 0.1;
-			Vector3 lpos = scene->lights[0]->position; // do not feel like writing this every time
-
 			for (int j = ax; j < bx; j++) {
 				tex_u = (1.0f - t) * tex_su + t * tex_eu;
 				tex_v = (1.0f - t) * tex_sv + t * tex_ev;
 				tex_w = (1.0f - t) * tex_sw + t * tex_ew;
 
 				if (tex_w > scene->pixelDepthBuffer[i * (size_t)screen->width + j]) {
-					int su = (tex_u / tex_w) * tri->orig->sprite->width;
-					int sv = (tex_v / tex_w) * tri->orig->sprite->height;
-					Edge3D ray = Edge3D(lpos, tri->orig->sprite_pixel_location(su, sv));
 
-					bool collided = false;
-					//for(Mesh* mesh : scene->meshes) {
-					//	for(Triangle& tr : mesh->triangles) {
-					//		if(tri->orig != &tr) {
-					//			if(tr.line_intersect(&ray)) {
-					//				collided = true;
-					//				break;
-					//			}
-					//		}
-					//	}
-					//}
-
-					if (!collided) {
-						float dist = (tri->orig->sprite_pixel_location(su, sv) - scene->lights[0]->position).mag();
-						tri->orig->sprite->SetPixel(Vector2(su, sv),
-							olc::Pixel(floor(Math::clamp(255 * (1 / (dist)), 0.f, 255.f)),
-										floor(Math::clamp(255 * (1 / (dist)), 0.f, 255.f)),
-										floor(Math::clamp(255 * (1 / (dist)), 0.f, 255.f))));
-					} else {
-						tri->orig->sprite->SetPixel(Vector2(su, sv), olc::BLACK);
-					}
-
-
-					p->Draw(j, i, tri->orig->sprite->Sample(tex_u / tex_w, tex_v / tex_w));
+					p->Draw(j, i, tri->e->GetComponent<Mesh>()->texture->Sample(tex_u / tex_w, tex_v / tex_w));
 					scene->pixelDepthBuffer[i * (size_t)screen->width + j] = tex_w;
 				}
 				t += tstep;
@@ -255,8 +195,9 @@ int ClipTriangles(const Vector3& plane_p, Vector3 plane_n, Triangle* in_tri, std
 	} else if (nInsidePointCount == 1 && nOutsidePointCount == 2) {
 		Triangle* newTri = new Triangle();
 		newTri->color = in_tri->color;
-		newTri->sprite = in_tri->sprite;
-		newTri->e = 0; //set pointer to zero, so we can mark it for deletion
+		newTri->e = in_tri->e;
+		newTri->e->GetComponent<Mesh>()->texture = in_tri->e->GetComponent<Mesh>()->texture;
+		newTri->is_clip = true; 
 
 		//the inside point is valid so we keep it
 		newTri->proj_points[0] = *inside_points[0];
@@ -278,13 +219,16 @@ int ClipTriangles(const Vector3& plane_p, Vector3 plane_n, Triangle* in_tri, std
 	} else if (nInsidePointCount == 2 && nOutsidePointCount == 1) {
 	//triangle will be clipped and becomes a quad which is cut into two more triangles
 		Triangle* newTri = new Triangle();
+		newTri->e = in_tri->e;
+		newTri->e->GetComponent<Mesh>()->texture = in_tri->e->GetComponent<Mesh>()->texture;
+		newTri->is_clip = true;
 		newTri->color = in_tri->color;
-		newTri->sprite = in_tri->sprite;
-		newTri->e = 0; //set pointer to zero, so we can mark it for deletion
+
 		newTri->proj_points[0] = *inside_points[0];
 		newTri->proj_points[1] = *inside_points[1];
 		newTri->proj_tex_points[0] = *inside_tex[0];
 		newTri->proj_tex_points[1] = *inside_tex[1];
+
 		newTri->proj_points[2] = Math::VectorPlaneIntersect(plane_p, plane_n, *inside_points[0], *outside_points[0], t);
 		newTri->proj_tex_points[2].x = t * (outside_tex[0]->x - inside_tex[0]->x) + inside_tex[0]->x;
 		newTri->proj_tex_points[2].y = t * (outside_tex[0]->y - inside_tex[0]->y) + inside_tex[0]->y;
@@ -292,12 +236,15 @@ int ClipTriangles(const Vector3& plane_p, Vector3 plane_n, Triangle* in_tri, std
 
 		Triangle* newTri2 = new Triangle();
 		newTri2->color = in_tri->color;
-		newTri2->sprite = in_tri->sprite;
-		newTri2->e = 0; //set pointer to zero, so we can mark it for deletion
+		newTri2->e = in_tri->e;
+		newTri2->e->GetComponent<Mesh>()->texture = in_tri->e->GetComponent<Mesh>()->texture;
+		newTri2->is_clip = true;
+
 		newTri2->proj_points[0] = *inside_points[1];
 		newTri2->proj_tex_points[0] = *inside_tex[1];
 		newTri2->proj_points[1] = newTri->proj_points[2];
 		newTri2->proj_tex_points[1] = newTri->proj_tex_points[2];
+
 		newTri2->proj_points[2] = Math::VectorPlaneIntersect(plane_p, plane_n, *inside_points[1], *outside_points[0], t);
 		newTri2->proj_tex_points[2].x = t * (outside_tex[0]->x - inside_tex[1]->x) + inside_tex[1]->x;
 		newTri2->proj_tex_points[2].y = t * (outside_tex[0]->y - inside_tex[1]->y) + inside_tex[1]->y;
@@ -318,11 +265,6 @@ int DrawTriangles(Scene* scene, Screen* screen, olc::PixelGameEngine* p, std::li
 		//draw textures
 		if(scene->RENDER_TEXTURES) {				
 			TexturedTriangle(scene, screen, p, tr);
-			//TexturedTriangle(scene, screen, p,
-			//	tr->proj_points[0].x, tr->proj_points[0].y, tr->proj_tex_points[0].x, tr->proj_tex_points[0].y, tr->proj_tex_points[0].z,
-			//	tr->proj_points[1].x, tr->proj_points[1].y, tr->proj_tex_points[1].x, tr->proj_tex_points[1].y, tr->proj_tex_points[1].z,
-			//	tr->proj_points[2].x, tr->proj_points[2].y, tr->proj_tex_points[2].x, tr->proj_tex_points[2].y, tr->proj_tex_points[2].z,
-			//	tr->sprite);
 		}
 
 		//draw wireframe
@@ -339,7 +281,7 @@ int DrawTriangles(Scene* scene, Screen* screen, olc::PixelGameEngine* p, std::li
 		}
 
 		//delete new clipping triangles
-		if(!tr->e) {
+		if(tr->is_clip) {
 			delete tr;
 		}
 		drawnCount++;
@@ -377,16 +319,6 @@ int RenderTriangles(Scene* scene, Camera* camera, Screen* screen, olc::PixelGame
 					pp = Math::WorldToCamera(pp, camera->viewMatrix).ToVector3();
 				}
 
-		//darken pixels based on light in camera space
-				//for(int spriteX = 0; spriteX < 25; ++spriteX) {
-				//	for(int spriteY = 0; spriteY < 25; ++spriteY) {
-				//		float dist = (t.sprite_pixel_location(spriteX, spriteY) - scene->lights[0]->position).mag();
-				//		//float dp = (scene->lights[0]->position - zClipped[zClipIndex]->points[0]).dot(zClipped[zClipIndex]->get_normal());
-				//		float rgb = floor(std::clamp(255 * (1 /  (2 * dist)), 0.f, 255.f));
-				//		t.sprite->SetPixel(Vector2(spriteX, spriteY), olc::Pixel(rgb, rgb, rgb));
-				//	}
-				//}
-
 		//clip to the nearZ plane in view/clip space
 				std::array<Triangle*, 2> zClipped = {};
 				int numZClipped = ClipTriangles(Vector3(0, 0, camera->nearZ), Vector3::FORWARD, &t, zClipped);
@@ -420,14 +352,14 @@ int RenderTriangles(Scene* scene, Camera* camera, Screen* screen, olc::PixelGame
 
 							int numBClipped = 0;
 							switch(bClipSide) {
-								case 0: { numBClipped = ClipTriangles(Vector3::ZERO,					Vector3::UP, tri, bClipped); } break;
-								case 1: { numBClipped = ClipTriangles(Vector3(0, screen->height-1, 0),	Vector3::DOWN, tri, bClipped); } break;
+								case 0: { numBClipped = ClipTriangles(Vector3::ZERO,					Vector3::UP,    tri, bClipped); } break;
+								case 1: { numBClipped = ClipTriangles(Vector3(0, screen->height-1, 0),	Vector3::DOWN,  tri, bClipped); } break;
 								case 2: { numBClipped = ClipTriangles(Vector3::ZERO,					Vector3::RIGHT, tri, bClipped); } break;
-								case 3: { numBClipped = ClipTriangles(Vector3(screen->width-1, 0, 0),	Vector3::LEFT, tri, bClipped); } break;
+								case 3: { numBClipped = ClipTriangles(Vector3(screen->width-1, 0, 0),	Vector3::LEFT,  tri, bClipped); } break;
 							}
 
 							for(int bClipIndex = 0; bClipIndex < numBClipped; ++bClipIndex) {
-								bClipped[bClipIndex]->sprite = zClipped[zClipIndex]->sprite;
+								bClipped[bClipIndex]->e->GetComponent<Mesh>()->texture = zClipped[zClipIndex]->e->GetComponent<Mesh>()->texture;
 								bClipped[bClipIndex]->orig = tri->orig;
 								borderClippedTris.push_back(bClipped[bClipIndex]);
 							}
@@ -591,6 +523,48 @@ int RenderLines(Scene* scene, Camera* camera, Screen* screen, olc::PixelGameEngi
 	}
 	return out;
 } //RenderLines
+
+
+//this (probably) returns a depth texture detailing how a light sees the scene
+//currently set up to work for directional lights
+//this could potentially be stored on Lights themselves but I'm not sure yet
+//TODO(o, sushi) use something other than olc::Sprite since it stores RGB info and we dont need that
+olc::Sprite* LightDepthTex(Light* li, Camera* c, Scene* s, Screen* sc) {
+	int resx = 1028;
+	int resy = 1028; //resolution of depth texture
+	olc::Sprite* depthTex = new olc::Sprite(resx, resy);
+	
+	//once we implement point lights we'll start making a bounding box around
+	//only what the camera sees but for now this is how it works with ortho projection
+	std::pair<Vector3, Vector3> bbox = s->SceneBoundingBox();
+
+	Matrix4 lightViewMat = Math::LookAtMatrix(li->position, li->direction);
+
+	//convert bounding box to light's "view" space
+	Vector3 maxcam = Math::WorldToCamera(bbox.first,  lightViewMat).ToVector3();
+	Vector3 mincam = Math::WorldToCamera(bbox.second, lightViewMat).ToVector3();
+
+	//make screen box from camera space bounding box
+	float maxx = std::max(fabs(mincam.x), fabs(maxcam.x));
+	float maxy = std::max(fabs(mincam.y), fabs(maxcam.y));
+	float max = std::max(maxx, maxy);
+
+	float aspectRatio = sc->height / sc->width;
+	float r = max * aspectRatio, t = max;
+	float l = -r, b = -t;
+
+	Matrix4 ortho = Math::MakeOrthoProjMat(r, l, t, b, c->farZ, c->nearZ);
+
+	std::vector<Triangle> tris;
+
+	for (Mesh* m : s->meshes) {
+		for (Triangle t : m->triangles) {
+			tris.push_back(t);
+		}
+	}
+
+	return depthTex;
+}
 
 void RenderSceneSystem::Update() {
 	Scene* scene = admin->currentScene;
