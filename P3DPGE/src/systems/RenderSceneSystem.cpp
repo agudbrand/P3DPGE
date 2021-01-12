@@ -548,7 +548,7 @@ olc::Sprite* LightDepthTex(Light* li, Camera* c, Scene* s, Screen* sc) {
 	float maxx = std::max(fabs(mincam.x), fabs(maxcam.x));
 	float maxy = std::max(fabs(mincam.y), fabs(maxcam.y));
 	float max = std::max(maxx, maxy);
-
+	//TODOP pls
 	float aspectRatio = sc->height / sc->width;
 	float r = max * aspectRatio, t = max;
 	float l = -r, b = -t;
