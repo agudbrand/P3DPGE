@@ -13,12 +13,11 @@ struct Triangle {
 
 	Triangle* orig		= nullptr;
 	Entity* e			= nullptr;
-	olc::Sprite* sprite = nullptr;
+
+	bool is_clip = false;
 
 	Vector3 normal;
 	float area;
-
-	bool alt_tri = false;
 
 	//maybe edges can be cleared when they're not actually needed,
 	//and only spawned when used?
@@ -43,8 +42,6 @@ struct Triangle {
 		tex_points[0] = Vector3(0, 0, 1);
 		tex_points[1] = Vector3(0, 1, 1);
 		tex_points[2] = Vector3(1, 0, 1);
-
-		//sprite = new olc::Sprite(50, 50);
 	};
 
 	Triangle(Vector3 p1, Vector3 p2, Vector3 p3, Entity* e) {
@@ -58,7 +55,6 @@ struct Triangle {
 		edges[2] = Edge(p3, p1);
 
 		this->e = e;
-		sprite = new olc::Sprite(15, 15);
 	}
 
 	//for constructing a triangle with texture points
@@ -72,46 +68,11 @@ struct Triangle {
 		edges[1] = Edge(p2, p3);
 		edges[2] = Edge(p3, p1);
 
-		sprite = new olc::Sprite(15, 15);
+		
+		tex_points[0] = t1;
+		tex_points[1] = t2;
+		tex_points[2] = t3;
 
-		if ((points[2] - points[0]).mag() > (points[2] - points[1]).mag()) {
-			alt_tri = true;
-			tex_points[0] = Vector3(0, 1, 1);
-			tex_points[1] = Vector3(0, 0, 1);
-			tex_points[2] = Vector3(1, 0, 1);
-		} else {
-			tex_points[0] = Vector3(0, 1, 1);
-			tex_points[1] = Vector3(1, 0, 1);
-			tex_points[2] = Vector3(0, 0, 1);
-		}
-
-		this->e = e;
-	}
-
-	Triangle(Vector3 p1, Vector3 p2, Vector3 p3, olc::Sprite* sprite, Entity* e) {
-		points[0] = p1;
-		points[1] = p2;
-		points[2] = p3;
-		copy_points();
-
-		edges[0] = Edge(p1, p2);
-		edges[1] = Edge(p2, p3);
-		edges[2] = Edge(p3, p1);
-
-		sprite = new olc::Sprite(15, 15);
-
-		if ((points[2] - points[0]).mag() > (points[2] - points[1]).mag()) {
-			alt_tri = true;
-			tex_points[0] = Vector3(0, 1, 1);
-			tex_points[1] = Vector3(0, 0, 1);
-			tex_points[2] = Vector3(1, 0, 1);
-		} else {
-			tex_points[0] = Vector3(0, 1, 1);
-			tex_points[1] = Vector3(1, 0, 1);
-			tex_points[2] = Vector3(0, 0, 1);
-		}
-
-		this->sprite = sprite;
 		this->e = e;
 	}
 
@@ -149,52 +110,6 @@ struct Triangle {
 		Vector3 l1 = proj_points[1] - proj_points[0];
 		Vector3 l2 = proj_points[2] - proj_points[0];
 		return l1.cross(l2).yInvert().normalized();
-	}
-
-	//TODO(r, sushi) figure out how to make this work better
-	Vector3 sprite_pixel_location(int x, int y) {
-		if (alt_tri) {
-			Vector3 v21 = points[2] - points[1];
-			Vector3 v01 = points[0] - points[1]; //TODO(or,delle) maybe optimize this by combining .mag() calls since they are expensive
-			float xdiv = v21.mag() / (sprite->width);
-			float ydiv = v01.mag() / (sprite->height);
-			Vector3 v0x = points[1] + v21.normalized() * x * xdiv;
-			Vector3 v0y = points[1] + v01.normalized() * y * ydiv;
-			return points[1] + (v0x - points[1]) + (v0y - points[1]);
-		}
-		else {
-			Vector3 v21 = points[1] - points[2];
-			Vector3 v20 = points[0] - points[2];
-			float xdiv = v21.mag() / (sprite->width);
-			float ydiv = v20.mag() / (sprite->height);
-			Vector3 v0x = points[2] + v21.normalized() * x * xdiv;
-			Vector3 v0y = points[2] + v20.normalized() * y * ydiv;
-			return points[2] + (v0x - points[2]) + (v0y - points[2]);
-		}
-
-	}
-
-	//for giving normalized sprite coordinates
-	Vector3 sprite_pixel_location(float nx, float ny) {
-		int x = nx * sprite->width;
-		int y = ny * sprite->height;
-		if (alt_tri) {
-			Vector3 v21 = points[2] - points[1];
-			Vector3 v01 = points[0] - points[1]; //TODO(or,delle) maybe optimize this by combining .mag() calls since they are expensive
-			float xdiv = v21.mag() / (sprite->width);
-			float ydiv = v01.mag() / (sprite->height);
-			Vector3 v0x = points[1] + v21.normalized() * x * xdiv;
-			Vector3 v0y = points[1] + v01.normalized() * y * ydiv;
-			return points[1] + (v0x - points[1]) + (v0y - points[1]);
-		} else {
-			Vector3 v21 = points[1] - points[2];
-			Vector3 v20 = points[0] - points[2];
-			float xdiv = v21.mag() / (sprite->width);
-			float ydiv = v20.mag() / (sprite->height);
-			Vector3 v0x = points[2] + v21.normalized() * x * xdiv;
-			Vector3 v0y = points[2] + v20.normalized() * y * ydiv;
-			return points[2] + (v0x - points[2]) + (v0y - points[2]);
-		}
 	}
 
 	//checks if a triangle contains a point in screen space

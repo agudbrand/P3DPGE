@@ -5,6 +5,7 @@
 #include "Matrix3.h"
 #include "Matrix4.h"
 #include "MatrixN.h"
+#include "Quaternion.h"
 
 #include <math.h>
 #include <algorithm>
@@ -87,6 +88,20 @@ namespace Math {
 
 	static Matrix4 WorldToLocal(Vector3 offsetFromOrigin) {
 		return Matrix4::TranslationMatrix(offsetFromOrigin).Inverse();
+	}
+
+	inline static float to_radians(float angle) { return angle * (M_PI / 180); }
+	inline static float to_degrees(float angle) { return angle * (180 / M_PI); }
+
+	inline static Vector3 to_radians(Vector3& vector) { return vector * (M_PI / 180); }
+	inline static Vector3 to_degrees(Vector3& vector) { return vector * (180 / M_PI); }
+
+	static Matrix4 MakeOrthoProjMat(float r, float l, float t, float b, float f, float n) {
+		return Matrix4(
+		2 / (r - l),			0,						0,												0,
+		0,						2 / (t - b),			0,												0,
+		0,						0,						-2 / (f - n),						0,
+		-(r + l) / (r - l),		-(t + b) / (t - b),		-(f + n) / (f - n),	1);
 	}
 
 }
@@ -318,10 +333,8 @@ inline MatrixN Vector3::ToM1x3() const {
 }
 
 inline MatrixN Vector3::ToM1x4(float w) const {
-	return MatrixN(1, 4, {x, y, z, w});
+	return MatrixN(1, 4, { x, y, z, w });
 }
-
-
 
 //// Non-MatrixN vs MatrixN Interactions ////
 
@@ -339,13 +352,108 @@ inline MatrixN::MatrixN(Vector3 v, float w) {
 
 
 
+//// Non-Quaternion vs Quaternion Interactions ////
+
+inline Vector3 Quaternion::ToVector3() {
+	Vector3 angles;
+
+	// roll (x-axis rotation)
+	double sinr_cosp = 2 * (w * x + y * z);
+	double cosr_cosp = 1 - 2 * (x * x + y * y);
+	angles.x = std::atan2(sinr_cosp, cosr_cosp);
+
+	// pitch (y-axis rotation)
+	double sinp = 2 * (w * y - z * x);
+	if (std::abs(sinp) >= 1)
+		angles.y = std::copysign(M_PI / 2, sinp); // use 90 degrees if out of range
+	else
+		angles.y = std::asin(sinp);
+
+	// yaw (z-axis rotation)
+	double siny_cosp = 2 * (w * z + x * y);
+	double cosy_cosp = 1 - 2 * (y * y + z * z);
+	angles.z = std::atan2(siny_cosp, cosy_cosp);
+
+	return angles;
+}
+
+//converts an angle and an axis to a quaternion
+//im not sure how this works or where it will be used and im not even sure if its
+//set up properly (sorry)
+inline Quaternion Quaternion::AxisAngleToQuat(float angle, Vector3 axis) {
+	float angler = Math::to_radians(angle);
+	return Quaternion(sinf(angler / 2) * axis.x, sinf(angler / 2) * axis.y, sinf(angler / 2) * axis.z, cosf(angler / 2));
+}
+
+//this may be wrong but I think a rotation vector would be 
+//Vector3(roll, pitch, yaw)
+//copied from https://www.wikiwand.com/en/Conversion_between_quaternions_and_Euler_angles#/Euler_angles_to_quaternion_conversion
+inline Quaternion Quaternion::RotVecToQuat(Vector3 rotation) {
+	//this is probably necessary although he didn't do this in the Gamasutra article
+	Vector3 rotationrad = rotation * TO_RADIANS;
+	float cy = cos(rotationrad.z * 0.5);
+	float sy = sin(rotationrad.z * 0.5);
+	float cp = cos(rotationrad.y * 0.5);
+	float sp = sin(rotationrad.y * 0.5);
+	float cr = cos(rotationrad.x * 0.5);
+	float sr = sin(rotationrad.x * 0.5);
+
+	Quaternion q;
+	q.w = cr * cp * cy + sr * sp * sy;
+	q.x = sr * cp * cy - cr * sp * sy;
+	q.y = cr * sp * cy + sr * cp * sy;
+	q.z = cr * cp * sy - sr * sp * cy;
+
+	return q;
+}
+
+inline Quaternion Quaternion::QuatSlerp(Vector3 fromv, Vector3 tov, float t) {
+	//this implements Spherical Linear intERPoplation
+	//it interpolates between two quaternions along the shortest arc on a sphere formed by them
+	//taken from https://www.wikiwand.com/en/Slerp#/Quaternion_Slerp
+
+	Quaternion from = RotVecToQuat(fromv);
+	Quaternion to = RotVecToQuat(tov);
+
+	from.normalize();
+	to.normalize();
+
+	float dot = to.dot(from);
+
+	if (dot < 0) {
+		to = -to;
+		dot = -dot;
+	}
+
+	const float dot_thresh = 0.9995;
+
+	// calculate coefficients
+	if (dot > dot_thresh) {
+		// standard case (slerp)
+		Quaternion result = from + ((to - from) * t);
+		result.normalize();
+		return result;
+	}
+
+	//since dot is in range [0, DOT_THRESHOLD], acos is safe
+	double theta_0 = acos(dot);			//theta_0 = angle between input vectors
+	double theta = theta_0 * t;			//theta = angle between v0 and result
+	double sin_theta = sin(theta);		//compute this value only once
+	double sin_theta_0 = sin(theta_0);	//compute this value only once
+
+	double s0 = cos(theta) - dot * sin_theta / sin_theta_0;  // == sin(theta_0 - theta) / sin(theta_0)
+	double s1 = sin_theta / sin_theta_0;
+
+	return (from * s0) + (to * s1);
+
+
+	// calculate final values
+}
+
+
 namespace Math {
 
-	inline static float to_radians(float angle) { return angle * (M_PI / 180); }
-	inline static float to_degrees(float angle) { return angle * (180 / M_PI); }
-
-	inline static Vector3 to_radians(Vector3& vector) { return vector * (M_PI / 180); }
-	inline static Vector3 to_degrees(Vector3& vector) { return vector * (180 / M_PI); }
+	
 
 	//ref: https://en.cppreference.com/w/cpp/algorithm/clamp
 	static float clamp(float v, float lo, float hi) {

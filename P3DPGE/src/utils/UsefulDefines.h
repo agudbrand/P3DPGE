@@ -22,6 +22,9 @@ typedef unsigned short	uint16;
 typedef unsigned int	uint32;
 typedef unsigned long	uint64;
 
+//use ortho projection
+#define USE_ORTHO false
+
 //static defines
 #define static_internal	static
 #define local_persist	static

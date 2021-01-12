@@ -18,7 +18,7 @@ public:
 	//T t& operator [](int i) { return container[i]; }
 	//void operator = (ContainerManager<T> c) { this->copy(c); }
 
-	void add_to(T t) {
+	int add_to(T t) {
 		if (empties.size() == 0) {
 			container.push_back(t);
 			real_size++;
