@@ -5,84 +5,117 @@
 
 #include "../components/Canvas.h"
 #include "../components/Screen.h"
+#include "../components/Scene.h"
 
-inline UI* CreateDebugMenu(EntityAdmin* admin, Canvas* canvas) {
-	std::vector<UI*> debug_buttons = std::vector<UI*>();
-	debug_buttons.push_back(new TextButton(admin, V2ZERO, "global debug", admin->GetCommand("debug_global")));
-	debug_buttons.push_back(new TextButton(admin, V2ZERO, "print commands", admin->GetCommand("debug_command_exec")));
-	debug_buttons.push_back(new TextButton(admin, V2ZERO, "pause engine ", admin->GetCommand("time_pause_engine")));
-	debug_buttons.push_back(new TextButton(admin, V2ZERO, "next frame", admin->GetCommand("time_next_frame")));
+#define OLC_PGEX_DEAR_IMGUI_IMPLEMENTATION
+#include "../internal/imgui/imgui_impl_pge.h"
+#include "../internal/imgui/imgui_impl_opengl2.h"
 
-	return new Panel(admin, V2ZERO, "debug", debug_buttons);
-}
+void RenderCanvasSystem::DrawUI(void) {
+	Scene* scene = admin->currentScene;
 
-inline UI* CreateSpawnMenu(EntityAdmin* admin, Canvas* canvas) {
-	std::vector<UI*> complex_spawn_buttons;
-	complex_spawn_buttons.push_back(new TextButton(admin, V2ZERO, "bmonkey", admin->GetCommand("spawn_complex")));
-	complex_spawn_buttons.push_back(new TextButton(admin, V2ZERO, "whale_ship", admin->GetCommand("spawn_complex1")));
-	complex_spawn_buttons.push_back(new TextButton(admin, V2ZERO, "24k_Triangles", admin->GetCommand("spawn_complex2")));
+	using namespace ImGui;
+	//These 3 lines are mandatory per-frame initialization
+	ImGui_ImplOpenGL2_NewFrame();
+	admin->tempCanvas->pge_imgui->ImGui_ImplPGE_NewFrame();
+	ImGui::NewFrame();
 
-	std::vector<UI*> spawn_buttons;
-	spawn_buttons.push_back(new TextButton(admin, V2ZERO, "spawn box", admin->GetCommand("spawn_box")));
-	spawn_buttons.push_back(new Panel(admin, V2ZERO, "spawn complex", complex_spawn_buttons));
+	ImGui::ShowDemoWindow();
 
-	return new Panel(admin,  V2ZERO, "spawn", spawn_buttons);
-}
+	////////////////////////////////////////////
 
-inline UI* CreateRenderMenu(EntityAdmin* admin, Canvas* canvas) {
-	std::vector<UI*> render_buttons = std::vector<UI*>();
-	render_buttons.push_back(new TextButton(admin, V2ZERO, "reset camera", admin->GetCommand("reset_camera")));
-	render_buttons.push_back(new TextButton(admin, V2ZERO, "wireframe", admin->GetCommand("render_wireframe")));
-	render_buttons.push_back(new TextButton(admin, V2ZERO, "textures", admin->GetCommand("render_textures")));
-	render_buttons.push_back(new TextButton(admin, V2ZERO, "edge numbers", admin->GetCommand("render_display_edges")));
-	render_buttons.push_back(new TextButton(admin, V2ZERO, "local axis", admin->GetCommand("render_local_axis")));
-	render_buttons.push_back(new TextButton(admin, V2ZERO, "global axis", admin->GetCommand("render_global_axis")));
-	render_buttons.push_back(new TextButton(admin, V2ZERO, "transforms", admin->GetCommand("render_transforms")));
-	render_buttons.push_back(new TextButton(admin, V2ZERO, "physics vectors", admin->GetCommand("render_physics")));
-	render_buttons.push_back(new TextButton(admin, V2ZERO, "screen aabb", admin->GetCommand("render_screen_bounding_box")));
-	render_buttons.push_back(new TextButton(admin, V2ZERO, "mesh vertices", admin->GetCommand("render_mesh_vertices")));
-	render_buttons.push_back(new TextButton(admin, V2ZERO, "mesh normals", admin->GetCommand("render_mesh_normals")));
-	render_buttons.push_back(new TextButton(admin, V2ZERO, "grid", admin->GetCommand("render_grid")));
-	render_buttons.push_back(new TextButton(admin, V2ZERO, "light rays", admin->GetCommand("render_light_rays")));
+	static bool show_app_metrics = false;
+	static bool show_app_style_editor = false;
+	if (show_app_metrics)       { ImGui::ShowMetricsWindow(&show_app_metrics); }
+	if (show_app_style_editor)	{ ImGui::Begin("Dear ImGui Style Editor", &show_app_style_editor); ImGui::ShowStyleEditor(); ImGui::End(); }
 
-	return new Panel(admin, V2ZERO, "render", render_buttons);
-}
+	ImGui::Begin("P3DPGE Debug Menu", 0, ImGuiWindowFlags_MenuBar);
+	if(BeginMenuBar()) {
+		if(BeginMenu("Debug")) {
+			static bool global_debug = true;
+			if(MenuItem("global debug", 0, &global_debug)) { global_debug = !global_debug; admin->ExecCommand("debug_global"); }
+			static bool print_commands = true;
+			if(MenuItem("print commands", 0, &print_commands)) { print_commands = !print_commands; admin->ExecCommand("debug_command_exec"); }
+			static bool pause_engine = false;
+			if(MenuItem("pause engine", 0, &pause_engine)) { pause_engine = !pause_engine; admin->ExecCommand("time_pause_engine"); }
+			if(MenuItem("next frame")) { admin->ExecCommand("time_next_frame"); }
+			if(MenuItem("reset camera")) { admin->ExecCommand("reset_camera"); }
+			ImGui::EndMenu();
+		}
+		if(BeginMenu("Spawn")) {
+			if(MenuItem("spawn box")) { admin->ExecCommand("spawn_box"); }
+			if(BeginMenu("spawn complex")) {
+				if(MenuItem("bmonkey")) { admin->ExecCommand("spawn_complex"); }
+				if(MenuItem("whale_ship")) { admin->ExecCommand("spawn_complex1"); }
+				if(MenuItem("24k_Triangles")) { admin->ExecCommand("spawn_complex2"); }
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Tools")){
+            ImGui::MenuItem("Metrics/Debugger", NULL, &show_app_metrics);
+            ImGui::MenuItem("Style Editor", NULL, &show_app_style_editor);
+            ImGui::EndMenu();
+        }
+		EndMenuBar();
+	}
 
-//TODO(,delle) update this to blender-ish style menu with editable values
-inline UI* CreatePropertiesMenu(EntityAdmin* admin, Canvas* canvas) {
-	std::vector<UI*> entity_buttons = std::vector<UI*>();
-	entity_buttons.push_back(new TextButton(admin, V2ZERO, "reset position", admin->GetCommand("reset_position")));
-	entity_buttons.push_back(new TextButton(admin, V2ZERO, "reset x position", admin->GetCommand("reset_position_x")));
-	entity_buttons.push_back(new TextButton(admin, V2ZERO, "reset y position", admin->GetCommand("reset_position_y")));
-	entity_buttons.push_back(new TextButton(admin, V2ZERO, "reset z position", admin->GetCommand("reset_position_z")));
-	entity_buttons.push_back(new TextButton(admin, V2ZERO, "reset velocity", admin->GetCommand("reset_velocity")));
-	entity_buttons.push_back(new TextButton(admin, V2ZERO, "reset rotation", admin->GetCommand("reset_rotation")));
-	entity_buttons.push_back(new TextButton(admin, V2ZERO, "reset x rotation", admin->GetCommand("reset_rotation_x")));
-	entity_buttons.push_back(new TextButton(admin, V2ZERO, "reset y rotation", admin->GetCommand("reset_rotation_y")));
-	entity_buttons.push_back(new TextButton(admin, V2ZERO, "reset z rotation", admin->GetCommand("reset_rotation_z")));
-	entity_buttons.push_back(new TextButton(admin, V2ZERO, "reset rotation velocity", admin->GetCommand("reset_rotation_velocity")));
+	if (ImGui::CollapsingHeader("Entities")){
+        //TODO(delle) implement Entities list and selection thru it, see Child windows
+    }
 
-	return new Panel(admin, V2ZERO, "entity", entity_buttons);
-}
+	if (ImGui::CollapsingHeader("Selected entity")){
+        //TODO(delle) implement selected entity panel, see PropertyEditor
+    }
 
-inline void AddTopMenus(EntityAdmin* admin, Canvas* canvas) {
-	UIRow* topMenu = new UIRow(V2ZERO, UIAnchor::NONE, true, 0, 20);
-	topMenu->Add(CreateDebugMenu(admin, canvas));
-	topMenu->Add(CreateSpawnMenu(admin, canvas));
-	topMenu->Add(CreateRenderMenu(admin, canvas));
-	topMenu->Add(CreatePropertiesMenu(admin, canvas));
-	canvas->containers.push_back(topMenu);
-}
+	if (ImGui::CollapsingHeader("Render options")){
+        if (ImGui::BeginTable("split", 3)) {
+            ImGui::TableNextColumn(); ImGui::Checkbox("wireframe", &scene->RENDER_WIREFRAME);
+            ImGui::TableNextColumn(); ImGui::Checkbox("textures", &scene->RENDER_TEXTURES);
+            ImGui::TableNextColumn(); ImGui::Checkbox("edge numbers", &scene->RENDER_EDGE_NUMBERS);
+            ImGui::TableNextColumn(); ImGui::Checkbox("local axis", &scene->RENDER_LOCAL_AXIS);
+            ImGui::TableNextColumn(); ImGui::Checkbox("global axis", &scene->RENDER_GLOBAL_AXIS);
+            ImGui::TableNextColumn(); ImGui::Checkbox("transforms", &scene->RENDER_TRANSFORMS);
+            ImGui::TableNextColumn(); ImGui::Checkbox("physics vectors", &scene->RENDER_PHYSICS);
+            ImGui::TableNextColumn(); ImGui::Checkbox("screen aabb", &scene->RENDER_SCREEN_BOUNDING_BOX);
+            ImGui::TableNextColumn(); ImGui::Checkbox("mesh vertices", &scene->RENDER_MESH_VERTICES);
+            ImGui::TableNextColumn(); ImGui::Checkbox("mesh normals", &scene->RENDER_MESH_NORMALS);
+            ImGui::TableNextColumn(); ImGui::Checkbox("grid", &scene->RENDER_GRID);
+            ImGui::TableNextColumn(); ImGui::Checkbox("light rays", &scene->RENDER_LIGHT_RAYS);
+            ImGui::EndTable();
+        }
+    }
 
-inline void AddBufferLog(EntityAdmin* admin, Canvas* canvas) { //TODO(delle) re-add bufferlog
-	g_cBuffer.allocate_space(100);
-	//canvas->elements.push_back(new Panel(admin, Vector2(10,100), "BUFFERLOG", std::vector<UI*>{}));
+	if (ImGui::CollapsingHeader("Bufferlog")){
+        //TODO(delle) implement bufferlog, see Child windows
+    }
+	ImGui::End();
+
+	////////////////////////////////////////////
+
+	//This finishes the Dear ImGui and renders it to the screen
+	ImGui::Render();
+	ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
 }
 
 void RenderCanvasSystem::Init() {
 	Canvas* canvas = admin->tempCanvas;
-	AddBufferLog(admin, canvas);
-	AddTopMenus(admin, canvas);
+	olc::PixelGameEngine* p =	admin->p;
+
+	//One time initialization of the Dear ImGui library
+	ImGui::CreateContext();
+	//Create an instance of the Dear ImGui PGE Integration
+	canvas->pge_imgui = new olc::imgui::PGE_ImGUI();
+		
+	//The vi2d for pixel size must match the values given in Construct()
+	//Otherwise the mouse will not work correctly
+	canvas->pge_imgui->ImGui_ImplPGE_Init(p);
+	//Initialize the OpenGL2 rendering system
+	ImGui_ImplOpenGL2_Init();
+
+	//Set a custom render function on layer 0.  Since DrawUI is a member of
+	//our class, we need to use std::bind
+	p->SetLayerCustomRenderFunction(0, std::bind(&RenderCanvasSystem::DrawUI, this));
 }
 
 void RenderCanvasSystem::Update() {

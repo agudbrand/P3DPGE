@@ -34,6 +34,9 @@
     <Filter Include="src\ui">
       <UniqueIdentifier>{610992e5-318a-4520-ab69-f12fe8b34250}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\internal\imgui">
+      <UniqueIdentifier>{fb1917cc-529e-4a2d-954d-03b3a5f1a16c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\math\Math.h">
@@ -192,6 +195,30 @@
     <ClInclude Include="src\ui\UI.h">
       <Filter>src\ui</Filter>
     </ClInclude>
+    <ClInclude Include="src\internal\imgui\imgui_impl_opengl2.h">
+      <Filter>src\internal\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\internal\imgui\imgui_impl_pge.h">
+      <Filter>src\internal\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\internal\imgui\imgui_internal.h">
+      <Filter>src\internal\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\internal\imgui\imstb_rectpack.h">
+      <Filter>src\internal\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\internal\imgui\imstb_textedit.h">
+      <Filter>src\internal\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\internal\imgui\imstb_truetype.h">
+      <Filter>src\internal\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\internal\imgui\imconfig.h">
+      <Filter>src\internal\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\internal\imgui\imgui.h">
+      <Filter>src\internal\imgui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -253,6 +280,24 @@
     </ClCompile>
     <ClCompile Include="src\ui\UIContainer.cpp">
       <Filter>src\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\internal\imgui\imgui_demo.cpp">
+      <Filter>src\internal\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\internal\imgui\imgui_draw.cpp">
+      <Filter>src\internal\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\internal\imgui\imgui_impl_opengl2.cpp">
+      <Filter>src\internal\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\internal\imgui\imgui_tables.cpp">
+      <Filter>src\internal\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\internal\imgui\imgui_widgets.cpp">
+      <Filter>src\internal\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\internal\imgui\imgui.cpp">
+      <Filter>src\internal\imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

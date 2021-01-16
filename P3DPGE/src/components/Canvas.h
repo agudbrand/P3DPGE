@@ -2,7 +2,10 @@
 #include "Component.h"
 
 struct UIContainer;
+namespace olc { namespace imgui { struct PGE_ImGUI; } }
+
 struct Canvas : public Component {
+	olc::imgui::PGE_ImGUI* pge_imgui;
 	std::vector<UIContainer*> containers;
 	bool hideAll;
 
@@ -11,12 +14,8 @@ struct Canvas : public Component {
 		hideAll = false;
 	}
 
-	Canvas(std::vector<UIContainer*> containers, bool hideAll = false) {
-		this->containers = containers;
-		this->hideAll = hideAll;
-	}
-
 	~Canvas() {
+		delete pge_imgui;
 		for(UIContainer* con : containers) delete con;
 		containers.clear();
 	}
