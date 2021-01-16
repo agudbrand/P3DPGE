@@ -202,7 +202,7 @@ int ClipTriangles(const Vector3& plane_p, Vector3 plane_n, Triangle* in_tri, std
 		//the inside point is valid so we keep it
 		newTri->proj_points[0] = *inside_points[0];
 		newTri->proj_tex_points[0] = *inside_tex[0];
-
+		
 		//but the two new points are not where the original triangle intersects with the plane
 		newTri->proj_points[1] = Math::VectorPlaneIntersect(plane_p, plane_n, *inside_points[0], *outside_points[0], t);
 		newTri->proj_tex_points[1].x = t * (outside_tex[0]->x - inside_tex[0]->x) + inside_tex[0]->x;

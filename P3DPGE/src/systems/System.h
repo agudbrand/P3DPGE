@@ -7,6 +7,6 @@ struct System {
 
 	virtual void Init() {}
 	virtual void Update() = 0;
-	virtual double Time() { return time; }
+	virtual double Duration() { return time; }
 	//virtual void NotifyComponent(Component*) = 0;
 };

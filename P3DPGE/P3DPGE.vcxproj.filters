@@ -31,6 +31,9 @@
     <Filter Include="src\geometry">
       <UniqueIdentifier>{98761010-368f-4f0f-999e-4ace06bd144d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\ui">
+      <UniqueIdentifier>{610992e5-318a-4520-ab69-f12fe8b34250}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\math\Math.h">
@@ -103,9 +106,6 @@
       <Filter>src\utils</Filter>
     </ClInclude>
     <ClInclude Include="src\utils\GLOBALS.h">
-      <Filter>src\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utils\UI.h">
       <Filter>src\utils</Filter>
     </ClInclude>
     <ClInclude Include="src\utils\UsefulDefines.h">
@@ -186,6 +186,12 @@
     <ClInclude Include="src\systems\RenderCUDAInterface.h">
       <Filter>src\systems\cpp</Filter>
     </ClInclude>
+    <ClInclude Include="src\ui\UIContainer.h">
+      <Filter>src\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ui\UI.h">
+      <Filter>src\ui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -244,6 +250,9 @@
     </ClCompile>
     <ClCompile Include="src\utils\Command.cpp">
       <Filter>src\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ui\UIContainer.cpp">
+      <Filter>src\ui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

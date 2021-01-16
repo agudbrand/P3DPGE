@@ -557,7 +557,7 @@ namespace Math {
 		);
 	}
 
-	//this assumes a rectangle whose pivot is the top right corner
+	//this assumes a rectangle whose pivot is the top left corner
 	static bool PointInRect(Vector2 size, Vector2 pos, Vector2 point) {
 		return pos.x < point.x&& point.x < pos.x + size.x &&
 			pos.y < point.y&& point.y < pos.y + size.y;

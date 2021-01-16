@@ -14,7 +14,6 @@ struct Input : public Component {
 
 	//ui stuff
 	bool ui_drag_latch = false;
-	bool ui_clicked = false;
 	UI* selectedUI = nullptr;
 
 	//entity stuff

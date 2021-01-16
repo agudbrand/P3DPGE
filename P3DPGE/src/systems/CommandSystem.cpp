@@ -1,5 +1,7 @@
 #include "CommandSystem.h"
 #include "../utils/Command.h"
+#include "../ui/UI.h"
+#include "../ui/UIContainer.h"
 
 #include "../systems/WorldSystem.h"
 
@@ -106,37 +108,28 @@ inline void HandleMouseInputs(EntityAdmin* admin, Input* input) {
 
 	//mouse left click pressed
 	if(input->MousePressed(INPUT_MOUSE_LEFT)) {
+		bool ui_clicked = false;
 		//check if mouse clicked on a UI element
 		if(!canvas->hideAll) {
-			for(UI* ui : canvas->elements) {
-				if(Button* b = dynamic_cast<Button*>(ui)){
-					if(b->Clicked(input->mousePos)) {
-						input->ui_clicked = true;
-						break;
-					}
-				}
-				if(Menu* m = dynamic_cast<Menu*>(ui)) {
-					if(m->Clicked(input->mousePos)) {
-						if(m->ClickedInTitle(input->mousePos)) {
-							input->selectedUI = m;
-						}
-						input->ui_clicked = true;
-						break;
-					}
+			for(UIContainer* con : canvas->containers) {
+				for(UI* ui : con->container) {
+					if(ui->Clicked(input->mousePos)) {
+						ui_clicked = true;
+						goto stop;
+					}//TODO(delle) re-add menu dragging
 				}
 			}
 		}
+		stop:
 
 		//if the click wasnt on a UI element, trigger select_entity command
-		if(!input->ui_clicked) {
-			admin->TriggerCommand("select_entity"); //TODO(i,delle) test that you can select an entity
-		}
+		if(!ui_clicked) { admin->TriggerCommand("select_entity"); } //TODO(i,delle) test that you can select an entity
 
 		//set click pos to mouse pos
 		input->mouseClickPos = input->mousePos;
 	}
 	//mouse left click held
-	else if(input->MouseHeld(INPUT_MOUSE_LEFT)) {
+	else if(input->MouseHeld(INPUT_MOUSE_LEFT)) { 
 		static_internal Vector2 offset;
 		if(input->selectedUI) {
 			if(!input->ui_drag_latch) {
@@ -144,6 +137,7 @@ inline void HandleMouseInputs(EntityAdmin* admin, Input* input) {
 				input->ui_drag_latch = true;
 			}
 			input->selectedUI->pos = input->mousePos + offset;
+			input->selectedUI->Update();
 		}
 	} 
 	//mouse left click released
