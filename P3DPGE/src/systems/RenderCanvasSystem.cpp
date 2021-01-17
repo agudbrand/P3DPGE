@@ -6,30 +6,38 @@
 #include "../components/Canvas.h"
 #include "../components/Screen.h"
 #include "../components/Scene.h"
+#include "../components/Camera.h"
 
 #define OLC_PGEX_DEAR_IMGUI_IMPLEMENTATION
 #include "../internal/imgui/imgui_impl_pge.h"
 #include "../internal/imgui/imgui_impl_opengl2.h"
 
-void RenderCanvasSystem::DrawUI(void) {
-	Scene* scene = admin->currentScene;
+//// utility ui elements ////
 
+void CopyButton(const char* text) {
+	if(ImGui::Button("Copy")){ ImGui::LogToClipboard(); ImGui::LogText(text); ImGui::LogFinish(); }
+}
+
+void InputVector3(const char* id, Vector3* vecPtr, bool inputUpdate = false) {
+	ImGui::SetNextItemWidth(-FLT_MIN);
+	if(inputUpdate) { //pointer voodoo to treat Vector3 as float vector
+		ImGui::InputFloat3(id, (float*)vecPtr); 
+	} else {
+		ImGui::InputFloat3(id, (float*)vecPtr, "%.3f", ImGuiInputTextFlags_EnterReturnsTrue); 
+	}
+}
+
+//// major ui elements ////
+
+void MakeMenuBar(EntityAdmin* admin) {
 	using namespace ImGui;
-	//These 3 lines are mandatory per-frame initialization
-	ImGui_ImplOpenGL2_NewFrame();
-	admin->tempCanvas->pge_imgui->ImGui_ImplPGE_NewFrame();
-	ImGui::NewFrame();
-
-	ImGui::ShowDemoWindow();
-
-	////////////////////////////////////////////
-
 	static bool show_app_metrics = false;
+	static bool show_app_about = false;
 	static bool show_app_style_editor = false;
 	if (show_app_metrics)       { ImGui::ShowMetricsWindow(&show_app_metrics); }
+	if (show_app_about)         { ImGui::ShowAboutWindow(&show_app_about); }
 	if (show_app_style_editor)	{ ImGui::Begin("Dear ImGui Style Editor", &show_app_style_editor); ImGui::ShowStyleEditor(); ImGui::End(); }
 
-	ImGui::Begin("P3DPGE Debug Menu", 0, ImGuiWindowFlags_MenuBar);
 	if(BeginMenuBar()) {
 		if(BeginMenu("Debug")) {
 			static bool global_debug = true;
@@ -39,7 +47,6 @@ void RenderCanvasSystem::DrawUI(void) {
 			static bool pause_engine = false;
 			if(MenuItem("pause engine", 0, &pause_engine)) { pause_engine = !pause_engine; admin->ExecCommand("time_pause_engine"); }
 			if(MenuItem("next frame")) { admin->ExecCommand("time_next_frame"); }
-			if(MenuItem("reset camera")) { admin->ExecCommand("reset_camera"); }
 			ImGui::EndMenu();
 		}
 		if(BeginMenu("Spawn")) {
@@ -52,44 +59,103 @@ void RenderCanvasSystem::DrawUI(void) {
 			}
 			ImGui::EndMenu();
 		}
-		if (ImGui::BeginMenu("Tools")){
-            ImGui::MenuItem("Metrics/Debugger", NULL, &show_app_metrics);
-            ImGui::MenuItem("Style Editor", NULL, &show_app_style_editor);
+		if (BeginMenu("Imgui")){
+            MenuItem("Metrics/Debugger", NULL, &show_app_metrics);
+            MenuItem("Style Editor", NULL, &show_app_style_editor);
+			ImGui::MenuItem("About Dear ImGui", NULL, &show_app_about);
             ImGui::EndMenu();
         }
 		EndMenuBar();
 	}
+}
 
-	if (ImGui::CollapsingHeader("Entities")){
-        //TODO(delle) implement Entities list and selection thru it, see Child windows
-    }
+void MakeGeneralHeader(EntityAdmin* admin) {
+	using namespace ImGui;
+	Camera* camera = admin->currentCamera;
+	if(CollapsingHeader("General", ImGuiTreeNodeFlags_DefaultOpen)) {
+		if(TreeNodeEx("Camera", ImGuiTreeNodeFlags_NoTreePushOnOpen)) {
+			Text("Address: %#08x", camera); SameLine(); if(ImGui::Button("Copy")) { ImGui::LogToClipboard(); ImGui::LogText("%#08x", camera); ImGui::LogFinish(); }
+			Text("Position"); SameLine(); InputVector3("##camPos", &camera->position);
+			Text("Rotation"); SameLine(); InputVector3("##camRot", &camera->rotation);
+			if(BeginTable("split", 3)) {
+				TableNextColumn(); Text("FOV"); SameLine(); InputFloat("##camFOV", &camera->fieldOfView, 0, 0, "%.2f", ImGuiInputTextFlags_EnterReturnsTrue);
+				TableNextColumn(); Text("NearZ"); SameLine(); InputFloat("##camNearZ", &camera->nearZ, 0, 0, "%.2f", ImGuiInputTextFlags_EnterReturnsTrue);
+				TableNextColumn(); Text("FarZ"); SameLine(); InputFloat("##camFarZ", &camera->farZ, 0, 0, "%.2f", ImGuiInputTextFlags_EnterReturnsTrue);
+				EndTable();
+			}
+			Separator();
+		}
+	}
+}
 
-	if (ImGui::CollapsingHeader("Selected entity")){
-        //TODO(delle) implement selected entity panel, see PropertyEditor
-    }
+//TODO(delle) implement Entities list and selection thru it, see Child windows
+void MakeEntitiesHeader(EntityAdmin* admin) {
+	using namespace ImGui;
+	if(CollapsingHeader("Entities")) {
+		
+	}
+}
 
-	if (ImGui::CollapsingHeader("Render options")){
-        if (ImGui::BeginTable("split", 3)) {
-            ImGui::TableNextColumn(); ImGui::Checkbox("wireframe", &scene->RENDER_WIREFRAME);
-            ImGui::TableNextColumn(); ImGui::Checkbox("textures", &scene->RENDER_TEXTURES);
-            ImGui::TableNextColumn(); ImGui::Checkbox("edge numbers", &scene->RENDER_EDGE_NUMBERS);
-            ImGui::TableNextColumn(); ImGui::Checkbox("local axis", &scene->RENDER_LOCAL_AXIS);
-            ImGui::TableNextColumn(); ImGui::Checkbox("global axis", &scene->RENDER_GLOBAL_AXIS);
-            ImGui::TableNextColumn(); ImGui::Checkbox("transforms", &scene->RENDER_TRANSFORMS);
-            ImGui::TableNextColumn(); ImGui::Checkbox("physics vectors", &scene->RENDER_PHYSICS);
-            ImGui::TableNextColumn(); ImGui::Checkbox("screen aabb", &scene->RENDER_SCREEN_BOUNDING_BOX);
-            ImGui::TableNextColumn(); ImGui::Checkbox("mesh vertices", &scene->RENDER_MESH_VERTICES);
-            ImGui::TableNextColumn(); ImGui::Checkbox("mesh normals", &scene->RENDER_MESH_NORMALS);
-            ImGui::TableNextColumn(); ImGui::Checkbox("grid", &scene->RENDER_GRID);
-            ImGui::TableNextColumn(); ImGui::Checkbox("light rays", &scene->RENDER_LIGHT_RAYS);
-            ImGui::EndTable();
+void MakeRenderHeader(EntityAdmin* admin) {
+	using namespace ImGui;
+	Scene* scene = admin->currentScene;
+	if (CollapsingHeader("Render options")){
+        if (BeginTable("split", 3)) {
+            TableNextColumn(); Checkbox("wireframe", &scene->RENDER_WIREFRAME);
+            TableNextColumn(); Checkbox("textures", &scene->RENDER_TEXTURES);
+            TableNextColumn(); Checkbox("edge numbers", &scene->RENDER_EDGE_NUMBERS);
+            TableNextColumn(); Checkbox("local axis", &scene->RENDER_LOCAL_AXIS);
+            TableNextColumn(); Checkbox("global axis", &scene->RENDER_GLOBAL_AXIS);
+            TableNextColumn(); Checkbox("transforms", &scene->RENDER_TRANSFORMS);
+            TableNextColumn(); Checkbox("physics vectors", &scene->RENDER_PHYSICS);
+            TableNextColumn(); Checkbox("screen aabb", &scene->RENDER_SCREEN_BOUNDING_BOX);
+            TableNextColumn(); Checkbox("mesh vertices", &scene->RENDER_MESH_VERTICES);
+            TableNextColumn(); Checkbox("mesh normals", &scene->RENDER_MESH_NORMALS);
+            TableNextColumn(); Checkbox("grid", &scene->RENDER_GRID);
+            TableNextColumn(); Checkbox("light rays", &scene->RENDER_LIGHT_RAYS);
+            EndTable();
         }
     }
+}
 
-	if (ImGui::CollapsingHeader("Bufferlog")){
-        //TODO(delle) implement bufferlog, see Child windows
-    }
+//TODO(delle) implement bufferlog
+void MakeBufferlogHeader(EntityAdmin* admin) {
+	using namespace ImGui;
+	if(CollapsingHeader("Bufferlog")) {
+		
+	}
+}
+
+//this actually creates the debug tools panel
+void MakeP3DPGEDebugTools(EntityAdmin* admin) {
+	using namespace ImGui;
+	ImGui::Begin("P3DPGE Debug Tools", 0, ImGuiWindowFlags_MenuBar);
+
+	MakeMenuBar(admin);
+	MakeGeneralHeader(admin);
+	MakeEntitiesHeader(admin);
+	MakeRenderHeader(admin);
+	MakeBufferlogHeader(admin);
+	
 	ImGui::End();
+}
+
+void RenderCanvasSystem::DrawUI(void) {
+	using namespace ImGui;
+	//These 3 lines are mandatory per-frame initialization
+	ImGui_ImplOpenGL2_NewFrame();
+	admin->tempCanvas->pge_imgui->ImGui_ImplPGE_NewFrame();
+	ImGui::NewFrame();
+
+	//demo window for reference
+	ImGui::ShowDemoWindow();
+
+	////////////////////////////////////////////
+
+	ImGuiIO& io = ImGui::GetIO();
+	static bool showDebugTools = true;
+	if(ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Backspace)) && io.KeyCtrl && io.KeyShift) { showDebugTools = !showDebugTools; }
+	if(showDebugTools) MakeP3DPGEDebugTools(admin);
 
 	////////////////////////////////////////////
 
@@ -120,7 +186,7 @@ void RenderCanvasSystem::Init() {
 
 void RenderCanvasSystem::Update() {
 	Canvas*	canvas =			admin->tempCanvas;
-	Screen*	screen =			admin->singletonScreen;
+	
 	olc::PixelGameEngine* p =	admin->p;
 
 	if(!canvas->hideAll) {
@@ -130,6 +196,4 @@ void RenderCanvasSystem::Update() {
 			}
 		}
 	}
-
-	p->DrawStringDecal(olc::vf2d(screen->width - 300, screen->height - 20), "Mouse: " + screen->mousePosV3.str2f());
 }
