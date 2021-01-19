@@ -216,7 +216,8 @@ int ClipTriangles(const Vector3& plane_p, Vector3 plane_n, Triangle* in_tri, std
 
 		out_tris = {newTri, 0};
 		return 1; //return new triangle
-	} else if (nInsidePointCount == 2 && nOutsidePointCount == 1) {
+	} 
+	else if (nInsidePointCount == 2 && nOutsidePointCount == 1) {
 	//triangle will be clipped and becomes a quad which is cut into two more triangles
 		Triangle* newTri = new Triangle();
 		newTri->e = in_tri->e;
@@ -550,6 +551,7 @@ olc::Sprite* LightDepthTex(Light* li, Camera* c, Scene* s, Screen* sc) {
 	float max = std::max(maxx, maxy);
 
 	float aspectRatio = sc->height / sc->width;
+
 	float r = max * aspectRatio, t = max;
 	float l = -r, b = -t;
 
