@@ -1,23 +1,23 @@
 #pragma once
 #include "Component.h"
-#include "../utils/UI.h"
 
+struct UIContainer;
 struct Canvas : public Component {
-	std::vector<UI*> elements;
+	std::vector<UIContainer*> containers;
 	bool hideAll;
 
 	Canvas() {
-		elements = std::vector<UI*>();
+		containers = std::vector<UIContainer*>();
 		hideAll = false;
 	}
 
-	Canvas(std::vector<UI*> elements, bool hideAll = false) {
-		this->elements = elements;
+	Canvas(std::vector<UIContainer*> containers, bool hideAll = false) {
+		this->containers = containers;
 		this->hideAll = hideAll;
 	}
 
 	~Canvas() {
-		for(UI* el : elements) delete el;
-		elements.clear();
+		for(UIContainer* con : containers) delete con;
+		containers.clear();
 	}
 };

@@ -1,4 +1,4 @@
-TODO List successfully generated with 93 TODOs found.
+TODO List successfully generated with 44 TODOs found.
 
 ~~~~~~~ TODO 0 ~~~~~~~
 CameraSystem.cpp, Line: 69
@@ -17,150 +17,6 @@ Tags: render
 implement ortho triangle clipping
 
 ~~~~~~~ TODO 2 ~~~~~~~
-Collider.cpp, Line: 20
-Creator: delle
-----------------------
-Tags: optimization
-----------------------
-check if the compiler optimizes this to be inline
-
-~~~~~~~ TODO 3 ~~~~~~~
-Collider.cpp, Line: 36
-Creator: delle
-----------------------
-Tags: physics
-----------------------
-implement aabb-aabb collision and resolution
-
-~~~~~~~ TODO 4 ~~~~~~~
-Collider.cpp, Line: 42
-Creator: delle
-----------------------
-Tags: physics
-----------------------
-implement sphere-aabb dynamic resolution
-
-~~~~~~~ TODO 5 ~~~~~~~
-Collider.cpp, Line: 43
-Creator: delle
-----------------------
-Tags: physics
-----------------------
-maybe abstract out closest point calculations for each collider
-
-~~~~~~~ TODO 6 ~~~~~~~
-Collider.cpp, Line: 60
-Creator: delle
-----------------------
-Tags: physics
-----------------------
-test this
-
-~~~~~~~ TODO 7 ~~~~~~~
-Collider.cpp, Line: 79
-Creator: delle
-----------------------
-Tags: clean up
-----------------------
-remove this, only for testing
-
-~~~~~~~ TODO 8 ~~~~~~~
-Collider.cpp, Line: 82
-Creator: delle
-----------------------
-Tags: physics
-----------------------
-test this
-
-~~~~~~~ TODO 9 ~~~~~~~
-Collider.cpp, Line: 92
-Creator: delle
-----------------------
-Tags: physics
-----------------------
-implement aabb-box collision and resolution
-
-~~~~~~~ TODO 10 ~~~~~~~
-Collider.cpp, Line: 98
-Creator: delle
-----------------------
-Tags: physics
-----------------------
-implement aabb-complex collision and resolution
-
-~~~~~~~ TODO 11 ~~~~~~~
-Collider.cpp, Line: 115
-Creator: delle
-----------------------
-Tags: physics
-----------------------
-test this
-
-~~~~~~~ TODO 12 ~~~~~~~
-Collider.cpp, Line: 149
-Creator: delle
-----------------------
-Tags: physics
-----------------------
-implement rotational collision resolution
-
-~~~~~~~ TODO 13 ~~~~~~~
-Collider.cpp, Line: 167
-Creator: delle
-----------------------
-Tags: physics
-----------------------
-test this in 3d
-
-~~~~~~~ TODO 14 ~~~~~~~
-Collider.cpp, Line: 174
-Creator: delle
-----------------------
-Tags: physics
-----------------------
-implement sphere-box collision and resolution
-
-~~~~~~~ TODO 15 ~~~~~~~
-Collider.cpp, Line: 180
-Creator: delle
-----------------------
-Tags: physics
-----------------------
-implement sphere-complex collision and resolution
-
-~~~~~~~ TODO 16 ~~~~~~~
-Collider.cpp, Line: 221
-Creator: delle
-----------------------
-Tags: physics
-----------------------
-implement 
-
-~~~~~~~ TODO 17 ~~~~~~~
-Collider.cpp, Line: 227
-Creator: delle
-----------------------
-Tags: physics
-----------------------
-implement box-box collision and resolution
-
-~~~~~~~ TODO 18 ~~~~~~~
-Collider.cpp, Line: 233
-Creator: delle
-----------------------
-Tags: physics
-----------------------
-implement box-complex collision and resolution
-
-~~~~~~~ TODO 19 ~~~~~~~
-Collider.cpp, Line: 317
-Creator: delle
-----------------------
-Tags: physics
-----------------------
-implement complex-complex collision and resolution
-
-~~~~~~~ TODO 20 ~~~~~~~
 Collider.h, Line: 14
 Creator: delle
 ----------------------
@@ -168,7 +24,7 @@ Tags: physics
 ----------------------
 implement trigger colliders
 
-~~~~~~~ TODO 21 ~~~~~~~
+~~~~~~~ TODO 3 ~~~~~~~
 Collider.h, Line: 88
 Creator: delle
 ----------------------
@@ -176,7 +32,7 @@ Tags: physics
 ----------------------
 implement convexPolyCollider
 
-~~~~~~~ TODO 22 ~~~~~~~
+~~~~~~~ TODO 4 ~~~~~~~
 Collider.h, Line: 89
 Creator: delle
 ----------------------
@@ -184,7 +40,7 @@ Tags: physics
 ----------------------
 implement capsuleCollider
 
-~~~~~~~ TODO 23 ~~~~~~~
+~~~~~~~ TODO 5 ~~~~~~~
 Collider.h, Line: 90
 Creator: delle
 ----------------------
@@ -192,14 +48,14 @@ Tags: physics
 ----------------------
 implement cylinder collider
 
-~~~~~~~ TODO 24 ~~~~~~~
+~~~~~~~ TODO 6 ~~~~~~~
 Collider.h, Line: 91
 Creator: delle
 ----------------------
 Tags: physics
 ----------------------
 implement complex collider (collider list)
-~~~~~~~ TODO 25 ~~~~~~~
+~~~~~~~ TODO 7 ~~~~~~~
 Command.h, Line: 31
 Creator: delle
 ----------------------
@@ -207,7 +63,7 @@ Tags: input
 ----------------------
 maybe add delayed and repeating commands
 
-~~~~~~~ TODO 26 ~~~~~~~
+~~~~~~~ TODO 8 ~~~~~~~
 CommandSystem.cpp, Line: 131
 Creator: delle
 ----------------------
@@ -215,7 +71,7 @@ Tags: input
 ----------------------
 test that you can select an entity
 
-~~~~~~~ TODO 27 ~~~~~~~
+~~~~~~~ TODO 9 ~~~~~~~
 Debug.h, Line: 50
 Creator:  sushi
 ----------------------
@@ -223,7 +79,7 @@ Tags: general
 ----------------------
 write a macro for running once in a loop
 
-~~~~~~~ TODO 28 ~~~~~~~
+~~~~~~~ TODO 10 ~~~~~~~
 Debug.h, Line: 182
 Creator: sushi
 ----------------------
@@ -231,7 +87,7 @@ Tags: No Tags
 ----------------------
 fix variadic ToString
 
-~~~~~~~ TODO 29 ~~~~~~~
+~~~~~~~ TODO 11 ~~~~~~~
 Debug.h, Line: 197
 Creator: sushi
 ----------------------
@@ -239,7 +95,7 @@ Tags: No Tags
 ----------------------
 fix variadic ToStringReturn
 
-~~~~~~~ TODO 30 ~~~~~~~
+~~~~~~~ TODO 12 ~~~~~~~
 Edge.h, Line: 23
 Creator:  sushi
 ----------------------
@@ -247,103 +103,7 @@ Tags: No Tags
 ----------------------
 find a good place to update edge, probably in Triangle?
 
-~~~~~~~ TODO 31 ~~~~~~~
-Entities.cpp, Line: 292
-Creator: delle
-----------------------
-Date: 11/13/20
-Tags: unimportant, physics
-----------------------
-change air friction to calculate for shape of object
-
-~~~~~~~ TODO 32 ~~~~~~~
-Entities.cpp, Line: 309
-Creator: delle
-----------------------
-Date: 11/13/20
-Tags: unimportant, physics
-----------------------
-create the GenerateRadialForce function
-
-~~~~~~~ TODO 33 ~~~~~~~
-Entities.cpp, Line: 332
-Creator: delle
-----------------------
-Date: 11/9/20
-Tags: severe, physics
-----------------------
-expand this to a general entity check, but right now it just checks circles
-
-~~~~~~~ TODO 34 ~~~~~~~
-Entities.cpp, Line: 333
-Creator: delle
-----------------------
-Date: 11/9/20
-Tags: optimization, unimportant, physics
-----------------------
-if other object is sphere, can optimize the equation to not use sqrt
-
-~~~~~~~ TODO 35 ~~~~~~~
-Entities.cpp, Line: 345
-Creator: delle
-----------------------
-Date: 11/9/20
-Tags: severe, physics
-----------------------
-expand this to a general entity check, but right now it just checks circles
-
-~~~~~~~ TODO 36 ~~~~~~~
-Entities.cpp, Line: 346
-Creator: delle
-----------------------
-Date: 11/17/20
-Tags: optimization, unimportant, physics
-----------------------
-can optimize this by recieving info from CheckCollision
-
-~~~~~~~ TODO 37 ~~~~~~~
-Entities.cpp, Line: 421
-Creator: delle
-----------------------
-Date: 11/9/20
-Tags: severe, physics
-----------------------
-expand this to a general entity check
-
-~~~~~~~ TODO 38 ~~~~~~~
-Entities.cpp, Line: 426
-Creator: delle
-----------------------
-Date: 11/9/20
-Tags: severe, physics
-----------------------
-expand this to a general entity check
-
-~~~~~~~ TODO 39 ~~~~~~~
-Entities.cpp, Line: 605
-Creator: delle
-----------------------
-Tags: render
-----------------------
-change the third parameter to the camera variable
-
-~~~~~~~ TODO 40 ~~~~~~~
-Entities.h, Line: 30
-Creator:  sushi
-----------------------
-Tags: render, entity, optimization
-----------------------
-implement this eventually
-
-~~~~~~~ TODO 41 ~~~~~~~
-Entities.h, Line: 152
-Creator:  sushi
-----------------------
-Tags: entity
-----------------------
-generate complex object relative to input position
-
-~~~~~~~ TODO 42 ~~~~~~~
+~~~~~~~ TODO 13 ~~~~~~~
 EntityAdmin.cpp, Line: 7
 Creator: delle
 ----------------------
@@ -351,14 +111,14 @@ Tags: physics
 ----------------------
 add physics based collision resolution for all entities
 
-~~~~~~~ TODO 43 ~~~~~~~
+~~~~~~~ TODO 14 ~~~~~~~
 EntityAdmin.h, Line: 79
 Creator: delle
 ----------------------
 Tags: No Tags
 ----------------------
 move WorldSystem entity-component functions into Entity
-~~~~~~~ TODO 44 ~~~~~~~
+~~~~~~~ TODO 15 ~~~~~~~
 Geometry.h, Line: 17
 Creator: delle
 ----------------------
@@ -366,7 +126,7 @@ Tags: No Tags
 ----------------------
 test ClosestPointOnBox
 
-~~~~~~~ TODO 45 ~~~~~~~
+~~~~~~~ TODO 16 ~~~~~~~
 Keybinds.h, Line: 41
 Creator: delle
 ----------------------
@@ -374,7 +134,7 @@ Tags: input
 ----------------------
 look into saving/loading keybinds with a file
 
-~~~~~~~ TODO 46 ~~~~~~~
+~~~~~~~ TODO 17 ~~~~~~~
 Math.h, Line: 599
 Creator: sushi
 ----------------------
@@ -382,63 +142,7 @@ Tags: No Tags
 ----------------------
 implement this
 
-~~~~~~~ TODO 47 ~~~~~~~
-Matrix.h, Line: 75
-Creator: delle
-----------------------
-Tags: optimization
-----------------------
-test that there is no memory leak on destruction of Matrix objects
-
-~~~~~~~ TODO 48 ~~~~~~~
-Matrix.h, Line: 120
-Creator:  delle
-----------------------
-Tags: No Tags
-----------------------
-define these in Math.h
-
-~~~~~~~ TODO 49 ~~~~~~~
-Matrix.h, Line: 121
-Creator:  delle
-----------------------
-Tags: No Tags
-----------------------
-define this in Math.h
-
-~~~~~~~ TODO 50 ~~~~~~~
-Matrix.h, Line: 122
-Creator:  delle
-----------------------
-Tags: No Tags
-----------------------
-define this in Math.h
-
-~~~~~~~ TODO 51 ~~~~~~~
-Matrix.h, Line: 162
-Creator not specified!
-----------------------
-Tags: entity, entity
-----------------------
-test that you can use this to assign values to the matrix
-
-~~~~~~~ TODO 52 ~~~~~~~
-Matrix.h, Line: 250
-Creator: delle
-----------------------
-Tags: optimization
-----------------------
-look into optimizing this by transposing to remove a loop, see Unreal implementation
-
-~~~~~~~ TODO 53 ~~~~~~~
-Matrix.h, Line: 335
-Creator: delle
-----------------------
-Tags: clean up
-----------------------
-clean up Matrix.str() and Matrix.str2F()
-
-~~~~~~~ TODO 54 ~~~~~~~
+~~~~~~~ TODO 18 ~~~~~~~
 Matrix3.h, Line: 144
 Creator: delle
 ----------------------
@@ -446,7 +150,7 @@ Tags: optimization
 ----------------------
 look into optimizing this by transposing to remove a loop, see Unreal Matrix.h
 
-~~~~~~~ TODO 55 ~~~~~~~
+~~~~~~~ TODO 19 ~~~~~~~
 Matrix3.h, Line: 219
 Creator: delle
 ----------------------
@@ -454,7 +158,7 @@ Tags: clean up
 ----------------------
 clean up Matrix3.str() and Matrix3.str2F()
 
-~~~~~~~ TODO 56 ~~~~~~~
+~~~~~~~ TODO 20 ~~~~~~~
 Matrix4.h, Line: 147
 Creator: delle
 ----------------------
@@ -462,7 +166,7 @@ Tags: optimization
 ----------------------
 look into optimizing this by transposing to remove a loop, see Unreal Matrix.h
 
-~~~~~~~ TODO 57 ~~~~~~~
+~~~~~~~ TODO 21 ~~~~~~~
 Matrix4.h, Line: 223
 Creator: delle
 ----------------------
@@ -470,7 +174,7 @@ Tags: clean up
 ----------------------
 clean up Matrix4.str() and Matrix4.str2F()
 
-~~~~~~~ TODO 58 ~~~~~~~
+~~~~~~~ TODO 22 ~~~~~~~
 MatrixN.h, Line: 258
 Creator: delle
 ----------------------
@@ -478,7 +182,7 @@ Tags: optimization
 ----------------------
 look into optimizing this by transposing to remove a loop, see Unreal implementation
 
-~~~~~~~ TODO 59 ~~~~~~~
+~~~~~~~ TODO 23 ~~~~~~~
 MatrixN.h, Line: 343
 Creator: delle
 ----------------------
@@ -486,7 +190,7 @@ Tags: clean up
 ----------------------
 clean up MatrixN.str() and MatrixN.str2F()
 
-~~~~~~~ TODO 60 ~~~~~~~
+~~~~~~~ TODO 24 ~~~~~~~
 Mesh.h, Line: 29
 Creator:  sushi
 ----------------------
@@ -494,7 +198,7 @@ Tags: render
 ----------------------
 make it so you can do this with a custom texture
 
-~~~~~~~ TODO 61 ~~~~~~~
+~~~~~~~ TODO 25 ~~~~~~~
 MeshSystem.cpp, Line: 21
 Creator:  sushi
 ----------------------
@@ -502,7 +206,7 @@ Tags: input
 ----------------------
 fix selecting objects
 
-~~~~~~~ TODO 62 ~~~~~~~
+~~~~~~~ TODO 26 ~~~~~~~
 MeshSystem.cpp, Line: 52
 Creator: delle
 ----------------------
@@ -510,7 +214,7 @@ Tags: input
 ----------------------
 change this to take in an ID once we figure that out
 
-~~~~~~~ TODO 63 ~~~~~~~
+~~~~~~~ TODO 27 ~~~~~~~
 MeshSystem.cpp, Line: 109
 Creator: delle
 ----------------------
@@ -518,7 +222,7 @@ Tags: No Tags
 ----------------------
 test 3x3 scale matrices
 
-~~~~~~~ TODO 64 ~~~~~~~
+~~~~~~~ TODO 28 ~~~~~~~
 PhysicsSystem.cpp, Line: 15
 Creator: delle
 ----------------------
@@ -526,7 +230,7 @@ Tags: input, physics
 ----------------------
 update entity movement commands to be based on EntityID
 
-~~~~~~~ TODO 65 ~~~~~~~
+~~~~~~~ TODO 29 ~~~~~~~
 PhysicsSystem.cpp, Line: 217
 Creator:  sushi
 ----------------------
@@ -534,7 +238,7 @@ Tags: No Tags
 ----------------------
 implement ScreenToWorld for ortho projection
 
-~~~~~~~ TODO 66 ~~~~~~~
+~~~~~~~ TODO 30 ~~~~~~~
 PhysicsSystem.cpp, Line: 229
 Creator: delle
 ----------------------
@@ -542,7 +246,7 @@ Tags: physics, input
 ----------------------
 test that you can add force to a selected entity
 
-~~~~~~~ TODO 67 ~~~~~~~
+~~~~~~~ TODO 31 ~~~~~~~
 PhysicsSystem.cpp, Line: 268
 Creator: delle
 ----------------------
@@ -550,7 +254,7 @@ Tags: physics
 ----------------------
 look into bettering this physics tick
 
-~~~~~~~ TODO 68 ~~~~~~~
+~~~~~~~ TODO 32 ~~~~~~~
 PhysicsSystem.cpp, Line: 476
 Creator: delle
 ----------------------
@@ -558,7 +262,7 @@ Tags: physics
 ----------------------
 look into better rotational interpolation once we switch to quaternions
 
-~~~~~~~ TODO 69 ~~~~~~~
+~~~~~~~ TODO 33 ~~~~~~~
 PhysicsSystem.cpp, Line: 495
 Creator: delle
 ----------------------
@@ -567,7 +271,7 @@ Tags: unimportant, physics
 ----------------------
 change air friction to calculate for shape of object
 
-~~~~~~~ TODO 70 ~~~~~~~
+~~~~~~~ TODO 34 ~~~~~~~
 PhysicsSystem.cpp, Line: 499
 Creator: delle
 ----------------------
@@ -576,7 +280,7 @@ Tags: physics
 ----------------------
 implement sliding friction between two objects 
 
-~~~~~~~ TODO 71 ~~~~~~~
+~~~~~~~ TODO 35 ~~~~~~~
 PhysicsWorld.h, Line: 23
 Creator: delle
 ----------------------
@@ -584,7 +288,7 @@ Tags: physics
 ----------------------
 look into maybe having physics here instead
 
-~~~~~~~ TODO 72 ~~~~~~~
+~~~~~~~ TODO 36 ~~~~~~~
 PhysicsWorld.h, Line: 38
 Creator: delle
 ----------------------
@@ -592,7 +296,7 @@ Tags: physics
 ----------------------
 this should depend on object shape
 
-~~~~~~~ TODO 73 ~~~~~~~
+~~~~~~~ TODO 37 ~~~~~~~
 Quaternion.h, Line: 7
 Creator: delle
 ----------------------
@@ -600,64 +304,7 @@ Tags: No Tags
 ----------------------
 implement quaternions
 
-~~~~~~~ TODO 74 ~~~~~~~
-Render.h, Line: 8
-Creator:  sushi
-----------------------
-Tags: render
-----------------------
-separate objects into different layers like debug, main, etc. to be drawn in certain orders
-
-~~~~~~~ TODO 75 ~~~~~~~
-Render.h, Line: 34
-Creator:  sushi
-----------------------
-Tags: render
-----------------------
-set up a way that debug can be applied to certain objects. this is important in the case of edge numbers
-
-~~~~~~~ TODO 76 ~~~~~~~
-Render.h, Line: 82
-Creator:  sushi
-----------------------
-Tags: render, clean up
-----------------------
-change this to take in types and not individual values
-
-~~~~~~~ TODO 77 ~~~~~~~
-Render.h, Line: 303
-Creator:  sushi
-----------------------
-Tags: render
-----------------------
-this still needs abstracted
-
-~~~~~~~ TODO 78 ~~~~~~~
-Render.h, Line: 359
-Creator:  sushi
-----------------------
-Tags: optimization
-----------------------
-optimize this for loop 
-
-~~~~~~~ TODO 79 ~~~~~~~
-Render.h, Line: 448
-Creator:  sushi
-----------------------
-Tags: general
-----------------------
-fix this so it works with additions
-
-~~~~~~~ TODO 80 ~~~~~~~
-Render.h, Line: 544
-Creator:  sushi
-----------------------
-Date:  11/18/2020
-Tags: render
-----------------------
-writing this is probably important
-
-~~~~~~~ TODO 81 ~~~~~~~
+~~~~~~~ TODO 38 ~~~~~~~
 RenderCanvasSystem.cpp, Line: 50
 Creator: delle
 ----------------------
@@ -665,7 +312,7 @@ Tags: No Tags
 ----------------------
 update this to blender-ish style menu with editable values
 
-~~~~~~~ TODO 82 ~~~~~~~
+~~~~~~~ TODO 39 ~~~~~~~
 RenderSceneSystem.cpp, Line: 315
 Creator: delle
 ----------------------
@@ -673,7 +320,7 @@ Tags: optimization, render
 ----------------------
 see if zClipIndex can remove the .midpoint()
 
-~~~~~~~ TODO 83 ~~~~~~~
+~~~~~~~ TODO 40 ~~~~~~~
 RenderSceneSystem.cpp, Line: 530
 Creator:  sushi
 ----------------------
@@ -681,7 +328,7 @@ Tags: optimization
 ----------------------
 use something other than olc::Sprite since it stores RGB info and we dont need that
 
-~~~~~~~ TODO 84 ~~~~~~~
+~~~~~~~ TODO 41 ~~~~~~~
 Scene.h, Line: 18
 Creator: delle
 ----------------------
@@ -689,7 +336,7 @@ Tags: render
 ----------------------
 implement global axis like in blender
 
-~~~~~~~ TODO 85 ~~~~~~~
+~~~~~~~ TODO 42 ~~~~~~~
 Scene.h, Line: 23
 Creator: delle
 ----------------------
@@ -697,55 +344,7 @@ Tags: render
 ----------------------
 upgrade grid to follow camera in smart way
 
-~~~~~~~ TODO 86 ~~~~~~~
-Vector.h, Line: 65
-Creator:  delle
-----------------------
-Tags: No Tags
-----------------------
-rename this to negatedX
-
-~~~~~~~ TODO 87 ~~~~~~~
-Vector.h, Line: 66
-Creator:  delle
-----------------------
-Tags: No Tags
-----------------------
-rename this to negatedY
-
-~~~~~~~ TODO 88 ~~~~~~~
-Vector.h, Line: 67
-Creator:  delle
-----------------------
-Tags: No Tags
-----------------------
-rename this to negatedZ
-
-~~~~~~~ TODO 89 ~~~~~~~
-Vector.h, Line: 69
-Creator not specified!
-----------------------
-Tags: entity, entity
-----------------------
-define these in Math.h
-
-~~~~~~~ TODO 90 ~~~~~~~
-Vector.h, Line: 187
-Creator:  delle
-----------------------
-Tags: No Tags
-----------------------
-test this
-
-~~~~~~~ TODO 91 ~~~~~~~
-Vector.h, Line: 236
-Creator:  delle
-----------------------
-Tags: No Tags
-----------------------
-test this
-
-~~~~~~~ TODO 92 ~~~~~~~
+~~~~~~~ TODO 43 ~~~~~~~
 WorldSystem.cpp, Line: 30
 Creator: delle
 ----------------------
