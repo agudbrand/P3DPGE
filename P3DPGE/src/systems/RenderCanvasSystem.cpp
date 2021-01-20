@@ -229,5 +229,5 @@ void RenderCanvasSystem::Update() {
 		}
 	}
 
-	p->DrawStringDecal(olc::vf2d(screen->width - 300, screen->height - 20), "Mouse: " + screen->mousePosV3.str2f());
+	//p->DrawStringDecal(olc::vf2d(screen->width - 300, screen->height - 20), "Mouse: " + screen->mousePosV3.str2f());
 }
