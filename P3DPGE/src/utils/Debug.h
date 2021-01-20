@@ -7,9 +7,7 @@
 #include <string>
 #include <vector>
 #include <cstdarg>
-
 #include <iostream>
-
 #include <windows.h>
 
 //global debug macros
@@ -186,6 +184,7 @@ namespace Debug {
 		std::string strings[] = { "", (ToStringReturn(std::forward<T>(args))) ... };
 		std::string str = "";
 		for (std::string s : strings) { str += s; }
+		
 		return str;
 	}
 

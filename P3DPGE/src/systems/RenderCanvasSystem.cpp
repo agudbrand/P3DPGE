@@ -61,7 +61,7 @@ inline UI* CreatePropertiesMenu(EntityAdmin* admin, Canvas* canvas) {
 	entity_buttons.push_back(new TextButton(admin, V2ZERO, "reset y rotation", admin->GetCommand("reset_rotation_y")));
 	entity_buttons.push_back(new TextButton(admin, V2ZERO, "reset z rotation", admin->GetCommand("reset_rotation_z")));
 	entity_buttons.push_back(new TextButton(admin, V2ZERO, "reset rotation velocity", admin->GetCommand("reset_rotation_velocity")));
-
+	
 	return new Panel(admin, V2ZERO, "entity", entity_buttons);
 }
 

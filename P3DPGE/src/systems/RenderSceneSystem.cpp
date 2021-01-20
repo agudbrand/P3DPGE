@@ -820,9 +820,9 @@ void RenderSceneSystem::Update() {
 	}
 
 	//generate light's depth texture
-	for (Light* l : scene->lights) {
-		LightDepthTex(l, camera, scene, screen);
-	}
+	//for (Light* l : scene->lights) {
+	//	LightDepthTex(l, camera, scene, screen);
+	//}
 
 
 	//render triangles

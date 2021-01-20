@@ -183,14 +183,14 @@
     <ClInclude Include="src\utils\ContainerManager.h">
       <Filter>src\utils</Filter>
     </ClInclude>
-    <ClInclude Include="src\systems\RenderCUDAInterface.h">
-      <Filter>src\systems\cpp</Filter>
-    </ClInclude>
     <ClInclude Include="src\ui\UIContainer.h">
       <Filter>src\ui</Filter>
     </ClInclude>
     <ClInclude Include="src\ui\UI.h">
       <Filter>src\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\systems\RenderCUDAInterface.h">
+      <Filter>src\systems\h</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
