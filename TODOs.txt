@@ -322,9 +322,9 @@ update this to blender-ish style menu with editable values
 
 ~~~~~~~ TODO 40 ~~~~~~~
 RenderCanvasSystem.cpp, Line: 76
-Creator not specified!
+Creator:  delle
 ----------------------
-Tags: entity, entity
+Tags: No Tags
 ----------------------
 re-add bufferlog
 
@@ -362,25 +362,25 @@ convert drawing to decals? (string and rect)
 
 ~~~~~~~ TODO 45 ~~~~~~~
 UI.h, Line: 53
-Creator not specified!
+Creator:  delle
 ----------------------
-Tags: entity, entity
+Tags: No Tags
 ----------------------
 implement hover text
 
 ~~~~~~~ TODO 46 ~~~~~~~
 UI.h, Line: 72
-Creator not specified!
+Creator:  delle
 ----------------------
-Tags: entity, entity
+Tags: No Tags
 ----------------------
 implement TextField and TextBox
 
 ~~~~~~~ TODO 47 ~~~~~~~
 UI.h, Line: 140
-Creator not specified!
+Creator:  delle
 ----------------------
-Tags: entity, entity
+Tags: No Tags
 ----------------------
 merge this into Clicked
 
