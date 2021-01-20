@@ -94,6 +94,8 @@ TODO(p,delle) add physics based collision resolution for all entities
 //// EntityAdmin ////
 
 void EntityAdmin::Create(olc::PixelGameEngine* p) {
+	g_cBuffer.allocate_space(100);
+
 	this->p = p;
 	systems = std::vector<System*>();
 	entities = std::map<EntityID, Entity*>();

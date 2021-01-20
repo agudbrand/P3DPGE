@@ -1,9 +1,9 @@
 #pragma once
 #define OLC_PGE_APPLICATION
+#include "internal/olcPixelGameEngine.h"
+
 #define KEYBOARD_LAYOUT_US_UK
 #define DEBUG_P3DPGE
-
-#include "internal/olcPixelGameEngine.h"
 #include "EntityAdmin.h"
 
 using namespace olc;
@@ -17,16 +17,25 @@ using namespace olc;
 
 class P3DPGE : public PixelGameEngine {
 public:
+	EntityAdmin entityAdmin;
+	int gameLayer;
+
 	P3DPGE() { sAppName = "P3DPGE"; }
 
-	EntityAdmin entityAdmin;
-
 	bool OnUserCreate() override {
+		//Create a new Layer which will be used for the game
+		gameLayer = CreateLayer();
+		//The layer is not enabled by default,  so we need to enable it
+		EnableLayer(gameLayer, true);
+
 		entityAdmin.Create(this);
 		return true;
 	}
 
 	bool OnUserUpdate(float deltaTime) {
+		//Change the Draw Target to not be Layer 0
+		SetDrawTarget((uint8_t)gameLayer);
+
 		entityAdmin.Update();
 		return true;
 	}

@@ -39,6 +39,14 @@
     <ClInclude Include="src\geometry\Edge.h" />
     <ClInclude Include="src\geometry\Geometry.h" />
     <ClInclude Include="src\geometry\Triangle.h" />
+    <ClInclude Include="src\internal\imgui\imconfig.h" />
+    <ClInclude Include="src\internal\imgui\imgui.h" />
+    <ClInclude Include="src\internal\imgui\imgui_impl_opengl2.h" />
+    <ClInclude Include="src\internal\imgui\imgui_impl_pge.h" />
+    <ClInclude Include="src\internal\imgui\imgui_internal.h" />
+    <ClInclude Include="src\internal\imgui\imstb_rectpack.h" />
+    <ClInclude Include="src\internal\imgui\imstb_textedit.h" />
+    <ClInclude Include="src\internal\imgui\imstb_truetype.h" />
     <ClInclude Include="src\internal\olcPixelGameEngine.h" />
     <ClInclude Include="src\math\InertiaTensors.h" />
     <ClInclude Include="src\math\Math.h" />
@@ -74,6 +82,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityAdmin.cpp" />
+    <ClCompile Include="src\internal\imgui\imgui.cpp" />
+    <ClCompile Include="src\internal\imgui\imgui_demo.cpp" />
+    <ClCompile Include="src\internal\imgui\imgui_draw.cpp" />
+    <ClCompile Include="src\internal\imgui\imgui_impl_opengl2.cpp" />
+    <ClCompile Include="src\internal\imgui\imgui_tables.cpp" />
+    <ClCompile Include="src\internal\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\math\Matrix3.cpp" />
     <ClCompile Include="src\math\Matrix4.cpp" />

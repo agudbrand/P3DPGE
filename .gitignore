@@ -345,3 +345,4 @@ healthchecksdb
 CodeGraphData/
 *.diagsession
 /docs/doxygen
+/P3DPGE/imgui.ini
