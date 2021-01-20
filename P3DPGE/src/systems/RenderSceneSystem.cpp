@@ -89,6 +89,8 @@ void TexturedTriangle(Scene* scene, Screen* screen, olc::PixelGameEngine* p, Tri
 				tex_v = (1.0f - t) * tex_sv + t * tex_ev; 
 				tex_w = (1.0f - t) * tex_sw + t * tex_ew; 
 
+				//LOG(tex_w);
+
 				if (tex_w > scene->pixelDepthBuffer[i * (size_t)screen->width + j]) {
 					p->Draw(j, i, tri->e->GetComponent<Mesh>()->texture->Sample(tex_u / tex_w, tex_v / tex_w));
 					scene->pixelDepthBuffer[i * (size_t)screen->width + j] = tex_w;
@@ -475,13 +477,16 @@ bool ClipLineToBorderPlanes(Vector3& start, Vector3& end, Screen* screen) {
 			if			(code & CLIP_TOP) {			//point is above screen
 				x = start.x + (end.x - start.x) * (-start.y) / (end.y - start.y);
 				y = 0;
-			} else if	(code & CLIP_BOTTOM) {		//point is below screen
+			} 
+			else if	(code & CLIP_BOTTOM) {		//point is below screen
 				x = start.x + (end.x - start.x) * (screen->height - start.y) / (end.y - start.y);
 				y = screen->height;
-			} else if	(code & CLIP_RIGHT) {		//point is right of screen
+			} 
+			else if	(code & CLIP_RIGHT) {		//point is right of screen
 				y = start.y + (end.y - start.y) * (screen->width - start.x) / (end.x - start.x);
 				x = screen->width;
-			} else if	(code & CLIP_LEFT) {		//point is left of screen
+			} 
+			else if	(code & CLIP_LEFT) {		//point is left of screen
 				y = start.y + (end.y - start.y) * (-start.x) / (end.x - start.x);
 				x = 0;
 			}
@@ -491,7 +496,8 @@ bool ClipLineToBorderPlanes(Vector3& start, Vector3& end, Screen* screen) {
 				start.x = x;
 				start.y = y;
 				lineStartCode = ComputeOutCode(start);
-			}else {
+			}
+			else {
 				end.x = x;
 				end.y = y;
 				lineEndCode = ComputeOutCode(end);
@@ -525,14 +531,12 @@ int RenderLines(Scene* scene, Camera* camera, Screen* screen, olc::PixelGameEngi
 } //RenderLines
 
 
-//this (probably) returns a depth texture detailing how a light sees the scene
+//this (probably) generates a light's depth texture for use in shadow casting
 //currently set up to work for directional lights
-//this could potentially be stored on Lights themselves but I'm not sure yet
-//TODO(o, sushi) use something other than olc::Sprite since it stores RGB info and we dont need that
-olc::Sprite* LightDepthTex(Light* li, Camera* c, Scene* s, Screen* sc) {
-	int resx = 1028;
-	int resy = 1028; //resolution of depth texture
-	olc::Sprite* depthTex = new olc::Sprite(resx, resy);
+void LightDepthTex(Light* li, Camera* c, Scene* s, Screen* sc) {
+	int resx = 1024;
+	int resy = 1024; //resolution of depth texture
+	li->depthTexture = std::vector<int>((size_t)resx * (size_t)resy);
 	
 	//once we implement point lights we'll start making a bounding box around
 	//only what the camera sees but for now this is how it works with ortho projection
@@ -553,17 +557,194 @@ olc::Sprite* LightDepthTex(Light* li, Camera* c, Scene* s, Screen* sc) {
 	float r = max * aspectRatio, t = max;
 	float l = -r, b = -t;
 
+	//make ortho proj mat for directional light
+	//NOTE: ortho projection may not work properly yet
 	Matrix4 ortho = Math::MakeOrthoProjMat(r, l, t, b, c->farZ, c->nearZ);
 
-	std::vector<Triangle> tris;
+	//std::vector<Triangle> tris;
 
+	Vector2 res(resx, resy);
+
+	//render the scene with respect to the light
+	//what im dloing is just projecting each triangle and rendering them instead
+	//of projecting them each individually. i dont know if this is more efficient or not
 	for (Mesh* m : s->meshes) {
-		for (Triangle t : m->triangles) {
-			tris.push_back(t);
+		for (Triangle tri : m->triangles) {
+
+			//project triangle to light's 'view'
+			tri.copy_points();
+			for (Vector3 v : tri.proj_points) {
+				v = Math::WorldToCamera(v, lightViewMat).ToVector3();
+				//LOG(v);
+				
+				
+			}
+
+			//project triangle to light's 'screen'
+			for (int i = 0; i < 3; i++) {
+				float w;
+				tri.proj_points[i] = Math::CameraToScreen(tri.proj_points[i], ortho, res, w);
+				tri.proj_tex_points[i].x /= w;
+				tri.proj_tex_points[i].y /= w;
+				tri.proj_tex_points[i].z = 1.f / w;
+				//LOG(w);
+			}
+
+			//gather world vertices to lerp between later
+			Vector3 ve1 = tri.points[0];
+			Vector3 ve2 = tri.points[1];
+			Vector3 ve3 = tri.points[2];
+			
+			int x1 = tri.proj_points[0].x; int x2 = tri.proj_points[1].x; int x3 = tri.proj_points[2].x;
+			int y1 = tri.proj_points[0].y; int y2 = tri.proj_points[1].y; int y3 = tri.proj_points[2].y;
+
+			float u1 = tri.proj_tex_points[0].x; float u2 = tri.proj_tex_points[1].x; float u3 = tri.proj_tex_points[2].x;
+			float v1 = tri.proj_tex_points[0].y; float v2 = tri.proj_tex_points[1].y; float v3 = tri.proj_tex_points[2].y;
+			float w1 = tri.proj_tex_points[0].z; float w2 = tri.proj_tex_points[1].z; float w3 = tri.proj_tex_points[2].z;
+
+			if (y2 < y1) { std::swap(y1, y2); std::swap(x1, x2); std::swap(u1, u2); std::swap(v1, v2); std::swap(w1, w2); }
+			if (y3 < y1) { std::swap(y1, y3); std::swap(x1, x3); std::swap(u1, u3); std::swap(v1, v3); std::swap(w1, w3); }
+			if (y3 < y2) { std::swap(y2, y3); std::swap(x2, x3); std::swap(u2, u3); std::swap(v2, v3); std::swap(w2, w3); }
+
+			//sort world vertices so ve1 is highest and ve3 is lowest
+			if (ve2.y < ve1.y) { std::swap(ve1, ve2); }
+			if (ve3.y < ve1.y) { std::swap(ve1, ve3); }
+			if (ve3.y < ve2.y) { std::swap(ve2, ve3); }
+
+			int dy1 = y2 - y1;
+			int dx1 = x2 - x1;
+			float dv1 = v2 - v1;
+			float du1 = u2 - u1;
+			float dw1 = w2 - w1;
+
+			int dy2 = y3 - y1;
+			int dx2 = x3 - x1;
+			float dv2 = v3 - v1;
+			float du2 = u3 - u1;
+			float dw2 = w3 - w1;
+
+			float tex_u, tex_v, tex_w;
+
+			float	dax_step = 0, dbx_step = 0,
+					du1_step = 0, dv1_step = 0,
+					du2_step = 0, dv2_step = 0,
+					dw1_step = 0, dw2_step = 0;
+
+			if (dy1) dax_step = dx1 / (float)abs(dy1);
+			if (dy2) dbx_step = dx2 / (float)abs(dy2);
+
+			if (dy1) du1_step = du1 / (float)abs(dy1);
+			if (dy1) dv1_step = dv1 / (float)abs(dy1);
+			if (dy1) dw1_step = dw1 / (float)abs(dy1);
+
+			if (dy2) du2_step = du2 / (float)abs(dy2);
+			if (dy2) dv2_step = dv2 / (float)abs(dy2);
+			if (dy2) dw2_step = dw2 / (float)abs(dy2);
+
+			if (dy1) {
+				for (int i = y1; i <= y2; i++) {
+					int ax = x1 + (float)(i - y1) * dax_step;
+					int bx = x1 + (float)(i - y1) * dbx_step;
+
+					float tex_su = u1 + (float)(i - y1) * du1_step;
+					float tex_sv = v1 + (float)(i - y1) * dv1_step;
+					float tex_sw = w1 + (float)(i - y1) * dw1_step;
+
+					float tex_eu = u1 + (float)(i - y1) * du2_step;
+					float tex_ev = v1 + (float)(i - y1) * dv2_step;
+					float tex_ew = w1 + (float)(i - y1) * dw2_step;
+
+					if (ax > bx) {
+						std::swap(ax, bx);
+						std::swap(tex_su, tex_eu);
+						std::swap(tex_sv, tex_ev);
+						std::swap(tex_sw, tex_ew);
+					}
+
+					tex_u = tex_su;
+					tex_v = tex_sv;
+					tex_w = tex_sw;
+
+					float tstep = 1.0f / ((float)(bx - ax));
+					float t = 0.0f;
+
+					for (int j = ax; j < bx; j++) {
+						tex_u = (1.0f - t) * tex_su + t * tex_eu;
+						tex_v = (1.0f - t) * tex_sv + t * tex_ev;
+						tex_w = (1.0f - t) * tex_sw + t * tex_ew;
+
+						//use the interpolation to find the point the pixel is drawing in world space 
+						//Vector3 worldp()
+
+
+						if (tex_w > li->depthTexture[i * (size_t)resx + j]) {
+							li->depthTexture[i * (size_t)resx + j] = tex_w;
+							//LOG(tex_w);
+						}
+						t += tstep;
+					}
+				}
+			}
+
+			dy1 = y3 - y2;
+			dx1 = x3 - x2;
+			dv1 = v3 - v2;
+			du1 = u3 - u2;
+			dw1 = w3 - w2;
+
+			if (dy1) dax_step = dx1 / (float)abs(dy1);
+			if (dy2) dbx_step = dx2 / (float)abs(dy2);
+
+			du1_step = 0, dv1_step = 0;
+			if (dy1) du1_step = du1 / (float)abs(dy1);
+			if (dy1) dv1_step = dv1 / (float)abs(dy1);
+			if (dy1) dw1_step = dw1 / (float)abs(dy1);
+
+			if (dy1) {
+				for (int i = y2; i <= y3; i++) {
+					int ax = x2 + (float)(i - y2) * dax_step;
+					int bx = x1 + (float)(i - y1) * dbx_step;
+
+					float tex_su = u2 + (float)(i - y2) * du1_step;
+					float tex_sv = v2 + (float)(i - y2) * dv1_step;
+					float tex_sw = w2 + (float)(i - y2) * dw1_step;
+
+					float tex_eu = u1 + (float)(i - y1) * du2_step;
+					float tex_ev = v1 + (float)(i - y1) * dv2_step;
+					float tex_ew = w1 + (float)(i - y1) * dw2_step;
+
+					if (ax > bx) {
+						std::swap(ax, bx);
+						std::swap(tex_su, tex_eu);
+						std::swap(tex_sv, tex_ev);
+						std::swap(tex_sw, tex_ew);
+					}
+
+					tex_u = tex_su;
+					tex_v = tex_sv;
+					tex_w = tex_sw;
+
+					float tstep = 1.0f / ((float)(bx - ax));
+					float t = 0.0f;
+
+					for (int j = ax; j < bx; j++) {
+						tex_u = (1.0f - t) * tex_su + t * tex_eu;
+						tex_v = (1.0f - t) * tex_sv + t * tex_ev;
+						tex_w = (1.0f - t) * tex_sw + t * tex_ew;
+
+						if (tex_w > li->depthTexture[i * (size_t)resx + j]) {
+							li->depthTexture[i * (size_t)resx + j] = tex_w;
+							//LOG(tex_w);
+						}
+						t += tstep;
+					}
+				}
+			}
 		}
 	}
 
-	return depthTex;
+
+
 }
 
 void RenderSceneSystem::Update() {
@@ -617,7 +798,7 @@ void RenderSceneSystem::Update() {
 		}
 	}
 
-	scene->lights.push_back(new Light(Vector3(0, 0, 0), Vector3(0, 0, 1))); //TODO replace this with light components on entities
+	scene->lights.push_back(new Light(Vector3(0, 1.5, 1), Vector3(0, 0, 1))); //TODO replace this with light components on entities
 
 //// Scene Rendering ////
 
@@ -638,11 +819,22 @@ void RenderSceneSystem::Update() {
 		}
 	}
 
+	//generate light's depth texture
+	//for (Light* l : scene->lights) {
+	//	LightDepthTex(l, camera, scene, screen);
+	//}
+
+
 	//render triangles
 	int drawnTriCount = RenderTriangles(scene, camera, screen, p);
 
 	//render lines
 	int drawnLineCount = RenderLines(scene, camera, screen, p);
+
+	//render light depth texture for debugin'
+	//for (int i : scene->lights[0]->depthTexture) {
+	//	p->Draw(Vector2(i / 1028, i % 1028), olc::Pixel(50 * i, 50 * i, 50 * i));
+	//}
 
 	//render transform texts
 	if(scene->RENDER_TRANSFORMS) {

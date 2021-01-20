@@ -64,7 +64,8 @@ void MeshSystem::Update() {
 		for(auto c : e.second->components) {
 			if(Mesh* mesh = dynamic_cast<Mesh*>(c)) {
 				m = mesh;
-			} else if(Transform* transform = dynamic_cast<Transform*>(c)) {
+			} 
+			else if(Transform* transform = dynamic_cast<Transform*>(c)) {
 				t = transform;
 			}
 		}
@@ -72,6 +73,7 @@ void MeshSystem::Update() {
 			if(t->position != t->prevPosition) {
 				TranslateMesh(m, t->position - t->prevPosition);
 			}
+			LOG("current rot: ", t->rotation, " last rot: ", t->prevRotation);
 			if(t->rotation != t->prevRotation) {
 				RotateMesh(m, Matrix4::RotationMatrixAroundPoint(t->position, t->rotation - t->prevRotation));
 			}
@@ -95,19 +97,22 @@ void MeshSystem::TranslateMesh(Mesh* mesh, Vector3 translation) {
 }
 
 void MeshSystem::RotateMesh(Mesh* mesh, Matrix4 rotation) {
-	for(auto& t : mesh->triangles) {
-		for(auto& p : t.points) {
+	for (auto& t : mesh->triangles) {
+		for (auto& p : t.points) {
 			p *= rotation;
 		}
 	}
 }
 
 void MeshSystem::ScaleMesh(Mesh* mesh, Matrix3 scale) {
-	for(auto& t : mesh->triangles) {
-		for(auto& p : t.points) {
+	
+	for (auto& t : mesh->triangles) {
+		for (auto& p : t.points) {
 			p *= scale; //TODO(,delle) test 3x3 scale matrices
 		}
 	}
+	
+	
 }
 
 void MeshSystem::TransformMesh(Mesh* mesh, Matrix4 transformation) {

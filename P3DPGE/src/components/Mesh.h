@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.h"
+#include "Transform.h"
 
 #include "../math/Vector3.h"
 #include "../geometry/Triangle.h"
@@ -61,6 +62,7 @@ struct Mesh : public Component {
 
 		Mesh* m = new Mesh(triangles);
 		m->entity = e;
+		//m->entity->GetComponent<Transform>()->lookDir = Vector3::ZERO;
 		m->texture = new olc::Sprite("sprites/UV_Grid_Sm.jpg");
 		return m;
 	}

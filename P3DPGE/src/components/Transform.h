@@ -9,6 +9,8 @@ struct Transform : public Component {
 	Vector3 rotation;
 	Vector3 scale;
 
+	Vector3 lookDir = Vector3::ZERO;
+
 	Vector3 prevPosition;
 	Vector3 prevRotation;
 

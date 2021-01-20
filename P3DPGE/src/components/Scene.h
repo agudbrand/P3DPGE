@@ -21,7 +21,7 @@ struct Scene : public Component {
 	bool RENDER_PHYSICS					= true;
 	bool RENDER_SCREEN_BOUNDING_BOX		= false; 
 	bool RENDER_MESH_VERTICES			= false; 
-	bool RENDER_GRID					= false; //TODO(r,delle) upgrade grid to follow camera in smart way
+	bool RENDER_GRID					= true; //TODO(r,delle) upgrade grid to follow camera in smart way
 	bool RENDER_LIGHT_RAYS				= false;
 	bool RENDER_MESH_NORMALS			= false;
 

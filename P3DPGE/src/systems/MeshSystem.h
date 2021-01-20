@@ -13,6 +13,9 @@ struct MeshSystem : public System {
 	void Init() override;
 	void Update() override;
 
+	//for using LookAt matrix to rotate
+	static const bool USE_LOOKAT = true;
+
 	//returns true if a line intersects with one of a mesh's triangles
 	static bool LineIntersect(Mesh* mesh, Edge3D* line);
 

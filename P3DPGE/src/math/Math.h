@@ -532,15 +532,16 @@ namespace Math {
 	//this function returns a matrix that tells a vector how to look at a specific point in space.
 	static Matrix4 LookAtMatrix(const Vector3& pos, const Vector3& target) {
 		if(pos == target) { return LookAtMatrix(pos, target + Vector3(.01f, 0, 0)); }
-
+		LOG("pos:               ", pos);
+		LOG("target:            ", target);
 		//get new forward direction
 		Vector3 newFor = (target - pos).normalized();
-
+		
+		LOG("target - pos:      ", target - pos);
 		//get right direction
 		Vector3 newRight; 
 		if(newFor == Vector3::UP || newFor == Vector3::DOWN) { 
-			newRight = Vector3::RIGHT;
-			//newRight = Vector3(0,.999f,0).cross(newFor);
+			newRight = Vector3::RIGHT; 
 		} else {
 			newRight = (Vector3::UP.cross(newFor)).normalized(); 
 		}
@@ -548,10 +549,21 @@ namespace Math {
 		//get up direction
 		Vector3 newUp = newRight.cross(newFor); 
 
+		LOG("Forward mag:       ", newFor.mag());
+		LOG("Right mag:         ", newRight.mag());
+		LOG("Up mag:            ", newUp.mag());
+		LOG("Forward dot Right: ", newFor.dot(newRight));
+		LOG("Right dot Up:      ", newRight.dot(newUp));
+		LOG("Up dot Forward:    ", newUp.dot(newFor));
+
+		LOG("Up vector:         ", newUp);
+		LOG("Right vector:      ", newRight);
+		LOG("Forward vector:    ", newFor);
+
 		//make look-at matrix
 		return Matrix4(
 			newRight.x, newRight.y, newRight.z, 0,
-			newUp.x,	newUp.y,	newUp.z,	0,
+			newUp.x,	-newUp.y,	newUp.z,	0,
 			newFor.x,	newFor.y,	newFor.z,	0,
 			pos.x,		pos.y,		pos.z,		1
 		);
