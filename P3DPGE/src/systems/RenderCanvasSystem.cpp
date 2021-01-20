@@ -74,7 +74,7 @@ inline void AddTopMenus(EntityAdmin* admin, Canvas* canvas) {
 	canvas->containers.push_back(topMenu);
 }
 
-inline void AddBufferLog(EntityAdmin* admin, Canvas* canvas) { //TODO(delle) re-add bufferlog
+inline void AddBufferLog(EntityAdmin* admin, Canvas* canvas) { //TODO(, delle) re-add bufferlog
 	g_cBuffer.allocate_space(100);
 	//canvas->elements.push_back(new Panel(admin, Vector2(10,100), "BUFFERLOG", std::vector<UI*>{}));
 }

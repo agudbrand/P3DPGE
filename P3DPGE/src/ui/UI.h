@@ -51,7 +51,7 @@ struct Button : public UI {
 
 struct TextButton : public Button {
 	std::string text;
-	std::string hoverText; //TODO(delle) implement hover text
+	std::string hoverText; //TODO(, delle) implement hover text
 
 	TextButton(EntityAdmin* admin, Vector2 pos, std::string text, Command* command = nullptr, std::string hoverText = "", Vector2 size = V2ZERO,
 				bool visible = true, olc::Pixel bgColor = olc::GREY, olc::Pixel borderColor = olc::DARK_GREY)
@@ -70,7 +70,7 @@ struct TextButton : public Button {
 	}
 };
 
-struct TextField : public UI { //TODO(delle) implement TextField and TextBox
+struct TextField : public UI { //TODO(, delle) implement TextField and TextBox
 	std::string text;
 	olc::Pixel borderColor;
 	olc::Pixel fontColor;
@@ -138,7 +138,7 @@ struct Panel : public UI {
 		}
 	}
 
-	//TODO(delle) merge this into Clicked
+	//TODO(, delle) merge this into Clicked
 	bool ClickedInTitle(Vector2 point) {
 		if(!visible) { return false; }
 		if (!closed && Math::PointInRect(size, pos, point)) { return true; }
