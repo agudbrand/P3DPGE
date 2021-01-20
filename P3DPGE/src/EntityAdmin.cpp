@@ -21,11 +21,10 @@ TODO(p,delle) add physics based collision resolution for all entities
 8.  figure out why rotation degenerates in collision, interpolation, and at higher than max velocities
 9.  local y-axis rotation is visually wrong
 10. add a .str() method to Component.h
-11. add a .time() method to System.h to get the time it took to finish
-12. finish Scene.h render option todos
-13. spawning some complexes doesnt work
-14. fix rotation interpolation
-15. add auto organization to UI
+11. finish Scene.h render option todos
+12. spawning some complexes doesnt work
+13. fix rotation interpolation
+14. add auto organization to UI
 
 */
 

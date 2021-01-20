@@ -52,6 +52,11 @@ Matrix4 MakeOrthoProjectionMatrix(Scene* s, Camera* c, Screen* sc) {
 	float aspectRatio = sc->height / sc->width;
 	float r = max * aspectRatio, t = max;
 	float l = -r, b = -t;
+
+	//TODO(r, sushi) implement ortho zooming by adjusting either the scale of objects or adjusting the bounding box
+	//r += 10; l -= 10;
+	//t += 10; b -= 10;
+
 	return Matrix4(
 		2 / (r - l),			0,						0,												0,
 		0,						2 / (t - b),			0,												0,

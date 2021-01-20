@@ -2,15 +2,14 @@
 #include "../internal/olcPixelGameEngine.h"
 #include "UsefulDefines.h"
 
-#include <any>
 #include <stack>
 #include <chrono>
 #include <string>
 #include <vector>
 #include <cstdarg>
+
 #include <iostream>
-#include <utility>
-#include <functional>
+
 #include <windows.h>
 
 //global debug macros
@@ -112,16 +111,6 @@ struct has_str_method {
 	static constexpr bool value = decltype(test<T>(0))::value;
 };
 
-//ref: https://stackoverflow.com/questions/51005897/what-is-a-good-alternative-to-this-c17-fold-expression-in-c14
-template<class F, class A0>
-auto fold(F&&, A0&& a0) {
-    return std::forward<A0>(a0);
-}
-
-template<class F, class A0, class...As>
-auto fold(F&& f, A0&&a0, As&&...as) {
-    return f(std::forward<A0>(a0), fold(f, std::forward<As>(as)...));
-}
 
 enum ConsoleColor {
 	BLUE = 1,
@@ -178,10 +167,9 @@ namespace Debug {
 	template<class T, typename std::enable_if<has_str_method<T>::value, bool>::type = true>
 	static void ToString(int mtype, T t, bool newline = true) { ToString(mtype, t.str(), newline); }
 
-	//TODO(,sushi) fix variadic ToString
-	//template<class... T>
-	//static void ToString(int mtype, T... args) { (ToString(mtype, args, false), ...); ToString(0, "", true); }
-
+	template<class... T>
+	static void ToString(int mtype, T... args) { int dummy[] = { 0,(ToString(mtype, std::forward<T>(args), false),0) ... }; ToString(0, "", true); }
+	
 	//returns the string for in engine printing
 	static std::string ToStringReturn(const char* str) { return std::string(str); }
 
@@ -193,9 +181,13 @@ namespace Debug {
 	template<class T, typename std::enable_if<has_str_method<T>::value, bool>::type = true>
 	static std::string ToStringReturn(T t) { return ToStringReturn(t.str()); }
 
-	//TODO(,sushi) fix variadic ToStringReturn
-	//template<class... T>
-	//static void ToStringReturn(int mtype, T... args) { (ToString(mtype, args, false) + ...); ToString(0, "", true); }
+	template<class... T>
+	static std::string ToStringReturn(T... args) { 
+		std::string strings[] = { "", (ToStringReturn(std::forward<T>(args))) ... };
+		std::string str = "";
+		for (std::string s : strings) { str += s; }
+		return str;
+	}
 
 	//// Call Tracing ////
 
