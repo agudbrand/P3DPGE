@@ -2,11 +2,13 @@
 #include "../utils/GLOBALS.h"
 #include "../ui/UI.h"
 #include "../ui/UIContainer.h"
+#include "../utils/ContainerManager.h"
 
 #include "../components/Canvas.h"
 #include "../components/Screen.h"
 #include "../components/Scene.h"
 #include "../components/Camera.h"
+#include "../components/Input.h"
 
 #define OLC_PGEX_DEAR_IMGUI_IMPLEMENTATION
 #include "../internal/imgui/imgui_impl_pge.h"
@@ -88,11 +90,38 @@ void MakeGeneralHeader(EntityAdmin* admin) {
 	}
 }
 
-//TODO(delle) implement Entities list and selection thru it, see Child windows
 void MakeEntitiesHeader(EntityAdmin* admin) {
 	using namespace ImGui;
 	if(CollapsingHeader("Entities")) {
-		
+		if(admin->singletonInput->selectedEntity) {
+			Text("Selected Entity: %d", admin->singletonInput->selectedEntity->id);
+		} else {
+			Text("Selected Entity: None");
+		}
+
+		if(BeginTable("split", 2, ImGuiTableFlags_BordersOuter | ImGuiTableFlags_Resizable)){
+			TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed);
+			TableSetupColumn("Components");
+			TableHeadersRow();
+			int counter = 0;
+			for(auto& entity : admin->entities) {
+				counter++;
+				TableNextRow(); TableNextColumn();
+				if(ImGui::Button(std::to_string(entity.first).c_str())) {
+					admin->singletonInput->selectedEntity = entity.second;
+				}
+				
+				TableNextColumn();
+				Text("Address: %#08x", entity.second);
+				if(TreeNodeEx((std::string("comps") + std::to_string(entity.first)).c_str(), ImGuiTreeNodeFlags_NoTreePushOnOpen, "Components")) {
+					for(Component* comp : entity.second->components) {
+						//TODO(delle) implement components list on entities
+					}
+					Separator();
+				}
+			}
+			EndTable();
+		}
 	}
 }
 
@@ -118,11 +147,14 @@ void MakeRenderHeader(EntityAdmin* admin) {
     }
 }
 
-//TODO(delle) implement bufferlog
 void MakeBufferlogHeader(EntityAdmin* admin) {
 	using namespace ImGui;
 	if(CollapsingHeader("Bufferlog")) {
-		
+		for(auto str : g_cBuffer.container) {
+			if(str.has_value()) {
+				Text(str.get().c_str());
+			}
+		}
 	}
 }
 
