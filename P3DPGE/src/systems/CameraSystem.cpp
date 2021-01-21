@@ -8,9 +8,10 @@
 #include "../utils/Command.h"
 
 void AddCameraCommands(EntityAdmin* admin) {
-	admin->commands["reset_camera"] = new Command([](EntityAdmin* admin) {
+	admin->commands["reset_camera"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentCamera->position = Vector3::ZERO;
 		admin->currentCamera->rotation = Vector3::ZERO;
+		return "";
 	}, "reset_camera", "reset_camera");
 }
 

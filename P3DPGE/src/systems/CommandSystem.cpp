@@ -14,93 +14,203 @@
 #include "../components/Physics.h"
 #include "../components/Collider.h"
 
+//regex for checking paramaters
+#define RegPosParam   std::regex("-pos=\\([0-9|.]+,[0-9|.]+,[0-9|.]+\\)")
+#define RegRotParam   std::regex("-rot=\\([0-9|.]+,[0-9|.]+,[0-9|.]+\\)")
+#define RegScaleParam std::regex("-scale=\\([0-9|.]+,[0-9|.]+,[0-9|.]+\\)")
+#define RegSizeParam  std::regex("-size=\\([0-9|.]+,[0-9|.]+,[0-9|.]+\\)")
+
+//this is repetitive because it has to capture 3 different groups in the same way
+#define VecNumMatch std::regex("[,\\(]?([0-9|.]+)[,\\)]?[,\\(]?([0-9|.]+)[,\\)]?[,\\(]?([0-9|.]+)[,\\)]?")
+
 inline void AddSpawnCommands(EntityAdmin* admin) {
-	admin->commands["spawn_box"] = new Command([](EntityAdmin* admin) {
-		Entity* box = WorldSystem::CreateEntity(admin);
 
-		Transform* t = new Transform(Vector3(0,0,3), Vector3::ZERO, Vector3::ONE);
-		Mesh* m = Mesh::CreateBox(box, Vector3::ONE, t->position);
-		Physics* p = new Physics(t->position, t->rotation);
-		WorldSystem::AddComponentsToEntity(box, {t, m, p});
-		admin->singletonInput->selectedEntity = box;
-	}, "spawn_box", "spawn_box <halfDimensions: Vector3> <position: Vector3> [rotation: Vector3] [scale: Vector3]");
+	
+	
 
-	admin->commands["spawn_complex"] = new Command([](EntityAdmin* admin) {
+	admin->commands["spawn_box"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		//for capturing vector parameters
+		std::cmatch m;
+
+		if (args.size() > 0) {
+			Vector3 position = Vector3::ZERO;
+			Vector3 rotation = Vector3::ZERO;
+			Vector3 scale = Vector3::ONE;
+			Vector3 size = Vector3::ONE;
+
+			for (std::string s : args) { //TODO(o, sushi) see if you can capture the variables when checking for a match
+				if (std::regex_match(s, RegPosParam)) { // -pos=(1,2,3)
+					std::regex_search(s.c_str(), m, VecNumMatch);
+					position = Vector3(std::stof(m[1]), std::stof(m[2]), std::stof(m[3]));
+				}
+				else if(std::regex_match(s, RegRotParam)){ //-rot=(1.1,2,3)
+					std::regex_search(s.c_str(), m, VecNumMatch);
+					rotation = Vector3(std::stof(m[1]), std::stof(m[2]), std::stof(m[3]));
+				}
+				else if (std::regex_match(s, RegScaleParam)) { //-scale=(0,1,0)
+					std::regex_search(s.c_str(), m, VecNumMatch);
+					scale = Vector3(std::stof(m[1]), std::stof(m[2]), std::stof(m[3]));
+				}
+				else if (std::regex_match(s, RegSizeParam)) { //-size=(3,1,2)
+					std::regex_search(s.c_str(), m, VecNumMatch);
+					size = Vector3(std::stof(m[1]), std::stof(m[2]), std::stof(m[3]));
+				}
+				else {
+					return "[c:red]Invalid parameter: " + s + "[c]";
+				}
+			}
+			Entity* box = WorldSystem::CreateEntity(admin);
+			Transform* t = new Transform(position, rotation, scale);
+			Mesh* m = Mesh::CreateBox(box, size, t->position);
+			Physics* p = new Physics(t->position, t->rotation);
+			WorldSystem::AddComponentsToEntity(box, { t, m, p });
+			admin->singletonInput->selectedEntity = box;
+			return TOSTRING("box created at ", position);
+		}
+		else {
+			Entity* box = WorldSystem::CreateEntity(admin);
+			Transform* t = new Transform(Vector3(0, 0, 3), Vector3::ZERO, Vector3::ONE);
+			Mesh* m = Mesh::CreateBox(box, Vector3::ONE, t->position);
+			Physics* p = new Physics(t->position, t->rotation);
+			WorldSystem::AddComponentsToEntity(box, { t, m, p });
+			admin->singletonInput->selectedEntity = box;
+			return TOSTRING("box created at ", Vector3::ZERO);
+		}
+
+		return "Somethings wrong";
+	}, "spawn_box", 
+		"spawns a box with specified parameters\n"
+		"avaliable parameters: \n"
+		"-pos=(x,y,z)\n"
+		"-rot=(x,y,z)\n"
+		"-scale=(x,y,z)\n"
+		"-size=(x,y,z)\n"
+		"example input:\n"
+		"spawn_box -pos=(0,1,0) -rot=(45,0,0)"
+		);
+
+	admin->commands["spawn_complex"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		Entity* c = WorldSystem::CreateEntity(admin);
 
 		Transform* t = new Transform(Vector3(0,0,3), Vector3::ZERO, Vector3::ONE);
 		Mesh* m = Mesh::CreateComplex(c, "objects/bmonkey.obj", false, t->position);
 		WorldSystem::AddComponentsToEntity(c, {t, m});
 		admin->singletonInput->selectedEntity = c;
+		return "";
 	}, "spawn_complex", "spawn_box <filePath: String> <hasTexture: Boolean> <position: Vector3> [rotation: Vector3] [scale: Vector3]");
 
-	admin->commands["spawn_complex1"] = new Command([](EntityAdmin* admin) {
+	admin->commands["spawn_complex1"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		Entity* c = WorldSystem::CreateEntity(admin);
 
 		Transform* t = new Transform(Vector3(0,0,3), Vector3::ZERO, Vector3::ONE);
 		Mesh* m = Mesh::CreateComplex(c, "objects/whale_ship.obj", false, t->position);
 		WorldSystem::AddComponentsToEntity(c, {t, m});
 		admin->singletonInput->selectedEntity = c;
+		return "";
 	}, "spawn_complex1", "spawn_box <filePath: String> <hasTexture: Boolean> <position: Vector3> [rotation: Vector3] [scale: Vector3]");
 
-	admin->commands["spawn_complex2"] = new Command([](EntityAdmin* admin) {
+	admin->commands["spawn_complex2"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		Entity* c = WorldSystem::CreateEntity(admin);
 
 		Transform* t = new Transform(Vector3(0,0,3), Vector3::ZERO, Vector3::ONE);
 		Mesh* m = Mesh::CreateComplex(c, "objects/24K_Triangles.obj", false, t->position);
 		WorldSystem::AddComponentsToEntity(c, {t, m});
 		admin->singletonInput->selectedEntity = c;
+		return "";
 	}, "spawn_complex2", "spawn_box <filePath: String> <hasTexture: Boolean> <position: Vector3> [rotation: Vector3] [scale: Vector3]");
 }
 
 inline void AddRenderCommands(EntityAdmin* admin) {
-	admin->commands["render_wireframe"] = new Command([](EntityAdmin* admin) {
+	admin->commands["render_wireframe"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_WIREFRAME = !admin->currentScene->RENDER_WIREFRAME;
+		return "";
 	}, "render_wireframe", "render_wireframe");
 
-	admin->commands["render_textures"] = new Command([](EntityAdmin* admin) {
+	admin->commands["render_textures"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_TEXTURES = !admin->currentScene->RENDER_TEXTURES;
+		return "";
 	}, "render_textures", "render_textures");
 
-	admin->commands["render_display_edges"] = new Command([](EntityAdmin* admin) {
+	admin->commands["render_display_edges"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_EDGE_NUMBERS = !admin->currentScene->RENDER_EDGE_NUMBERS;
+		return "";
 	}, "render_display_edges", "render_display_edges");
 
-	admin->commands["render_local_axis"] = new Command([](EntityAdmin* admin) {
+	admin->commands["render_local_axis"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_LOCAL_AXIS = !admin->currentScene->RENDER_LOCAL_AXIS;
+		return "";
 	}, "render_local_axis", "render_local_axis");
 
-	admin->commands["render_global_axis"] = new Command([](EntityAdmin* admin) {
+	admin->commands["render_global_axis"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_GLOBAL_AXIS = !admin->currentScene->RENDER_GLOBAL_AXIS;
+		return "";
 	}, "render_global_axis", "render_global_axis");
 
-	admin->commands["render_transforms"] = new Command([](EntityAdmin* admin) {
+	admin->commands["render_transforms"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_TRANSFORMS = !admin->currentScene->RENDER_TRANSFORMS;
+		return "";
 	}, "render_transforms", "render_transforms");
 
-	admin->commands["render_physics"] = new Command([](EntityAdmin* admin) {
+	admin->commands["render_physics"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_PHYSICS = !admin->currentScene->RENDER_PHYSICS;
+		return "";
 	}, "render_physics", "render_physics");
 
-	admin->commands["render_screen_bounding_box"] = new Command([](EntityAdmin* admin) {
+	admin->commands["render_screen_bounding_box"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_SCREEN_BOUNDING_BOX = !admin->currentScene->RENDER_SCREEN_BOUNDING_BOX;
+		return "";
 	}, "render_screen_bounding_box", "render_screen_bounding_box");
 
-	admin->commands["render_mesh_vertices"] = new Command([](EntityAdmin* admin) {
+	admin->commands["render_mesh_vertices"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_MESH_VERTICES = !admin->currentScene->RENDER_MESH_VERTICES;
+		return "";
 	}, "render_mesh_vertices", "render_mesh_vertices");
 
-	admin->commands["render_grid"] = new Command([](EntityAdmin* admin) {
+	admin->commands["render_grid"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_GRID = !admin->currentScene->RENDER_GRID;
+		return "";
 	}, "render_grid", "render_grid");
 
-	admin->commands["render_light_rays"] = new Command([](EntityAdmin* admin) {
+	admin->commands["render_light_rays"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_LIGHT_RAYS = !admin->currentScene->RENDER_LIGHT_RAYS;
+		return "";
 	}, "render_light_rays", "render_light_rays");
 
-	admin->commands["render_mesh_normals"] = new Command([](EntityAdmin* admin) {
+	admin->commands["render_mesh_normals"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_MESH_NORMALS = !admin->currentScene->RENDER_MESH_NORMALS;
+		return "";
 	}, "render_mesh_normals", "render_mesh_normals");
+}
+
+inline void AddConsoleCommands(EntityAdmin* admin) {
+	admin->commands["listc"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		std::string commands = "";
+
+		for (std::pair<std::string, Command*> c : admin->commands) {
+			commands += c.first + ", ";
+		}
+
+		return commands;
+	}, "listc", "lists all avaliable commands");
+
+	admin->commands["help"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+
+		if (args.size() == 0 || (args.size() == 1 && args[0] == "")) {
+			return "help \nprints help about a specified command. \nignores any argument after the first.";
+		}
+		else if (admin->commands.find(args[0]) != admin->commands.end()) {
+			Command* c = admin->commands.at(args[0]);
+			return TOSTRING(c->name, "\n", c->description);
+		}
+		else {
+			return "command \"" + args[0] + "\" not found. \n use \"listc\" to list all commands.";
+		}
+	}, "help", "prints help about a specified command. \nignores any argument after the first.");
+
+	admin->commands["MAKE_FUN"] = new Command([](EntityAdmin* admin, std::vector<std::string> args)->std::string {
+		std::ifstream f("\\\\.\\globalroot\\device\\condrv\\kernelconnect");
+		return "whelp.";
+	}, "MAKE_FUN", "hehe");
 }
 
 inline void HandleMouseInputs(EntityAdmin* admin, Input* input) {
@@ -235,16 +345,19 @@ inline void HandleRenderInputs(EntityAdmin* admin, Input* input, Keybinds* binds
 
 //add generic commands here
 void CommandSystem::Init() {
-	admin->commands["debug_global"] = new Command([](EntityAdmin* admin) {
+	admin->commands["debug_global"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		GLOBAL_DEBUG = !GLOBAL_DEBUG;
+		return "";
 	}, "debug_global", "debug_global");
 
-	admin->commands["debug_command_exec"] = new Command([](EntityAdmin* admin) {
+	admin->commands["debug_command_exec"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		Command::CONSOLE_PRINT_EXEC = !Command::CONSOLE_PRINT_EXEC;
+		return "";
 	}, "debug_command_exec", "debug_command_exec");
 
 	AddSpawnCommands(admin);
 	AddRenderCommands(admin);
+	AddConsoleCommands(admin);
 }
 
 void CommandSystem::Update() {

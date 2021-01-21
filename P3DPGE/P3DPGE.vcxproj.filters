@@ -219,6 +219,12 @@
     <ClInclude Include="src\internal\imgui\imgui.h">
       <Filter>src\internal\imgui</Filter>
     </ClInclude>
+    <ClInclude Include="src\systems\ConsoleSystem.h">
+      <Filter>src\systems\h</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\Console.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -298,6 +304,9 @@
     </ClCompile>
     <ClCompile Include="src\internal\imgui\imgui.cpp">
       <Filter>src\internal\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\systems\ConsoleSystem.cpp">
+      <Filter>src\systems\cpp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

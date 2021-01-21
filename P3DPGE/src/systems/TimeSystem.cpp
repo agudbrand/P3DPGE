@@ -3,18 +3,21 @@
 #include "../components/Time.h"
 #include "../utils/Command.h"
 
+template<class... T>
 inline void AddTimeCommands(EntityAdmin* admin) {
-	admin->commands["time_pause_engine"] = new Command([](EntityAdmin* admin) {
+	admin->commands["time_pause_engine"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->singletonTime->paused = !admin->singletonTime->paused;
-		if(admin->singletonTime->paused) {
+		if (admin->singletonTime->paused) {
 			admin->singletonTime->deltaTime = 0.f;
 		}
-	}, "time_pause_engine", "time_pause_engine");
+		return "";
+		}, "time_pause_engine", "time_pause_engine");
 
-	admin->commands["time_next_frame"] = new Command([](EntityAdmin* admin) {
+	admin->commands["time_next_frame"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		if(admin->singletonTime->paused) {
 			admin->singletonTime->frame = true;
 		}
+		return "";
 	}, "time_next_frame", "time_next_frame");
 }
 

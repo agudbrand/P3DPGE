@@ -25,6 +25,7 @@ TODO(p,delle) add physics based collision resolution for all entities
 12. spawning some complexes doesnt work
 13. fix rotation interpolation
 14. add auto organization to UI
+15. implement string returns, better descriptions, and parameter parsing on every command (use spawn_box as reference)
 
 */
 
@@ -67,6 +68,7 @@ TODO(p,delle) add physics based collision resolution for all entities
 #include "components/MovementState.h"			//Component.h
 #include "components/Scene.h"					//Component.h
 #include "components/Canvas.h"					//Component.h, UI.h
+#include "components/Console.h"
 //#include "components/Mesh.h"					//Component.h, Vector3.h, Triangle.h, Armature.h
 //#include "components/Light.h"					//Component.h, Vector3.h 
 //#include "components/Physics.h"				//Component.h, Vector3.h
@@ -85,6 +87,7 @@ TODO(p,delle) add physics based collision resolution for all entities
 #include "systems/RenderCanvasSystem.h"			//System.h |cpp->| Canvas.h, Screen.h
 #include "systems/WorldSystem.h"				//System.h |cpp->| World.h, Transform.h, Mesh.h, Command.h, Input.h
 #include "systems/TriggeredCommandSystem.h"		//System.h |cpp->| Command.h
+#include "systems/ConsoleSystem.h"				//System.h |cpp->| Console.h
 
 //debug includes
 #ifdef DEBUG_P3DPGE
@@ -118,6 +121,8 @@ void EntityAdmin::Create(olc::PixelGameEngine* p) {
 	tempMovementState = new MovementState();
 	tempCanvas = new Canvas();
 
+	console = new Console();
+
 	//systems initialization
 	AddSystem(new TimeSystem());
 	AddSystem(new ScreenSystem());
@@ -134,6 +139,7 @@ void EntityAdmin::Create(olc::PixelGameEngine* p) {
 	AddSystem(new RenderCanvasSystem());
 	AddSystem(new WorldSystem());
 	AddSystem(new TriggeredCommandSystem());
+	AddSystem(new ConsoleSystem());
 #ifdef DEBUG_P3DPGE
 	AddSystem(new DebugSystem());
 #endif	

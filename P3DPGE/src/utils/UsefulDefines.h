@@ -60,3 +60,6 @@ typedef unsigned long	uint64;
 #define INPUT_CTRL_HELD		2
 #define INPUT_SHIFT_HELD	4
 //#define INPUT_ALT_HELD	8 //ALT not supported by PGE v2.09
+
+//regex defines
+//used in object spawning 

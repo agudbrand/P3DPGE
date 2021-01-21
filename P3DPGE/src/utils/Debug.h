@@ -3,6 +3,7 @@
 #include "UsefulDefines.h"
 
 #include <stack>
+#include <regex>
 #include <chrono>
 #include <string>
 #include <vector>
@@ -170,6 +171,7 @@ namespace Debug {
 	
 	//returns the string for in engine printing
 	static std::string ToStringReturn(const char* str) { return std::string(str); }
+	static std::string ToStringReturn(char* str)       { return std::string(str); }
 
 	static std::string ToStringReturn(const std::string& str) { return str; }
 

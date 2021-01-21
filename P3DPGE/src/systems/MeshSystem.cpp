@@ -13,7 +13,7 @@
 #include "../components/Screen.h"
 
 inline void AddSelectEntityCommand(EntityAdmin* admin) {
-	admin->commands["select_entity"] = new Command([](EntityAdmin* admin) {
+	admin->commands["select_entity"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->singletonInput->selectedEntity = nullptr;
 
 		//ortho proj matrices can't be inverted so need to set up a method for selecting
@@ -47,7 +47,7 @@ inline void AddSelectEntityCommand(EntityAdmin* admin) {
 		}
 		
 		if (!admin->singletonInput->selectedEntity) { ERROR("No object selected"); }
-		
+		return "";
 		//TODO(i,delle) change this to take in an ID once we figure that out
 	}, "select_entity", "select_entity <EntityID>");
 }
@@ -73,7 +73,6 @@ void MeshSystem::Update() {
 			if(t->position != t->prevPosition) {
 				TranslateMesh(m, t->position - t->prevPosition);
 			}
-			LOG("current rot: ", t->rotation, " last rot: ", t->prevRotation);
 			if(t->rotation != t->prevRotation) {
 				RotateMesh(m, Matrix4::RotationMatrixAroundPoint(t->position, t->rotation - t->prevRotation));
 			}

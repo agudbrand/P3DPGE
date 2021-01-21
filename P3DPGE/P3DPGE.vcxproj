@@ -25,6 +25,7 @@
     <ClInclude Include="src\components\Canvas.h" />
     <ClInclude Include="src\components\Collider.h" />
     <ClInclude Include="src\components\Component.h" />
+    <ClInclude Include="src\components\Console.h" />
     <ClInclude Include="src\components\Keybinds.h" />
     <ClInclude Include="src\components\Light.h" />
     <ClInclude Include="src\components\MovementState.h" />
@@ -59,6 +60,7 @@
     <ClInclude Include="src\EntityAdmin.h" />
     <ClInclude Include="src\systems\CameraSystem.h" />
     <ClInclude Include="src\systems\CommandSystem.h" />
+    <ClInclude Include="src\systems\ConsoleSystem.h" />
     <ClInclude Include="src\systems\DebugSystem.h" />
     <ClInclude Include="src\systems\MeshSystem.h" />
     <ClInclude Include="src\systems\PhysicsSystem.h" />
@@ -94,6 +96,7 @@
     <ClCompile Include="src\math\Vector3.cpp" />
     <ClCompile Include="src\systems\CameraSystem.cpp" />
     <ClCompile Include="src\systems\CommandSystem.cpp" />
+    <ClCompile Include="src\systems\ConsoleSystem.cpp" />
     <ClCompile Include="src\systems\DebugSystem.cpp" />
     <ClCompile Include="src\systems\MeshSystem.cpp" />
     <ClCompile Include="src\systems\PhysicsSystem.cpp" />

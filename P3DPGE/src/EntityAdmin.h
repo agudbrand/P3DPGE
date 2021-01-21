@@ -19,6 +19,7 @@ struct Keybinds;
 struct Scene;
 struct MovementState;
 struct Canvas;
+struct Console;
 
 struct EntityAdmin {
 	olc::PixelGameEngine* p;
@@ -40,6 +41,7 @@ struct EntityAdmin {
 	Scene* currentScene;
 	MovementState* tempMovementState;
 	Canvas* tempCanvas;
+	Console* console;
 
 	void Create(olc::PixelGameEngine* p);
 	void Cleanup();

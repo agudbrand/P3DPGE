@@ -3,7 +3,8 @@
 
 struct EntityAdmin;
 
-typedef void (*CommandAction)(EntityAdmin* admin);
+typedef std::string (*CommandAction)(EntityAdmin* admin, std::vector<std::string> args);
+
 //typedef void (*CommandActionArgs)(EntityAdmin* admin, std::string args);
 
 struct Command {
@@ -21,11 +22,39 @@ struct Command {
 		this->description = description;
 	}
 
+	inline std::vector<std::string> ParseArgs(std::string args) {
+		std::vector<std::string> argsl;
+		LOG(args);
+		
+		while (args.size() != 0) {
+			//if (args.size() == 1 && args[0] == ' ') { //probably better way to check/fix this
+			//	break;
+			//}
+			if (args[0] == ' ') {
+				args.erase(0, 1);
+			}
+			else {
+				size_t fc = args.find_first_not_of(" ");//first char
+				size_t fs = args.find_first_of(" ");    //first space
+				LOG(fc, " ", fs, " ", args.substr(fc, fs));
+				argsl.push_back(args.substr(args.find_first_not_of(" "), args.find_first_of(" ")));
+				args.erase(fc, fs - fc);
+			}
+			
+			//if (args[0] == ' ') { args.erase(0, 1); }
+		}
+		return argsl;
+	}
+
 	//execute command action function
-	inline void Exec(EntityAdmin* admin) const {
+	inline std::string Exec(EntityAdmin* admin, std::string args = "") {
+ 		std::vector<std::string> argsl = ParseArgs(args);
+		for (std::string s : argsl) {
+			LOG(s);
+		}
 		//DEBUG if(CONSOLE_PRINT_EXEC) LOG("Executing command: ", name);
 		DEBUG if(CONSOLE_PRINT_EXEC) Debug::ToString(1, std::string("Executing command: ") + name, true);
-		action(admin);
+		return action(admin, argsl);
 	}
 };
 

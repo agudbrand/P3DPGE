@@ -16,205 +16,227 @@
 //TODO(ip,delle) update entity movement commands to be based on EntityID
 inline void AddSelectedEntityCommands(EntityAdmin* admin) {
 //// translation ////
-	admin->commands["reset_position"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonInput->selectedEntity) {
-			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+	admin->commands["reset_position"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		if (admin->singletonInput->selectedEntity) {
+			if (Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
 				p->acceleration = Vector3::ZERO;
 				p->velocity = Vector3::ZERO;
 				p->position = Vector3::ZERO;
 			}
 		}
-	}, "reset_position", "reset_position <EntityID> [String: xyz]");
+		return "";
+		}, "reset_position", "reset_position <EntityID> [String: xyz]");
 
-	admin->commands["reset_position_x"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonInput->selectedEntity) {
-			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+	admin->commands["reset_position_x"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		if (admin->singletonInput->selectedEntity) {
+			if (Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
 				p->acceleration = Vector3(0, p->acceleration.y, p->acceleration.z);
 				p->velocity = Vector3(0, p->velocity.y, p->velocity.z);
 				p->position = Vector3(0, p->position.y, p->position.z);
 			}
 		}
-	}, "reset_position_x", "temp");
+		return "";
+		}, "reset_position_x", "temp");
 
-	admin->commands["reset_position_y"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonInput->selectedEntity) {
-			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+	admin->commands["reset_position_y"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		if (admin->singletonInput->selectedEntity) {
+			if (Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
 				p->acceleration = Vector3(p->acceleration.x, 0, p->acceleration.z);
 				p->velocity = Vector3(p->velocity.x, 0, p->velocity.z);
 				p->position = Vector3(p->position.x, 0, p->position.z);
 			}
 		}
-	}, "reset_position_y", "temp");
+		return "";
+		}, "reset_position_y", "temp");
 
-	admin->commands["reset_position_z"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonInput->selectedEntity) {
-			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+	admin->commands["reset_position_z"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		if (admin->singletonInput->selectedEntity) {
+			if (Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
 				p->acceleration = Vector3(p->acceleration.x, p->acceleration.y, 0);
 				p->velocity = Vector3(p->velocity.x, p->velocity.y, 0);
 				p->position = Vector3(p->position.x, p->position.y, 0);
 			}
 		}
-	}, "reset_position_z", "temp");
+		return "";
+		}, "reset_position_z", "temp");
 
-	admin->commands["reset_velocity"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonInput->selectedEntity) {
-			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+	admin->commands["reset_velocity"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		if (admin->singletonInput->selectedEntity) {
+			if (Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
 				p->acceleration = Vector3::ZERO;
 				p->velocity = Vector3::ZERO;
 			}
 		}
-	}, "reset_velocity", "reset_position <EntityID> [String: xyz]");
+		return "";
+		}, "reset_velocity", "reset_position <EntityID> [String: xyz]");
 
-	admin->commands["translate_right"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonInput->selectedEntity) {
-			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+	admin->commands["translate_right"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		if (admin->singletonInput->selectedEntity) {
+			if (Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
 				PhysicsSystem::AddInput(p, Vector3::RIGHT);
 			}
 		}
-	}, "translate_right", "translate_right <EntityID> <amount> [speed]");
+		return "";
+		}, "translate_right", "translate_right <EntityID> <amount> [speed]");
 
-	admin->commands["translate_left"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonInput->selectedEntity) {
-			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+	admin->commands["translate_left"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		if (admin->singletonInput->selectedEntity) {
+			if (Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
 				PhysicsSystem::AddInput(p, Vector3::LEFT);
 			}
 		}
-	}, "translate_left", "translate_left <EntityID> <amount> [speed]");
+		return "";
+		}, "translate_left", "translate_left <EntityID> <amount> [speed]");
 
-	admin->commands["translate_up"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonInput->selectedEntity) {
-			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+	admin->commands["translate_up"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		if (admin->singletonInput->selectedEntity) {
+			if (Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
 				PhysicsSystem::AddInput(p, Vector3::UP);
 			}
 		}
-	}, "translate_up", "translate_up <EntityID> <amount> [speed]");
+		return "";
+		}, "translate_up", "translate_up <EntityID> <amount> [speed]");
 
-	admin->commands["translate_down"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonInput->selectedEntity) {
-			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+	admin->commands["translate_down"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		if (admin->singletonInput->selectedEntity) {
+			if (Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
 				PhysicsSystem::AddInput(p, Vector3::DOWN);
 			}
 		}
-	}, "translate_down", "translate_down <EntityID> <amount> [speed]");
+		return "";
+		}, "translate_down", "translate_down <EntityID> <amount> [speed]");
 
-	admin->commands["translate_forward"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonInput->selectedEntity) {
-			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+	admin->commands["translate_forward"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		if (admin->singletonInput->selectedEntity) {
+			if (Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
 				PhysicsSystem::AddInput(p, Vector3::FORWARD);
 			}
 		}
-	}, "translate_forward", "translate_forward <EntityID> <amount> [speed]");
+		return "";
+		}, "translate_forward", "translate_forward <EntityID> <amount> [speed]");
 
-	admin->commands["translate_backward"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonInput->selectedEntity) {
-			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+	admin->commands["translate_backward"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		if (admin->singletonInput->selectedEntity) {
+			if (Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
 				PhysicsSystem::AddInput(p, Vector3::BACK);
 			}
 		}
-	}, "translate_backward", "translate_backward <EntityID> <amount> [speed]");
+		return "";
+		}, "translate_backward", "translate_backward <EntityID> <amount> [speed]");
 
-//// rotation ////
+	//// rotation ////
 
-	admin->commands["reset_rotation"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonInput->selectedEntity) {
-			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+	admin->commands["reset_rotation"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		if (admin->singletonInput->selectedEntity) {
+			if (Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
 				p->rotAcceleration = Vector3::ZERO;
 				p->rotVelocity = Vector3::ZERO;
 				p->rotation = Vector3::ZERO;
 			}
 		}
-	}, "reset_rotation", "reset_rotation <EntityID> [String: xyz]");
+		return "";
+		}, "reset_rotation", "reset_rotation <EntityID> [String: xyz]");
 
-	admin->commands["reset_rotation_x"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonInput->selectedEntity) {
-			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+	admin->commands["reset_rotation_x"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		if (admin->singletonInput->selectedEntity) {
+			if (Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
 				p->rotAcceleration = Vector3(0, p->rotAcceleration.y, p->rotAcceleration.z);
 				p->rotVelocity = Vector3(0, p->rotVelocity.y, p->rotVelocity.z);
 				p->rotation = Vector3(0, p->rotation.y, p->rotation.z);
 			}
 		}
-	}, "reset_rotation_x", "temp");
+		return "";
+		}, "reset_rotation_x", "temp");
 
-	admin->commands["reset_rotation_y"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonInput->selectedEntity) {
-			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+	admin->commands["reset_rotation_y"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		if (admin->singletonInput->selectedEntity) {
+			if (Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
 				p->rotAcceleration = Vector3(p->rotAcceleration.x, 0, p->rotAcceleration.z);
 				p->rotVelocity = Vector3(p->rotVelocity.x, 0, p->rotVelocity.z);
 				p->rotation = Vector3(p->rotation.x, 0, p->rotation.z);
 			}
 		}
-	}, "reset_rotation_y", "temp");
+		return "";
+		}, "reset_rotation_y", "temp");
 
-	admin->commands["reset_rotation_z"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonInput->selectedEntity) {
-			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+	admin->commands["reset_rotation_z"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		if (admin->singletonInput->selectedEntity) {
+			if (Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
 				p->rotAcceleration = Vector3(p->rotAcceleration.x, p->rotAcceleration.y, 0);
 				p->rotVelocity = Vector3(p->rotVelocity.x, p->rotVelocity.y, 0);
 				p->rotation = Vector3(p->rotation.x, p->rotation.y, 0);
 			}
 		}
-	}, "reset_rotation_z", "temp");
+		return "";
+		}, "reset_rotation_z", "temp");
 
-	admin->commands["reset_rotation_velocity"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonInput->selectedEntity) {
-			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+	admin->commands["reset_rotation_velocity"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		if (admin->singletonInput->selectedEntity) {
+			if (Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
 				p->rotAcceleration = Vector3::ZERO;
 				p->rotVelocity = Vector3::ZERO;
 			}
 		}
-	}, "reset_rotation_velocity", "reset_rotation_velocity <EntityID> [String: xyz]");
+		return "";
+		}, "reset_rotation_velocity", "reset_rotation_velocity <EntityID> [String: xyz]");
 
-	admin->commands["rotate_+x"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonInput->selectedEntity) {
-			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+	admin->commands["rotate_+x"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		if (admin->singletonInput->selectedEntity) {
+			if (Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
 				p->rotVelocity += Vector3(5, 0, 0);
 			}
 		}
-	}, "rotate_+x", "rotate_+x <EntityID> <amount> [speed]");
+		return "";
+		}, "rotate_+x", "rotate_+x <EntityID> <amount> [speed]");
 
-	admin->commands["rotate_-x"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonInput->selectedEntity) {
-			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+	admin->commands["rotate_-x"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		if (admin->singletonInput->selectedEntity) {
+			if (Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
 				p->rotVelocity += Vector3(-5, 0, 0);
 			}
 		}
-	}, "rotate_-x", "rotate_-x <EntityID> <amount> [speed]");
+		return "";
+		}, "rotate_-x", "rotate_-x <EntityID> <amount> [speed]");
 
-	admin->commands["rotate_+y"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonInput->selectedEntity) {
-			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+	admin->commands["rotate_+y"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		if (admin->singletonInput->selectedEntity) {
+			if (Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
 				p->rotVelocity += Vector3(0, 5, 0);
 			}
 		}
-	}, "rotate_+y", "rotate_+y <EntityID> <amount> [speed]");
+		return "";
+		}, "rotate_+y", "rotate_+y <EntityID> <amount> [speed]");
 
-	admin->commands["rotate_-y"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonInput->selectedEntity) {
-			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+	admin->commands["rotate_-y"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		if (admin->singletonInput->selectedEntity) {
+			if (Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
 				p->rotVelocity += Vector3(0, -5, 0);
 			}
 		}
-	}, "rotate_-y", "rotate_-y <EntityID> <amount> [speed]");
+		return "";
+		}, "rotate_-y", "rotate_-y <EntityID> <amount> [speed]");
 
-	admin->commands["rotate_+z"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonInput->selectedEntity) {
-			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+	admin->commands["rotate_+z"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		if (admin->singletonInput->selectedEntity) {
+			if (Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
 				p->rotVelocity += Vector3(0, 0, 5);
 			}
 		}
-	}, "rotate_+z", "rotate_+z <EntityID> <amount> [speed]");
+		return "";
+		}, "rotate_+z", "rotate_+z <EntityID> <amount> [speed]");
 
-	admin->commands["rotate_-z"] = new Command([](EntityAdmin* admin) {
-		if(admin->singletonInput->selectedEntity) {
-			if(Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
+	admin->commands["rotate_-z"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		if (admin->singletonInput->selectedEntity) {
+			if (Physics* p = admin->singletonInput->selectedEntity->GetComponent<Physics>()) {
 				p->rotVelocity += Vector3(0, 0, -5);
 			}
 		}
-	}, "rotate_-z", "rotate_-z <EntityID> <amount> [speed]");
+		return "";
+		}, "rotate_-z", "rotate_-z <EntityID> <amount> [speed]");
 
-//// other ////
+	//// other ////
 
-	admin->commands["add_force"] = new Command([](EntityAdmin* admin) {
+	admin->commands["add_force"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		if (USE_ORTHO) { //TODO(, sushi) implement ScreenToWorld for ortho projection
 			LOG("\nWarning: ScreenToWorld not yet implemented for orthographic projection. World interaction with mouse will not work.\n");
 		}
@@ -230,6 +252,7 @@ inline void AddSelectedEntityCommands(EntityAdmin* admin) {
 				}
 			}
 		}
+		return "";
 	}, "add_force", "add_force <EntityID> <force_vector> [constant_force?]");
 }
 

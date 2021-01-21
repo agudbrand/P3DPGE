@@ -236,7 +236,7 @@ int ClipTriangles(const Vector3& plane_p, Vector3 plane_n, Triangle* in_tri, std
 		newTri->proj_tex_points[2].y = t * (outside_tex[0]->y - inside_tex[0]->y) + inside_tex[0]->y;
 		newTri->proj_tex_points[2].z = t * (outside_tex[0]->z - inside_tex[0]->z) + inside_tex[0]->z;
 
-		Triangle* newTri2 = new Triangle();
+		Triangle* newTri2 = new Triangle(); //TODO(, sushi) figure out why this is leaking
 		newTri2->color = in_tri->color;
 		newTri2->e = in_tri->e;
 		newTri2->e->GetComponent<Mesh>()->texture = in_tri->e->GetComponent<Mesh>()->texture;

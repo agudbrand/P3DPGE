@@ -1,4 +1,5 @@
 #include "RenderCanvasSystem.h"
+#include "ConsoleSystem.h"
 #include "../utils/GLOBALS.h"
 #include "../ui/UI.h"
 #include "../ui/UIContainer.h"
@@ -62,11 +63,11 @@ void MakeMenuBar(EntityAdmin* admin) {
 			ImGui::EndMenu();
 		}
 		if (BeginMenu("Imgui")){
-            MenuItem("Metrics/Debugger", NULL, &show_app_metrics);
-            MenuItem("Style Editor", NULL, &show_app_style_editor);
+			MenuItem("Metrics/Debugger", NULL, &show_app_metrics);
+			MenuItem("Style Editor", NULL, &show_app_style_editor);
 			ImGui::MenuItem("About Dear ImGui", NULL, &show_app_about);
-            ImGui::EndMenu();
-        }
+			ImGui::EndMenu();
+		}
 		EndMenuBar();
 	}
 }
@@ -129,22 +130,22 @@ void MakeRenderHeader(EntityAdmin* admin) {
 	using namespace ImGui;
 	Scene* scene = admin->currentScene;
 	if (CollapsingHeader("Render options")){
-        if (BeginTable("split", 3)) {
-            TableNextColumn(); Checkbox("wireframe", &scene->RENDER_WIREFRAME);
-            TableNextColumn(); Checkbox("textures", &scene->RENDER_TEXTURES);
-            TableNextColumn(); Checkbox("edge numbers", &scene->RENDER_EDGE_NUMBERS);
-            TableNextColumn(); Checkbox("local axis", &scene->RENDER_LOCAL_AXIS);
-            TableNextColumn(); Checkbox("global axis", &scene->RENDER_GLOBAL_AXIS);
-            TableNextColumn(); Checkbox("transforms", &scene->RENDER_TRANSFORMS);
-            TableNextColumn(); Checkbox("physics vectors", &scene->RENDER_PHYSICS);
-            TableNextColumn(); Checkbox("screen aabb", &scene->RENDER_SCREEN_BOUNDING_BOX);
-            TableNextColumn(); Checkbox("mesh vertices", &scene->RENDER_MESH_VERTICES);
-            TableNextColumn(); Checkbox("mesh normals", &scene->RENDER_MESH_NORMALS);
-            TableNextColumn(); Checkbox("grid", &scene->RENDER_GRID);
-            TableNextColumn(); Checkbox("light rays", &scene->RENDER_LIGHT_RAYS);
-            EndTable();
-        }
-    }
+		if (BeginTable("split", 3)) {
+			TableNextColumn(); Checkbox("wireframe", &scene->RENDER_WIREFRAME);
+			TableNextColumn(); Checkbox("textures", &scene->RENDER_TEXTURES);
+			TableNextColumn(); Checkbox("edge numbers", &scene->RENDER_EDGE_NUMBERS);
+			TableNextColumn(); Checkbox("local axis", &scene->RENDER_LOCAL_AXIS);
+			TableNextColumn(); Checkbox("global axis", &scene->RENDER_GLOBAL_AXIS);
+			TableNextColumn(); Checkbox("transforms", &scene->RENDER_TRANSFORMS);
+			TableNextColumn(); Checkbox("physics vectors", &scene->RENDER_PHYSICS);
+			TableNextColumn(); Checkbox("screen aabb", &scene->RENDER_SCREEN_BOUNDING_BOX);
+			TableNextColumn(); Checkbox("mesh vertices", &scene->RENDER_MESH_VERTICES);
+			TableNextColumn(); Checkbox("mesh normals", &scene->RENDER_MESH_NORMALS);
+			TableNextColumn(); Checkbox("grid", &scene->RENDER_GRID);
+			TableNextColumn(); Checkbox("light rays", &scene->RENDER_LIGHT_RAYS);
+			EndTable();
+		}
+	}
 }
 
 void MakeBufferlogHeader(EntityAdmin* admin) {
@@ -180,7 +181,7 @@ void RenderCanvasSystem::DrawUI(void) {
 	ImGui::NewFrame();
 
 	//demo window for reference
-	ImGui::ShowDemoWindow();
+	//ImGui::ShowDemoWindow();
 
 	////////////////////////////////////////////
 
@@ -188,6 +189,14 @@ void RenderCanvasSystem::DrawUI(void) {
 	static bool showDebugTools = true;
 	if(ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Backspace)) && io.KeyCtrl && io.KeyShift) { showDebugTools = !showDebugTools; }
 	if(showDebugTools) MakeP3DPGEDebugTools(admin);
+	//TODO(i, sushi) add console boolean
+	//cant use a static call here because then we can't reference admin in the static function
+	//maybe theres a better way to do this, I don't know
+	for (System* s : admin->systems) {
+		if (ConsoleSystem* c = dynamic_cast<ConsoleSystem*>(s)) {
+			c->DrawConsole();
+		}
+	}
 
 	////////////////////////////////////////////
 

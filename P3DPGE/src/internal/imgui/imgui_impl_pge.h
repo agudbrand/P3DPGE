@@ -296,6 +296,8 @@ namespace olc
 			io.KeyMap[ImGuiKey_Y] = olc::Y;
 			io.KeyMap[ImGuiKey_Z] = olc::Z;
 
+			
+
 			//Create a listing of all the control keys so we can iterate them later
 			vControlInputKeys = {
 				olc::TAB, olc::LEFT, olc::RIGHT, olc::UP, olc::DOWN,
@@ -351,7 +353,10 @@ namespace olc
 				{olc::NP_SUB, '-', '-'},
 				{olc::NP_DECIMAL, '.', '.'},
 				{olc::PERIOD, '.', '>'},
-				{olc::SPACE, ' ', ' '}
+				{olc::SPACE, ' ', ' '},
+				{olc::MINUS, '-', '_'}, //TODO(i, sushi) add the rest of the missing keys
+				{olc::COMMA, ',', '<'},
+				{olc::EQUALS, '=', '+'}
 			};
 
 			return olc::OK;
