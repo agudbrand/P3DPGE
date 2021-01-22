@@ -10,6 +10,7 @@
 #include "../components/Scene.h"
 #include "../components/Camera.h"
 #include "../components/Input.h"
+#include "../components/Time.h"
 
 #define OLC_PGEX_DEAR_IMGUI_IMPLEMENTATION
 #include "../internal/imgui/imgui_impl_pge.h"
@@ -80,7 +81,7 @@ void MakeGeneralHeader(EntityAdmin* admin) {
 			Text("Address: %#08x", camera); SameLine(); if(ImGui::Button("Copy")) { ImGui::LogToClipboard(); ImGui::LogText("%#08x", camera); ImGui::LogFinish(); }
 			Text("Position"); SameLine(); InputVector3("##camPos", &camera->position);
 			Text("Rotation"); SameLine(); InputVector3("##camRot", &camera->rotation);
-			if(BeginTable("CameraTable", 3)) {
+			if(BeginTable("split2", 3)) {
 				TableNextColumn(); Text("FOV"); SameLine(); InputFloat("##camFOV", &camera->fieldOfView, 0, 0, "%.2f", ImGuiInputTextFlags_EnterReturnsTrue);
 				TableNextColumn(); Text("NearZ"); SameLine(); InputFloat("##camNearZ", &camera->nearZ, 0, 0, "%.2f", ImGuiInputTextFlags_EnterReturnsTrue);
 				TableNextColumn(); Text("FarZ"); SameLine(); InputFloat("##camFarZ", &camera->farZ, 0, 0, "%.2f", ImGuiInputTextFlags_EnterReturnsTrue);
@@ -100,7 +101,7 @@ void MakeEntitiesHeader(EntityAdmin* admin) {
 			Text("Selected Entity: None");
 		}
 
-		if(BeginTable("EntitiesHeader", 2, ImGuiTableFlags_BordersOuter | ImGuiTableFlags_Resizable)){
+		if(BeginTable("split3", 2, ImGuiTableFlags_BordersOuter | ImGuiTableFlags_Resizable)){
 			TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed);
 			TableSetupColumn("Components");
 			TableHeadersRow();
@@ -130,7 +131,7 @@ void MakeRenderHeader(EntityAdmin* admin) {
 	using namespace ImGui;
 	Scene* scene = admin->currentScene;
 	if (CollapsingHeader("Render options")){
-		if (BeginTable("RenderTable", 3)) {
+		if (BeginTable("split", 3)) {
 			TableNextColumn(); Checkbox("wireframe", &scene->RENDER_WIREFRAME);
 			TableNextColumn(); Checkbox("textures", &scene->RENDER_TEXTURES);
 			TableNextColumn(); Checkbox("edge numbers", &scene->RENDER_EDGE_NUMBERS);
@@ -173,6 +174,86 @@ void MakeP3DPGEDebugTools(EntityAdmin* admin) {
 	ImGui::End();
 }
 
+void DrawFrameGraph(EntityAdmin* admin) { //TODO(r, sushi) implement styling and more options
+
+	//ImGui::SetNextWindowSize(ImVec2(300, 200));
+	ImGui::Begin("FPSGraph", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
+
+	static int prevstoresize = 100;
+	static int storesize = 100;
+	static int fupdate = 20;
+
+	ImGui::SliderInt("amount to store", &storesize, 10, 200);
+	ImGui::SliderInt("frames to update", &fupdate, 1, 40);
+
+	static std::vector<float> realvalues(storesize);
+	static std::vector<float> printvalues(storesize);
+	static int max_val = 0;
+	static int min_val = INT_MAX;
+
+	if (prevstoresize != storesize) {
+		//can't believe this worked lol 
+		std::reverse(realvalues.begin(), realvalues.end());  realvalues.resize(storesize); std::reverse(realvalues.begin(), realvalues.end());
+		std::reverse(printvalues.begin(), printvalues.end());  printvalues.resize(storesize); std::reverse(printvalues.begin(), printvalues.end());
+		prevstoresize = storesize;
+	}
+	
+
+	static int frame_count = 0;
+
+	std::rotate(realvalues.begin(), realvalues.begin() + 1, realvalues.end()); //rotate vector back one space
+
+	int FPS = std::floor(1 / admin->time->deltaTime);
+	float avg = Math::average(realvalues.begin(), realvalues.end(), storesize);
+
+	//float avg = 0;
+	//
+	//for (float f : realvalues) {
+	//	avg += f;
+	//}
+
+	//avg /= realvalues.size();
+
+	if (frame_count < fupdate) {
+		realvalues[realvalues.size() - 1] = FPS; //append frame rate
+
+		frame_count++;
+	}
+	else {
+
+		//dynamic max/min_val setting
+		if (avg > max_val || avg < max_val - 15) max_val = avg; 
+		if (avg < min_val || avg > min_val + 15) min_val = avg;
+
+		std::rotate(printvalues.begin(), printvalues.begin() + 1, printvalues.end());
+		
+		printvalues[printvalues.size() - 1] = std::floorl(avg);
+
+		
+
+		frame_count = 0;
+	}
+
+	ImGui::Text(TOSTRING(avg, " ", max_val, " ", min_val).c_str());
+	
+	ImGui::SetNextItemWidth(ImGui::GetWindowWidth());
+	ImGui::PlotLines("", &printvalues[0], printvalues.size(), 0, 0, min_val, max_val, ImVec2(300, 200));
+
+
+
+	//for (float f : realvalues) {
+	//	printvalues.push_back(f + ((avg - f) * 0.9)); //make graph not so spikey
+	//}
+
+
+	
+	
+	
+
+	
+	ImGui::End();
+}
+
 void RenderCanvasSystem::DrawUI(void) {
 	using namespace ImGui;
 	//These 3 lines are mandatory per-frame initialization
@@ -181,13 +262,14 @@ void RenderCanvasSystem::DrawUI(void) {
 	ImGui::NewFrame();
 
 	//demo window for reference
-	ImGui::ShowDemoWindow();
+	//ImGui::ShowDemoWindow();
 
 	////////////////////////////////////////////
 
 	ImGuiIO& io = ImGui::GetIO();
 	static bool showDebugTools = true;
 	static bool showConsole = true;
+	static bool displayFrameGraph = true;
 
 	if(ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Backspace)) && io.KeyCtrl && io.KeyShift) { showDebugTools = !showDebugTools; }
 	if (admin->input->KeyPressed(olc::OEM_3)) { showConsole = !showConsole; }
@@ -206,6 +288,8 @@ void RenderCanvasSystem::DrawUI(void) {
 	else {
 		admin->IMGUI_KEY_CAPTURE = false;
 	}
+		
+	if (displayFrameGraph) DrawFrameGraph(admin);
 
 	////////////////////////////////////////////
 

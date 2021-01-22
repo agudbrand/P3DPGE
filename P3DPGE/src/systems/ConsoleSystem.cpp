@@ -200,7 +200,7 @@ void ConsoleSystem::DrawConsole() {
 
 	//window styling
 	PushStyleVar(ImGuiStyleVar_ScrollbarRounding, 0);
-	PushStyleColor(ImGuiCol_Border,               olcPixToVec4(olc::Pixel(0, 0, 0, 0)));
+	PushStyleColor(ImGuiCol_Border,               olcPixToVec4(olc::Pixel(0, 0, 0, 255)));
 	PushStyleColor(ImGuiCol_TitleBg,              olcPixToVec4(olc::Pixel(0, 0, 0, 255)));
 	PushStyleColor(ImGuiCol_WindowBg,             olcPixToVec4(olc::Pixel(0, 0, 0, 255)));
 	PushStyleColor(ImGuiCol_TitleBgActive,        olcPixToVec4(olc::Pixel(0, 0, 0, 255)));
@@ -210,9 +210,9 @@ void ConsoleSystem::DrawConsole() {
 
 	//initialize console window
 	SetNextWindowSize(ImVec2(admin->screen->width, admin->screen->height / 1.5));
-	SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
+	SetNextWindowPos(ImVec2(0, 0));
 	
-	ImGui::Begin("Console!", 0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |ImGuiWindowFlags_NoTitleBar);
+	ImGui::Begin("Console!", 0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove);
 
 
 	if (BeginMenuBar()) {
@@ -347,7 +347,6 @@ void ConsoleSystem::DrawConsole() {
 			AddLog(ExecCommand(s, args, admin), c); //attempt to execute command and print result
 		}
 		
-
 		c->historyPos = -1; //reset history position
 
 		memset(c->inputBuf, 0, sizeof(s)); //erase input from text box
@@ -367,7 +366,6 @@ void ConsoleSystem::DrawConsole() {
 	            PopStyleColor();       PopStyleColor();       PopStyleColor();
 			       PopStyleColor(); PopStyleColor();             
 	                     
-	                   
 
 	//if we selected something from completion menu
 	//we have to do this here to prevent enter from sending a command
