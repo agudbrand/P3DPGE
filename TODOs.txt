@@ -96,7 +96,7 @@ Tags: input
 re-enable clicking entities
 
 ~~~~~~~ TODO 12 ~~~~~~~
-ConsoleSystem.cpp, Line: 24
+ConsoleSystem.cpp, Line: 26
 Creator:  sushi
 ----------------------
 Tags: No Tags
@@ -104,7 +104,7 @@ Tags: No Tags
 extend this map
 
 ~~~~~~~ TODO 13 ~~~~~~~
-ConsoleSystem.cpp, Line: 102
+ConsoleSystem.cpp, Line: 104
 Creator:  sushi
 ----------------------
 Tags: No Tags
@@ -112,7 +112,7 @@ Tags: No Tags
 implement showing a commands help if tab is pressed when the command is already typed
 
 ~~~~~~~ TODO 14 ~~~~~~~
-ConsoleSystem.cpp, Line: 294
+ConsoleSystem.cpp, Line: 296
 Creator:  sushi
 ----------------------
 Tags: optimization
@@ -120,7 +120,7 @@ Tags: optimization
 maybe optimize by only drawing what we know will be displayed on screen instead of parsing through all of it
 
 ~~~~~~~ TODO 15 ~~~~~~~
-Debug.h, Line: 70
+Debug.h, Line: 79
 Creator:  sushi
 ----------------------
 Tags: general
@@ -353,7 +353,7 @@ Tags: entity, entity
 implement components list on entities
 
 ~~~~~~~ TODO 44 ~~~~~~~
-RenderCanvasSystem.cpp, Line: 194
+RenderCanvasSystem.cpp, Line: 195
 Creator:  sushi
 ----------------------
 Tags: input
