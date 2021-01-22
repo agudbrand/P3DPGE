@@ -28,6 +28,10 @@ void TimeSystem::Init() {
 void TimeSystem::Update() {
 	Time* time = admin->time;
 
+	//sets date and time string
+	time->end_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+	ctime_s(time->datentime, sizeof(time->datentime), &time->end_time);
+
 	if(!time->paused) {
 		time->deltaTime = admin->p->GetElapsedTime();
 		time->totalTime += time->deltaTime;

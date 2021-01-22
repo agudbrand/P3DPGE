@@ -15,6 +15,10 @@ struct Time : public Component {
 	bool paused;
 	bool frame;
 
+	std::time_t end_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+	char datentime[30] = {};
+	
+
 	Time() {
 		deltaTime	= 0.f;
 		totalTime	= 0.f;

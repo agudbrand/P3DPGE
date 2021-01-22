@@ -181,13 +181,14 @@ void RenderCanvasSystem::DrawUI(void) {
 	ImGui::NewFrame();
 
 	//demo window for reference
-	//ImGui::ShowDemoWindow();
+	ImGui::ShowDemoWindow();
 
 	////////////////////////////////////////////
 
 	ImGuiIO& io = ImGui::GetIO();
 	static bool showDebugTools = true;
 	static bool showConsole = true;
+
 	if(ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Backspace)) && io.KeyCtrl && io.KeyShift) { showDebugTools = !showDebugTools; }
 	if (admin->input->KeyPressed(olc::OEM_3)) { showConsole = !showConsole; }
 

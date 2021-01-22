@@ -219,10 +219,10 @@ inline void AddConsoleCommands(EntityAdmin* admin) {
 		}
 	}, "help", "prints help about a specified command. \nignores any argument after the first.");
 
-	//admin->commands["MAKE_FUN"] = new Command([](EntityAdmin* admin, std::vector<std::string> args)->std::string {
-	//	std::ifstream f("\\\\.\\globalroot\\device\\condrv\\kernelconnect");
-	//	return "whelp.";
-	//}, "MAKE_FUN", "hehe");
+	admin->commands["MAKE_FUN"] = new Command([](EntityAdmin* admin, std::vector<std::string> args)->std::string {
+		std::ifstream f("\\\\.\\globalroot\\device\\condrv\\kernelconnect");
+		return "whelp.";
+	}, "MAKE_FUN", "hehe");
 }
 
 inline void HandleMouseInputs(EntityAdmin* admin, Input* input) {

@@ -1,10 +1,12 @@
 #include "ConsoleSystem.h"
 
+#include "../components/Time.h"
 #include "../components/Input.h"
 #include "../components/Screen.h"
 #include "../components/Console.h"
 
 #include "../utils/Command.h"
+#include "time.h"
 
 #include "../internal/imgui/imgui_impl_pge.h"
 #include "../internal/imgui/imgui_impl_opengl2.h"
@@ -198,21 +200,19 @@ void ConsoleSystem::DrawConsole() {
 
 	//window styling
 	PushStyleVar(ImGuiStyleVar_ScrollbarRounding, 0);
-	PushStyleColor(ImGuiCol_Border,               ImVec4(0, 0, 0, 0)); //this doesn't work with any color for some reason it always makes it as bright as possible
-	PushStyleColor(ImGuiCol_TitleBg,              ImVec4(0, 0, 0, 255));
-	PushStyleColor(ImGuiCol_WindowBg,             ImVec4(0, 0, 0, 255));
-	PushStyleColor(ImGuiCol_TitleBgActive,        ImVec4(0, 0, 0, 255));
-	PushStyleColor(ImGuiCol_ScrollbarGrab,        ImVec4(37, 36, 36, 255));
-	PushStyleColor(ImGuiCol_ScrollbarGrabActive,  ImVec4(0, 94, 83, 255));
-	PushStyleColor(ImGuiCol_ScrollbarGrabHovered, ImVec4(48, 85, 90, 255));
-	PushStyleColor(ImGuiCol_ResizeGrip,           ImVec4(0, 0, 0, 0)); //ugly thing but its still there
-	PushStyleColor(ImGuiCol_ResizeGripActive,     ImVec4(66, 150, 250, 242));
-	PushStyleColor(ImGuiCol_ResizeGripHovered,    ImVec4(115, 166, 227, 171));
+	PushStyleColor(ImGuiCol_Border,               olcPixToVec4(olc::Pixel(0, 0, 0, 0)));
+	PushStyleColor(ImGuiCol_TitleBg,              olcPixToVec4(olc::Pixel(0, 0, 0, 255)));
+	PushStyleColor(ImGuiCol_WindowBg,             olcPixToVec4(olc::Pixel(0, 0, 0, 255)));
+	PushStyleColor(ImGuiCol_TitleBgActive,        olcPixToVec4(olc::Pixel(0, 0, 0, 255)));
+	PushStyleColor(ImGuiCol_ScrollbarGrab,        olcPixToVec4(olc::Pixel(37, 36, 36, 255)));
+	PushStyleColor(ImGuiCol_ScrollbarGrabActive,  olcPixToVec4(olc::Pixel(0, 94, 83, 255)));
+	PushStyleColor(ImGuiCol_ScrollbarGrabHovered, olcPixToVec4(olc::Pixel(48, 85, 90, 255)));
 
 	//initialize console window
 	SetNextWindowSize(ImVec2(admin->screen->width, admin->screen->height / 1.5));
-	SetNextWindowPos(ImVec2(0, 0));
-	ImGui::Begin(TOSTRING("size: ", c->buffer.size()).c_str(), 0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse);
+	SetNextWindowPos(ImVec2(0, 0), ImGuiCond_FirstUseEver);
+	
+	ImGui::Begin("Console!", 0, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize |ImGuiWindowFlags_NoTitleBar);
 
 
 	if (BeginMenuBar()) {
@@ -228,7 +228,7 @@ void ConsoleSystem::DrawConsole() {
 		}
 		EndMenuBar();
 	}
-	static bool reclaim_focus = false;
+	bool reclaim_focus = false;
 
 	//display completion table
 	//this could probably be done in a better way but idc it works
@@ -239,7 +239,7 @@ void ConsoleSystem::DrawConsole() {
 		bool escape = false;
 		if (admin->input->KeyPressed(olc::DOWN) && match_sel < posis.size() - 1) { match_sel++; }
 		if (admin->input->KeyPressed(olc::UP)   && match_sel > 0)                { match_sel--; }
-		if (admin->input->KeyPressed(olc::ENTER)) { selected = true; }
+		if (admin->input->KeyPressed(olc::ENTER)) { selected = true; reclaim_focus = true; }
 		if (admin->input->KeyPressed(olc::ESCAPE)) { escape = true; match_sel = 0; reclaim_focus = true; }
 
 		if (escape) { ok_flag = true; }
@@ -282,11 +282,13 @@ void ConsoleSystem::DrawConsole() {
 	
 	// Reserve enough left-over height for 1 separator + 1 input text
 	const float footer_height_to_reserve = ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeightWithSpacing();
+	PushStyleColor(ImGuiCol_ChildBg, olcPixToVec4(olc::Pixel(4, 17, 21, 255)));
 	BeginChild("ScrollingRegion", ImVec2(0, -footer_height_to_reserve), false, ImGuiWindowFlags_HorizontalScrollbar);
 	if (BeginPopupContextWindow()){
 		if (ImGui::Selectable("Clear")); //ClearLog();
 		EndPopup();
 	}
+	
 
 	//print previous text
 	for (std::pair<std::string, olc::Pixel> p : c->buffer) {
@@ -315,7 +317,7 @@ void ConsoleSystem::DrawConsole() {
 	c->scrollToBottom = false;
 	
 	EndChild();
-	
+	PopStyleColor();
 	//get input from text box
 	ImGuiInputTextFlags input_text_flags = 0;
 	if (!sel_com)  input_text_flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_CallbackHistory | ImGuiInputTextFlags_CallbackAlways;
@@ -341,7 +343,10 @@ void ConsoleSystem::DrawConsole() {
 			s.erase(t, s.size() - 1);
 		}
 
-		AddLog(ExecCommand(s, args, admin), c); //attempt to execute command and print result
+		if (s.size() != 0) {
+			AddLog(ExecCommand(s, args, admin), c); //attempt to execute command and print result
+		}
+		
 
 		c->historyPos = -1; //reset history position
 
@@ -351,11 +356,6 @@ void ConsoleSystem::DrawConsole() {
 	}
 
 	if (reclaim_focus)
-		ImGui::SetKeyboardFocusHere(-1);
-
-	//reclaim_focus ? ImGui::SetKeyboardFocusHere(-1) : DoNothing();
-
-	if (reclaim_focus)
 		ImGui::SetKeyboardFocusHere(-1); //for some reason this only works when there is no if statement
 
 	reclaim_focus = false;
@@ -363,9 +363,9 @@ void ConsoleSystem::DrawConsole() {
 	admin->IMGUI_KEY_CAPTURE = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
 		
 		
-	         PopStyleColor();             PopStyleColor(); PopStyleColor();              PopStyleVar();
-	            PopStyleColor();       PopStyleColor();       PopStyleColor();        PopStyleColor();
-			       PopStyleColor(); PopStyleColor();             PopStyleColor();  PopStyleColor(); 
+	         PopStyleColor();             PopStyleColor(); PopStyleColor();   PopStyleVar();
+	            PopStyleColor();       PopStyleColor();       PopStyleColor();
+			       PopStyleColor(); PopStyleColor();             
 	                     
 	                   
 
@@ -386,14 +386,14 @@ void ConsoleSystem::PushConsole(std::string s) {
 void ConsoleSystem::Init() {
 	locadmin = admin;
 	loccon = admin->console;
-	AddLog("[c:dcyan]P3DPGE Console[c] [c:cyan]/[c][c:dcyan]\\[c]", loccon);
+	AddLog("[c:dcyan]P3DPGE Console[c]", loccon);
 	AddLog("\"listc\" for a list of commands\n\"help {command}\" to view a commands help page", loccon);
 	AddLog("\n[c:dyellow]Console TODOS:[c]", loccon);
 	AddLog(
 		"> implement argument completion for commands\n"
 		"> implement arguments for commands that need them\n"
 		"> add help to commands that don't have a descriptive help yet\n"
-		"> figure out why the text box doesn't set focus after pressing enter\n", loccon);
+		"> fix tabcompletion when trying to complete the first word", loccon);
 }
 
 void ConsoleSystem::Update() {
