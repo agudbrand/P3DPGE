@@ -94,8 +94,8 @@ void MakeGeneralHeader(EntityAdmin* admin) {
 void MakeEntitiesHeader(EntityAdmin* admin) {
 	using namespace ImGui;
 	if(CollapsingHeader("Entities")) {
-		if(admin->singletonInput->selectedEntity) {
-			Text("Selected Entity: %d", admin->singletonInput->selectedEntity->id);
+		if(admin->input->selectedEntity) {
+			Text("Selected Entity: %d", admin->input->selectedEntity->id);
 		} else {
 			Text("Selected Entity: None");
 		}
@@ -109,7 +109,7 @@ void MakeEntitiesHeader(EntityAdmin* admin) {
 				counter++;
 				TableNextRow(); TableNextColumn();
 				if(ImGui::Button(std::to_string(entity.first).c_str())) {
-					admin->singletonInput->selectedEntity = entity.second;
+					admin->input->selectedEntity = entity.second;
 				}
 				
 				TableNextColumn();
@@ -169,7 +169,7 @@ void MakeP3DPGEDebugTools(EntityAdmin* admin) {
 	MakeEntitiesHeader(admin);
 	MakeRenderHeader(admin);
 	MakeBufferlogHeader(admin);
-	
+
 	ImGui::End();
 }
 
@@ -187,15 +187,23 @@ void RenderCanvasSystem::DrawUI(void) {
 
 	ImGuiIO& io = ImGui::GetIO();
 	static bool showDebugTools = true;
+	static bool showConsole = true;
 	if(ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Backspace)) && io.KeyCtrl && io.KeyShift) { showDebugTools = !showDebugTools; }
+	if (admin->input->KeyPressed(olc::OEM_3)) { showConsole = !showConsole; }
+
 	if(showDebugTools) MakeP3DPGEDebugTools(admin);
 	//TODO(i, sushi) add console boolean
 	//cant use a static call here because then we can't reference admin in the static function
 	//maybe theres a better way to do this, I don't know
-	for (System* s : admin->systems) {
-		if (ConsoleSystem* c = dynamic_cast<ConsoleSystem*>(s)) {
-			c->DrawConsole();
+	if (showConsole) {
+		for (System* s : admin->systems) {
+			if (ConsoleSystem* c = dynamic_cast<ConsoleSystem*>(s)) {
+				c->DrawConsole();
+			}
 		}
+	}
+	else {
+		admin->IMGUI_KEY_CAPTURE = false;
 	}
 
 	////////////////////////////////////////////

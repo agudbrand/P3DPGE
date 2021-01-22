@@ -354,9 +354,15 @@ namespace olc
 				{olc::NP_DECIMAL, '.', '.'},
 				{olc::PERIOD, '.', '>'},
 				{olc::SPACE, ' ', ' '},
-				{olc::MINUS, '-', '_'}, //TODO(i, sushi) add the rest of the missing keys
+				{olc::MINUS, '-', '_'},
 				{olc::COMMA, ',', '<'},
-				{olc::EQUALS, '=', '+'}
+				{olc::EQUALS, '=', '+'},
+				{olc::OEM_1, ';',':'},
+				{olc::OEM_2, '/','?'},
+				{olc::OEM_3, '~','`'},
+				{olc::OEM_4, '[', '{'},
+				{olc::OEM_6, ']', '}'},
+				{olc::OEM_7, '\'', '\"'},
 			};
 
 			return olc::OK;

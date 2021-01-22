@@ -6,16 +6,16 @@
 template<class... T>
 inline void AddTimeCommands(EntityAdmin* admin) {
 	admin->commands["time_pause_engine"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
-		admin->singletonTime->paused = !admin->singletonTime->paused;
-		if (admin->singletonTime->paused) {
-			admin->singletonTime->deltaTime = 0.f;
+		admin->time->paused = !admin->time->paused;
+		if (admin->time->paused) {
+			admin->time->deltaTime = 0.f;
 		}
-		return "";
+		return ""; //TODO(, sushi) format these
 		}, "time_pause_engine", "time_pause_engine");
 
 	admin->commands["time_next_frame"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
-		if(admin->singletonTime->paused) {
-			admin->singletonTime->frame = true;
+		if(admin->time->paused) {
+			admin->time->frame = true;
 		}
 		return "";
 	}, "time_next_frame", "time_next_frame");
@@ -26,7 +26,7 @@ void TimeSystem::Init() {
 }
 
 void TimeSystem::Update() {
-	Time* time = admin->singletonTime;
+	Time* time = admin->time;
 
 	if(!time->paused) {
 		time->deltaTime = admin->p->GetElapsedTime();

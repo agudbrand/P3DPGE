@@ -31,10 +31,10 @@ struct EntityAdmin {
 	PhysicsWorld* physicsWorld;
 	
 	//singletons
-	Input* singletonInput;
-	Screen* singletonScreen;
-	Time* singletonTime;
-	World* singletonWorld;
+	Input* input;
+	Screen* screen;
+	Time* time;
+	World* world;
 
 	Camera* currentCamera;
 	Keybinds* currentKeybinds;
@@ -43,6 +43,9 @@ struct EntityAdmin {
 	Canvas* tempCanvas;
 	Console* console;
 
+	bool paused = false;
+	bool IMGUI_KEY_CAPTURE = false;
+
 	void Create(olc::PixelGameEngine* p);
 	void Cleanup();
 
@@ -50,6 +53,17 @@ struct EntityAdmin {
 
 	void AddSystem(System* system);
 	void RemoveSystem(System* system);
+
+	//returns a pointer to a system
+	//probably be careful using this cause there could be data races
+	//im only implementing it to push data to the console
+	//i know i can do it directly but then there would be no color parsing
+	template<class T>
+	T* GetSystem() {
+		T* t = nullptr;
+		for (System* s : systems) { if (T* temp = dynamic_cast<T*>(s)) { t = temp; break; } }
+		return t;
+	}
 
 	void AddComponent(Component* component);
 	void RemoveComponent(Component* component);

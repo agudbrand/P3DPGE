@@ -23,6 +23,23 @@
 #define LOGF(...)     Debug::ToString(1, __VA_ARGS__)
 #define ERRORF(...)   Debug::ToString(0, __VA_ARGS__)
 
+#define CLOG(...) DEBUG admin->GetSystem<ConsoleSystem>()->PushConsole(TOSTRING("[c:yellow]", __VA_ARGS__, "[c]"))
+#define CERROR(...) DEBUG admin->GetSystem<ConsoleSystem>()->PushConsole(TOSTRING("[c:red]", __VA_ARGS__, "[c]"))
+#define CSUCCESS(...) DEBUG admin->GetSystem<ConsoleSystem>()->PushConsole(TOSTRING("[c:green]", __VA_ARGS__, "[c]"))
+
+//additionally prints where function was called
+#define CLOG_LOC(...) DEBUG admin->GetSystem<ConsoleSystem>()->PushConsole(TOSTRING("[c:yellow]In ", __FILENAME__, " at ", __LINE__ , ": \n[c]", "[c:yellow]", __VA_ARGS__, "[c]"))
+#define CERROR_LOC(...) DEBUG admin->GetSystem<ConsoleSystem>()->PushConsole(TOSTRING("[c:red]In ", __FILENAME__, " at ", __LINE__, ": \n[c]", "[c:red]", __VA_ARGS__, "[c]"))
+#define CSUCCESS_LOC(...) DEBUG admin->GetSystem<ConsoleSystem>()->PushConsole(TOSTRING("[c:green]In ", __FILENAME__, " at ", __LINE__, ": \n[c]", "[c:green]", __VA_ARGS__, "[c]"))
+
+#define CASSERT(condition, message)     if(!(condition) && !admin->paused) CERROR_LOC("Assertion '" #condition "' failed: \n", message); admin->paused = true
+#define CASSERTWARN(condition, message) if(!(condition) && !admin->paused) CLOG_LOC("Assertion '" #condition "' failed: \n", message)
+
+#define CLOGF(...) admin->GetSystem<ConsoleSystem>()->PushConsole(TOSTRING("[c:yellow]", __VA_ARGS__, "[c]"))
+#define CERRORF(...) admin->GetSystem<ConsoleSystem>()->PushConsole(TOSTRING("[c:red]", __VA_ARGS__, "[c]"))
+#define CSUCCESSF(...) admin->GetSystem<ConsoleSystem>()->PushConsole(TOSTRING("[c:green]", __VA_ARGS__, "[c]"))
+
+
 #define TOSTRING(...) Debug::ToStringReturn(__VA_ARGS__)
 
 //stringize certain macros

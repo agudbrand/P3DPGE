@@ -14,15 +14,15 @@
 
 inline void AddSelectEntityCommand(EntityAdmin* admin) {
 	admin->commands["select_entity"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
-		admin->singletonInput->selectedEntity = nullptr;
+		admin->input->selectedEntity = nullptr;
 
 		//ortho proj matrices can't be inverted so need to set up a method for selecting
 		//when using ortho
 		//plus I think I need to fix selecting objects period so
 		//TODO(i, sushi) fix selecting objects
 		if (!USE_ORTHO) {
-			Vector3 pos = Math::ScreenToWorld(admin->singletonInput->mousePos, admin->currentCamera->projectionMatrix,
-				admin->currentCamera->viewMatrix, admin->singletonScreen->dimensions);
+			Vector3 pos = Math::ScreenToWorld(admin->input->mousePos, admin->currentCamera->projectionMatrix,
+				admin->currentCamera->viewMatrix, admin->screen->dimensions);
 			pos *= Math::WorldToLocal(admin->currentCamera->position);
 			pos.normalize();
 			pos *= 1000;
@@ -35,7 +35,7 @@ inline void AddSelectEntityCommand(EntityAdmin* admin) {
 
 			for (Mesh* m : admin->currentScene->meshes) {
 				if (MeshSystem::LineIntersect(m, ray)) {
-					admin->singletonInput->selectedEntity = m->entity;
+					admin->input->selectedEntity = m->entity;
 					break;
 				}
 			}
@@ -46,7 +46,7 @@ inline void AddSelectEntityCommand(EntityAdmin* admin) {
 			LOG("\nWarning: ScreenToWorld not yet implemented for orthographic projection. World interaction with mouse will not work.\n");
 		}
 		
-		if (!admin->singletonInput->selectedEntity) { ERROR("No object selected"); }
+		if (!admin->input->selectedEntity) { ERROR("No object selected"); }
 		return "";
 		//TODO(i,delle) change this to take in an ID once we figure that out
 	}, "select_entity", "select_entity <EntityID>");

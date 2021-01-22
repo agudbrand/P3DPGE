@@ -3,7 +3,7 @@
 #include "../components/Screen.h"
 
 void ScreenSystem::Update() {
-	Screen*		screen = admin->singletonScreen;
+	Screen*		screen = admin->screen;
 	olc::PixelGameEngine*	p = admin->p;
 
 	//clear the screen to black

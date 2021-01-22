@@ -68,7 +68,7 @@ Matrix4 MakeOrthoProjectionMatrix(Scene* s, Camera* c, Screen* sc) {
 
 void CameraSystem::Update() {
 	Camera* camera = admin->currentCamera;
-	Screen* screen = admin->singletonScreen;
+	Screen* screen = admin->screen;
 	Scene*  scene  = admin->currentScene;
 
 	camera->viewMatrix = MakeViewMatrix(camera);

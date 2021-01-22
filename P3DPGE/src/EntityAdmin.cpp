@@ -107,10 +107,10 @@ void EntityAdmin::Create(olc::PixelGameEngine* p) {
 	physicsWorld = new PhysicsWorld();
 
 	//singleton initialization
-	singletonInput = new Input(p);
-	singletonScreen = new Screen(p);
-	singletonTime = new Time();
-	singletonWorld = new World();
+	input = new Input(p);
+	screen = new Screen(p);
+	time = new Time();
+	world = new World();
 
 	//current admin components
 	currentCamera = new Camera();
@@ -154,10 +154,10 @@ void EntityAdmin::Cleanup() {
 	delete physicsWorld;
 
 	//clean up singletons
-	delete singletonInput;
-	delete singletonScreen;
-	delete singletonTime;
-	delete singletonWorld;
+	delete input;
+	delete screen;
+	delete time;
+	delete world;
 	delete currentCamera;
 	delete currentKeybinds;
 	delete tempMovementState;
@@ -166,10 +166,23 @@ void EntityAdmin::Cleanup() {
 }
 
 void EntityAdmin::Update() {
-	for(System* s : systems) {
-		steady_clock::time_point startTime = steady_clock::now(); //TODO(,delle) test that system durations work
-		s->Update();
-		s->time = duration_cast<duration<double>>(steady_clock::now() - startTime).count();
+	if (!paused) {
+		for (System* s : systems) {
+			steady_clock::time_point startTime = steady_clock::now(); //TODO(,delle) test that system durations work
+			s->Update();
+			s->time = duration_cast<duration<double>>(steady_clock::now() - startTime).count();
+		}
+	}
+	else {
+		for (System* s : systems) {
+			if      (ScreenSystem* a = dynamic_cast<ScreenSystem*>(s))             { a->Update(); }
+			else if (ConsoleSystem* b = dynamic_cast<ConsoleSystem*>(s))           { b->Update(); }
+			else if (CommandSystem* c = dynamic_cast<CommandSystem*>(s))           { c->Update(); }
+			else if (RenderSceneSystem* d = dynamic_cast<RenderSceneSystem*>(s))   { d->Update(); }
+			else if (RenderCanvasSystem* e = dynamic_cast<RenderCanvasSystem*>(s)) { e->Update(); }
+			else if (TimeSystem* f = dynamic_cast<TimeSystem*>(s))                 { f->Update(); }
+			
+		}
 	}
 }
 

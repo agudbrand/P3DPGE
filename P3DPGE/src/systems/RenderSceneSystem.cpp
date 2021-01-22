@@ -1,4 +1,5 @@
 #include "RenderSceneSystem.h"
+#include "ConsoleSystem.h"
 #include "../math/Math.h"
 
 #include "../components/Scene.h"
@@ -8,6 +9,7 @@
 #include "../components/Screen.h"
 #include "../components/Transform.h"
 #include "../components/Physics.h"
+#include "../components/Time.h"
 
 #include <thrust/host_vector.h>
 
@@ -750,9 +752,9 @@ void LightDepthTex(Light* li, Camera* c, Scene* s, Screen* sc) {
 void RenderSceneSystem::Update() {
 	Scene* scene = admin->currentScene;
 	Camera* camera = admin->currentCamera;
-	Input* input = admin->singletonInput;
+	Input* input = admin->input;
 	Keybinds* binds = admin->currentKeybinds;
-	Screen* screen = admin->singletonScreen;
+	Screen* screen = admin->screen;
 	olc::PixelGameEngine* p = admin->p;
 
 //// Scene Manangement ////
@@ -856,5 +858,15 @@ void RenderSceneSystem::Update() {
 
 	p->DrawCircle(Math::WorldToScreen2D(scene->lights[0]->position, camera->projectionMatrix, camera->viewMatrix, screen->dimensions), 10);
 	p->DrawStringDecal(olc::vf2d(screen->width-300, screen->height - 10), "Tri Total: " + std::to_string(totalTriCount) + "  Tri Drawn: " + std::to_string(drawnTriCount));
+
+	if (admin->paused) {
+		Vector2 tsize = p->GetTextSize("ENGINE PAUSED") * 5;
+		olc::Pixel col(30, 168, 150);
+		static float tstep = 1;
+		float modmod = cosf(4 * admin->time->totalTime);
+		float mod = (sinf((4 * admin->time->totalTime) + modmod) + 1) / 2; //nice looking flash effect
+		p->DrawStringDecal(Vector2(0, admin->screen->height - tsize.y), "ENGINE PAUSED", col * mod , Vector2(5, 5));
+	}
+
 
 } //Update

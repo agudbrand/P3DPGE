@@ -3,18 +3,18 @@
 
 struct Console : public Component {
 	char inputBuf[256];
-	std::vector<std::string> buffer;
+	std::vector<std::pair<std::string, olc::Pixel>> buffer; //text, color
 	std::vector<std::string> history;
-	int historyPos;
+	int historyPos = -1;
 
-	bool autoScroll;
-	bool scrollToBottom;
+	bool autoScroll = true;
+	bool scrollToBottom = false;
 
-	Console() {
-		memset(inputBuf, 0, sizeof(inputBuf));
-		historyPos = -1;
-		autoScroll = true;
-		scrollToBottom = false;
-	}
+	//Console() {
+	//	memset(inputBuf, 0, sizeof(inputBuf));
+	//	historyPos = -1;
+	//	autoScroll = true;
+	//	scrollToBottom = false;
+	//}
 
 };
