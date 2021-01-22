@@ -1,4 +1,4 @@
-TODO List successfully generated with 58 TODOs found.
+TODO List successfully generated with 56 TODOs found.
 
 ~~~~~~~ TODO 0 ~~~~~~~
 CameraSystem.cpp, Line: 56
@@ -64,7 +64,7 @@ Tags: physics
 ----------------------
 implement complex collider (collider list)
 ~~~~~~~ TODO 8 ~~~~~~~
-Command.h, Line: 60
+Command.h, Line: 57
 Creator: delle
 ----------------------
 Tags: input
@@ -80,7 +80,7 @@ Tags: optimization
 see if you can capture the variables when checking for a match
 
 ~~~~~~~ TODO 10 ~~~~~~~
-CommandSystem.cpp, Line: 240
+CommandSystem.cpp, Line: 252
 Creator not specified!
 ----------------------
 Tags: entity, entity
@@ -88,7 +88,7 @@ Tags: entity, entity
 re-add menu dragging
 
 ~~~~~~~ TODO 11 ~~~~~~~
-CommandSystem.cpp, Line: 247
+CommandSystem.cpp, Line: 259
 Creator: delle
 ----------------------
 Tags: input
@@ -96,7 +96,7 @@ Tags: input
 re-enable clicking entities
 
 ~~~~~~~ TODO 12 ~~~~~~~
-ConsoleSystem.cpp, Line: 14
+ConsoleSystem.cpp, Line: 24
 Creator:  sushi
 ----------------------
 Tags: No Tags
@@ -104,7 +104,7 @@ Tags: No Tags
 extend this map
 
 ~~~~~~~ TODO 13 ~~~~~~~
-ConsoleSystem.cpp, Line: 53
+ConsoleSystem.cpp, Line: 102
 Creator:  sushi
 ----------------------
 Tags: No Tags
@@ -112,38 +112,22 @@ Tags: No Tags
 implement showing a commands help if tab is pressed when the command is already typed
 
 ~~~~~~~ TODO 14 ~~~~~~~
-ConsoleSystem.cpp, Line: 151
-Creator:  sushi
-----------------------
-Tags: optimization
-----------------------
-store color information on the buffer
-
-~~~~~~~ TODO 15 ~~~~~~~
-ConsoleSystem.cpp, Line: 152
+ConsoleSystem.cpp, Line: 294
 Creator:  sushi
 ----------------------
 Tags: optimization
 ----------------------
 maybe optimize by only drawing what we know will be displayed on screen instead of parsing through all of it
 
-~~~~~~~ TODO 16 ~~~~~~~
-ConsoleSystem.cpp, Line: 161
-Creator:  sushi
-----------------------
-Tags: optimization
-----------------------
-figure out why this lags the engine when theres lots of text in the buffer
-
-~~~~~~~ TODO 17 ~~~~~~~
-Debug.h, Line: 48
+~~~~~~~ TODO 15 ~~~~~~~
+Debug.h, Line: 70
 Creator:  sushi
 ----------------------
 Tags: general
 ----------------------
 write a macro for running once in a loop
 
-~~~~~~~ TODO 18 ~~~~~~~
+~~~~~~~ TODO 16 ~~~~~~~
 Edge.h, Line: 23
 Creator:  sushi
 ----------------------
@@ -151,7 +135,7 @@ Tags: No Tags
 ----------------------
 find a good place to update edge, probably in Triangle?
 
-~~~~~~~ TODO 19 ~~~~~~~
+~~~~~~~ TODO 17 ~~~~~~~
 EntityAdmin.cpp, Line: 7
 Creator: delle
 ----------------------
@@ -159,22 +143,22 @@ Tags: physics
 ----------------------
 add physics based collision resolution for all entities
 
-~~~~~~~ TODO 20 ~~~~~~~
-EntityAdmin.cpp, Line: 169
+~~~~~~~ TODO 18 ~~~~~~~
+EntityAdmin.cpp, Line: 170
 Creator: delle
 ----------------------
 Tags: No Tags
 ----------------------
 test that system durations work
 
-~~~~~~~ TODO 21 ~~~~~~~
-EntityAdmin.h, Line: 81
+~~~~~~~ TODO 19 ~~~~~~~
+EntityAdmin.h, Line: 95
 Creator: delle
 ----------------------
 Tags: No Tags
 ----------------------
 move WorldSystem entity-component functions into Entity
-~~~~~~~ TODO 22 ~~~~~~~
+~~~~~~~ TODO 20 ~~~~~~~
 Geometry.h, Line: 17
 Creator: delle
 ----------------------
@@ -182,15 +166,7 @@ Tags: No Tags
 ----------------------
 test ClosestPointOnBox
 
-~~~~~~~ TODO 23 ~~~~~~~
-imgui_impl_pge.h, Line: 356
-Creator:  sushi
-----------------------
-Tags: input
-----------------------
-add the rest of the missing keys
-
-~~~~~~~ TODO 24 ~~~~~~~
+~~~~~~~ TODO 21 ~~~~~~~
 Keybinds.h, Line: 41
 Creator: delle
 ----------------------
@@ -198,7 +174,7 @@ Tags: input
 ----------------------
 look into saving/loading keybinds with a file
 
-~~~~~~~ TODO 25 ~~~~~~~
+~~~~~~~ TODO 22 ~~~~~~~
 Math.h, Line: 611
 Creator: sushi
 ----------------------
@@ -206,7 +182,7 @@ Tags: No Tags
 ----------------------
 implement this
 
-~~~~~~~ TODO 26 ~~~~~~~
+~~~~~~~ TODO 23 ~~~~~~~
 Matrix3.h, Line: 144
 Creator: delle
 ----------------------
@@ -214,7 +190,7 @@ Tags: optimization
 ----------------------
 look into optimizing this by transposing to remove a loop, see Unreal Matrix.h
 
-~~~~~~~ TODO 27 ~~~~~~~
+~~~~~~~ TODO 24 ~~~~~~~
 Matrix3.h, Line: 219
 Creator: delle
 ----------------------
@@ -222,7 +198,7 @@ Tags: clean up
 ----------------------
 clean up Matrix3.str() and Matrix3.str2F()
 
-~~~~~~~ TODO 28 ~~~~~~~
+~~~~~~~ TODO 25 ~~~~~~~
 Matrix4.h, Line: 147
 Creator: delle
 ----------------------
@@ -230,7 +206,7 @@ Tags: optimization
 ----------------------
 look into optimizing this by transposing to remove a loop, see Unreal Matrix.h
 
-~~~~~~~ TODO 29 ~~~~~~~
+~~~~~~~ TODO 26 ~~~~~~~
 Matrix4.h, Line: 223
 Creator: delle
 ----------------------
@@ -238,7 +214,7 @@ Tags: clean up
 ----------------------
 clean up Matrix4.str() and Matrix4.str2F()
 
-~~~~~~~ TODO 30 ~~~~~~~
+~~~~~~~ TODO 27 ~~~~~~~
 MatrixN.h, Line: 258
 Creator: delle
 ----------------------
@@ -246,7 +222,7 @@ Tags: optimization
 ----------------------
 look into optimizing this by transposing to remove a loop, see Unreal implementation
 
-~~~~~~~ TODO 31 ~~~~~~~
+~~~~~~~ TODO 28 ~~~~~~~
 MatrixN.h, Line: 343
 Creator: delle
 ----------------------
@@ -254,7 +230,7 @@ Tags: clean up
 ----------------------
 clean up MatrixN.str() and MatrixN.str2F()
 
-~~~~~~~ TODO 32 ~~~~~~~
+~~~~~~~ TODO 29 ~~~~~~~
 Mesh.h, Line: 30
 Creator:  sushi
 ----------------------
@@ -262,7 +238,7 @@ Tags: render
 ----------------------
 make it so you can do this with a custom texture
 
-~~~~~~~ TODO 33 ~~~~~~~
+~~~~~~~ TODO 30 ~~~~~~~
 MeshSystem.cpp, Line: 21
 Creator:  sushi
 ----------------------
@@ -270,7 +246,7 @@ Tags: input
 ----------------------
 fix selecting objects
 
-~~~~~~~ TODO 34 ~~~~~~~
+~~~~~~~ TODO 31 ~~~~~~~
 MeshSystem.cpp, Line: 52
 Creator: delle
 ----------------------
@@ -278,7 +254,7 @@ Tags: input
 ----------------------
 change this to take in an ID once we figure that out
 
-~~~~~~~ TODO 35 ~~~~~~~
+~~~~~~~ TODO 32 ~~~~~~~
 MeshSystem.cpp, Line: 111
 Creator: delle
 ----------------------
@@ -286,7 +262,7 @@ Tags: No Tags
 ----------------------
 test 3x3 scale matrices
 
-~~~~~~~ TODO 36 ~~~~~~~
+~~~~~~~ TODO 33 ~~~~~~~
 PhysicsSystem.cpp, Line: 15
 Creator: delle
 ----------------------
@@ -294,7 +270,7 @@ Tags: input, physics
 ----------------------
 update entity movement commands to be based on EntityID
 
-~~~~~~~ TODO 37 ~~~~~~~
+~~~~~~~ TODO 34 ~~~~~~~
 PhysicsSystem.cpp, Line: 239
 Creator:  sushi
 ----------------------
@@ -302,7 +278,7 @@ Tags: No Tags
 ----------------------
 implement ScreenToWorld for ortho projection
 
-~~~~~~~ TODO 38 ~~~~~~~
+~~~~~~~ TODO 35 ~~~~~~~
 PhysicsSystem.cpp, Line: 251
 Creator: delle
 ----------------------
@@ -310,7 +286,7 @@ Tags: physics, input
 ----------------------
 test that you can add force to a selected entity
 
-~~~~~~~ TODO 39 ~~~~~~~
+~~~~~~~ TODO 36 ~~~~~~~
 PhysicsSystem.cpp, Line: 291
 Creator: delle
 ----------------------
@@ -318,7 +294,7 @@ Tags: physics
 ----------------------
 look into bettering this physics tick
 
-~~~~~~~ TODO 40 ~~~~~~~
+~~~~~~~ TODO 37 ~~~~~~~
 PhysicsSystem.cpp, Line: 499
 Creator: delle
 ----------------------
@@ -326,7 +302,7 @@ Tags: physics
 ----------------------
 look into better rotational interpolation once we switch to quaternions
 
-~~~~~~~ TODO 41 ~~~~~~~
+~~~~~~~ TODO 38 ~~~~~~~
 PhysicsSystem.cpp, Line: 518
 Creator: delle
 ----------------------
@@ -335,7 +311,7 @@ Tags: unimportant, physics
 ----------------------
 change air friction to calculate for shape of object
 
-~~~~~~~ TODO 42 ~~~~~~~
+~~~~~~~ TODO 39 ~~~~~~~
 PhysicsSystem.cpp, Line: 522
 Creator: delle
 ----------------------
@@ -344,7 +320,7 @@ Tags: physics
 ----------------------
 implement sliding friction between two objects 
 
-~~~~~~~ TODO 43 ~~~~~~~
+~~~~~~~ TODO 40 ~~~~~~~
 PhysicsWorld.h, Line: 23
 Creator: delle
 ----------------------
@@ -352,7 +328,7 @@ Tags: physics
 ----------------------
 look into maybe having physics here instead
 
-~~~~~~~ TODO 44 ~~~~~~~
+~~~~~~~ TODO 41 ~~~~~~~
 PhysicsWorld.h, Line: 38
 Creator: delle
 ----------------------
@@ -360,7 +336,7 @@ Tags: physics
 ----------------------
 this should depend on object shape
 
-~~~~~~~ TODO 45 ~~~~~~~
+~~~~~~~ TODO 42 ~~~~~~~
 Quaternion.h, Line: 7
 Creator: delle
 ----------------------
@@ -368,7 +344,7 @@ Tags: No Tags
 ----------------------
 implement quaternions
 
-~~~~~~~ TODO 46 ~~~~~~~
+~~~~~~~ TODO 43 ~~~~~~~
 RenderCanvasSystem.cpp, Line: 118
 Creator not specified!
 ----------------------
@@ -376,31 +352,31 @@ Tags: entity, entity
 ----------------------
 implement components list on entities
 
-~~~~~~~ TODO 47 ~~~~~~~
-RenderCanvasSystem.cpp, Line: 191
+~~~~~~~ TODO 44 ~~~~~~~
+RenderCanvasSystem.cpp, Line: 194
 Creator:  sushi
 ----------------------
 Tags: input
 ----------------------
 add console boolean
 
-~~~~~~~ TODO 48 ~~~~~~~
-RenderSceneSystem.cpp, Line: 238
+~~~~~~~ TODO 45 ~~~~~~~
+RenderSceneSystem.cpp, Line: 240
 Creator:  sushi
 ----------------------
 Tags: No Tags
 ----------------------
 figure out why this is leaking
 
-~~~~~~~ TODO 49 ~~~~~~~
-RenderSceneSystem.cpp, Line: 317
+~~~~~~~ TODO 46 ~~~~~~~
+RenderSceneSystem.cpp, Line: 319
 Creator: delle
 ----------------------
 Tags: optimization, render
 ----------------------
 see if zClipIndex can remove the .midpoint()
 
-~~~~~~~ TODO 50 ~~~~~~~
+~~~~~~~ TODO 47 ~~~~~~~
 Scene.h, Line: 18
 Creator: delle
 ----------------------
@@ -408,7 +384,7 @@ Tags: render
 ----------------------
 implement global axis like in blender
 
-~~~~~~~ TODO 51 ~~~~~~~
+~~~~~~~ TODO 48 ~~~~~~~
 Scene.h, Line: 23
 Creator: delle
 ----------------------
@@ -416,7 +392,15 @@ Tags: render
 ----------------------
 upgrade grid to follow camera in smart way
 
-~~~~~~~ TODO 52 ~~~~~~~
+~~~~~~~ TODO 49 ~~~~~~~
+TimeSystem.cpp, Line: 12
+Creator:  sushi
+----------------------
+Tags: No Tags
+----------------------
+format these
+
+~~~~~~~ TODO 50 ~~~~~~~
 UI.h, Line: 12
 Creator not specified!
 ----------------------
@@ -424,7 +408,7 @@ Tags: entity, entity
 ----------------------
 convert drawing to decals? (string and rect)
 
-~~~~~~~ TODO 53 ~~~~~~~
+~~~~~~~ TODO 51 ~~~~~~~
 UI.h, Line: 53
 Creator:  delle
 ----------------------
@@ -432,7 +416,7 @@ Tags: No Tags
 ----------------------
 implement hover text
 
-~~~~~~~ TODO 54 ~~~~~~~
+~~~~~~~ TODO 52 ~~~~~~~
 UI.h, Line: 72
 Creator:  delle
 ----------------------
@@ -440,7 +424,7 @@ Tags: No Tags
 ----------------------
 implement TextField and TextBox
 
-~~~~~~~ TODO 55 ~~~~~~~
+~~~~~~~ TODO 53 ~~~~~~~
 UI.h, Line: 140
 Creator:  delle
 ----------------------
@@ -448,7 +432,7 @@ Tags: No Tags
 ----------------------
 merge this into Clicked
 
-~~~~~~~ TODO 56 ~~~~~~~
+~~~~~~~ TODO 54 ~~~~~~~
 UsefulDefines.h, Line: 47
 Creator: delle
 ----------------------
@@ -456,7 +440,7 @@ Tags: input
 ----------------------
 add alternate keyboard formats
 
-~~~~~~~ TODO 57 ~~~~~~~
+~~~~~~~ TODO 55 ~~~~~~~
 WorldSystem.cpp, Line: 30
 Creator: delle
 ----------------------
