@@ -80,7 +80,7 @@ void MakeGeneralHeader(EntityAdmin* admin) {
 			Text("Address: %#08x", camera); SameLine(); if(ImGui::Button("Copy")) { ImGui::LogToClipboard(); ImGui::LogText("%#08x", camera); ImGui::LogFinish(); }
 			Text("Position"); SameLine(); InputVector3("##camPos", &camera->position);
 			Text("Rotation"); SameLine(); InputVector3("##camRot", &camera->rotation);
-			if(BeginTable("split", 3)) {
+			if(BeginTable("CameraTable", 3)) {
 				TableNextColumn(); Text("FOV"); SameLine(); InputFloat("##camFOV", &camera->fieldOfView, 0, 0, "%.2f", ImGuiInputTextFlags_EnterReturnsTrue);
 				TableNextColumn(); Text("NearZ"); SameLine(); InputFloat("##camNearZ", &camera->nearZ, 0, 0, "%.2f", ImGuiInputTextFlags_EnterReturnsTrue);
 				TableNextColumn(); Text("FarZ"); SameLine(); InputFloat("##camFarZ", &camera->farZ, 0, 0, "%.2f", ImGuiInputTextFlags_EnterReturnsTrue);
@@ -100,7 +100,7 @@ void MakeEntitiesHeader(EntityAdmin* admin) {
 			Text("Selected Entity: None");
 		}
 
-		if(BeginTable("split", 2, ImGuiTableFlags_BordersOuter | ImGuiTableFlags_Resizable)){
+		if(BeginTable("EntitiesHeader", 2, ImGuiTableFlags_BordersOuter | ImGuiTableFlags_Resizable)){
 			TableSetupColumn("ID", ImGuiTableColumnFlags_WidthFixed);
 			TableSetupColumn("Components");
 			TableHeadersRow();
@@ -130,7 +130,7 @@ void MakeRenderHeader(EntityAdmin* admin) {
 	using namespace ImGui;
 	Scene* scene = admin->currentScene;
 	if (CollapsingHeader("Render options")){
-		if (BeginTable("split", 3)) {
+		if (BeginTable("RenderTable", 3)) {
 			TableNextColumn(); Checkbox("wireframe", &scene->RENDER_WIREFRAME);
 			TableNextColumn(); Checkbox("textures", &scene->RENDER_TEXTURES);
 			TableNextColumn(); Checkbox("edge numbers", &scene->RENDER_EDGE_NUMBERS);
