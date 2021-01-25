@@ -738,6 +738,9 @@ namespace olc
 		virtual olc::rcode CreateGraphics(bool bFullScreen, bool bEnableVSYNC, const olc::vi2d& vViewPos, const olc::vi2d& vViewSize) = 0;
 		virtual olc::rcode CreateWindowPane(const olc::vi2d& vWindowPos, olc::vi2d& vWindowSize, bool bFullScreen) = 0;
 		virtual olc::rcode SetWindowTitle(const std::string& s) = 0;
+		virtual olc::rcode SetCursorVisibility(bool bShowCursor) = 0;
+		virtual olc::rcode SetCursorPosition(const olc::vi2d& vCursorPos) = 0;
+		virtual olc::rcode SetCursorPositionLocal(const olc::vi2d& vCursorPos) = 0;
 		virtual olc::rcode StartSystemEventLoop() = 0;
 		virtual olc::rcode HandleSystemEvent() = 0;
 		static olc::PixelGameEngine* ptrPGE;
@@ -787,6 +790,14 @@ namespace olc
 		const olc::vi2d& GetWindowMouse() const;
 		// Gets the mouse as a vector to keep Tarriest happy
 		const olc::vi2d& GetMousePos() const;
+		// Gets the mouse cursor's visibility
+		bool GetMouseVisibility() const;
+		// Sets the mouse cursor's visibility
+		void SetMouseVisibility(bool bShowCursor);
+		// Sets the mouse cursor's position in "screen" space
+		void SetMousePosition(const olc::vi2d& vCursorPos);
+		// Sets the mouse cursor's position in "client" space
+		void SetMousePositionLocal(const olc::vi2d& vCursorPos);
 
 	public: // Utility
 		// Returns the width of the screen in "pixels"
@@ -1000,6 +1011,7 @@ namespace olc
 	public: //P3DPGE Changes
 		HWButton	pKeyboardState[256] = { 0 };
 		HWButton	pMouseState[nMouseButtons] = { 0 };
+		bool		bMouseVisible = true;
 
 		friend class PGEX;
 	};
@@ -1755,6 +1767,18 @@ namespace olc
 
 	const olc::vi2d& PixelGameEngine::GetMousePos() const
 	{ return vMousePos; }
+
+	bool PixelGameEngine::GetMouseVisibility() const
+	{ return bMouseVisible; }
+
+	void PixelGameEngine::SetMouseVisibility(bool bShowCursor)
+	{ bMouseVisible = bShowCursor; }
+
+	void PixelGameEngine::SetMousePosition(const olc::vi2d& vCursorPos) 
+	{ platform->SetCursorPosition(vCursorPos); }
+
+	void PixelGameEngine::SetMousePositionLocal(const olc::vi2d& vCursorPos) 
+	{ platform->SetCursorPositionLocal(vCursorPos); }
 
 	int32_t PixelGameEngine::GetMouseWheel() const
 	{ return nMouseWheelDelta; }
@@ -3624,6 +3648,7 @@ namespace olc
 // O------------------------------------------------------------------------------O
 
 
+//mouse updating grabbed from https://github.com/OneLoneCoder/olcPixelGameEngine/pull/142
 // O------------------------------------------------------------------------------O
 // | START PLATFORM: MICROSOFT WINDOWS XP, VISTA, 7, 8, 10                        |
 // O------------------------------------------------------------------------------O
@@ -3634,6 +3659,9 @@ namespace olc
 	#pragma comment(lib, "gdi32.lib")		// For other Windows Compilers please add
 	#pragma comment(lib, "opengl32.lib")	// these libs to your linker input
 #endif
+
+HCURSOR olc_ArrowCursor;
+HCURSOR olc_InvisibleCursor;
 
 namespace olc
 {
@@ -3666,7 +3694,8 @@ namespace olc
 
 		virtual olc::rcode ThreadCleanUp() override
 		{
-			renderer->DestroyDevice();			
+			renderer->DestroyDevice();
+			DestroyCursor(olc_InvisibleCursor);
 			PostMessage(olc_hWnd, WM_DESTROY, 0, 0);
 			return olc::OK;
 		}
@@ -3686,7 +3715,7 @@ namespace olc
 		{
 			WNDCLASS wc;
 			wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-			wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+			wc.hCursor = NULL;
 			wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 			wc.hInstance = GetModuleHandle(nullptr);
 			wc.lpfnWndProc = olc_WindowEvent;
@@ -3768,6 +3797,20 @@ namespace olc
 			mapKeys[VK_OEM_MINUS] = Key::MINUS;		// the minus key on any keyboard
 			mapKeys[VK_OEM_PERIOD] = Key::PERIOD;	// the period key on any keyboard
 			mapKeys[VK_CAPITAL] = Key::CAPS_LOCK;
+
+			BYTE cursorAndMask[128];
+			BYTE cursorXorMask[128];
+			for(int i = 0; i < 128; i++){
+				cursorAndMask[i] = 0xff;
+				cursorXorMask[i] = 0x00;
+			}
+
+			// create Arrow Mouse Cursor
+			olc_ArrowCursor = LoadCursor(NULL, IDC_ARROW);
+
+			// create Invisible Mouse Cursor
+			olc_InvisibleCursor = CreateCursor(wc.hInstance, 0 /* hotspot x */, 0 /* hostpot y */, 32 /* width */, 32 /* height */, cursorAndMask, cursorXorMask);
+
 			return olc::OK;
 		}
 
@@ -3778,6 +3821,34 @@ namespace olc
 #else
 			SetWindowText(olc_hWnd, s.c_str());
 #endif
+			return olc::OK;
+		}
+
+		virtual olc::rcode SetCursorVisibility(bool bShowCursor) override
+		{
+			std::cout << "windows set cursor" << std::endl;
+			//int test = ShowCursor(bShowCursor);
+			//std::cout << std::to_string(test) << std::endl;
+			if(bShowCursor) {
+				SetCursor(olc_ArrowCursor);
+			} else {
+				SetCursor(olc_InvisibleCursor);
+			}
+			return olc::OK;
+		}
+
+		virtual olc::rcode SetCursorPosition(const olc::vi2d& vCursorPos) override 
+		{
+			SetCursorPos(vCursorPos.x, vCursorPos.y);
+			return olc::OK;
+		}
+
+		virtual olc::rcode SetCursorPositionLocal(const olc::vi2d& vCursorPos) override 
+		{
+			tagPOINT local;
+			local.x = vCursorPos.x; local.y = vCursorPos.y;
+			ClientToScreen(olc_hWnd, &local);
+			SetCursorPos(local.x, local.y);
 			return olc::OK;
 		}
 
@@ -3807,6 +3878,7 @@ namespace olc
 				ptrPGE->olc_UpdateMouse(ix, iy);
 				return 0;
 			}
+			case WM_SETCURSOR:	SetCursor((ptrPGE->bMouseVisible) ? olc_ArrowCursor : olc_InvisibleCursor); return 0;
 			case WM_SIZE:       ptrPGE->olc_UpdateWindowSize(lParam & 0xFFFF, (lParam >> 16) & 0xFFFF);	return 0;
 			case WM_MOUSEWHEEL:	ptrPGE->olc_UpdateMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));           return 0;
 			case WM_MOUSELEAVE: ptrPGE->olc_UpdateMouseFocus(false);                                    return 0;
@@ -3854,12 +3926,25 @@ namespace olc
 		X11::Colormap                olc_ColourMap;
 		X11::XSetWindowAttributes    olc_SetWindowAttribs;
 
+		X11::Cursor					 olc_ArrowCursor;
+		X11::Cursor					 olc_InvisibleCursor;
+		X11::Pixmap					 olc_BitmapNoData;
+		X11::XColor					 olc_BlackColor;
+
 	public:
 		virtual olc::rcode ApplicationStartUp() override
 		{ return olc::rcode::OK; }
 
 		virtual olc::rcode ApplicationCleanUp() override
-		{ return olc::rcode::OK; }
+		{ 
+			X11::XFreeCursor(olc_Display, olc_ArrowCursor);
+			X11::XFreeCursor(olc_Display, olc_InvisibleCursor);
+			X11::XFreePixmap(olc_Display, olc_BitmapNoData);
+
+			X11::XDestroyWindow(olc_Display, olc_Window);
+			X11::XCloseDisplay(olc_Display);			
+			return olc::rcode::OK;
+		}
 
 		virtual olc::rcode ThreadStartUp() override
 		{ return olc::rcode::OK; }
@@ -3911,6 +3996,20 @@ namespace olc
 
 			XMapWindow(olc_Display, olc_Window);
 			XStoreName(olc_Display, olc_Window, "OneLoneCoder.com - Pixel Game Engine");
+
+			// create mouse cursors
+			char noData[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+			olc_BlackColor.red = 0;
+			olc_BlackColor.green = 0;
+			olc_BlackColor.blue = 0;
+
+			olc_BitmapNoData = X11::XCreateBitmapFromData(olc_Display, olc_Window,
+				noData, 8, 8);
+
+			olc_ArrowCursor = X11::XCreateFontCursor(olc_Display, XC_left_ptr);
+			olc_InvisibleCursor = X11::XCreatePixmapCursor(olc_Display, olc_BitmapNoData,
+			olc_BitmapNoData, &olc_BlackColor, &olc_BlackColor, 0, 0);
 
 			if (bFullScreen) // Thanks DragonEye, again :D
 			{
@@ -4002,6 +4101,12 @@ namespace olc
 			XEvent xev;
 			while (XPending(olc_Display))
 			{
+				if(ptrPGE->bMouseVisible) {
+					XDefineCursor(olc_Display, olc_Window, olc_ArrowCursor);
+				} else {
+					XDefineCursor(olc_Display, olc_Window, olc_InvisibleCursor);
+				}
+
 				XNextEvent(olc_Display, &xev);
 				if (xev.type == Expose)
 				{

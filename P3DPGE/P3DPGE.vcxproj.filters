@@ -37,6 +37,9 @@
     <Filter Include="src\internal\imgui">
       <UniqueIdentifier>{fb1917cc-529e-4a2d-954d-03b3a5f1a16c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="_">
+      <UniqueIdentifier>{6ddc0275-2360-4a7c-91db-70517fd1e907}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\math\Math.h">
@@ -313,5 +316,15 @@
     <CudaCompile Include="src\systems\RenderCUDAInterface.cu">
       <Filter>src\systems\cpp</Filter>
     </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\.gitignore">
+      <Filter>_</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\TODOs.txt">
+      <Filter>_</Filter>
+    </Text>
   </ItemGroup>
 </Project>

@@ -274,6 +274,16 @@ inline void HandleMouseInputs(EntityAdmin* admin, Input* input) {
 		//reset click pos to null
 		input->mouseClickPos = Vector2(admin->p->ScreenWidth(), admin->p->ScreenHeight());
 	}
+
+	if(input->MousePressed(INPUT_MOUSE_RIGHT)) {
+		admin->p->SetMouseVisibility(false);
+	} else if(input->MouseReleased(INPUT_MOUSE_RIGHT)) {
+		admin->p->SetMouseVisibility(true);
+	}
+
+	if(input->KeyPressed(olc::MINUS)) {
+		admin->p->SetMousePositionLocal(admin->p->GetWindowSize() / 2);
+	}
 }
 
 inline void HandleSelectedEntityInputs(EntityAdmin* admin, Input* input) {
