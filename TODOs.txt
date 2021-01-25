@@ -1,4 +1,4 @@
-TODO List successfully generated with 56 TODOs found.
+TODO List successfully generated with 57 TODOs found.
 
 ~~~~~~~ TODO 0 ~~~~~~~
 CameraSystem.cpp, Line: 56
@@ -80,7 +80,7 @@ Tags: optimization
 see if you can capture the variables when checking for a match
 
 ~~~~~~~ TODO 10 ~~~~~~~
-CommandSystem.cpp, Line: 252
+CommandSystem.cpp, Line: 275
 Creator not specified!
 ----------------------
 Tags: entity, entity
@@ -88,7 +88,7 @@ Tags: entity, entity
 re-add menu dragging
 
 ~~~~~~~ TODO 11 ~~~~~~~
-CommandSystem.cpp, Line: 259
+CommandSystem.cpp, Line: 282
 Creator: delle
 ----------------------
 Tags: input
@@ -175,7 +175,7 @@ Tags: input
 look into saving/loading keybinds with a file
 
 ~~~~~~~ TODO 22 ~~~~~~~
-Math.h, Line: 611
+Math.h, Line: 623
 Creator: sushi
 ----------------------
 Tags: No Tags
@@ -231,7 +231,7 @@ Tags: clean up
 clean up MatrixN.str() and MatrixN.str2F()
 
 ~~~~~~~ TODO 29 ~~~~~~~
-Mesh.h, Line: 30
+Mesh.h, Line: 31
 Creator:  sushi
 ----------------------
 Tags: render
@@ -345,7 +345,7 @@ Tags: No Tags
 implement quaternions
 
 ~~~~~~~ TODO 43 ~~~~~~~
-RenderCanvasSystem.cpp, Line: 118
+RenderCanvasSystem.cpp, Line: 119
 Creator not specified!
 ----------------------
 Tags: entity, entity
@@ -353,14 +353,22 @@ Tags: entity, entity
 implement components list on entities
 
 ~~~~~~~ TODO 44 ~~~~~~~
-RenderCanvasSystem.cpp, Line: 195
+RenderCanvasSystem.cpp, Line: 176
+Creator:  sushi
+----------------------
+Tags: render
+----------------------
+implement styling and more options
+
+~~~~~~~ TODO 45 ~~~~~~~
+RenderCanvasSystem.cpp, Line: 250
 Creator:  sushi
 ----------------------
 Tags: input
 ----------------------
 add console boolean
 
-~~~~~~~ TODO 45 ~~~~~~~
+~~~~~~~ TODO 46 ~~~~~~~
 RenderSceneSystem.cpp, Line: 240
 Creator:  sushi
 ----------------------
@@ -368,7 +376,7 @@ Tags: No Tags
 ----------------------
 figure out why this is leaking
 
-~~~~~~~ TODO 46 ~~~~~~~
+~~~~~~~ TODO 47 ~~~~~~~
 RenderSceneSystem.cpp, Line: 319
 Creator: delle
 ----------------------
@@ -376,7 +384,7 @@ Tags: optimization, render
 ----------------------
 see if zClipIndex can remove the .midpoint()
 
-~~~~~~~ TODO 47 ~~~~~~~
+~~~~~~~ TODO 48 ~~~~~~~
 Scene.h, Line: 18
 Creator: delle
 ----------------------
@@ -384,7 +392,7 @@ Tags: render
 ----------------------
 implement global axis like in blender
 
-~~~~~~~ TODO 48 ~~~~~~~
+~~~~~~~ TODO 49 ~~~~~~~
 Scene.h, Line: 23
 Creator: delle
 ----------------------
@@ -392,7 +400,7 @@ Tags: render
 ----------------------
 upgrade grid to follow camera in smart way
 
-~~~~~~~ TODO 49 ~~~~~~~
+~~~~~~~ TODO 50 ~~~~~~~
 TimeSystem.cpp, Line: 12
 Creator:  sushi
 ----------------------
@@ -400,7 +408,7 @@ Tags: No Tags
 ----------------------
 format these
 
-~~~~~~~ TODO 50 ~~~~~~~
+~~~~~~~ TODO 51 ~~~~~~~
 UI.h, Line: 12
 Creator not specified!
 ----------------------
@@ -408,7 +416,7 @@ Tags: entity, entity
 ----------------------
 convert drawing to decals? (string and rect)
 
-~~~~~~~ TODO 51 ~~~~~~~
+~~~~~~~ TODO 52 ~~~~~~~
 UI.h, Line: 53
 Creator:  delle
 ----------------------
@@ -416,7 +424,7 @@ Tags: No Tags
 ----------------------
 implement hover text
 
-~~~~~~~ TODO 52 ~~~~~~~
+~~~~~~~ TODO 53 ~~~~~~~
 UI.h, Line: 72
 Creator:  delle
 ----------------------
@@ -424,7 +432,7 @@ Tags: No Tags
 ----------------------
 implement TextField and TextBox
 
-~~~~~~~ TODO 53 ~~~~~~~
+~~~~~~~ TODO 54 ~~~~~~~
 UI.h, Line: 140
 Creator:  delle
 ----------------------
@@ -432,7 +440,7 @@ Tags: No Tags
 ----------------------
 merge this into Clicked
 
-~~~~~~~ TODO 54 ~~~~~~~
+~~~~~~~ TODO 55 ~~~~~~~
 UsefulDefines.h, Line: 47
 Creator: delle
 ----------------------
@@ -440,7 +448,7 @@ Tags: input
 ----------------------
 add alternate keyboard formats
 
-~~~~~~~ TODO 55 ~~~~~~~
+~~~~~~~ TODO 56 ~~~~~~~
 WorldSystem.cpp, Line: 30
 Creator: delle
 ----------------------
