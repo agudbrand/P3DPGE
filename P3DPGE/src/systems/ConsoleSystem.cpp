@@ -285,7 +285,7 @@ void ConsoleSystem::DrawConsole() {
 	PushStyleColor(ImGuiCol_ChildBg, olcPixToVec4(olc::Pixel(4, 17, 21, 255)));
 	BeginChild("ScrollingRegion", ImVec2(0, -footer_height_to_reserve), false, ImGuiWindowFlags_HorizontalScrollbar);
 	if (BeginPopupContextWindow()){
-		if (ImGui::Selectable("Clear")); //ClearLog();
+		if (ImGui::Selectable("hehe")) AddLog("hoho", c);
 		EndPopup();
 	}
 	
@@ -325,13 +325,14 @@ void ConsoleSystem::DrawConsole() {
 	
 
 	PushStyleColor(ImGuiCol_FrameBg, olcPixToVec4(olc::VERY_DARK_CYAN));
-	SetNextItemWidth(ImGui::GetWindowWidth() - 50);
-	if (InputText("/\\", c->inputBuf, sizeof(c->inputBuf), input_text_flags, &TextEditCallbackStub, (void*)this)) { 
+	SetNextItemWidth(ImGui::GetWindowWidth() - 15);
+	ImGui::SetItemDefaultFocus();
+	if (InputText("", c->inputBuf, sizeof(c->inputBuf), input_text_flags, &TextEditCallbackStub, (void*)this)) { 
 
 		std::string s = c->inputBuf;
 		reclaim_focus = true;
 
-		c->history.push_back(s);
+		if(s.size() != 0) c->history.push_back(s);
 
 		AddLog(TOSTRING("[c:cyan]/[c][c:dcyan]\\[c] ", s), c); //print command typed
 
@@ -354,8 +355,9 @@ void ConsoleSystem::DrawConsole() {
 		c->scrollToBottom = true; //scroll to bottom when we press enter
 	}
 
+	ImGui::SetItemDefaultFocus();
 	if (reclaim_focus)
-		ImGui::SetKeyboardFocusHere(-1); //for some reason this only works when there is no if statement
+		ImGui::SetKeyboardFocusHere(-1);
 
 	reclaim_focus = false;
 

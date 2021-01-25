@@ -164,7 +164,7 @@ inline void AddRenderCommands(EntityAdmin* admin) {
 
 	admin->commands["r_global_axis"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_GLOBAL_AXIS = !admin->currentScene->RENDER_GLOBAL_AXIS;
-		if (admin->currentScene->RENDER_TEXTURES) return "render_global_axis = true";
+		if (admin->currentScene->RENDER_GLOBAL_AXIS) return "render_global_axis = true";
 		else return "render_global_axis = false";
 		}, "r_global_axis", "toggles rendering the global axis relatie to camera orientation in the top right of the screen");
 
@@ -296,12 +296,6 @@ inline void HandleMouseInputs(EntityAdmin* admin, Input* input) {
 
 		//reset click pos to null
 		input->mouseClickPos = Vector2(admin->p->ScreenWidth(), admin->p->ScreenHeight());
-	}
-
-	if(input->MousePressed(INPUT_MOUSE_RIGHT)) {
-		admin->p->SetMouseVisibility(false);
-	} else if(input->MouseReleased(INPUT_MOUSE_RIGHT)) {
-		admin->p->SetMouseVisibility(true);
 	}
 
 	if(input->KeyPressed(olc::MINUS)) {

@@ -8,101 +8,55 @@
 #include "../components/Camera.h"
 #include "../components/MovementState.h"
 #include "../components/Time.h"
+#include "../components/Screen.h"
 #include "../internal/imgui/imgui.h"
 
 #include "../math/Math.h"
 
 EntityAdmin* ladmin; //im not rewriting every function to take admin
+//turns out there wasnt that many functions 
 
 void CameraMovement(float deltaTime, Camera* camera, Input* input, Keybinds* binds, uint32 moveState) {
 	if (!ladmin->IMGUI_KEY_CAPTURE) {
+
+		Vector3 inputs;
+
 		if (moveState & MOVEMENT_FLYING) {
 			//translate up
-			if (input->KeyDown(binds->movementFlyingUp)) {
-				if (input->KeyHeld(olc::SHIFT)) {
-					camera->position.y += 16 * deltaTime;
-				}
-				else if (input->KeyHeld(olc::CTRL)) {
-					camera->position.y += 4 * deltaTime;
-				}
-				else {
-					camera->position.y += 8 * deltaTime;
-				}
-			}
+			if (input->KeyDown(binds->movementFlyingUp)) {  inputs.y += 1;  }
 
 			//translate down
-			if (input->KeyDown(binds->movementFlyingDown)) {
-				if (input->KeyHeld(olc::SHIFT)) {
-					camera->position.y -= 16 * deltaTime;
-				}
-				else if (input->KeyHeld(olc::CTRL)) {
-					camera->position.y -= 4 * deltaTime;
-				}
-				else {
-					camera->position.y -= 8 * deltaTime;
-				}
-			}
+			if (input->KeyDown(binds->movementFlyingDown)) {  inputs.y -= 1; }
 		}
 
 		//translate forward
-		if (input->KeyDown(binds->movementFlyingForward)) {
-			if (input->KeyHeld(olc::SHIFT)) {
-				camera->position += camera->lookDir.yInvert() * 16 * deltaTime;
-			}
-			else if (input->KeyHeld(olc::CTRL)) {
-				camera->position += camera->lookDir.yInvert() * 4 * deltaTime;
-			}
-			else {
-				camera->position += camera->lookDir.yInvert() * 8 * deltaTime;
-			}
-		}
+		if (input->KeyDown(binds->movementFlyingForward)) {  inputs += camera->lookDir.yInvert().normalized(); }
 
 		//translate back
-		if (input->KeyDown(binds->movementFlyingBack)) {
-			if (input->KeyHeld(olc::SHIFT)) {
-				camera->position -= camera->lookDir.yInvert() * 16 * deltaTime;
-			}
-			else if (input->KeyHeld(olc::CTRL)) {
-				camera->position -= camera->lookDir.yInvert() * 4 * deltaTime;
-			}
-			else {
-				camera->position -= camera->lookDir.yInvert() * 8 * deltaTime;
-			}
-		}
+		if (input->KeyDown(binds->movementFlyingBack)) {  inputs -= camera->lookDir.yInvert().normalized(); }
 
 		//translate right
-		if (input->KeyDown(binds->movementFlyingRight)) {
-			if (input->KeyHeld(olc::SHIFT)) {
-				camera->position -= camera->lookDir.cross(Vector3::UP) * 16 * deltaTime;
-			}
-			else if (input->KeyHeld(olc::CTRL)) {
-				camera->position -= camera->lookDir.cross(Vector3::UP) * 4 * deltaTime;
-			}
-			else {
-				camera->position -= camera->lookDir.cross(Vector3::UP) * 8 * deltaTime;
-			}
-		}
+		if (input->KeyDown(binds->movementFlyingRight)) {  inputs -= camera->lookDir.cross(Vector3::UP).normalized(); }
 
 		//translate left
-		if (input->KeyDown(binds->movementFlyingLeft)) {
-			if (input->KeyHeld(olc::SHIFT)) {
-				camera->position += camera->lookDir.cross(Vector3::UP) * 16 * deltaTime;
-			}
-			else if (input->KeyHeld(olc::CTRL)) {
-				camera->position += camera->lookDir.cross(Vector3::UP) * 4 * deltaTime;
-			}
-			else {
-				camera->position += camera->lookDir.cross(Vector3::UP) * 8 * deltaTime;
-			}
-		}
+		if (input->KeyDown(binds->movementFlyingLeft)) { inputs += camera->lookDir.cross(Vector3::UP).normalized(); }
+
+
+		if (input->KeyHeld(olc::SHIFT))		{ camera->position += inputs.normalized() * 16 * deltaTime; }
+		else if (input->KeyHeld(olc::CTRL)) { camera->position += inputs.normalized() * 4 * deltaTime; }
+		else								{ camera->position += inputs.normalized() * 8 * deltaTime; }
 	}
+
 
 	
 }
 
 void CameraRotation(float deltaTime, Camera* camera, Input* input, Keybinds* binds) {
 
-	if (input->KeyPressed(olc::M)) { ladmin->currentCamera->MOUSE_LOOK = !ladmin->currentCamera->MOUSE_LOOK; }
+	if (input->KeyPressed(olc::N)) { 
+		ladmin->currentCamera->MOUSE_LOOK = !ladmin->currentCamera->MOUSE_LOOK; 
+		ladmin->p->bMouseVisible = !ladmin->p->bMouseVisible;
+	}
 	if (!ladmin->IMGUI_KEY_CAPTURE) {
 		if (!ladmin->currentCamera->MOUSE_LOOK) {
 			//camera rotation up
@@ -134,8 +88,19 @@ void CameraRotation(float deltaTime, Camera* camera, Input* input, Keybinds* bin
 			}
 		}
 		else {
+			ladmin->p->bMouseVisible = false; // i have to do this explicitly so the mouse is visible when ImGUI opens the console
+
+			float x = (ladmin->input->mousePos.x * 2) - ladmin->screen->width;
+			float y = (ladmin->input->mousePos.y * 2) - ladmin->screen->height;
+
+			camera->target.z = Math::clamp(camera->target.z - 0.09 * y, 1, 179);
+			camera->target.y = camera->target.y - 0.09 * x;
 			
+			ladmin->p->SetMousePositionLocal(ladmin->screen->dimensions / 2);
 		}
+	}
+	else if(ladmin->currentCamera->MOUSE_LOOK) {
+		ladmin->p->bMouseVisible = true;
 	}
 }
 

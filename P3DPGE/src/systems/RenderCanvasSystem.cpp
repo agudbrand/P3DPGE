@@ -238,16 +238,11 @@ void RenderCanvasSystem::DrawUI(void) {
 	//demo window for reference
 	//ImGui::ShowDemoWindow();
 
-	
-
-	if (admin->currentCamera->MOUSE_LOOK) {
-		ImGui::SetCursorScreenPos(ImVec2(300, 300));
-	}
 	////////////////////////////////////////////
 
 	ImGuiIO& io = ImGui::GetIO();
-	static bool showDebugTools = true;
-	static bool showConsole = true;
+	static bool showDebugTools = false;
+	static bool showConsole = false;
 
 	if(ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Backspace)) && io.KeyCtrl && io.KeyShift) { showDebugTools = !showDebugTools; }
 	if (admin->input->KeyPressed(olc::OEM_3)) { showConsole = !showConsole; }
