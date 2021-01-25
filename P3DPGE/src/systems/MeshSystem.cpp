@@ -70,12 +70,9 @@ void MeshSystem::Update() {
 			}
 		}
 		if(m && t) {
-			if(t->position != t->prevPosition) {
-				TranslateMesh(m, t->position - t->prevPosition);
-			}
-			if(t->rotation != t->prevRotation) {
-				RotateMesh(m, Matrix4::RotationMatrixAroundPoint(t->position, t->rotation - t->prevRotation));
-			}
+			RotateMesh(m, Matrix4::RotationMatrix(t->rotation));
+			TranslateMesh(m, t->position);
+			
 		}
 	}
 }
@@ -89,17 +86,20 @@ bool MeshSystem::LineIntersect(Mesh* mesh, Edge3D* line) {
 
 void MeshSystem::TranslateMesh(Mesh* mesh, Vector3 translation) {
 	for(auto& t : mesh->triangles) {
-		for(auto& p : t.points) {
-			p += translation;
+		for (int i = 0; i < 3; i++) {
+			t.points[i] += translation;
 		}
 	}
 }
 
 void MeshSystem::RotateMesh(Mesh* mesh, Matrix4 rotation) {
 	for (auto& t : mesh->triangles) {
-		for (auto& p : t.points) {
-			p *= rotation;
+		BUFFERLOG(0, t);
+		for (int i = 0; i < 3; i++) {
+			
+			t.points[i] = t.poffsets[i] * rotation;
 		}
+		BUFFERLOG(0, t);
 	}
 }
 

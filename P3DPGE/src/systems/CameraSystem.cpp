@@ -21,9 +21,9 @@ void CameraSystem::Init() {
 
 Matrix4 MakeViewMatrix(Camera* camera) {
 	//camera->lookDir = Vector3::FORWARD * Matrix3::RotationMatrixY(camera->rotation.y);
-	camera->lookDir = Vector3::FORWARD * Matrix4::RotationMatrix(camera->rotation);
-	BUFFERLOG(1, camera->lookDir);
-	return Math::LookAtMatrix(camera->position, camera->position + camera->lookDir).Inverse();
+	
+	camera->lookDir = Math::SphericalToRectangularCoords(camera->target);
+	return Math::LookAtMatrix(camera->position, camera->lookDir + camera->position).Inverse();
 }
 
 Matrix4 MakeProjectionMatrix(Camera* camera, Screen* screen) {
@@ -79,5 +79,5 @@ void CameraSystem::Update() {
 	else		   camera->projectionMatrix = MakeProjectionMatrix(camera, screen);
 
 	admin->p->DrawStringDecal(olc::vf2d(screen->width-300, screen->height - 30), "Camera Pos: " + camera->position.str2f());
-	admin->p->DrawStringDecal(olc::vf2d(screen->width-300, screen->height - 40), "Camera Rot: " + camera->rotation.str2f());
+	admin->p->DrawStringDecal(olc::vf2d(screen->width-300, screen->height - 40), "Camera Rot: " + camera->target.str2f());
 }

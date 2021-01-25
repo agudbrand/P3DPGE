@@ -25,6 +25,7 @@ struct Scene : public Component {
 	bool RENDER_LIGHT_RAYS				= false;
 	bool RENDER_MESH_NORMALS			= false;
 
+
 	Scene(olc::PixelGameEngine* p) {
 		meshes = std::vector<Mesh*>();
 		lights = std::vector<Light*>();

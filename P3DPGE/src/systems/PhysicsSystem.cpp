@@ -328,30 +328,30 @@ inline void PhysicsTick(PhysicsTuple& t, PhysicsWorld* pw, Time* time) {
 
 	//update rotational movement and scuffed vector rotational clamping
 	t.physics->rotVelocity += t.physics->rotAcceleration * time->physicsDeltaTime;
-	if(t.physics->rotVelocity.x > pw->maxRotVelocity) {
-		t.physics->rotVelocity.x = pw->maxRotVelocity;
-	} else if(t.physics->rotVelocity.x < -pw->maxRotVelocity) {
-		t.physics->rotVelocity.x = -pw->maxRotVelocity;
-	} else if(abs(t.physics->rotVelocity.x) < pw->minRotVelocity) {
-		t.physics->rotVelocity.x = 0;
-		t.physics->rotAcceleration.x = 0;
-	}
-	if(t.physics->rotVelocity.y > pw->maxRotVelocity) {
-		t.physics->rotVelocity.y = pw->maxRotVelocity;
-	} else if(t.physics->rotVelocity.y < -pw->maxRotVelocity) {
-		t.physics->rotVelocity.y = -pw->maxRotVelocity;
-	} else if(abs(t.physics->rotVelocity.y) < pw->minRotVelocity) {
-		t.physics->rotVelocity.y = 0;
-		t.physics->rotAcceleration.y = 0;
-	}
-	if(t.physics->rotVelocity.z > pw->maxRotVelocity) {
-		t.physics->rotVelocity.z = pw->maxRotVelocity;
-	} else if(t.physics->rotVelocity.z < -pw->maxRotVelocity) {
-		t.physics->rotVelocity.z = -pw->maxRotVelocity;
-	} else if(abs(t.physics->rotVelocity.z) < pw->minRotVelocity) {
-		t.physics->rotVelocity.z = 0;
-		t.physics->rotAcceleration.z = 0;
-	}
+	//if(t.physics->rotVelocity.x > pw->maxRotVelocity) {
+	//	t.physics->rotVelocity.x = pw->maxRotVelocity;
+	//} else if(t.physics->rotVelocity.x < -pw->maxRotVelocity) {
+	//	t.physics->rotVelocity.x = -pw->maxRotVelocity;
+	//} else if(abs(t.physics->rotVelocity.x) < pw->minRotVelocity) {
+	//	t.physics->rotVelocity.x = 0;
+	//	t.physics->rotAcceleration.x = 0;
+	//}
+	//if(t.physics->rotVelocity.y > pw->maxRotVelocity) {
+	//	t.physics->rotVelocity.y = pw->maxRotVelocity;
+	//} else if(t.physics->rotVelocity.y < -pw->maxRotVelocity) {
+	//	t.physics->rotVelocity.y = -pw->maxRotVelocity;
+	//} else if(abs(t.physics->rotVelocity.y) < pw->minRotVelocity) {
+	//	t.physics->rotVelocity.y = 0;
+	//	t.physics->rotAcceleration.y = 0;
+	//}
+	//if(t.physics->rotVelocity.z > pw->maxRotVelocity) {
+	//	t.physics->rotVelocity.z = pw->maxRotVelocity;
+	//} else if(t.physics->rotVelocity.z < -pw->maxRotVelocity) {
+	//	t.physics->rotVelocity.z = -pw->maxRotVelocity;
+	//} else if(abs(t.physics->rotVelocity.z) < pw->minRotVelocity) {
+	//	t.physics->rotVelocity.z = 0;
+	//	t.physics->rotAcceleration.z = 0;
+	//}
 	t.physics->rotation += t.physics->rotVelocity * time->physicsDeltaTime;
 
 	//reset accelerations

@@ -445,9 +445,6 @@ inline Quaternion Quaternion::QuatSlerp(Vector3 fromv, Vector3 tov, float t) {
 	double s1 = sin_theta / sin_theta_0;
 
 	return (from * s0) + (to * s1);
-
-
-	// calculate final values
 }
 
 
@@ -567,6 +564,21 @@ namespace Math {
 			newFor.x,	-newFor.y,	newFor.z,	0,
 			pos.x,		pos.y,		pos.z,		1
 		);
+	}
+
+	//this assumes its in degrees
+	static Vector3 SphericalToRectangularCoords(Vector3 v) {
+		float y = Math::to_radians(v.y);
+		float z = Math::to_radians(v.z);
+		return Vector3(v.x * sinf(z) * cosf(y), v.x * cosf(z), v.x * sinf(z) * sinf(y));
+	}
+
+	static Vector3 RectangularToSphericalCoords(Vector3 v) {
+		float rho = sqrt(v.mag());
+		float theta = Math::to_degrees(atan(v.y / v.z));
+		float phi = Math::to_degrees(acos(v.z / v.mag())); //maybe use v.y instead of v.z because y is our vertical axis
+		return Vector3(rho, theta, phi);
+
 	}
 
 	//this assumes a rectangle whose pivot is the top left corner

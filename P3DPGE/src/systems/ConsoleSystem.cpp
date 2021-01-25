@@ -384,8 +384,9 @@ void ConsoleSystem::PushConsole(std::string s) {
 void ConsoleSystem::Init() {
 	locadmin = admin;
 	loccon = admin->console;
-	AddLog("[c:dcyan]P3DPGE Console[c]", loccon);
+	AddLog("[c:dcyan]P3DPGE Console ver. 0.5.0[c]", loccon);
 	AddLog("\"listc\" for a list of commands\n\"help {command}\" to view a commands help page", loccon);
+	AddLog("see console_release_notes.txt for version information", loccon);
 	AddLog("\n[c:dyellow]Console TODOS:[c]", loccon);
 	AddLog(
 		"> implement argument completion for commands\n"

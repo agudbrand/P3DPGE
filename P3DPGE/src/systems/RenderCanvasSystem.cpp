@@ -175,8 +175,6 @@ void MakeP3DPGEDebugTools(EntityAdmin* admin) {
 }
 
 void DrawFrameGraph(EntityAdmin* admin) { //TODO(r, sushi) implement styling and more options
-
-	//ImGui::SetNextWindowSize(ImVec2(300, 200));
 	ImGui::Begin("FPSGraph", 0, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
 
 	static int prevstoresize = 100;
@@ -192,12 +190,11 @@ void DrawFrameGraph(EntityAdmin* admin) { //TODO(r, sushi) implement styling and
 	static int min_val = INT_MAX;
 
 	if (prevstoresize != storesize) {
-		//can't believe this worked lol 
+		//keeps the data in place when resizing
 		std::reverse(realvalues.begin(), realvalues.end());  realvalues.resize(storesize); std::reverse(realvalues.begin(), realvalues.end());
 		std::reverse(printvalues.begin(), printvalues.end());  printvalues.resize(storesize); std::reverse(printvalues.begin(), printvalues.end());
 		prevstoresize = storesize;
 	}
-	
 
 	static int frame_count = 0;
 
@@ -206,17 +203,8 @@ void DrawFrameGraph(EntityAdmin* admin) { //TODO(r, sushi) implement styling and
 	int FPS = std::floor(1 / admin->time->deltaTime);
 	float avg = Math::average(realvalues.begin(), realvalues.end(), storesize);
 
-	//float avg = 0;
-	//
-	//for (float f : realvalues) {
-	//	avg += f;
-	//}
-
-	//avg /= realvalues.size();
-
 	if (frame_count < fupdate) {
 		realvalues[realvalues.size() - 1] = FPS; //append frame rate
-
 		frame_count++;
 	}
 	else {
@@ -229,8 +217,6 @@ void DrawFrameGraph(EntityAdmin* admin) { //TODO(r, sushi) implement styling and
 		
 		printvalues[printvalues.size() - 1] = std::floorl(avg);
 
-		
-
 		frame_count = 0;
 	}
 
@@ -239,18 +225,6 @@ void DrawFrameGraph(EntityAdmin* admin) { //TODO(r, sushi) implement styling and
 	ImGui::SetNextItemWidth(ImGui::GetWindowWidth());
 	ImGui::PlotLines("", &printvalues[0], printvalues.size(), 0, 0, min_val, max_val, ImVec2(300, 200));
 
-
-
-	//for (float f : realvalues) {
-	//	printvalues.push_back(f + ((avg - f) * 0.9)); //make graph not so spikey
-	//}
-
-
-	
-	
-	
-
-	
 	ImGui::End();
 }
 
@@ -264,12 +238,16 @@ void RenderCanvasSystem::DrawUI(void) {
 	//demo window for reference
 	//ImGui::ShowDemoWindow();
 
+	
+
+	if (admin->currentCamera->MOUSE_LOOK) {
+		ImGui::SetCursorScreenPos(ImVec2(300, 300));
+	}
 	////////////////////////////////////////////
 
 	ImGuiIO& io = ImGui::GetIO();
 	static bool showDebugTools = true;
 	static bool showConsole = true;
-	static bool displayFrameGraph = true;
 
 	if(ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_Backspace)) && io.KeyCtrl && io.KeyShift) { showDebugTools = !showDebugTools; }
 	if (admin->input->KeyPressed(olc::OEM_3)) { showConsole = !showConsole; }
@@ -289,7 +267,7 @@ void RenderCanvasSystem::DrawUI(void) {
 		admin->IMGUI_KEY_CAPTURE = false;
 	}
 		
-	if (displayFrameGraph) DrawFrameGraph(admin);
+	if (admin->tempCanvas->SHOW_FPS_GRAPH) DrawFrameGraph(admin);
 
 	////////////////////////////////////////////
 

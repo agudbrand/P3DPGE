@@ -8,6 +8,7 @@ struct Triangle {
 	//this can probably be different but it works for now
 	Vector3 points[3];
 	Vector3 proj_points[3];
+	Vector3 poffsets[3]; //the triangle's points stored as offsets from the mesh's pos. so we always know what the orig shape of the mesh was
 	Vector3 tex_points[3];
 	Vector3 proj_tex_points[3];
 
@@ -29,10 +30,15 @@ struct Triangle {
 
 	Triangle() {}
 	//constructing triangles without attached entity
-	Triangle(Vector3 p1, Vector3 p2, Vector3 p3) {
-		points[0] = p1;
-		points[1] = p2;
-		points[2] = p3;
+	Triangle(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 position) {
+		poffsets[0] = p1;
+		poffsets[1] = p2;
+		poffsets[2] = p3;
+
+		points[0] = p1 + position;
+		points[1] = p1 + position;
+		points[2] = p1 + position;
+
 		copy_points();
 
 		edges[0] = Edge(p1, p2);
@@ -44,10 +50,15 @@ struct Triangle {
 		tex_points[2] = Vector3(1, 0, 1);
 	};
 
-	Triangle(Vector3 p1, Vector3 p2, Vector3 p3, Entity* e) {
-		points[0] = p1;
-		points[1] = p2;
-		points[2] = p3;
+	Triangle(Vector3 p1, Vector3 p2, Vector3 p3, Entity* e, Vector3 position) {
+		poffsets[0] = p1;
+		poffsets[1] = p2;
+		poffsets[2] = p3;
+
+		points[0] = p1 + position;
+		points[1] = p1 + position;
+		points[2] = p1 + position;
+
 		copy_points();
 
 		edges[0] = Edge(p1, p2);
@@ -58,10 +69,15 @@ struct Triangle {
 	}
 
 	//for constructing a triangle with texture points
-	Triangle(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 t1, Vector3 t2, Vector3 t3, Entity* e) {
-		points[0] = p1;
-		points[1] = p2;
-		points[2] = p3;
+	Triangle(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 t1, Vector3 t2, Vector3 t3, Entity* e, Vector3 position) {
+		poffsets[0] = p1;
+		poffsets[1] = p2;
+		poffsets[2] = p3;
+
+		points[0] = p1 + position;
+		points[1] = p1 + position;
+		points[2] = p1 + position;
+
 		copy_points();
 
 		edges[0] = Edge(p1, p2);
