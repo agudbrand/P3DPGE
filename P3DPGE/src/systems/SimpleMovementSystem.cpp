@@ -8,6 +8,9 @@
 #include "../components/Camera.h"
 #include "../components/MovementState.h"
 #include "../components/Time.h"
+#include "../internal/imgui/imgui.h"
+
+#include "../math/Math.h"
 
 EntityAdmin* ladmin; //im not rewriting every function to take admin
 
@@ -44,26 +47,26 @@ void CameraMovement(float deltaTime, Camera* camera, Input* input, Keybinds* bin
 		//translate forward
 		if (input->KeyDown(binds->movementFlyingForward)) {
 			if (input->KeyHeld(olc::SHIFT)) {
-				camera->position += camera->lookDir * 16 * deltaTime;
+				camera->position += camera->lookDir.yInvert() * 16 * deltaTime;
 			}
 			else if (input->KeyHeld(olc::CTRL)) {
-				camera->position += camera->lookDir * 4 * deltaTime;
+				camera->position += camera->lookDir.yInvert() * 4 * deltaTime;
 			}
 			else {
-				camera->position += camera->lookDir * 8 * deltaTime;
+				camera->position += camera->lookDir.yInvert() * 8 * deltaTime;
 			}
 		}
 
 		//translate back
 		if (input->KeyDown(binds->movementFlyingBack)) {
 			if (input->KeyHeld(olc::SHIFT)) {
-				camera->position -= camera->lookDir * 16 * deltaTime;
+				camera->position -= camera->lookDir.yInvert() * 16 * deltaTime;
 			}
 			else if (input->KeyHeld(olc::CTRL)) {
-				camera->position -= camera->lookDir * 4 * deltaTime;
+				camera->position -= camera->lookDir.yInvert() * 4 * deltaTime;
 			}
 			else {
-				camera->position -= camera->lookDir * 8 * deltaTime;
+				camera->position -= camera->lookDir.yInvert() * 8 * deltaTime;
 			}
 		}
 
@@ -98,57 +101,40 @@ void CameraMovement(float deltaTime, Camera* camera, Input* input, Keybinds* bin
 }
 
 void CameraRotation(float deltaTime, Camera* camera, Input* input, Keybinds* binds) {
+
+	if (input->KeyPressed(olc::M)) { ladmin->currentCamera->MOUSE_LOOK = !ladmin->currentCamera->MOUSE_LOOK; }
 	if (!ladmin->IMGUI_KEY_CAPTURE) {
-		//camera rotation up
-		if (input->KeyPressed(binds->cameraRotateUp) || input->KeyHeld(binds->cameraRotateUp)) {
-			if (input->KeyHeld(olc::SHIFT)) {
-				camera->rotation.x += 50 * deltaTime;
+		if (!ladmin->currentCamera->MOUSE_LOOK) {
+			//camera rotation up
+			if (input->KeyPressed(binds->cameraRotateUp) || input->KeyHeld(binds->cameraRotateUp)) {
+				if (input->KeyHeld(olc::SHIFT))		{ camera->target.z = Math::clamp(camera->target.z + 50 * deltaTime, 1,179); }
+				else if (input->KeyHeld(olc::CTRL)) { camera->target.z = Math::clamp(camera->target.z + 5 * deltaTime, 1,179); }
+				else								{ camera->target.z = Math::clamp(camera->target.z + 25 * deltaTime, 1,179); }
 			}
-			else if (input->KeyHeld(olc::CTRL)) {
-				camera->rotation.x += 5 * deltaTime;
+
+			//camera rotation down
+			if (input->KeyPressed(binds->cameraRotateDown) || input->KeyHeld(binds->cameraRotateDown)) {
+				if (input->KeyHeld(olc::SHIFT))		{ camera->target.z = Math::clamp(camera->target.z - 50 * deltaTime, 1,179); }
+				else if (input->KeyHeld(olc::CTRL)) { camera->target.z = Math::clamp(camera->target.z - 5 * deltaTime, 1,179); }
+				else								{ camera->target.z = Math::clamp(camera->target.z - 25 * deltaTime, 1, 179); }
 			}
-			else {
-				camera->rotation.x += 25 * deltaTime;
+
+			//camera rotation right
+			if (input->KeyPressed(binds->cameraRotateRight) || input->KeyHeld(binds->cameraRotateRight)) {
+				if (input->KeyHeld(olc::SHIFT))		{ camera->target.y -= 50 * deltaTime; }
+				else if (input->KeyHeld(olc::CTRL)) { camera->target.y -= 5 * deltaTime; }
+				else								{ camera->target.y -= 25 * deltaTime; }
+			}
+
+			//camera rotation left
+			if (input->KeyPressed(binds->cameraRotateLeft) || input->KeyHeld(binds->cameraRotateLeft)) {
+				if (input->KeyHeld(olc::SHIFT))		{ camera->target.y += 50 * deltaTime; }
+				else if (input->KeyHeld(olc::CTRL)) { camera->target.y += 5 * deltaTime; }
+				else								{ camera->target.y += 25 * deltaTime; }
 			}
 		}
-
-		//camera rotation down
-		if (input->KeyPressed(binds->cameraRotateDown) || input->KeyHeld(binds->cameraRotateDown)) {
-			if (input->KeyHeld(olc::SHIFT)) {
-				camera->rotation.x -= 50 * deltaTime;
-			}
-			else if (input->KeyHeld(olc::CTRL)) {
-				camera->rotation.x -= 5 * deltaTime;
-			}
-			else {
-				camera->rotation.x -= 25 * deltaTime;
-			}
-		}
-
-		//camera rotation right
-		if (input->KeyPressed(binds->cameraRotateRight) || input->KeyHeld(binds->cameraRotateRight)) {
-			if (input->KeyHeld(olc::SHIFT)) {
-				camera->rotation.y -= 50 * deltaTime;
-			}
-			else if (input->KeyHeld(olc::CTRL)) {
-				camera->rotation.y -= 5 * deltaTime;
-			}
-			else {
-				camera->rotation.y -= 25 * deltaTime;
-			}
-		}
-
-		//camera rotation left
-		if (input->KeyPressed(binds->cameraRotateLeft) || input->KeyHeld(binds->cameraRotateLeft)) {
-			if (input->KeyHeld(olc::SHIFT)) {
-				camera->rotation.y += 50 * deltaTime;
-			}
-			else if (input->KeyHeld(olc::CTRL)) {
-				camera->rotation.y += 5 * deltaTime;
-			}
-			else {
-				camera->rotation.y += 25 * deltaTime;
-			}
+		else {
+			
 		}
 	}
 }

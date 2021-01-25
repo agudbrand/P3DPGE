@@ -345,7 +345,12 @@ healthchecksdb
 CodeGraphData/
 *.diagsession
 /docs/doxygen
-P3DPGE/imgui.ini
 
+
+# P3DPGE ignores
 imgui.ini
-P3DPGE/imgui.ini
+objects/
+sprite/
+scenes/
+*.obj
+

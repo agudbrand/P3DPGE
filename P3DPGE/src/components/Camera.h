@@ -7,6 +7,9 @@ struct Camera : public Component {
 	Vector3 position;
 	Vector3 rotation;
 	Vector3 lookDir;
+	Vector3 target = Vector3(1, 0, 90);
+
+	bool MOUSE_LOOK = false;
 
 	float nearZ; //the distance from the camera's position to screen plane
 	float farZ; //the maximum render distance

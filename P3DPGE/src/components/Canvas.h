@@ -9,6 +9,8 @@ struct Canvas : public Component {
 	std::vector<UIContainer*> containers;
 	bool hideAll;
 
+	bool SHOW_FPS_GRAPH = false;
+
 	Canvas() {
 		containers = std::vector<UIContainer*>();
 		hideAll = false;

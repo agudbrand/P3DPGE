@@ -118,80 +118,97 @@ inline void AddSpawnCommands(EntityAdmin* admin) {
 		admin->input->selectedEntity = c;
 		return "";
 	}, "spawn_complex2", "spawn_box <filePath: String> <hasTexture: Boolean> <position: Vector3> [rotation: Vector3] [scale: Vector3]");
+
+	admin->commands["spawn_scene"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		Entity* c = WorldSystem::CreateEntity(admin);
+
+		Transform* t = new Transform(Vector3(0, 0, 3), Vector3::ZERO, Vector3::ONE);
+		Mesh* m = Mesh::CreateComplex(c, "scenes/scene_test.obj", true, t->position);
+		WorldSystem::AddComponentsToEntity(c, { t, m });
+
+		olc::Sprite* s = new olc::Sprite(1, 1);
+		s->SetPixel(Vector2(0, 0), olc::WHITE);
+
+		m->texture = s;
+
+		admin->input->selectedEntity = c;
+		return "";
+		}, "spawn_scene", "spawn_box <filePath: String> <hasTexture: Boolean> <position: Vector3> [rotation: Vector3] [scale: Vector3]");
+
 }
 
 inline void AddRenderCommands(EntityAdmin* admin) {
-	admin->commands["render_wireframe"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+	admin->commands["r_wireframe"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_WIREFRAME = !admin->currentScene->RENDER_WIREFRAME;
 		if (admin->currentScene->RENDER_WIREFRAME) return "render_wireframe = true";
 		else return "render_wireframe = false";
-	}, "render_wireframe", "toggles rendering wireframe");
+	}, "r_wireframe", "toggles rendering wireframe");
 
-	admin->commands["render_textures"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+	admin->commands["r_textures"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_TEXTURES = !admin->currentScene->RENDER_TEXTURES;
 		if (admin->currentScene->RENDER_TEXTURES) return "render_textures = true";
 		else return "render_textures = false";
-	}, "render_textures", "toggles rendering textuires");
+	}, "r_textures", "toggles rendering textuires");
 
-	admin->commands["render_display_edges"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+	admin->commands["r_display_edges"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_EDGE_NUMBERS = !admin->currentScene->RENDER_EDGE_NUMBERS;
 		if (admin->currentScene->RENDER_EDGE_NUMBERS) return "render_edge_numbers = true";
 		else return "render_edge_numbers = false";
-		}, "render_display_edges", "toggles diaplying edge numbers on triangles");
+		}, "r_display_edges", "toggles diaplying edge numbers on triangles");
 
-	admin->commands["render_local_axis"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+	admin->commands["r_local_axis"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_LOCAL_AXIS = !admin->currentScene->RENDER_LOCAL_AXIS;
 		if (admin->currentScene->RENDER_LOCAL_AXIS) return "render_local_axis = true";
 		else return "render_local_axis = false";
-		}, "render_local_axis", "toggles rendering the local axis on entities");
+		}, "r_local_axis", "toggles rendering the local axis on entities");
 
-	admin->commands["render_global_axis"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+	admin->commands["r_global_axis"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_GLOBAL_AXIS = !admin->currentScene->RENDER_GLOBAL_AXIS;
 		if (admin->currentScene->RENDER_TEXTURES) return "render_global_axis = true";
 		else return "render_global_axis = false";
-		}, "render_global_axis", "toggles rendering the global axis relatie to camera orientation in the top right of the screen");
+		}, "r_global_axis", "toggles rendering the global axis relatie to camera orientation in the top right of the screen");
 
-	admin->commands["render_transforms"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+	admin->commands["r_transforms"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_TRANSFORMS = !admin->currentScene->RENDER_TRANSFORMS;
 		if (admin->currentScene->RENDER_TRANSFORMS) return "render_transforms = true";
 		else return "render_transforms = false";
-		}, "render_transforms", "toggles diaplaying tranform information on entities");
+		}, "r_transforms", "toggles diaplaying tranform information on entities");
 
-	admin->commands["render_physics"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+	admin->commands["r_physics"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_PHYSICS = !admin->currentScene->RENDER_PHYSICS;
 		if (admin->currentScene->RENDER_PHYSICS) return "render_physics = true";
 		else return "render_physics = false";
-		}, "render_physics", "toggles rendering velocity and acceleration vectors on entities");
+		}, "r_physics", "toggles rendering velocity and acceleration vectors on entities");
 
-	admin->commands["render_screen_bounding_box"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+	admin->commands["r_screen_bounding_box"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_SCREEN_BOUNDING_BOX = !admin->currentScene->RENDER_SCREEN_BOUNDING_BOX;
 		if (admin->currentScene->RENDER_SCREEN_BOUNDING_BOX) return "render_screen_bounding_box = true";
 		else return "render_screen_bounding_box = false";
-		}, "render_screen_bounding_box", "toggles rendering of the screen space bounding box of entities");
+		}, "r_screen_bounding_box", "toggles rendering of the screen space bounding box of entities");
 
-	admin->commands["render_mesh_vertices"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+	admin->commands["r_mesh_vertices"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_MESH_VERTICES = !admin->currentScene->RENDER_MESH_VERTICES;
 		if (admin->currentScene->RENDER_MESH_VERTICES) return "render_mesh_vertices = true";
 		else return "render_mesh_vertices = false";
-		}, "render_mesh_vertices", "toggles rendering of mesh vertices");
+		}, "r_mesh_vertices", "toggles rendering of mesh vertices");
 
-	admin->commands["render_grid"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+	admin->commands["r_grid"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_GRID = !admin->currentScene->RENDER_GRID;
 		if (admin->currentScene->RENDER_GRID) return "render_grid = true";
 		else return "render_grid = false";
-		}, "render_grid", "toggles rendering the world grid");
+		}, "r_grid", "toggles rendering the world grid");
 
-	admin->commands["render_light_rays"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+	admin->commands["r_light_rays"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_LIGHT_RAYS = !admin->currentScene->RENDER_LIGHT_RAYS;
 		if (admin->currentScene->RENDER_LIGHT_RAYS) return "render_light_rays = true";
 		else return "render_light_rays = false";
-		}, "render_light_rays", "toggles rendering light rays");
+		}, "r_light_rays", "toggles rendering light rays");
 
-	admin->commands["render_mesh_normals"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+	admin->commands["r_mesh_normals"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		admin->currentScene->RENDER_MESH_NORMALS = !admin->currentScene->RENDER_MESH_NORMALS;
 		if (admin->currentScene->RENDER_MESH_NORMALS) return "render_mesh_normals = true";
 		else return "render_mesh_normals = false";
-	}, "render_mesh_normals", "toggles rendering mesh normals");
+	}, "r_mesh_normals", "toggles rendering mesh normals");
 }
 
 inline void AddConsoleCommands(EntityAdmin* admin) {
@@ -223,6 +240,12 @@ inline void AddConsoleCommands(EntityAdmin* admin) {
 		std::ifstream f("\\\\.\\globalroot\\device\\condrv\\kernelconnect");
 		return "whelp.";
 	}, "MAKE_FUN", "hehe");
+
+	admin->commands["ui_fps_graph"] = new Command([](EntityAdmin* admin, std::vector<std::string> args)->std::string {
+		admin->tempCanvas->SHOW_FPS_GRAPH = !admin->tempCanvas->SHOW_FPS_GRAPH;
+		if (admin->tempCanvas->SHOW_FPS_GRAPH) return "showing FPS graph";
+		else return "hiding fps graph";
+		}, "ui_fps_graph", "displays the FPS graph menu");
 }
 
 inline void HandleMouseInputs(EntityAdmin* admin, Input* input) {
