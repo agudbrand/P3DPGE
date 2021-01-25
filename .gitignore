@@ -350,7 +350,6 @@ CodeGraphData/
 # P3DPGE ignores
 imgui.ini
 objects/
-sprite/
+sprites/
 scenes/
 *.obj
-
