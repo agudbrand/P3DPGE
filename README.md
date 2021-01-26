@@ -2,7 +2,7 @@
 ===
 A game engine for 3D physics and graphics using javidx9's [Pixel Game Engine](https://github.com/OneLoneCoder/olcPixelGameEngine)
 
-### Dependencies:
+### Build Dependencies:
 * [Boost Libraries 1.74.0](https://www.boost.org/users/history/version_1_74_0.html)
 
 ### Features
