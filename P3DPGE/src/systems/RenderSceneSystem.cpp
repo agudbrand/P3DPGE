@@ -11,8 +11,6 @@
 #include "../components/Physics.h"
 #include "../components/Time.h"
 
-#include <thrust/host_vector.h>
-
 void RenderSceneSystem::Init() {
 	
 }
@@ -476,7 +474,7 @@ bool ClipLineToBorderPlanes(Vector3& start, Vector3& end, Screen* screen) {
 			int code = lineEndCode > lineStartCode ? lineEndCode : lineStartCode;
 
 			//clip the points the the screen bounds by finding the intersection point
-			if			(code & CLIP_TOP) {			//point is above screen
+			if			(code & CLIP_TOP) {		//point is above screen
 				x = start.x + (end.x - start.x) * (-start.y) / (end.y - start.y);
 				y = 0;
 			} 

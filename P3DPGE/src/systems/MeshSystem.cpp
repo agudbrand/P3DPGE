@@ -1,4 +1,5 @@
 #include "MeshSystem.h"
+#include "ConsoleSystem.h"
 #include "../math/Math.h"
 #include "../geometry/Edge.h"
 
@@ -30,9 +31,11 @@ inline void AddSelectEntityCommand(EntityAdmin* admin) {
 
 			//draw ray if debugging
 			RenderedEdge3D* ray = new RenderedEdge3D(pos, admin->currentCamera->position);
-			DEBUG ray->e = (Entity*)1; //to make it not delete every frame
-			DEBUG admin->currentScene->lines.push_back(ray);
+			ray->e = (Entity*)1; //to make it not delete every frame
+			admin->currentScene->lines.push_back(ray);
 
+			CLOG(*ray);
+			
 			for (Mesh* m : admin->currentScene->meshes) {
 				if (MeshSystem::LineIntersect(m, ray)) {
 					admin->input->selectedEntity = m->entity;
@@ -46,7 +49,7 @@ inline void AddSelectEntityCommand(EntityAdmin* admin) {
 			LOG("\nWarning: ScreenToWorld not yet implemented for orthographic projection. World interaction with mouse will not work.\n");
 		}
 		
-		if (!admin->input->selectedEntity) { ERROR("No object selected"); }
+		if (!admin->input->selectedEntity) { CERROR("No object selected"); }
 		return "";
 		//TODO(i,delle) change this to take in an ID once we figure that out
 	}, "select_entity", "select_entity <EntityID>");

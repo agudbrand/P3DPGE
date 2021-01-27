@@ -263,9 +263,10 @@ inline void HandleMouseInputs(EntityAdmin* admin, Input* input) {
 			}
 		}
 		stop:
+		//our ui isn't used anymore
 
 		//if the click wasnt on a UI element, trigger select_entity command
-		//if(!ui_clicked) { admin->TriggerCommand("select_entity"); } //TODO(i,delle) re-enable clicking entities
+		admin->ExecCommand("select_entity"); //TODO(i,delle) re-enable clicking entities
 
 		//set click pos to mouse pos
 		input->mouseClickPos = input->mousePos;

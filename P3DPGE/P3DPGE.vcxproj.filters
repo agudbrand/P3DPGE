@@ -189,9 +189,6 @@
     <ClInclude Include="src\utils\ContainerManager.h">
       <Filter>src\utils</Filter>
     </ClInclude>
-    <ClInclude Include="src\systems\RenderCUDAInterface.h">
-      <Filter>src\systems\cpp</Filter>
-    </ClInclude>
     <ClInclude Include="src\ui\UIContainer.h">
       <Filter>src\ui</Filter>
     </ClInclude>
@@ -311,11 +308,6 @@
     <ClCompile Include="src\systems\ConsoleSystem.cpp">
       <Filter>src\systems\cpp</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <CudaCompile Include="src\systems\RenderCUDAInterface.cu">
-      <Filter>src\systems\cpp</Filter>
-    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore">

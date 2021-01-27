@@ -62,6 +62,7 @@ struct EntityAdmin {
 	T* GetSystem() {
 		T* t = nullptr;
 		for (System* s : systems) { if (T* temp = dynamic_cast<T*>(s)) { t = temp; break; } }
+		ASSERT(t != nullptr, "attempted to retrieve a system that doesn't exist");
 		return t;
 	}
 
@@ -83,6 +84,7 @@ struct Entity {
 	T* GetComponent(){
 		T* t = nullptr;
 		for(Component* c : components) { if(T* temp = dynamic_cast<T*>(c)) { t = temp; break; } }
+		ASSERT(t != nullptr, "attempted to retrieve a component that doesn't exist");
 		return t;
 	}
 

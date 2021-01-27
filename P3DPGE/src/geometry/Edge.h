@@ -128,8 +128,8 @@ struct Edge3D {
 	bool within_depth(Vector3 point)  { return (point.z <= p[deep].z && point.z >= p[!deep].z); }
 	bool within_depth(float z_point)  { return (z_point <= p[deep].z && z_point >= p[!deep].z); }
 
-	std::string str() { return "{(" + p[0].str() + "), (" + p[1].str() + ")}"; }
-	std::string str2f() { return "{(" + p[0].str2f() + "), (" + p[1].str2f() + ")}"; }
+	virtual std::string str() { return "{(" + p[0].str() + "), (" + p[1].str() + ")}"; }
+	virtual std::string str2f() { return "{(" + p[0].str2f() + "), (" + p[1].str2f() + ")}"; }
 
 	Vector3 edge_midpoint() {
 		return Vector3((p[0].x + p[1].x) / 2, (p[0].y + p[1].y) / 2, (p[0].z + p[1].z) / 2);
