@@ -25,9 +25,6 @@
 
 inline void AddSpawnCommands(EntityAdmin* admin) {
 
-	
-	
-
 	admin->commands["spawn_box"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
 		//for capturing vector parameters
 		std::cmatch m;

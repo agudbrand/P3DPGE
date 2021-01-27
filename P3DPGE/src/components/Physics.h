@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.h"
+#include "Transform.h"
 #include "../math/Vector3.h"
 
 struct Physics : public Component {
