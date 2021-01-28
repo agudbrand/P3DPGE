@@ -4,6 +4,7 @@ A game engine for 3D physics and graphics using javidx9's [Pixel Game Engine](ht
 
 ### Build Dependencies:
 * [Boost Libraries 1.74.0](https://www.boost.org/users/history/version_1_74_0.html)
+* [OpenAL 1.1](https://www.openal.org/downloads/)
 
 ### Features
 * Importing Wavefront (.obj) models
@@ -27,12 +28,14 @@ A game engine for 3D physics and graphics using javidx9's [Pixel Game Engine](ht
 * Vulkan rendering
 * Lighting and shadows
 * Level/scene editor
+* Sound system
 
 ### Credits
 * [dellevelled](https://github.com/DelleVelleD) Co-developer
 * [SushiSalad](https://github.com/SushiSalad) Co-developer
 * [olcPixelGameEngine](https://github.com/OneLoneCoder/olcPixelGameEngine)
 * [Dear ImGui](https://github.com/ocornut/imgui)
+* [dr_libs](https://github.com/mackron/dr_libs)
 
 ### [License](LICENSE.txt)
 Public Domain or MIT licensed -- whichever you prefer
