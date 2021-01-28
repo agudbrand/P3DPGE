@@ -225,6 +225,18 @@
     <ClInclude Include="src\components\Console.h">
       <Filter>src\components</Filter>
     </ClInclude>
+    <ClInclude Include="src\internal\olcPGEX_Sound.h">
+      <Filter>src\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="src\systems\SoundSystem.h">
+      <Filter>src\systems\h</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\Listener.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\Source.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -306,6 +318,9 @@
       <Filter>src\internal\imgui</Filter>
     </ClCompile>
     <ClCompile Include="src\systems\ConsoleSystem.cpp">
+      <Filter>src\systems\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\systems\SoundSystem.cpp">
       <Filter>src\systems\cpp</Filter>
     </ClCompile>
   </ItemGroup>

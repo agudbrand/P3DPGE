@@ -31,10 +31,8 @@ inline void AddSelectEntityCommand(EntityAdmin* admin) {
 
 			//draw ray if debugging
 			RenderedEdge3D* ray = new RenderedEdge3D(pos, admin->currentCamera->position);
-			ray->e = (Entity*)1; //to make it not delete every frame
+			ray->e = (Entity*)1; // to make it not delete every frame
 			admin->currentScene->lines.push_back(ray);
-
-			CLOG(*ray);
 			
 			for (Mesh* m : admin->currentScene->meshes) {
 				if (MeshSystem::LineIntersect(m, ray)) {
@@ -42,8 +40,6 @@ inline void AddSelectEntityCommand(EntityAdmin* admin) {
 					break;
 				}
 			}
-
-			
 		}
 		else {
 			LOG("\nWarning: ScreenToWorld not yet implemented for orthographic projection. World interaction with mouse will not work.\n");

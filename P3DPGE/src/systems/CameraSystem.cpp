@@ -23,7 +23,8 @@ Matrix4 MakeViewMatrix(Camera* camera) {
 	//camera->lookDir = Vector3::FORWARD * Matrix3::RotationMatrixY(camera->rotation.y);
 	
 	camera->lookDir = Math::SphericalToRectangularCoords(camera->target);
-	return Math::LookAtMatrix(camera->position, camera->lookDir + camera->position).Inverse();
+	//camera->lookDir = camera->targetrect - camera->position;
+	return Math::LookAtMatrix(camera->position, camera->lookDir + camera->position, camera->up).Inverse();
 }
 
 Matrix4 MakeProjectionMatrix(Camera* camera, Screen* screen) {

@@ -13,6 +13,7 @@
 #include "../components/Scene.h"
 #include "../components/Physics.h"
 #include "../components/Collider.h"
+#include "../components/Source.h"
 
 //regex for checking paramaters
 #define RegPosParam   std::regex("-pos=\\([0-9|.]+,[0-9|.]+,[0-9|.]+\\)")
@@ -60,7 +61,8 @@ inline void AddSpawnCommands(EntityAdmin* admin) {
 			Transform* t = new Transform(position, rotation, scale);
 			Mesh* m = Mesh::CreateBox(box, size, t->position);
 			Physics* p = new Physics(t->position, t->rotation);
-			WorldSystem::AddComponentsToEntity(box, { t, m, p });
+			Source* s = new Source((char*)"sounds/Kick.wav", p);
+			WorldSystem::AddComponentsToEntity(box, { t, m, p, s });
 			admin->input->selectedEntity = box;
 			return TOSTRING("box created at ", position);
 		}
@@ -69,7 +71,8 @@ inline void AddSpawnCommands(EntityAdmin* admin) {
 			Transform* t = new Transform(Vector3(0, 0, 3), Vector3::ZERO, Vector3::ONE);
 			Mesh* m = Mesh::CreateBox(box, Vector3::ONE, t->position);
 			Physics* p = new Physics(t->position, t->rotation);
-			WorldSystem::AddComponentsToEntity(box, { t, m, p });
+			Source* s = new Source((char*)"sounds/Kick.wav", p);
+			WorldSystem::AddComponentsToEntity(box, { t, m, p, s });
 			admin->input->selectedEntity = box;
 			return TOSTRING("box created at ", Vector3::ZERO);
 		}
@@ -263,10 +266,9 @@ inline void HandleMouseInputs(EntityAdmin* admin, Input* input) {
 			}
 		}
 		stop:
-		//our ui isn't used anymore
 
 		//if the click wasnt on a UI element, trigger select_entity command
-		admin->ExecCommand("select_entity"); //TODO(i,delle) re-enable clicking entities
+		//admin->ExecCommand("select_entity"); //TODO(i,delle) re-enable clicking entities
 
 		//set click pos to mouse pos
 		input->mouseClickPos = input->mousePos;

@@ -248,7 +248,6 @@ void RenderCanvasSystem::DrawUI(void) {
 	if (admin->input->KeyPressed(olc::OEM_3)) { showConsole = !showConsole; }
 
 	if(showDebugTools) MakeP3DPGEDebugTools(admin);
-	//TODO(i, sushi) add console boolean
 	//cant use a static call here because then we can't reference admin in the static function
 	//maybe theres a better way to do this, I don't know
 	if (showConsole) {

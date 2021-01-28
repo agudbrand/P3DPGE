@@ -529,12 +529,10 @@ namespace Math {
 	//this function returns a matrix that tells a vector how to look at a specific point in space.
 	static Matrix4 LookAtMatrix(const Vector3& pos, const Vector3& target) {
 		if(pos == target) { return LookAtMatrix(pos, target + Vector3(.01f, 0, 0)); }
-		//LOG("pos:               ", pos);
-		//LOG("target:            ", target);
+
 		//get new forward direction
 		Vector3 newFor = (target - pos).normalized();
 		
-		//LOG("target - pos:      ", target - pos);
 		//get right direction
 		Vector3 newRight; 
 		if(newFor == Vector3::UP || newFor == Vector3::DOWN) { 
@@ -545,6 +543,38 @@ namespace Math {
 
 		//get up direction
 		Vector3 newUp = newRight.cross(newFor); 
+
+		//make look-at matrix
+		return Matrix4(
+			newRight.x, -newRight.y, newRight.z, 0,
+			newUp.x,	newUp.y,	newUp.z,	0,
+			newFor.x,	-newFor.y,	newFor.z,	0,
+			pos.x,		pos.y,		pos.z,		1
+		);
+	}
+	
+	//this ones for getting the up vector back for sound orientation
+	static Matrix4 LookAtMatrix(const Vector3& pos, const Vector3& target, Vector3& up) {
+		if (pos == target) { return LookAtMatrix(pos, target + Vector3(.01f, 0, 0)); }
+		//LOG("pos:               ", pos);
+		//LOG("target:            ", target);
+		//get new forward direction
+		Vector3 newFor = (target - pos).normalized();
+
+		//LOG("target - pos:      ", target - pos);
+		//get right direction
+		Vector3 newRight;
+		if (newFor == Vector3::UP || newFor == Vector3::DOWN) {
+			newRight = Vector3::RIGHT;
+		}
+		else {
+			newRight = (Vector3::UP.cross(newFor)).normalized();
+		}
+
+		//get up direction
+		Vector3 newUp = newRight.cross(newFor);
+
+		up = newUp;
 
 		//LOG("Forward mag:       ", newFor.mag());
 		//LOG("Right mag:         ", newRight.mag());
@@ -560,9 +590,9 @@ namespace Math {
 		//make look-at matrix
 		return Matrix4(
 			newRight.x, -newRight.y, newRight.z, 0,
-			newUp.x,	newUp.y,	newUp.z,	0,
-			newFor.x,	-newFor.y,	newFor.z,	0,
-			pos.x,		pos.y,		pos.z,		1
+			newUp.x, newUp.y, newUp.z, 0,
+			newFor.x, -newFor.y, newFor.z, 0,
+			pos.x, pos.y, pos.z, 1
 		);
 	}
 

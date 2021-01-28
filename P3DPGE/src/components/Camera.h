@@ -8,6 +8,8 @@ struct Camera : public Component {
 	Vector3 rotation;
 	Vector3 lookDir;
 	Vector3 target = Vector3(1, 0, 90);
+	Vector3 targetrect;
+	Vector3 up;
 
 	bool MOUSE_LOOK = false;
 

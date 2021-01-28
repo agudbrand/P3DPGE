@@ -28,12 +28,14 @@
     <ClInclude Include="src\components\Console.h" />
     <ClInclude Include="src\components\Keybinds.h" />
     <ClInclude Include="src\components\Light.h" />
+    <ClInclude Include="src\components\Listener.h" />
     <ClInclude Include="src\components\MovementState.h" />
     <ClInclude Include="src\components\Scene.h" />
     <ClInclude Include="src\components\Screen.h" />
     <ClInclude Include="src\components\Input.h" />
     <ClInclude Include="src\components\Mesh.h" />
     <ClInclude Include="src\components\Physics.h" />
+    <ClInclude Include="src\components\Source.h" />
     <ClInclude Include="src\components\Time.h" />
     <ClInclude Include="src\components\Transform.h" />
     <ClInclude Include="src\components\World.h" />
@@ -48,6 +50,7 @@
     <ClInclude Include="src\internal\imgui\imstb_rectpack.h" />
     <ClInclude Include="src\internal\imgui\imstb_textedit.h" />
     <ClInclude Include="src\internal\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\internal\olcPGEX_Sound.h" />
     <ClInclude Include="src\internal\olcPixelGameEngine.h" />
     <ClInclude Include="src\math\InertiaTensors.h" />
     <ClInclude Include="src\math\Math.h" />
@@ -68,6 +71,7 @@
     <ClInclude Include="src\systems\RenderSceneSystem.h" />
     <ClInclude Include="src\systems\ScreenSystem.h" />
     <ClInclude Include="src\systems\SimpleMovementSystem.h" />
+    <ClInclude Include="src\systems\SoundSystem.h" />
     <ClInclude Include="src\systems\System.h" />
     <ClInclude Include="src\systems\TimeSystem.h" />
     <ClInclude Include="src\systems\TriggeredCommandSystem.h" />
@@ -103,6 +107,7 @@
     <ClCompile Include="src\systems\RenderSceneSystem.cpp" />
     <ClCompile Include="src\systems\ScreenSystem.cpp" />
     <ClCompile Include="src\systems\SimpleMovementSystem.cpp" />
+    <ClCompile Include="src\systems\SoundSystem.cpp" />
     <ClCompile Include="src\systems\TimeSystem.cpp" />
     <ClCompile Include="src\systems\TriggeredCommandSystem.cpp" />
     <ClCompile Include="src\systems\WorldSystem.cpp" />
@@ -189,7 +194,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\src\boost_1_74_0;C:\src\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\OpenAL 1.1 SDK\include;C:\src\boost_1_74_0;C:\src\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
@@ -200,6 +205,8 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <Profile>true</Profile>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\OpenAL 1.1 SDK\libs\Win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -210,7 +217,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\src\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\OpenAL 1.1 SDK\include;C:\src\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
@@ -223,6 +230,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <Profile>true</Profile>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\OpenAL 1.1 SDK\libs\Win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -231,7 +240,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\src\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\OpenAL 1.1 SDK\include;C:\src\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <SuppressStartupBanner>false</SuppressStartupBanner>
@@ -242,6 +251,8 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <Profile>true</Profile>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\OpenAL 1.1 SDK\libs\Win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -252,7 +263,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\src\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\OpenAL 1.1 SDK\include;C:\src\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
@@ -264,6 +275,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <Profile>true</Profile>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\OpenAL 1.1 SDK\libs\Win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
