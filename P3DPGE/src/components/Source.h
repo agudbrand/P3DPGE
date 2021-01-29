@@ -25,10 +25,16 @@ struct Source : public Component {
 	float pitch = 1; //ranges from 0.5 to 2
 
 	bool loop = false;
+	bool request_play = false;
 
 	//path to sound file
 	//this will probably be a collection of sounds eventually, once i figure out how i want that to work
 	char* snd_file; 
+
+	void RequestPlay(float gain = 1, float pitch = 1) {
+		this->gain = gain; this->pitch = pitch;
+		request_play = true;
+	}
 
 	Source(char* snd_file, Physics* p, Transform* t = nullptr, bool loop = false, float gain = 1, float pitch = 1) {
 		this->snd_file = snd_file;

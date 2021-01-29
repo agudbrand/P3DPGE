@@ -64,8 +64,8 @@ struct Vector3 {
 	void    clampMag(float min, float max);
 	Vector3 clampedMag(float min, float max) const;
 	float	distanceTo(const Vector3& rhs) const;
-	float	projectOn(Vector3& rhs) const;
-	Vector3 componentOn(Vector3& rhs) const;
+	Vector3	compOn(Vector3 rhs);
+	float projectOn(Vector3 rhs);
 	Vector3	xComp() const;
 	Vector3 yComp() const;
 	Vector3 zComp() const;
@@ -267,13 +267,13 @@ inline float Vector3::distanceTo(const Vector3& rhs) const {
 	return (*this - rhs).mag();
 }
 
-inline float Vector3::projectOn(Vector3& rhs) const {
-	return this->dot(rhs.normalized());
+inline Vector3 Vector3::compOn(Vector3 rhs) {
+	return rhs.normalized() * this->projectOn(rhs);
 }
 
-inline Vector3 Vector3::componentOn(Vector3& rhs) const {
-	Vector3 rhsNormalized = rhs.normalized();
-	return rhsNormalized * this->dot(rhsNormalized);
+inline float Vector3::projectOn(Vector3 rhs) {
+	if (this->mag() != 0) return this->dot(rhs) / this->mag();
+	else return 0;
 }
 
 inline Vector3 Vector3::xComp() const {

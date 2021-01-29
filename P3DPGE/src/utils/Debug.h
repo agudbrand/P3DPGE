@@ -32,7 +32,7 @@
 #define CERROR_LOC(...) DEBUG admin->GetSystem<ConsoleSystem>()->PushConsole(TOSTRING("\n[c:red]In ", __FILENAME__, " at ", __LINE__, ": \n[c]", "[c:red]", __VA_ARGS__, "[c]"))
 #define CSUCCESS_LOC(...) DEBUG admin->GetSystem<ConsoleSystem>()->PushConsole(TOSTRING("\n[c:green]In ", __FILENAME__, " at ", __LINE__, ": \n[c]", "[c:green]", __VA_ARGS__, "[c]"))
 
-#define CASSERT(condition, message)     if(!(condition) && !admin->paused) CERROR_LOC("Assertion '" #condition "' failed: \n", message); admin->paused = true
+#define CASSERT(condition, message)     if(!(condition) && !admin->paused){ CERROR_LOC("Assertion '" #condition "' failed: \n", message); admin->paused = true;}
 #define CASSERTWARN(condition, message) if(!(condition) && !admin->paused) CLOG_LOC("Assertion '" #condition "' failed: \n", message)
 
 #define CLOGF(...) admin->GetSystem<ConsoleSystem>()->PushConsole(TOSTRING("\n[c:yellow]", __VA_ARGS__, "[c]"))

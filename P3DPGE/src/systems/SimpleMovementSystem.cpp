@@ -53,11 +53,12 @@ void CameraMovement(float deltaTime, Camera* camera, Input* input, Keybinds* bin
 
 void CameraRotation(float deltaTime, Camera* camera, Input* input, Keybinds* binds) {
 
-	if (input->KeyPressed(olc::N)) { 
-		ladmin->currentCamera->MOUSE_LOOK = !ladmin->currentCamera->MOUSE_LOOK; 
-		ladmin->p->bMouseVisible = !ladmin->p->bMouseVisible;
-	}
 	if (!ladmin->IMGUI_KEY_CAPTURE) {
+
+		if (input->KeyPressed(olc::N)) {
+			ladmin->currentCamera->MOUSE_LOOK = !ladmin->currentCamera->MOUSE_LOOK;
+			ladmin->p->bMouseVisible = !ladmin->p->bMouseVisible;
+		}
 		if (!ladmin->currentCamera->MOUSE_LOOK) {
 			//camera rotation up
 			if (input->KeyPressed(binds->cameraRotateUp) || input->KeyHeld(binds->cameraRotateUp)) {

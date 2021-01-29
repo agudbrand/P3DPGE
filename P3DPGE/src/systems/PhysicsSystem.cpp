@@ -12,6 +12,7 @@
 #include "../components/Time.h"
 #include "../components/Camera.h"
 #include "../components/Screen.h"
+#include "../components/Source.h"
 
 //TODO(ip,delle) update entity movement commands to be based on EntityID
 inline void AddSelectedEntityCommands(EntityAdmin* admin) {
@@ -294,8 +295,11 @@ inline void PhysicsTick(PhysicsTuple& t, PhysicsWorld* pw, Time* time) {
 
 	//add input forces
 	t.physics->inputVector.normalize();
-	PhysicsSystem::AddForce(nullptr, t.physics, t.physics->inputVector);
+	PhysicsSystem::AddForce(nullptr, t.physics, t.physics->inputVector * 30);
 	t.physics->inputVector = Vector3::ZERO;
+
+	//add gravity TODO(,sushi) make this a var and toggle later
+	PhysicsSystem::AddForce(nullptr, t.physics, Vector3(0, -9.8, 0));
 
 	//add temp air friction force
 	PhysicsSystem::AddFrictionForce(nullptr, t.physics, pw->frictionAir);
@@ -308,16 +312,20 @@ inline void PhysicsTick(PhysicsTuple& t, PhysicsWorld* pw, Time* time) {
 	t.physics->acceleration = netForce / t.physics->mass * 50;
 
 	//update linear movement and clamp it to min/max velocity
-	t.physics->velocity += t.physics->acceleration * time->physicsDeltaTime;
-	float velMag = t.physics->velocity.mag();
-	if(velMag > pw->maxVelocity) {
-		t.physics->velocity /= velMag;
-		t.physics->velocity *= pw->maxVelocity;
-	} else if(velMag < pw->minVelocity) {
-		t.physics->velocity = Vector3::ZERO;
-		t.physics->acceleration = Vector3::ZERO;
+	if (!t.physics->isStatic) {
+		t.physics->velocity += t.physics->acceleration * time->physicsDeltaTime;
+		float velMag = t.physics->velocity.mag();
+		if (velMag > pw->maxVelocity) {
+			t.physics->velocity /= velMag;
+			t.physics->velocity *= pw->maxVelocity;
+		}
+		else if (velMag < pw->minVelocity) {
+			t.physics->velocity = Vector3::ZERO;
+			t.physics->acceleration = Vector3::ZERO;
+		}
+		t.physics->position += t.physics->velocity * time->physicsDeltaTime;
 	}
-	t.physics->position += t.physics->velocity * time->physicsDeltaTime;
+	
 
 //// rotation ////
 
@@ -365,8 +373,160 @@ Matrix4 LocalToWorldInertiaTensor(Physics* physics, Matrix3 inertiaTensor) {
 	return inverseTransformation.Transpose() * inertiaTensor.To4x4() * inverseTransformation;
 }
 
-inline void AABBAABBCollision(Physics* aabb, AABBCollider* aabbCol, Physics* other, AABBCollider* otherCol) {
-	ERROR("AABB-AABB collision not implemented in PhysicsSystem.cpp");
+inline void AABBAABBCollision(Physics* obj1, AABBCollider* obj1Col, Physics* obj2, AABBCollider* obj2Col) {
+	//ERROR("AABB-AABB collision not implemented in PhysicsSystem.cpp");
+	std::vector<Vector3> obj1ps;
+	std::vector<Vector3> obj2ps;
+
+	obj1ps.reserve(8); obj2ps.reserve(8);
+
+	//oh bruh
+	obj1ps.push_back(obj1->position + obj1Col->halfDims); obj2ps.push_back(obj2->position + obj2Col->halfDims);
+	obj1ps.push_back(obj1->position + obj1Col->halfDims.xInvert()); obj2ps.push_back(obj2->position + obj2Col->halfDims.xInvert());
+	obj1ps.push_back(obj1->position + obj1Col->halfDims.yInvert()); obj2ps.push_back(obj2->position + obj2Col->halfDims.yInvert());
+	obj1ps.push_back(obj1->position + obj1Col->halfDims.zInvert()); obj2ps.push_back(obj2->position + obj2Col->halfDims.zInvert());
+	obj1ps.push_back(obj1->position + obj1Col->halfDims.xInvert().yInvert()); obj2ps.push_back(obj2->position + obj2Col->halfDims.xInvert().yInvert());
+	obj1ps.push_back(obj1->position + obj1Col->halfDims.xInvert().zInvert()); obj2ps.push_back(obj2->position + obj2Col->halfDims.xInvert().zInvert());
+	obj1ps.push_back(obj1->position + obj1Col->halfDims.yInvert().zInvert()); obj2ps.push_back(obj2->position + obj2Col->halfDims.yInvert().zInvert());
+	obj1ps.push_back(obj1->position + obj1Col->halfDims.xInvert().yInvert().zInvert());obj2ps.push_back(obj2->position + obj2Col->halfDims.xInvert().yInvert().zInvert());
+	
+	//calculate min and max values over each axis
+	float max = std::numeric_limits<float>::max();
+
+	float xmax1 = -max; float ymax1 = -max; float zmax1 = -max;
+	float xmax2 = -max; float ymax2 = -max; float zmax2 = -max;
+
+	float xmin1 =  max; float ymin1 =  max; float zmin1 =  max;
+	float xmin2 =  max; float ymin2 =  max; float zmin2 =  max;
+
+	for (int i = 0; i < 8; i++) {
+		if      (obj1ps[i].x > xmax1) xmax1 = obj1ps[i].x;
+		else if (obj1ps[i].x < xmin1) xmin1 = obj1ps[i].x; 
+		if      (obj1ps[i].y > ymax1) ymax1 = obj1ps[i].y;
+		else if (obj1ps[i].y < ymin1) ymin1 = obj1ps[i].y;
+		if      (obj1ps[i].z > zmax1) zmax1 = obj1ps[i].z;
+		else if (obj1ps[i].z < zmin1) zmin1 = obj1ps[i].z;
+
+		if      (obj2ps[i].x > xmax2) xmax2 = obj2ps[i].x;
+		else if (obj2ps[i].x < xmin2) xmin2 = obj2ps[i].x;
+		if      (obj2ps[i].y > ymax2) ymax2 = obj2ps[i].y;
+		else if (obj2ps[i].y < ymin2) ymin2 = obj2ps[i].y;
+		if      (obj2ps[i].z > zmax2) zmax2 = obj2ps[i].z;
+		else if (obj2ps[i].z < zmin2) zmin2 = obj2ps[i].z;
+	}
+
+	if (//check if overlapping
+		(xmin1 <= xmax2 && xmax1 >= xmin2) &&
+		(ymin1 <= ymax2 && ymax1 >= ymin2) &&
+		(zmin1 <= zmax2 && zmax1 >= zmin2)) {
+
+		float xover, yover, zover;
+
+		//we need to know which box is in front over each axis so
+		//the overlap is correct
+		if (xmax1 < xmax2) xover = xmax1 - xmin2;
+		else               xover = xmax2 - xmin1;
+		if (ymax1 < ymax2) yover = ymax1 - ymin2;
+		else               yover = ymax2 - ymin1;
+		if (zmax1 < zmax2) zover = zmax1 - zmin2;
+		else               zover = zmax2 - zmin1;
+
+		//TODO(, sushi) find a nicer way to determine how loud a collision sound is 
+		//obj1->entity->GetComponent<Source>()->RequestPlay(obj1->velocity.mag() + obj2->velocity.mag());
+
+		bool xf = false; bool yf = false; bool zf = false;
+
+		//static resolution
+		if (xover < yover && xover < zover) {
+			if(!obj1->isStatic) obj1->position.x += xover / 2;
+			if(!obj2->isStatic) obj2->position.x -= xover / 2;
+			xf = true;
+		}	
+		else if (yover < xover && yover < zover) {
+			if(!obj1->isStatic) obj1->position.y += yover / 2;
+			if(!obj2->isStatic) obj2->position.y -= yover / 2;
+			yf = true;
+		}
+		else if (zover < yover && zover < xover) {
+			if(!obj1->isStatic) obj1->position.z += zover / 2;
+			if(!obj2->isStatic) obj2->position.z -= zover / 2;
+			zf = true;
+		}
+
+		//dynamic resolution
+		Vector3 ovel;
+
+		//if the first objects vel is zero we must use the other obj to avoid
+		//dividing by zero. if both are 0 then we dont resolve anything
+		//i dont think this is necessary anymore since i fixed something in
+		//Vector3 but im gonna keep it just incase
+		if (obj1->velocity != Vector3::ZERO) {
+			ovel = obj1->velocity;
+		}
+		else if (obj2->velocity != Vector3::ZERO) {
+			ovel = obj2->velocity;
+		}
+		else {
+			ovel = Vector3::ZERO;
+		}
+
+		Vector3 vcm;
+		Vector3 v1f;
+		Vector3 v2f;
+
+		//resolution by the Center of Mass Frame Reference Method
+		//http://www.ww-p.org/common/pages/DisplayFile.aspx?itemId=8889217
+		if (ovel != Vector3::ZERO) {
+			
+			vcm = ((obj1->mass * obj1->velocity) + (obj2->mass * obj2->velocity)) / (obj1->mass + obj2->mass);
+			v1f = -obj1->velocity + (2 * vcm);
+			v2f = -obj2->velocity + (2 * vcm);
+
+			if (!obj1->isStatic) obj1->velocity = v1f;
+			if (!obj2->isStatic) obj2->velocity = v2f;
+
+			//account for elasticity
+			//makes object reflect off of whichever surface of the aabb it hit
+			//TODO(,sushi) implement elasticity
+			//if (obj1->elasticity != 0 || obj2->elasticity != 0) {
+			//	if (xf) {
+			//		//this rotates the vel vector 180 degrees around the vector perp to the surface it hit.
+			//		Vector3 velcomp = -ovel.compOn(Vector3(1, 0, 0) * (ovel.x / fabs(ovel.x))); //the division is so sign is correct
+			//		Vector3 velperp = -ovel - velcomp;
+			//		obj->velocity = obj->elasticity * ovel.mag() * (-velperp + velcomp).normalized();
+			//		oobj->velocity = oobj->velocity.mag() * -obj->velocity.normalized();
+			//		
+			//
+			//
+			//	}
+			//	else if (yf) {
+			//		Vector3 velcomp = -ovel.compOn(Vector3(0, 1, 0) * (ovel.y / fabs(ovel.y)));
+			//		Vector3 velperp = -ovel - velcomp;
+			//		obj->velocity = obj->elasticity * ovel.mag() * (-velperp + velcomp).normalized();
+			//		oobj->velocity = oobj->velocity.mag() * -obj->velocity.normalized();
+			//	}
+			//	else if (zf) {
+			//		Vector3 velcomp = -ovel.compOn(Vector3(0, 0, 1) * (ovel.z / fabs(ovel.z)));
+			//		Vector3 velperp = -ovel - velcomp;
+			//		obj->velocity = obj->elasticity * ovel.mag() * (-velperp + velcomp).normalized();
+			//		oobj->velocity = oobj->velocity.mag() * -obj->velocity.normalized();
+			//
+			//	}
+			//}
+			
+		}
+		
+
+
+
+		
+
+
+	}
+
+
+	
+
 }
 
 inline void AABBSphereCollision(Physics* aabb, AABBCollider* aabbCol, Physics* sphere, SphereCollider* sphereCol) {
@@ -376,6 +536,7 @@ inline void AABBSphereCollision(Physics* aabb, AABBCollider* aabbCol, Physics* s
 	if(distanceBetween < sphereCol->radius) {
 		if(!aabbCol->isTrigger && !sphereCol->isTrigger) {
 			SUCCESS("collision happened");
+			aabb->entity->GetComponent<Source>()->request_play = true;
 			//static resolution
 			if (aabbPoint == sphere->position) { 
 				//NOTE if the closest point is the same, the vector between will have no direction; this 

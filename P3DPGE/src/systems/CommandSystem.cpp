@@ -16,13 +16,13 @@
 #include "../components/Source.h"
 
 //regex for checking paramaters
-#define RegPosParam   std::regex("-pos=\\([0-9|.]+,[0-9|.]+,[0-9|.]+\\)")
-#define RegRotParam   std::regex("-rot=\\([0-9|.]+,[0-9|.]+,[0-9|.]+\\)")
-#define RegScaleParam std::regex("-scale=\\([0-9|.]+,[0-9|.]+,[0-9|.]+\\)")
-#define RegSizeParam  std::regex("-size=\\([0-9|.]+,[0-9|.]+,[0-9|.]+\\)")
+#define RegPosParam   std::regex("-pos=\\([0-9|.|-]+,[0-9|.|-]+,[0-9|.|-]+\\)")
+#define RegRotParam   std::regex("-rot=\\([0-9|.|-]+,[0-9|.|-]+,[0-9|.|-]+\\)")
+#define RegScaleParam std::regex("-scale=\\([0-9|.|-]+,[0-9|.|-]+,[0-9|.|-]+\\)")
+#define RegSizeParam  std::regex("-size=\\([0-9|.|-]+,[0-9|.|-]+,[0-9|.|-]+\\)")
 
 //this is repetitive because it has to capture 3 different groups in the same way
-#define VecNumMatch std::regex("[,\\(]?([0-9|.]+)[,\\)]?[,\\(]?([0-9|.]+)[,\\)]?[,\\(]?([0-9|.]+)[,\\)]?")
+#define VecNumMatch std::regex("[,\\(]?([0-9|.|-]+)[,\\)]?[,\\(]?([0-9|.|-]+)[,\\)]?[,\\(]?([0-9|.|-]+)[,\\)]?")
 
 inline void AddSpawnCommands(EntityAdmin* admin) {
 
@@ -35,6 +35,8 @@ inline void AddSpawnCommands(EntityAdmin* admin) {
 			Vector3 rotation = Vector3::ZERO;
 			Vector3 scale = Vector3::ONE;
 			Vector3 size = Vector3::ONE;
+			float mass = 1;
+			bool isStatic = false;
 
 			for (std::string s : args) { //TODO(o, sushi) see if you can capture the variables when checking for a match
 				if (std::regex_match(s, RegPosParam)) { // -pos=(1,2,3)
@@ -53,6 +55,13 @@ inline void AddSpawnCommands(EntityAdmin* admin) {
 					std::regex_search(s.c_str(), m, VecNumMatch);
 					size = Vector3(std::stof(m[1]), std::stof(m[2]), std::stof(m[3]));
 				}
+				else if (std::regex_match(s, std::regex("-mass=[0-9|.]+"))) {
+					std::regex_search(s.c_str(), m, std::regex("[0-9|.]+"));
+					mass = std::stof(m[0]);
+				}
+				else if (std::regex_match(s, std::regex("-static"))) {
+					isStatic = true;
+				}
 				else {
 					return "[c:red]Invalid parameter: " + s + "[c]";
 				}
@@ -60,9 +69,10 @@ inline void AddSpawnCommands(EntityAdmin* admin) {
 			Entity* box = WorldSystem::CreateEntity(admin);
 			Transform* t = new Transform(position, rotation, scale);
 			Mesh* m = Mesh::CreateBox(box, size, t->position);
-			Physics* p = new Physics(t->position, t->rotation);
+			Physics* p = new Physics(t->position, t->rotation, Vector3::ZERO, Vector3::ZERO, Vector3::ZERO, Vector3::ZERO, 0, mass, isStatic);
 			Source* s = new Source((char*)"sounds/Kick.wav", p);
-			WorldSystem::AddComponentsToEntity(box, { t, m, p, s });
+			AABBCollider* c = new AABBCollider(box, size, 1);
+			WorldSystem::AddComponentsToEntity(box, { t, m, p, s, c });
 			admin->input->selectedEntity = box;
 			return TOSTRING("box created at ", position);
 		}
@@ -72,7 +82,8 @@ inline void AddSpawnCommands(EntityAdmin* admin) {
 			Mesh* m = Mesh::CreateBox(box, Vector3::ONE, t->position);
 			Physics* p = new Physics(t->position, t->rotation);
 			Source* s = new Source((char*)"sounds/Kick.wav", p);
-			WorldSystem::AddComponentsToEntity(box, { t, m, p, s });
+			AABBCollider* c = new AABBCollider(box, Vector3::ONE, 1);
+			WorldSystem::AddComponentsToEntity(box, { t, m, p, s, c });
 			admin->input->selectedEntity = box;
 			return TOSTRING("box created at ", Vector3::ZERO);
 		}
@@ -408,6 +419,11 @@ void CommandSystem::Init() {
 		if (admin->paused) return "engine_pause = true";
 		else return "engine_pause = false";
 	}, "engine_pause", "toggles pausing the engine");
+
+	admin->commands["selent_play_sound"] = new Command([](EntityAdmin* admin, std::vector<std::string> args) -> std::string {
+		admin->input->selectedEntity->GetComponent<Source>()->request_play = true;
+		return TOSTRING("selected entity playing sound: ", admin->input->selectedEntity->GetComponent<Source>()->snd_file);
+	}, "selent_play_sound", "plays a sound from the selected entity");
 
 	AddSpawnCommands(admin);
 	AddRenderCommands(admin);

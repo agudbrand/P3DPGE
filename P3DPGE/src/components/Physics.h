@@ -18,8 +18,10 @@ struct Physics : public Component {
 	std::vector<Vector3> forces;
 	Vector3 inputVector;
 
+	bool isStatic = false;
+
 	Physics(Vector3 position, Vector3 rotation, Vector3 velocity = Vector3::ZERO, Vector3 acceleration = Vector3::ZERO, Vector3 rotVeloctiy = Vector3::ZERO, 
-						Vector3 rotAcceleration = Vector3::ZERO, float elasticity = .5f, float mass = 1.f){
+						Vector3 rotAcceleration = Vector3::ZERO, float elasticity = .5f, float mass = 1.f, bool isStatic = false){
 		this->position = position;
 		this->rotation = rotation;
 		this->velocity = velocity;
@@ -28,6 +30,7 @@ struct Physics : public Component {
 		this->rotAcceleration = rotAcceleration;
 		this->elasticity = elasticity;
 		this->mass = mass;
+		this->isStatic = isStatic;
 	}
 
 	Physics(Vector3 position, Vector3 rotation, float mass, float elasticity){

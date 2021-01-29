@@ -97,6 +97,9 @@ void MakeEntitiesHeader(EntityAdmin* admin) {
 	if(CollapsingHeader("Entities")) {
 		if(admin->input->selectedEntity) {
 			Text("Selected Entity: %d", admin->input->selectedEntity->id);
+			if (ImGui::Button("play sound")) {
+				admin->ExecCommand("selent_play_sound");
+			}
 		} else {
 			Text("Selected Entity: None");
 		}
