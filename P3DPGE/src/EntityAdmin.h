@@ -21,8 +21,14 @@ struct MovementState;
 struct Canvas;
 struct Console;
 
+enum struct P3DPGE_RenderingAPI{
+	PGE2, VULKAN1
+};
+
 struct EntityAdmin {
 	olc::PixelGameEngine* p;
+	P3DPGE_RenderingAPI renderingAPI;
+
 	std::vector<System*> systems;
 	std::map<EntityID, Entity*> entities;
 	//object_pool<Component>* componentsPtr;
@@ -46,7 +52,7 @@ struct EntityAdmin {
 	bool paused = false;
 	bool IMGUI_KEY_CAPTURE = false;
 
-	void Create(olc::PixelGameEngine* p);
+	void Init(olc::PixelGameEngine* p);
 	void Cleanup();
 
 	void Update();

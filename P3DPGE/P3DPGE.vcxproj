@@ -28,6 +28,7 @@
     <ClInclude Include="src\components\Console.h" />
     <ClInclude Include="src\components\Keybinds.h" />
     <ClInclude Include="src\components\Light.h" />
+    <ClInclude Include="src\components\Model.h" />
     <ClInclude Include="src\components\MovementState.h" />
     <ClInclude Include="src\components\Scene.h" />
     <ClInclude Include="src\components\Screen.h" />
@@ -49,6 +50,7 @@
     <ClInclude Include="src\internal\imgui\imstb_textedit.h" />
     <ClInclude Include="src\internal\imgui\imstb_truetype.h" />
     <ClInclude Include="src\internal\olcPixelGameEngine.h" />
+    <ClInclude Include="src\internal\VulkanRendering.h" />
     <ClInclude Include="src\math\InertiaTensors.h" />
     <ClInclude Include="src\math\Math.h" />
     <ClInclude Include="src\math\Matrix3.h" />
@@ -90,6 +92,7 @@
     <ClCompile Include="src\internal\imgui\imgui_impl_opengl2.cpp" />
     <ClCompile Include="src\internal\imgui\imgui_tables.cpp" />
     <ClCompile Include="src\internal\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\internal\VulkanRendering.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\math\Matrix3.cpp" />
     <ClCompile Include="src\math\Matrix4.cpp" />
@@ -116,6 +119,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
+    <None Include="..\README.md" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\TODOs.txt" />
@@ -195,7 +199,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\src\boost_1_74_0;C:\src\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\src\tinyobjloader-master;C:\src\boost_1_74_0;C:\src\stb-master;C:\VulkanSDK\1.2.162.1\Include;C:\src\glm;C:\src\glfw-3.3.2.bin.WIN64\include;C:\src\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
@@ -206,6 +210,8 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <Profile>true</Profile>
+      <AdditionalLibraryDirectories>C:\VulkanSDK\1.2.162.1\Lib;C:\src\glfw-3.3.2.bin.WIN64\lib-vc2015;%(AdditionalLibraryDirectories);$(CudaToolkitLibDir)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies);cudart.lib;cudadevrt.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -216,7 +222,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\src\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\src\tinyobjloader-master;C:\src\boost_1_74_0;C:\src\stb-master;C:\VulkanSDK\1.2.162.1\Include;C:\src\glm;C:\src\glfw-3.3.2.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
@@ -229,6 +235,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <Profile>true</Profile>
+      <AdditionalLibraryDirectories>C:\VulkanSDK\1.2.162.1\Lib;C:\src\glfw-3.3.2.bin.WIN64\lib-vc2015;%(AdditionalLibraryDirectories);$(CudaToolkitLibDir)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies);cudart.lib;cudadevrt.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -237,7 +245,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\src\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\src\tinyobjloader-master;C:\src\boost_1_74_0;C:\src\stb-master;C:\VulkanSDK\1.2.162.1\Include;C:\src\glm;C:\src\glfw-3.3.2.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <SuppressStartupBanner>false</SuppressStartupBanner>
@@ -248,6 +256,8 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <Profile>true</Profile>
+      <AdditionalLibraryDirectories>C:\VulkanSDK\1.2.162.1\Lib;C:\src\glfw-3.3.2.bin.WIN64\lib-vc2015;%(AdditionalLibraryDirectories);$(CudaToolkitLibDir)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies);cudart.lib;cudadevrt.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -258,7 +268,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\src\boost_1_74_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\src\tinyobjloader-master;C:\src\boost_1_74_0;C:\src\stb-master;C:\VulkanSDK\1.2.162.1\Include;C:\src\glm;C:\src\glfw-3.3.2.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
@@ -270,6 +280,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <Profile>true</Profile>
+      <AdditionalLibraryDirectories>C:\VulkanSDK\1.2.162.1\Lib;C:\src\glfw-3.3.2.bin.WIN64\lib-vc2015;%(AdditionalLibraryDirectories);$(CudaToolkitLibDir)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies);cudart.lib;cudadevrt.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

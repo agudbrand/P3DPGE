@@ -33,7 +33,7 @@ inline void AddSelectEntityCommand(EntityAdmin* admin) {
 			DEBUG ray->e = (Entity*)1; //to make it not delete every frame
 			DEBUG admin->currentScene->lines.push_back(ray);
 
-			for (Mesh* m : admin->currentScene->meshes) {
+			for (OldMesh* m : admin->currentScene->meshes) {
 				if (MeshSystem::LineIntersect(m, ray)) {
 					admin->input->selectedEntity = m->entity;
 					break;
@@ -58,11 +58,11 @@ void MeshSystem::Init() {
 
 void MeshSystem::Update() {
 	for(auto e : admin->entities) {
-		Mesh* m = 0;
+		OldMesh* m = 0;
 		Transform* t = 0;
 		Physics* p = 0;
 		for(auto c : e.second->components) {
-			if(Mesh* mesh = dynamic_cast<Mesh*>(c)) {
+			if(OldMesh* mesh = dynamic_cast<OldMesh*>(c)) {
 				m = mesh;
 			} 
 			else if(Transform* transform = dynamic_cast<Transform*>(c)) {
@@ -77,14 +77,14 @@ void MeshSystem::Update() {
 	}
 }
 
-bool MeshSystem::LineIntersect(Mesh* mesh, Edge3D* line) {
+bool MeshSystem::LineIntersect(OldMesh* mesh, Edge3D* line) {
 	for(Triangle& t : mesh->triangles) {
 		if(t.line_intersect(line)) { return true; }
 	}
 	return false;
 }
 
-void MeshSystem::TranslateMesh(Mesh* mesh, Vector3 translation) {
+void MeshSystem::TranslateMesh(OldMesh* mesh, Vector3 translation) {
 	for(auto& t : mesh->triangles) {
 		for (int i = 0; i < 3; i++) {
 			t.points[i] += translation;
@@ -92,7 +92,7 @@ void MeshSystem::TranslateMesh(Mesh* mesh, Vector3 translation) {
 	}
 }
 
-void MeshSystem::RotateMesh(Mesh* mesh, Matrix4 rotation) {
+void MeshSystem::RotateMesh(OldMesh* mesh, Matrix4 rotation) {
 	for (auto& t : mesh->triangles) {
 		BUFFERLOG(0, t);
 		for (int i = 0; i < 3; i++) {
@@ -103,7 +103,7 @@ void MeshSystem::RotateMesh(Mesh* mesh, Matrix4 rotation) {
 	}
 }
 
-void MeshSystem::ScaleMesh(Mesh* mesh, Matrix3 scale) {
+void MeshSystem::ScaleMesh(OldMesh* mesh, Matrix3 scale) {
 	
 	for (auto& t : mesh->triangles) {
 		for (auto& p : t.points) {
@@ -114,7 +114,7 @@ void MeshSystem::ScaleMesh(Mesh* mesh, Matrix3 scale) {
 	
 }
 
-void MeshSystem::TransformMesh(Mesh* mesh, Matrix4 transformation) {
+void MeshSystem::TransformMesh(OldMesh* mesh, Matrix4 transformation) {
 	for(auto& t : mesh->triangles) {
 		for(auto& p : t.points) {
 			p *= transformation;

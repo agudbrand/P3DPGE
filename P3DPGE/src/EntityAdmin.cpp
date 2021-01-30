@@ -38,8 +38,8 @@ TODO(p,delle) add physics based collision resolution for all entities
   SimpleMovementSystem	|| Camera							|| Input, Keybinds, MovementState, Time
   PhysicsSystem			|| Time, Transform, Physics			|| Camera, Screen
   CameraSystem			|| Camera							|| Screen
-  MeshSystem			|| Mesh								|| Transform
-  RenderSceneSystem		|| Scene							|| Mesh, Camera, Screen, Light, Time, 
+  MeshSystem			|| OldMesh								|| Transform
+  RenderSceneSystem		|| Scene							|| OldMesh, Camera, Screen, Light, Time, 
 						||									||	Transform, Physics
   RenderCanvasSystem	|| Canvas							|| Screen
   WorldSystem			|| World, Entity					|| N/A
@@ -55,7 +55,7 @@ TODO(p,delle) add physics based collision resolution for all entities
 												//	<math.h>, <algorithm>, <numeric>
 //#include "geometry/Edge.h"					//Math.h
 //#include "geometry/Triangle.h"				//Math.h, Edge.h
-
+#include "internal/VulkanRendering.h"
 
 //component includes
 #include "components/Component.h"				//UsefulDefines.h, <vector>
@@ -69,7 +69,7 @@ TODO(p,delle) add physics based collision resolution for all entities
 #include "components/Scene.h"					//Component.h
 #include "components/Canvas.h"					//Component.h, UI.h
 #include "components/Console.h"
-//#include "components/Mesh.h"					//Component.h, Vector3.h, Triangle.h, Armature.h
+//#include "components/OldMesh.h"				//Component.h, Vector3.h, Triangle.h, Armature.h
 //#include "components/Light.h"					//Component.h, Vector3.h 
 //#include "components/Physics.h"				//Component.h, Vector3.h
 //#include "components/Transform.h"				//Component.h, Vector3.h, Matrix4.h
@@ -82,10 +82,10 @@ TODO(p,delle) add physics based collision resolution for all entities
 #include "systems/SimpleMovementSystem.h"		//System.h |cpp->| Input.h, Keybinds.h, Camera.h, MovementState.h, Time.h
 #include "systems/PhysicsSystem.h"				//System.h |cpp->| PhysicsWorld.h, Math.h, Transform.h, Physics.h, Input.h, Command.h, Input.h, Time.h, Camera.h, Screen.h
 #include "systems/CameraSystem.h"				//System.h |cpp->| Camera.h, Screen.h, Command.h
-#include "systems/MeshSystem.h"					//System.h |cpp->| Mesh.h, Transform.h, Physics.h, Command.h, Input.h, Camera.h, Scene.h, Screen.h, Light.h
-#include "systems/RenderSceneSystem.h"			//System.h |cpp->| Math.h, Scene.h, Mesh.h, Camera.h, Light.h, Screen.h, Transform.h, Command.h
+#include "systems/MeshSystem.h"					//System.h |cpp->| OldMesh.h, Transform.h, Physics.h, Command.h, Input.h, Camera.h, Scene.h, Screen.h, Light.h
+#include "systems/RenderSceneSystem.h"			//System.h |cpp->| Math.h, Scene.h, OldMesh.h, Camera.h, Light.h, Screen.h, Transform.h, Command.h
 #include "systems/RenderCanvasSystem.h"			//System.h |cpp->| Canvas.h, Screen.h
-#include "systems/WorldSystem.h"				//System.h |cpp->| World.h, Transform.h, Mesh.h, Command.h, Input.h
+#include "systems/WorldSystem.h"				//System.h |cpp->| World.h, Transform.h, OldMesh.h, Command.h, Input.h
 #include "systems/TriggeredCommandSystem.h"		//System.h |cpp->| Command.h
 #include "systems/ConsoleSystem.h"				//System.h |cpp->| Console.h
 
@@ -96,10 +96,11 @@ TODO(p,delle) add physics based collision resolution for all entities
 
 //// EntityAdmin ////
 
-void EntityAdmin::Create(olc::PixelGameEngine* p) {
+void EntityAdmin::Init(olc::PixelGameEngine* p) {
 	g_cBuffer.allocate_space(100);
 
 	this->p = p;
+
 	systems = std::vector<System*>();
 	entities = std::map<EntityID, Entity*>();
 	components = std::vector<Component*>();
@@ -129,9 +130,7 @@ void EntityAdmin::Create(olc::PixelGameEngine* p) {
 	AddSystem(new CommandSystem());
 	AddSystem(new SimpleMovementSystem());
 	switch(physicsWorld->integrationMode) {
-		default: /* Semi-Implicit Euler */ {
-			AddSystem(new PhysicsSystem());
-		}
+		default: { AddSystem(new PhysicsSystem()); break; } // Semi-Implicit Euler
 	}
 	AddSystem(new CameraSystem());
 	AddSystem(new MeshSystem());

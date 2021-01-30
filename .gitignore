@@ -353,3 +353,6 @@ objects/
 sprites/
 scenes/
 *.obj
+*.png
+*.jpg
+*.bat

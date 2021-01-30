@@ -4,10 +4,9 @@
 
 struct Light;
 struct Edge3D;
-//struct Mesh;
 
 struct Scene : public Component {
-	std::vector<Mesh*> meshes;
+	std::vector<OldMesh*> meshes;
 	std::vector<Edge3D*> lines;
 	std::vector<Light*> lights;
 	std::vector<float> pixelDepthBuffer;
@@ -25,9 +24,8 @@ struct Scene : public Component {
 	bool RENDER_LIGHT_RAYS				= false;
 	bool RENDER_MESH_NORMALS			= false;
 
-
 	Scene(olc::PixelGameEngine* p) {
-		meshes = std::vector<Mesh*>();
+		meshes = std::vector<OldMesh*>();
 		lights = std::vector<Light*>();
 		lights = std::vector<Light*>();
 		pixelDepthBuffer = std::vector<float>((size_t)p->ScreenWidth() * (size_t)p->ScreenHeight());
@@ -42,7 +40,7 @@ struct Scene : public Component {
 
 		std::vector<Vector3> vertices;
 
-		for (Mesh* m : meshes) {
+		for (OldMesh* m : meshes) {
 			for (Triangle t : m->triangles) {
 				for (Vector3 v : t.points) {
 					if      (v.x < min.x) { min.x = v.x; }

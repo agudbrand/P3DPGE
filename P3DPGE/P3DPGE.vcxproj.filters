@@ -228,6 +228,12 @@
     <ClInclude Include="src\components\Console.h">
       <Filter>src\components</Filter>
     </ClInclude>
+    <ClInclude Include="src\components\Model.h">
+      <Filter>src\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\internal\VulkanRendering.h">
+      <Filter>src\internal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -311,6 +317,9 @@
     <ClCompile Include="src\systems\ConsoleSystem.cpp">
       <Filter>src\systems\cpp</Filter>
     </ClCompile>
+    <ClCompile Include="src\internal\VulkanRendering.cpp">
+      <Filter>src\internal</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="src\systems\RenderCUDAInterface.cu">
@@ -319,6 +328,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore">
+      <Filter>_</Filter>
+    </None>
+    <None Include="..\README.md">
       <Filter>_</Filter>
     </None>
   </ItemGroup>

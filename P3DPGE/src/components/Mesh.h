@@ -6,7 +6,7 @@
 #include "../geometry/Triangle.h"
 #include "../animation/Armature.h"
 
-struct Mesh : public Component {
+struct OldMesh : public Component {
 	Armature* armature = nullptr;
 	std::vector<Triangle> triangles;
 
@@ -14,23 +14,23 @@ struct Mesh : public Component {
 	olc::Sprite* texture = nullptr;
 
 	//single triangle mesh for testing
-	Mesh(Triangle t) {
+	OldMesh(Triangle t) {
 		triangles.push_back(t);
 	}
 
-	Mesh(std::vector<Triangle> triangles, Armature* armature = 0) {
+	OldMesh(std::vector<Triangle> triangles, Armature* armature = 0) {
 		this->armature = armature;
 		this->triangles = triangles;
 	}
 
-	~Mesh() {
+	~OldMesh() {
 		if(armature) {
 			delete armature;
 		}
 	}
 
 	//TODO(r, sushi) make it so you can do this with a custom texture
-	static Mesh* CreateBox(Entity* e, Vector3 halfDims, Vector3 position) {
+	static OldMesh* CreateBox(Entity* e, Vector3 halfDims, Vector3 position) {
 		std::vector<Triangle> triangles;
 
 		Vector3 p1 = halfDims.xInvert().yInvert().zInvert();
@@ -61,7 +61,7 @@ struct Mesh : public Component {
 		triangles.push_back(Triangle(p7, p2, p1, Vector3(0, 1, 1), Vector3(0, 0, 1), Vector3(1, 0, 1), e, position)); 
 		triangles.push_back(Triangle(p7, p1, p3, Vector3(0, 1, 1), Vector3(1, 0, 1), Vector3(1, 1, 1), e, position)); 
 
-		Mesh* m = new Mesh(triangles);
+		OldMesh* m = new OldMesh(triangles);
 		m->entity = e;
 		//m->entity->GetComponent<Transform>()->lookDir = Vector3::ZERO;
 		m->texture = new olc::Sprite("sprites/UV_Grid_Sm.jpg");
@@ -69,7 +69,7 @@ struct Mesh : public Component {
 	}
 
 
-	static Mesh* CreateComplex(Entity* e, const char* fileName, bool hasTexture, Vector3 position) {
+	static OldMesh* CreateComplex(Entity* e, const char* fileName, bool hasTexture, Vector3 position) {
 		std::ifstream f(fileName);
 		if (!f.is_open()) { return 0; }
 	
@@ -125,7 +125,7 @@ struct Mesh : public Component {
 			}
 		}
 
-		Mesh* m = new Mesh(triangles);
+		OldMesh* m = new OldMesh(triangles);
 		m->entity = e;
 
 		return m;

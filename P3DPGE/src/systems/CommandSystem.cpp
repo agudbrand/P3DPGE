@@ -61,7 +61,7 @@ inline void AddSpawnCommands(EntityAdmin* admin) {
 			}
 			Entity* box = WorldSystem::CreateEntity(admin);
 			Transform* t = new Transform(position, rotation, scale);
-			Mesh* m = Mesh::CreateBox(box, size, t->position);
+			OldMesh* m = OldMesh::CreateBox(box, size, t->position);
 			Physics* p = new Physics(t->position, t->rotation);
 			WorldSystem::AddComponentsToEntity(box, { t, m, p });
 			admin->input->selectedEntity = box;
@@ -70,7 +70,7 @@ inline void AddSpawnCommands(EntityAdmin* admin) {
 		else {
 			Entity* box = WorldSystem::CreateEntity(admin);
 			Transform* t = new Transform(Vector3(0, 0, 3), Vector3::ZERO, Vector3::ONE);
-			Mesh* m = Mesh::CreateBox(box, Vector3::ONE, t->position);
+			OldMesh* m = OldMesh::CreateBox(box, Vector3::ONE, t->position);
 			Physics* p = new Physics(t->position, t->rotation);
 			WorldSystem::AddComponentsToEntity(box, { t, m, p });
 			admin->input->selectedEntity = box;
@@ -93,7 +93,7 @@ inline void AddSpawnCommands(EntityAdmin* admin) {
 		Entity* c = WorldSystem::CreateEntity(admin);
 
 		Transform* t = new Transform(Vector3(0,0,3), Vector3::ZERO, Vector3::ONE);
-		Mesh* m = Mesh::CreateComplex(c, "objects/bmonkey.obj", false, t->position);
+		OldMesh* m = OldMesh::CreateComplex(c, "objects/bmonkey.obj", false, t->position);
 		WorldSystem::AddComponentsToEntity(c, {t, m});
 		admin->input->selectedEntity = c;
 		return "";
@@ -103,7 +103,7 @@ inline void AddSpawnCommands(EntityAdmin* admin) {
 		Entity* c = WorldSystem::CreateEntity(admin);
 
 		Transform* t = new Transform(Vector3(0,0,3), Vector3::ZERO, Vector3::ONE);
-		Mesh* m = Mesh::CreateComplex(c, "objects/whale_ship.obj", false, t->position);
+		OldMesh* m = OldMesh::CreateComplex(c, "objects/whale_ship.obj", false, t->position);
 		WorldSystem::AddComponentsToEntity(c, {t, m});
 		admin->input->selectedEntity = c;
 		return "";
@@ -113,7 +113,7 @@ inline void AddSpawnCommands(EntityAdmin* admin) {
 		Entity* c = WorldSystem::CreateEntity(admin);
 
 		Transform* t = new Transform(Vector3(0,0,3), Vector3::ZERO, Vector3::ONE);
-		Mesh* m = Mesh::CreateComplex(c, "objects/24K_Triangles.obj", false, t->position);
+		OldMesh* m = OldMesh::CreateComplex(c, "objects/24K_Triangles.obj", false, t->position);
 		WorldSystem::AddComponentsToEntity(c, {t, m});
 		admin->input->selectedEntity = c;
 		return "";
@@ -123,7 +123,7 @@ inline void AddSpawnCommands(EntityAdmin* admin) {
 		Entity* c = WorldSystem::CreateEntity(admin);
 
 		Transform* t = new Transform(Vector3(0, 0, 3), Vector3::ZERO, Vector3::ONE);
-		Mesh* m = Mesh::CreateComplex(c, "scenes/scene_test.obj", true, t->position);
+		OldMesh* m = OldMesh::CreateComplex(c, "scenes/scene_test.obj", true, t->position);
 		WorldSystem::AddComponentsToEntity(c, { t, m });
 
 		olc::Sprite* s = new olc::Sprite(1, 1);
@@ -261,7 +261,7 @@ inline void HandleMouseInputs(EntityAdmin* admin, Input* input) {
 					if(ui->Clicked(input->mousePos)) {
 						ui_clicked = true;
 						goto stop;
-					}//TODO(delle) re-add menu dragging
+					}//TODO(i,delle) re-add menu dragging
 				}
 			}
 		}
@@ -298,8 +298,10 @@ inline void HandleMouseInputs(EntityAdmin* admin, Input* input) {
 		input->mouseClickPos = Vector2(admin->p->ScreenWidth(), admin->p->ScreenHeight());
 	}
 
-	if(input->KeyPressed(olc::MINUS)) {
-		admin->p->SetMousePositionLocal(admin->p->GetWindowSize() / 2);
+	if(input->MousePressed(INPUT_MOUSE_RIGHT)) {
+		admin->p->SetMouseFPSMode(true);
+	} else if(input->MouseReleased(INPUT_MOUSE_RIGHT)) {
+		admin->p->SetMouseFPSMode(false);
 	}
 }
 
@@ -427,14 +429,14 @@ void CommandSystem::Update() {
 	if(input->KeyPressed(olc::F1, INPUT_SHIFT_HELD)) {
 		Entity* box = WorldSystem::CreateEntity(admin);
 		Transform* t = new Transform(Vector3(-10, 0, 20), Vector3::ZERO, Vector3::ONE);
-		Mesh* m = Mesh::CreateBox(box, Vector3(5, 5, 5), t->position);
+		OldMesh* m = OldMesh::CreateBox(box, Vector3(5, 5, 5), t->position);
 		Physics* p = new Physics(t->position, t->rotation, 100.f, 0.1f); //heavy concrete cube
 		AABBCollider* c = new AABBCollider(box, Vector3(5, 5, 5), p->mass);
 		WorldSystem::AddComponentsToEntity(box, {t, m, p, c});
 
 		Entity* sphere = WorldSystem::CreateEntity(admin);
 		Transform* t2 = new Transform(Vector3(30, 0, 20), Vector3::ZERO, Vector3::ONE);
-		Mesh* m2 = Mesh::CreateBox(sphere, Vector3(.3f, .3f, .3f), t2->position);
+		OldMesh* m2 = OldMesh::CreateBox(sphere, Vector3(.3f, .3f, .3f), t2->position);
 		Physics* p2 = new Physics(t2->position, t2->rotation, Vector3(-30, 2, 0)); //light rubber ball
 		p2->elasticity = .5f;
 		SphereCollider* c2 = new SphereCollider(sphere, 1, p2->mass);

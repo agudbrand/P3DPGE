@@ -13,10 +13,6 @@
 
 #include <thrust/host_vector.h>
 
-void RenderSceneSystem::Init() {
-	
-}
-
 void TexturedTriangle(Scene* scene, Screen* screen, olc::PixelGameEngine* p, Triangle* tri){	
 	int x1 = tri->proj_points[0].x; int x2 = tri->proj_points[1].x; int x3 = tri->proj_points[2].x;
 	int y1 = tri->proj_points[0].y; int y2 = tri->proj_points[1].y; int y3 = tri->proj_points[2].y;
@@ -94,7 +90,7 @@ void TexturedTriangle(Scene* scene, Screen* screen, olc::PixelGameEngine* p, Tri
 				//LOG(tex_w);
 
 				if (tex_w > scene->pixelDepthBuffer[i * (size_t)screen->width + j]) {
-					p->Draw(j, i, tri->e->GetComponent<Mesh>()->texture->Sample(tex_u / tex_w, tex_v / tex_w));
+					p->Draw(j, i, tri->e->GetComponent<OldMesh>()->texture->Sample(tex_u / tex_w, tex_v / tex_w));
 					scene->pixelDepthBuffer[i * (size_t)screen->width + j] = tex_w;
 				}
 				t += tstep;
@@ -150,7 +146,7 @@ void TexturedTriangle(Scene* scene, Screen* screen, olc::PixelGameEngine* p, Tri
 
 				if (tex_w > scene->pixelDepthBuffer[i * (size_t)screen->width + j]) {
 
-					p->Draw(j, i, tri->e->GetComponent<Mesh>()->texture->Sample(tex_u / tex_w, tex_v / tex_w));
+					p->Draw(j, i, tri->e->GetComponent<OldMesh>()->texture->Sample(tex_u / tex_w, tex_v / tex_w));
 					scene->pixelDepthBuffer[i * (size_t)screen->width + j] = tex_w;
 				}
 				t += tstep;
@@ -200,7 +196,7 @@ int ClipTriangles(const Vector3& plane_p, Vector3 plane_n, Triangle* in_tri, std
 		Triangle* newTri = new Triangle();
 		newTri->color = in_tri->color;
 		newTri->e = in_tri->e;
-		newTri->e->GetComponent<Mesh>()->texture = in_tri->e->GetComponent<Mesh>()->texture;
+		newTri->e->GetComponent<OldMesh>()->texture = in_tri->e->GetComponent<OldMesh>()->texture;
 		newTri->is_clip = true; 
 
 		//the inside point is valid so we keep it
@@ -224,7 +220,7 @@ int ClipTriangles(const Vector3& plane_p, Vector3 plane_n, Triangle* in_tri, std
 	//triangle will be clipped and becomes a quad which is cut into two more triangles
 		Triangle* newTri = new Triangle();
 		newTri->e = in_tri->e;
-		newTri->e->GetComponent<Mesh>()->texture = in_tri->e->GetComponent<Mesh>()->texture;
+		newTri->e->GetComponent<OldMesh>()->texture = in_tri->e->GetComponent<OldMesh>()->texture;
 		newTri->is_clip = true;
 		newTri->color = in_tri->color;
 
@@ -241,7 +237,7 @@ int ClipTriangles(const Vector3& plane_p, Vector3 plane_n, Triangle* in_tri, std
 		Triangle* newTri2 = new Triangle(); //TODO(, sushi) figure out why this is leaking
 		newTri2->color = in_tri->color;
 		newTri2->e = in_tri->e;
-		newTri2->e->GetComponent<Mesh>()->texture = in_tri->e->GetComponent<Mesh>()->texture;
+		newTri2->e->GetComponent<OldMesh>()->texture = in_tri->e->GetComponent<OldMesh>()->texture;
 		newTri2->is_clip = true;
 
 		newTri2->proj_points[0] = *inside_points[1];
@@ -296,7 +292,7 @@ int DrawTriangles(Scene* scene, Screen* screen, olc::PixelGameEngine* p, std::li
 
 int RenderTriangles(Scene* scene, Camera* camera, Screen* screen, olc::PixelGameEngine* p) {
 	int drawnTriCount = 0;
-	for(Mesh* mesh : scene->meshes) {
+	for(OldMesh* mesh : scene->meshes) {
 		std::vector<Vector3*> screenSpaceVertices;
 		for(Triangle& t : mesh->triangles) {
 			if(scene->RENDER_MESH_VERTICES) {
@@ -363,7 +359,7 @@ int RenderTriangles(Scene* scene, Camera* camera, Screen* screen, olc::PixelGame
 							}
 
 							for(int bClipIndex = 0; bClipIndex < numBClipped; ++bClipIndex) {
-								bClipped[bClipIndex]->e->GetComponent<Mesh>()->texture = zClipped[zClipIndex]->e->GetComponent<Mesh>()->texture;
+								bClipped[bClipIndex]->e->GetComponent<OldMesh>()->texture = zClipped[zClipIndex]->e->GetComponent<OldMesh>()->texture;
 								bClipped[bClipIndex]->orig = tri->orig;
 								borderClippedTris.push_back(bClipped[bClipIndex]);
 							}
@@ -532,7 +528,6 @@ int RenderLines(Scene* scene, Camera* camera, Screen* screen, olc::PixelGameEngi
 	return out;
 } //RenderLines
 
-
 //this (probably) generates a light's depth texture for use in shadow casting
 //currently set up to work for directional lights
 void LightDepthTex(Light* li, Camera* c, Scene* s, Screen* sc) {
@@ -570,7 +565,7 @@ void LightDepthTex(Light* li, Camera* c, Scene* s, Screen* sc) {
 	//render the scene with respect to the light
 	//what im dloing is just projecting each triangle and rendering them instead
 	//of projecting them each individually. i dont know if this is more efficient or not
-	for (Mesh* m : s->meshes) {
+	for (OldMesh* m : s->meshes) {
 		for (Triangle tri : m->triangles) {
 
 			//project triangle to light's 'view'
@@ -749,7 +744,7 @@ void LightDepthTex(Light* li, Camera* c, Scene* s, Screen* sc) {
 
 }
 
-void RenderSceneSystem::Update() {
+void CustomRendering(EntityAdmin* admin) {
 	Scene* scene = admin->currentScene;
 	Camera* camera = admin->currentCamera;
 	Input* input = admin->input;
@@ -772,7 +767,7 @@ void RenderSceneSystem::Update() {
 	std::vector<std::pair<Vector2, std::string>> render_transforms;
 	for(auto pair : admin->entities) {
 		for(Component* comp : pair.second->components) {
-			if(Mesh* mesh = dynamic_cast<Mesh*>(comp)) {
+			if(OldMesh* mesh = dynamic_cast<OldMesh*>(comp)) {
 				scene->meshes.push_back(mesh);
 				totalTriCount += mesh->triangles.size();
 			}
@@ -867,6 +862,12 @@ void RenderSceneSystem::Update() {
 		float mod = (sinf((4 * admin->time->totalTime) + modmod) + 1) / 2; //nice looking flash effect
 		p->DrawStringDecal(Vector2(0, admin->screen->height - tsize.y), "ENGINE PAUSED", col * mod , Vector2(5, 5));
 	}
+}
 
+void RenderSceneSystem::Init() {
+	
+}
 
+void RenderSceneSystem::Update() {
+	
 } //Update
