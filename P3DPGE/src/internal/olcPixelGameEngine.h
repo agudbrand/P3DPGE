@@ -1,15 +1,3 @@
-#pragma once
-struct GLFWwindow;
-namespace p3dpge_vk {
-	struct RenderAPI {
-		GLFWwindow* window;
-		bool framebufferResized = false;
-		virtual void Init() {}
-		virtual void Draw() {}
-		virtual void Cleanup() {}
-	};
-}
-
 /*
 	olcPixelGameEngine.h
 
@@ -342,7 +330,7 @@ int main()
 #endif
 
 // Renderer
-#if !defined(OLC_GFX_VULKAN1) && !defined(OLC_GFX_OPENGL10) || !defined(OLC_GFX_OPENGL33) && !defined(OLC_GFX_DIRECTX10)
+#if !defined(OLC_GFX_OPENGL10) || !defined(OLC_GFX_OPENGL33) && !defined(OLC_GFX_DIRECTX10)
 	#define OLC_GFX_OPENGL10
 #endif
 
@@ -3399,74 +3387,6 @@ namespace olc
 
 
 
-// O------------------------------------------------------------------------------O
-// | START RENDERER: Vulkan(SDK) 1.2.162.1										  |
-// O------------------------------------------------------------------------------O
-#if defined(OLC_GFX_VULKAN1) && defined(__GLFW__)
-#if defined(_WIN32)
-	#include <windows.h>
-	#pragma comment(lib,"glfw3.lib")
-	#pragma comment(lib,"vulkan-1.lib")
-#endif
-
-//#include <vulkan/vulkan.h>
-#include <GLFW/glfw3.h>
-
-namespace olc
-{
-
-struct Renderer_VK1 : public olc::Renderer {
-	GLFWwindow* window;
-	p3dpge_vk::RenderAPI* vulkan;
-
-	static void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
-		auto app = reinterpret_cast<Renderer_VK1*>(glfwGetWindowUserPointer(window));
-		app->vulkan->framebufferResized = true;
-	}
-
-	///////////////////////
-	//// pge functions ////
-	///////////////////////
-
-	virtual void       PrepareDevice() {
-		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	};
-
-	virtual olc::rcode CreateDevice(std::vector<void*> params, bool bFullScreen, bool bVSYNC) {
-		window = (GLFWwindow *)(params[0]);
-		vulkan->Init();
-		return olc::OK;
-	};
-
-	virtual olc::rcode DestroyDevice() {
-		vulkan->Cleanup();
-		return olc::OK;
-	};
-
-	virtual void       DisplayFrame() {
-		vulkan->Draw();
-	};
-
-	virtual void       PrepareDrawing() {};
-	virtual void	   SetDecalMode(const olc::DecalMode& mode) {};
-	virtual void       DrawLayerQuad(const olc::vf2d& offset, const olc::vf2d& scale, const olc::Pixel tint) {};
-	virtual void       DrawDecalQuad(const olc::DecalInstance& decal) {};
-	virtual uint32_t   CreateTexture(const uint32_t width, const uint32_t height, const bool filtered = false) { return 0; };
-	virtual void       UpdateTexture(uint32_t id, olc::Sprite* spr) {};
-	virtual uint32_t   DeleteTexture(const uint32_t id) { return 0; };
-	virtual void       ApplyTexture(uint32_t id) {};
-	virtual void       UpdateViewport(const olc::vi2d& pos, const olc::vi2d& size) {};
-	virtual void       ClearBuffer(olc::Pixel p, bool bDepth) {};
-};
-
-};
-
-#endif
-// O------------------------------------------------------------------------------O
-// | END RENDERER: Vulkan(SDK) 1.2.162.1										  |
-// O------------------------------------------------------------------------------O
-
-
 
 // O------------------------------------------------------------------------------O
 // | START IMAGE LOADER: GDI+, Windows Only, always exists, a little slow         |
@@ -4620,11 +4540,6 @@ namespace olc {
 			return olc::rcode::FAIL;
 		}
 
-#if defined(OLC_GFX_VULKAN1)
-		glfwSetWindowUserPointer(olc_Window, renderer.get());
-		glfwSetFramebufferSizeCallback(olc_Window, Renderer_VK1::framebufferResizeCallback);
-#endif
-
 		int glfw_screen_width, glfw_screen_height, glfw_x_leftcorner, glfw_y_leftcorner;
 		glfwGetMonitorWorkarea(glfwGetPrimaryMonitor(), &glfw_x_leftcorner, &glfw_y_leftcorner, &glfw_screen_width, &glfw_screen_height);
 	  
@@ -4869,10 +4784,6 @@ namespace olc
 
 #if defined(OLC_GFX_DIRECTX11)
 		renderer = std::make_unique<olc::Renderer_DX11>();
-#endif
-
-#if defined(OLC_GFX_VULKAN1)
-		renderer = std::make_unique<olc::Renderer_VK1>();
 #endif
 
 		// Associate components with PGE instance

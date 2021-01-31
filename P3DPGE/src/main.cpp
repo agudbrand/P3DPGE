@@ -1,5 +1,5 @@
 #pragma once
-#define OLC_GFX_VULKAN1
+
 #define __GLFW__
 #define OLC_IMAGE_STB
 #define OLC_PGE_APPLICATION
@@ -32,24 +32,19 @@ Linker Libraries:
 class P3DPGE : public olc::PixelGameEngine {
 public:
 	EntityAdmin entityAdmin;
-	int gameLayer;
+	int gameDrawLayer;
 
 	P3DPGE() { sAppName = "P3DPGE"; }
 
 	bool OnUserCreate() override {
-		//Create a new Layer which will be used for the game
-		gameLayer = CreateLayer();
-		//The layer is not enabled by default,  so we need to enable it
-		EnableLayer(gameLayer, true);
-
-		entityAdmin.Init(this);
+		gameDrawLayer = CreateLayer();
+		EnableLayer(gameDrawLayer, true);
+		entityAdmin.Init(this, P3DPGE_RenderingAPI::VULKAN1);
 		return true;
 	}
 
 	bool OnUserUpdate(float deltaTime) override {
-		//Change the Draw Target to not be Layer 0
-		SetDrawTarget((uint8_t)gameLayer);
-
+		SetDrawTarget((uint8_t)gameDrawLayer);
 		entityAdmin.Update();
 		return true;
 	}

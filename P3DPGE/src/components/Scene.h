@@ -1,6 +1,7 @@
 #pragma once
 #include "Component.h"
 #include "Mesh.h"
+#include "../internal/VulkanRendering.h"
 
 struct Light;
 struct Edge3D;

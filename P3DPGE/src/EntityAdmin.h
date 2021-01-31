@@ -52,7 +52,7 @@ struct EntityAdmin {
 	bool paused = false;
 	bool IMGUI_KEY_CAPTURE = false;
 
-	void Init(olc::PixelGameEngine* p);
+	void Init(olc::PixelGameEngine* p, P3DPGE_RenderingAPI renderAPI);
 	void Cleanup();
 
 	void Update();

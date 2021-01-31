@@ -869,5 +869,8 @@ void RenderSceneSystem::Init() {
 }
 
 void RenderSceneSystem::Update() {
-	
+	switch(admin->renderingAPI) {
+		case(P3DPGE_RenderingAPI::VULKAN1): //{ admin->currentScene->renderAPI.drawFrame(); }break;
+		default: { CustomRendering(admin); } break;
+	}
 } //Update

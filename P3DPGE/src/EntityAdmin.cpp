@@ -55,7 +55,6 @@ TODO(p,delle) add physics based collision resolution for all entities
 												//	<math.h>, <algorithm>, <numeric>
 //#include "geometry/Edge.h"					//Math.h
 //#include "geometry/Triangle.h"				//Math.h, Edge.h
-#include "internal/VulkanRendering.h"
 
 //component includes
 #include "components/Component.h"				//UsefulDefines.h, <vector>
@@ -96,10 +95,11 @@ TODO(p,delle) add physics based collision resolution for all entities
 
 //// EntityAdmin ////
 
-void EntityAdmin::Init(olc::PixelGameEngine* p) {
+void EntityAdmin::Init(olc::PixelGameEngine* p, P3DPGE_RenderingAPI renderAPI) {
 	g_cBuffer.allocate_space(100);
 
 	this->p = p;
+	this->renderingAPI = renderAPI;
 
 	systems = std::vector<System*>();
 	entities = std::map<EntityID, Entity*>();
@@ -254,6 +254,7 @@ uint32 Entity::AddComponent(Component* component) {
 	return components.size()-1;
 }
 
+//TODO(o,delle) reserve before pushback
 uint32 Entity::AddComponents(std::vector<Component*> comps) {
 	uint32 value = this->components.size();
 	for(auto& c : comps) {

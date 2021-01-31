@@ -61,10 +61,11 @@ namespace std {
 	};
 }
 
-struct VulkanRenderAPI : p3dpge_vk::RenderAPI {
+struct VulkanRenderAPI {
 	//////////////////////////////
 	//// vulkan api variables ////
 	//////////////////////////////
+	GLFWwindow* window;
 	VkInstance instance;
 	VkDebugUtilsMessengerEXT debugMessenger;
 	VkSurfaceKHR surface;
@@ -118,6 +119,7 @@ struct VulkanRenderAPI : p3dpge_vk::RenderAPI {
 	std::vector<VkFence> inFlightFences;
 	std::vector<VkFence> imagesInFlight;
 	size_t currentFrame = 0;
+	bool* framebufferResized;
 	
 	///////////////////////////////
 	//// user config variables ////
@@ -130,14 +132,6 @@ struct VulkanRenderAPI : p3dpge_vk::RenderAPI {
 	VkSampleCountFlagBits msaaSamples = VK_SAMPLE_COUNT_1_BIT;
 	uint32 mipLevels;
 	int MAX_FRAMES_IN_FLIGHT = 2;
-
-	/////////////////////////////////
-	//// pge interface functions ////
-	/////////////////////////////////
-
-	void Init() override { initVulkan(); }
-	void Draw() override { drawFrame(); }
-	void Cleanup() override { cleanupVulkan(); }
 
 	//////////////////////////
 	//// vulkan functions ////
@@ -261,7 +255,7 @@ struct VulkanRenderAPI : p3dpge_vk::RenderAPI {
 	//// utility functions ////
 	///////////////////////////
 
-	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
+	//static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
 	bool checkValidationLayerSupport();
 
